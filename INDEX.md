@@ -57,55 +57,20 @@
 
 ### Skills
 
-| Field | Value |
-|---|---|
-| `id` | `frontend-design` |
-| `type` | `skills` |
-| `canonical_location` | `/registry/skills/frontend-design` |
-| `status` | `active` |
-| `source_of_truth` | `/registry/skills/frontend-design/SKILL.md` |
-| `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
-
-| Field | Value |
-|---|---|
-| `id` | `pdf` |
-| `type` | `skills` |
-| `canonical_location` | `/registry/skills/pdf` |
-| `status` | `active` |
-| `source_of_truth` | `/registry/skills/pdf/SKILL.md` |
-| `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
-
-| Field | Value |
-|---|---|
-| `id` | `docx` |
-| `type` | `skills` |
-| `canonical_location` | `/registry/skills/docx` |
-| `status` | `active` |
-| `source_of_truth` | `/registry/skills/docx/SKILL.md` |
-| `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
-
-| Field | Value |
-|---|---|
-| `id` | `xlsx` |
-| `type` | `skills` |
-| `canonical_location` | `/registry/skills/xlsx` |
-| `status` | `active` |
-| `source_of_truth` | `/registry/skills/xlsx/SKILL.md` |
-| `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
-
-| Field | Value |
-|---|---|
-| `id` | `mcp-builder` |
-| `type` | `skills` |
-| `canonical_location` | `/registry/skills/mcp-builder` |
-| `status` | `active` |
-| `source_of_truth` | `/registry/skills/mcp-builder/SKILL.md` |
-| `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `pdf` | Core 8 | `/registry/skills/pdf` | `active` |
+| `docx` | Core 8 | `/registry/skills/docx` | `active` |
+| `xlsx` | Core 8 | `/registry/skills/xlsx` | `active` |
+| `pptx` | Core 8 | `/registry/skills/pptx` | `active` |
+| `mcp-builder` | Core 8 | `/registry/skills/mcp-builder` | `active` |
+| `skill-creator` | Core 8 | `/registry/skills/skill-creator` | `active` |
+| `webapp-testing` | Core 8 | `/registry/skills/webapp-testing` | `active` |
+| `doc-coauthoring` | Core 8 | `/registry/skills/doc-coauthoring` | `active` |
+| `frontend-design` | Expansion 4 | `/registry/skills/frontend-design` | `active` |
+| `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
+| `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
+| `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
 ### Workflow
 
