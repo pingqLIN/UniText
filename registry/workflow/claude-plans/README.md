@@ -4,7 +4,6 @@
 
 目前狀態：
 
-- workflow root 已建立
-- 尚未擴充成完整 catalog
+- 已補上 `WORKFLOW.md` 與 `PLAN_TEMPLATE.md`
 - 可作為後續 planning / runbook adoption 的第一個 canonical entry
-
+- 適合作為 workflow 類型的 review seed

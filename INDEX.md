@@ -96,6 +96,18 @@
 | `supported_clis` | `claude` |
 | `delivery_guidance` | Register through the MCP adapter; the final delivery mode depends on CLI capabilities and local environment. |
 
+### Agents
+
+| Field | Value |
+|---|---|
+| `id` | `registry-curator` |
+| `type` | `agents` |
+| `canonical_location` | `/registry/agents/registry-curator` |
+| `status` | `active` |
+| `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
+| `supported_clis` | `claude, codex, gemini` |
+| `delivery_guidance` | Use as a shared agent persona for review and adoption tasks; actual wiring depends on CLI capability. |
+
 ## 5. Example Catalog Entries
 
 ### Example: Skill

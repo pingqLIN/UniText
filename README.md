@@ -195,7 +195,9 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 | Core documentation | Stable |
 | Registry structure | Active — `skills/`, `mcp/`, `workflow/`, `agents/` roots present |
 | Skills registry | Active baseline — first canonical batch adopted, broader adoption still in progress |
-| Agents registry | Seeded — root created, entries pending |
+| Agents registry | Active seed — `registry-curator` entry created |
+| MCP registry | Draft seed — canonical example plus adoption notes present |
+| Workflow registry | Draft seed — workflow doc plus plan template present |
 | Operations audit trail | Active |
 | Sync and review scripts | Active baseline in `local/scripts/` |
 
