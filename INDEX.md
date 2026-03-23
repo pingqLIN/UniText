@@ -51,6 +51,10 @@
 
 ## 4. Current Catalog Entries
 
+### Review Shortlist
+
+目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
+
 ### Skills
 
 | Field | Value |

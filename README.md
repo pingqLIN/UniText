@@ -159,6 +159,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [OPERATIONS.md](OPERATIONS.md) | Delivery modes, triggers, and safety rules |
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Authoring repo vs. project template distinction |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
+| [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` essential skills set for the current review wave |
 
 Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md`
 
