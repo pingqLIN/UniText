@@ -1,8 +1,11 @@
 param(
-  [string]$Source = "Q:\\UniText\\registry\\skills"
+  [string]$Source = ""
 )
 
 $ErrorActionPreference = "Stop"
+$root = Resolve-Path (Join-Path $PSScriptRoot "..\\..")
+$resolvedSource = if ($Source) { (Resolve-Path $Source).Path } else { (Join-Path $root "registry\skills") }
+$expectedSuffix = [IO.Path]::Combine("registry", "skills")
 $targets = @(
   "$HOME\\.claude\\skills",
   "$HOME\\.gemini\\skills",
@@ -11,10 +14,10 @@ $targets = @(
 
 $report = @()
 $report += [pscustomobject]@{
-  path = $Source
+  path = $resolvedSource
   kind = "source"
-  exists = Test-Path $Source
-  attrs = if (Test-Path $Source) { (Get-Item $Source).Attributes.ToString() } else { $null }
+  exists = Test-Path $resolvedSource
+  attrs = if (Test-Path $resolvedSource) { (Get-Item $resolvedSource).Attributes.ToString() } else { $null }
   target = $null
 }
 
@@ -35,8 +38,8 @@ foreach ($path in $targets) {
     exists = $exists
     attrs = if ($item) { $item.Attributes.ToString() } else { $null }
     target = if ($item -and $item.LinkType) { $item.Target } else { $null }
-    expected_target = $Source
-    matches_expected = if ($item -and $item.LinkType) { $item.Target -eq $Source } else { $null }
+    expected_target = $expectedSuffix
+    matches_expected = if ($item -and $item.LinkType) { $item.Target -like "*$expectedSuffix" } else { $null }
   }
 }
 
