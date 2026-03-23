@@ -79,11 +79,17 @@ delivery 只能由明確 trigger 啟動：
 ## 6. Adoption Flow
 
 1. `SCAN`
+   - 掃描候選來源，列出可 adopt 的資源與 readiness 狀態
 2. `REVIEW`
+   - 依 review checklist 檢查 metadata、內容品質與 canonical source 合法性
 3. `DRY-RUN`
+   - 預覽 adopt 或 delivery 將修改哪些目標、是否需要 backup
 4. `ADOPT`
+   - 將來源內容寫入 registry canonical location，若覆寫既有內容需先 backup
 5. `DELIVER`
+   - 由 adapter 將 registry 內容送到對應 CLI，若會覆寫既有狀態需保留 log 與 backup
 6. `VERIFY`
+   - 驗證檔案存在性、路徑解析、delivery mode 與目標 CLI 載入條件是否成立
 
 ## 7. Operations State
 

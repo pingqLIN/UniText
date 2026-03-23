@@ -1,12 +1,18 @@
-# AI CLI Path Map (2026-02-28)
+# AI CLI Path Map (Archived 2026-02-28)
 
-> 狀態：Legacy Reference
-> 注意：本文件描述的是某一組既有部署的路徑對照，不是 `UniText` 的跨平台規格真相。邏輯契約請以 `VISION.md`、`RESOURCE_SPEC.md`、`OPERATIONS.md` 為準。
+> 狀態：Archived Legacy Reference
+> 注意：本文件描述的是舊部署對照，不是 `UniText` 的現行 canonical path 真相。現行 skills source 以 repo 內 `registry/skills/` 與 `local/scripts/` 的相對路徑邏輯為準。
 
 ## Unified Targets
-- Skills: `C:\Dev\UniText\skills`
+- Skills: `C:\Dev\UniText\skills`（舊）
 - MCP: `C:\Dev\UniText\mcp`
 - Workflow: `C:\Dev\UniText\workflow`
+
+## Current Direction
+
+- 現行 canonical skills source：`registry/skills/`
+- 現行 delivery 驗證目標：使用者家目錄下 `.claude/skills`、`.gemini/skills`、`.agents/skills`
+- 歷史 `C:\Dev\UniText\skills` 路徑應視為 pre-registry 版本
 
 ## Codex
 - Config file: `%USERPROFILE%\.codex\config.toml`

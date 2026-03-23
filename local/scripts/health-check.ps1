@@ -11,7 +11,11 @@ $required = @(
   "local\\scripts\\sync-skills.ps1",
   "local\\scripts\\scan-skills.ps1",
   "local\\scripts\\verify-delivery.ps1",
-  "local\\scripts\\batch-adopt-skills.ps1"
+  "local\\scripts\\batch-adopt-skills.ps1",
+  "local\\scripts\\generate-index-entries.ps1",
+  "local\\scripts\\rollback-skills.ps1",
+  "local\\docs\\ADOPTION_CHECKLIST.md",
+  "local\\docs\\ENVIRONMENT.md"
 )
 
 $missing = $required | Where-Object { -not (Test-Path $_) }
