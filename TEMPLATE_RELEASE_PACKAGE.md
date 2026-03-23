@@ -42,6 +42,13 @@
   - `registry/agents/example-agent/`
   - `registry/mcp/example-mcp/`
   - `registry/workflow/example-workflow/`
+- starter local overlay skeleton
+  - `local/README.md`
+  - `local/docs/PATH_MAP.md`
+  - `local/scripts/sync-skills.ps1`
+- release metadata
+  - `manifest.json`
+  - `release.json`
 
 ## 3. Exclude
 
@@ -82,6 +89,12 @@ ops/template-package/template_YYYYMMDD_HHMMSS/
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-template-package.ps1 -DryRun
 ```
 
+若要驗證輸出的 package：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
+```
+
 ## 5. Export Interpretation
 
 匯出的 template package 代表：
@@ -105,11 +118,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 - reviewer-facing entry docs
 - template release cleanup baseline
 - 可重複產出 template package 的 export script
+- starter local overlay skeleton
+- template package verification script
+- release metadata
 
 因此目前最適合的判讀是：
 
-**template release cleanup in progress**
+**template release candidate**
 
 而不是：
 
-**final template release ready**
+**authoring workspace snapshot**

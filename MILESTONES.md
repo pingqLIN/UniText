@@ -40,6 +40,8 @@
 - template export 流程已文件化
 - `TEMPLATE_RELEASE_PACKAGE.md` 與 `TEMPLATE_RELEASE_CHECKLIST.md` 已存在
 - `local/scripts/export-template-package.ps1` 可重複產出 starter package
+- `local/scripts/verify-template-package.ps1` 可驗證 starter package 結構
 - 已有 template-safe generic examples 可覆蓋 `skills`、`mcp`、`agents`、`workflow`
+- 已有 template-safe `local/` skeleton
 - canonical resource coverage 持續擴張到 `skills`、`mcp`、`agents`、`workflow`
 - 至少 2 個 CLI 實際通過 delivery 驗證

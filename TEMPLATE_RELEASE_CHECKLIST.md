@@ -25,19 +25,22 @@
 - [ ] 至少 1 個 generic agent example
 - [ ] 至少 1 個 generic mcp example
 - [ ] 至少 1 個 generic workflow example
+- [ ] 至少 1 份 generic local overlay skeleton
 
 ## 4. Validation
 
 - [ ] `health-check.ps1` 可通過
 - [ ] `export-template-package.ps1 -DryRun` 可列出 package 內容
 - [ ] `export-template-package.ps1` 可成功產出 package
+- [ ] `verify-template-package.ps1` 可通過
 - [ ] package 內含 `manifest.json`
+- [ ] package 內含 `release.json`
 
 ## 5. Release Call
 
 若以上項目都完成，可視為：
 
-**適合進入 template release 候選階段**
+**適合視為 template release candidate**
 
 若仍有 local-only 邊界不清、examples 不完整、或 CLI 驗證不足，則仍應視為：
 

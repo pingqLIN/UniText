@@ -74,6 +74,8 @@
 
 若要整理成乾淨的 starter package，請看 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 並使用 `local/scripts/export-template-package.ps1`。
 
+若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
+
 ### Skills
 
 | `id` | Tier | `canonical_location` | `status` |

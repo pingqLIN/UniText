@@ -22,6 +22,8 @@
   - 將外部審查所需的 cover note、highlights、核心文件、精選 registry entries 與最小 scripts 匯出到 `ops/review-package/`
 - `export-template-package.ps1`
   - 將 template-safe docs、generic examples 與 starter layout 匯出到 `ops/template-package/`
+- `verify-template-package.ps1`
+  - 驗證輸出的 template package 是否包含必要 starter 結構，且不含 review-only / local-only 內容
 
 ## Governance Note
 

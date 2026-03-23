@@ -21,6 +21,7 @@ $required = @(
   "local\\scripts\\rollback-skills.ps1",
   "local\\scripts\\export-review-package.ps1",
   "local\\scripts\\export-template-package.ps1",
+  "local\\scripts\\verify-template-package.ps1",
   "local\\docs\\ADOPTION_CHECKLIST.md",
   "local\\docs\\ENVIRONMENT.md",
   "local\\docs\\authoring\\README.md",
@@ -30,7 +31,10 @@ $required = @(
   "template\\examples\\skills\\example-skill\\SKILL.md",
   "template\\examples\\agents\\example-agent\\AGENT.md",
   "template\\examples\\mcp\\example-mcp\\definition.json",
-  "template\\examples\\workflow\\example-workflow\\WORKFLOW.md"
+  "template\\examples\\workflow\\example-workflow\\WORKFLOW.md",
+  "template\\examples\\local\\README.md",
+  "template\\examples\\local\\docs\\PATH_MAP.template.md",
+  "template\\examples\\local\\scripts\\sync-skills.template.ps1"
 )
 
 $missing = $required | Where-Object { -not (Test-Path $_) }

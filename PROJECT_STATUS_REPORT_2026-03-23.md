@@ -68,6 +68,9 @@
   - `TEMPLATE_RELEASE_PACKAGE.md`
   - `TEMPLATE_RELEASE_CHECKLIST.md`
   - `local/scripts/export-template-package.ps1`
+- template release verification 與 local overlay skeleton 已補齊：
+  - `local/scripts/verify-template-package.ps1`
+  - `template/examples/local/`
 - template-safe generic examples 已建立：
   - `template/examples/skills/example-skill/`
   - `template/examples/agents/example-agent/`
@@ -83,6 +86,7 @@
 - 外部審查資料已可透過 review package 流程重複產出，不再只依賴人工整理。
 - 審查者現在已有最短入口文件，不必先自行消化完整 status report 才能理解專案定位。
 - template package 也已可重複產出，但仍屬 cleanup baseline，而非最終 release 版。
+- template package 已具備 release metadata、local skeleton 與獨立驗證腳本，完成度已接近 release candidate。
 - `mcp`、`workflow`、`agents` 雖已不是空殼，但仍屬 seed 狀態，尚未形成完整 coverage。
 
 ### 3. 已有的可驗證成果
@@ -125,6 +129,7 @@
 9. 完成 reviewer-facing package guide 與可重複匯出流程
 10. 完成 reviewer-facing cover note 與 highlights summary
 11. 完成 template release cleanup guide、checklist、export flow 與 generic examples
+12. 完成 template package verification 與 local overlay skeleton
 
 ### 尚未達成的里程碑
 
@@ -177,16 +182,15 @@
 - 哪一天完成哪個里程碑
 - 目前與上一版相比差了哪些差異
 
-### 6. template release cleanup 已開始，但仍未完整產品化
+### 6. template release 已接近候選版，但仍未完整產品化
 
-雖然目前已經具備 reviewer-facing package guide、template cleanup guide 與兩條 export flow，但仍未完成：
+雖然目前已經具備 reviewer-facing package guide、template cleanup guide、兩條 export flow、verification script 與 local skeleton，但仍未完成：
 
-- template-safe export 的最終版型
 - local-only state 的全面清除策略
 - 對外 release artifact 的固定結構與版本標記
-- template package 內建 local overlay 範例的最終抽象化程度
+- `agents / mcp / workflow` 從 seed 到更完整 baseline 的深度補強
 
-也就是說，專案已經到達「可整理外部審查資料」與「可做 template release cleanup」階段，但還沒到「可直接當 release template 發布」階段。
+也就是說，專案已經到達「可整理外部審查資料」與「template release candidate 可產出」階段，但仍有少量產品化收尾空間。
 
 ## 五、整體判斷
 
@@ -195,10 +199,10 @@
 | 層次 | 目前狀態 | 判讀 |
 |---|---|---|
 | Concept / Architecture | 高 | 已相對成熟 |
-| Governance / Documentation | 高 | 已可作為 template base，並支撐 review package 與 template cleanup |
+| Governance / Documentation | 高 | 已可作為 template base，並支撐 review package 與 template release candidate |
 | Canonical Resource Adoption | 中高 | skills 主集已成形，其他資源類型已有 seed |
 
-綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 已到達可整理外部審查資料階段、Phase 4 已進入 template release cleanup baseline，但尚未 final release ready 的專案**。
+綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 已到達可整理外部審查資料階段、Phase 4 已可產出 template release candidate 的專案**。
 
 換句話說，這不是「還在想」的專案，而是「已經把規則、結構與治理框架搭好，正要進入大規模納管與產品化整理」的專案。
 

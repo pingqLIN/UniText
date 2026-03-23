@@ -206,7 +206,7 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 | Operations audit trail | Active |
 | Sync and review scripts | Active baseline in `local/scripts/` |
 | External review package | Active baseline — reviewer guide and export script present |
-| Template release cleanup | Active baseline — template package guide, checklist, export script, and generic examples present |
+| Template release cleanup | Release candidate — template package guide, checklist, export + verify scripts, generic examples, and local overlay skeleton present |
 
 ---
 
