@@ -61,6 +61,9 @@
 - reviewer-facing package guide 與 export script 已補齊：
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `local/scripts/export-review-package.ps1`
+- reviewer-facing entry docs 已補齊：
+  - `EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
 
 ### 2. 進行中項目
 
@@ -69,6 +72,7 @@
   - Agents registry：已從空 root 推進到第一個 active seed
 - `local/docs/authoring/` 中存在比根目錄更完整的 authoring 文件，代表目前仍處於「整理模板版」與「保留作者工作版」並行的過渡期。
 - 外部審查資料已可透過 review package 流程重複產出，不再只依賴人工整理。
+- 審查者現在已有最短入口文件，不必先自行消化完整 status report 才能理解專案定位。
 - `mcp`、`workflow`、`agents` 雖已不是空殼，但仍屬 seed 狀態，尚未形成完整 coverage。
 
 ### 3. 已有的可驗證成果
@@ -109,6 +113,7 @@
 7. 完成 Git 初始化與最小審查腳本補齊
 8. 完成第一個 agent entry 與 mcp / workflow seeds 補強
 9. 完成 reviewer-facing package guide 與可重複匯出流程
+10. 完成 reviewer-facing cover note 與 highlights summary
 
 ### 尚未達成的里程碑
 

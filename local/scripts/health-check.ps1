@@ -9,6 +9,8 @@ $required = @(
   "PROJECT_MODES.md",
   "MILESTONES.md",
   "EXTERNAL_REVIEW_PACKAGE.md",
+  "EXTERNAL_REVIEW_COVER_NOTE.md",
+  "EXTERNAL_REVIEW_HIGHLIGHTS.md",
   "local\\scripts\\sync-skills.ps1",
   "local\\scripts\\scan-skills.ps1",
   "local\\scripts\\verify-delivery.ps1",

@@ -18,14 +18,16 @@
 
 建議外部審查者依以下順序閱讀：
 
-1. `README.md`
-2. `INDEX.md`
-3. `VISION.md`
-4. `RESOURCE_SPEC.md`
-5. `OPERATIONS.md`
-6. `MILESTONES.md`
-7. `PROJECT_STATUS_REPORT_2026-03-23.md`
-8. `ESSENTIAL_SKILLS_SHORTLIST.md`
+1. `EXTERNAL_REVIEW_COVER_NOTE.md`
+2. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+3. `README.md`
+4. `INDEX.md`
+5. `VISION.md`
+6. `RESOURCE_SPEC.md`
+7. `OPERATIONS.md`
+8. `MILESTONES.md`
+9. `PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 若要看實際資源樣本，再往下看：
 
@@ -40,6 +42,8 @@
 目前 review package 應包含以下內容：
 
 - 核心文件
+  - `EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
   - `README.md`
   - `INDEX.md`
   - `VISION.md`
@@ -121,6 +125,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 
 截至 2026-03-24，`UniText` 已具備：
 
+- reviewer-facing cover note 與 highlights summary
 - 外部審查可讀的核心文件
 - `8 + 4` 精選 skills 主集
 - agent / mcp / workflow 的最小可審查 seed

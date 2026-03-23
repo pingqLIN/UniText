@@ -16,6 +16,8 @@
 5. `PROJECT_MODES.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_PACKAGE.md`
+8. `EXTERNAL_REVIEW_COVER_NOTE.md`
+9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
 
 ## 2. Resource Catalog
 
@@ -60,6 +62,11 @@
 ### Review Package
 
 若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
+
+若要直接給審查者最短入口，請先看：
+
+- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
+- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Skills
 

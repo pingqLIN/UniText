@@ -26,6 +26,7 @@
 - `.gitignore` 已排除 local-only 與大型歷史產物
 - `README.md`、`INDEX.md`、`PROJECT_STATUS_REPORT_2026-03-23.md` 三者狀態一致
 - `EXTERNAL_REVIEW_PACKAGE.md` 已定義審查範圍、閱讀順序與排除項目
+- `EXTERNAL_REVIEW_COVER_NOTE.md` 與 `EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
 - `local/scripts/export-review-package.ps1` 可重複產出 review package
 - 外部審查可直接看到：
   - 核心架構文件

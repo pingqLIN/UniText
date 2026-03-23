@@ -19,7 +19,7 @@
 - `rollback-skills.ps1`
   - 從 `ops/history/adopt_*` 的 backup 回復指定 skill
 - `export-review-package.ps1`
-  - 將外部審查所需的核心文件、精選 registry entries 與最小 scripts 匯出到 `ops/review-package/`
+  - 將外部審查所需的 cover note、highlights、核心文件、精選 registry entries 與最小 scripts 匯出到 `ops/review-package/`
 
 ## Governance Note
 

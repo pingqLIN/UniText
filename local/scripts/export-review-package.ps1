@@ -27,6 +27,8 @@ $expansionSkills = @(
   "theme-factory"
 )
 $items = @(
+  [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_COVER_NOTE.md" },
+  [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_HIGHLIGHTS.md" },
   [pscustomobject]@{ kind = "file"; path = "README.md" },
   [pscustomobject]@{ kind = "file"; path = "INDEX.md" },
   [pscustomobject]@{ kind = "file"; path = "VISION.md" },
