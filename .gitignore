@@ -6,4 +6,4 @@ ops/history/drift_*/
 ops/history/inventory_*/
 ops/history/unify_*/
 ops/history/set_setting_*/
-
+ops/review-package/

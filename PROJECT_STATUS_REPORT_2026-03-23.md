@@ -1,6 +1,6 @@
 # UniText 專案開發進度報告
 
-> 報告日期：2026-03-23
+> 報告日期：2026-03-24
 > 報告性質：專案現況盤點 / Status Report
 > 盤點範圍：目前 workspace 內可見文件、`registry/`、`local/`、`ops/` 產物
 
@@ -20,7 +20,7 @@
 
 - 將精選主集以外的 skills 納管策略收斂清楚
 - 將 `mcp`、`agents`、`workflow` 從 seed 推進到更完整的 active baseline
-- 從「外部審查可讀」推進到「template release ready」
+- 從「已可整理外部審查資料」推進到「template release ready」
 
 ## 二、目前進度判讀
 
@@ -58,6 +58,9 @@
 - `agents` 已補上第一個可審查 entry：`registry-curator`
 - `mcp` seed 已補上說明文件與 adoption notes
 - `workflow` seed 已補上 workflow doc 與 plan template
+- reviewer-facing package guide 與 export script 已補齊：
+  - `EXTERNAL_REVIEW_PACKAGE.md`
+  - `local/scripts/export-review-package.ps1`
 
 ### 2. 進行中項目
 
@@ -65,6 +68,7 @@
   - Skills registry：已從首批 adoption 進一步收斂為 `8 + 4` 審查主集
   - Agents registry：已從空 root 推進到第一個 active seed
 - `local/docs/authoring/` 中存在比根目錄更完整的 authoring 文件，代表目前仍處於「整理模板版」與「保留作者工作版」並行的過渡期。
+- 外部審查資料已可透過 review package 流程重複產出，不再只依賴人工整理。
 - `mcp`、`workflow`、`agents` 雖已不是空殼，但仍屬 seed 狀態，尚未形成完整 coverage。
 
 ### 3. 已有的可驗證成果
@@ -104,6 +108,7 @@
 6. 完成 `8 + 4` 審查主集 adoption
 7. 完成 Git 初始化與最小審查腳本補齊
 8. 完成第一個 agent entry 與 mcp / workflow seeds 補強
+9. 完成 reviewer-facing package guide 與可重複匯出流程
 
 ### 尚未達成的里程碑
 
@@ -156,15 +161,15 @@
 - 哪一天完成哪個里程碑
 - 目前與上一版相比差了哪些差異
 
-### 6. 缺少可量化成功標準
+### 6. release packaging 尚未完整產品化
 
-目前文件清楚說明了 UniText「應該長什麼樣子」，但還沒有明確定義：
+雖然目前已經具備 reviewer-facing package guide 與 export script，但仍未完成：
 
-- Phase 1 完成的量化條件
-- MVP 應包含哪些最小可交付內容
-- 哪些驗證通過後才能算完成 adoption / delivery
+- template-safe export 的最終版型
+- local-only state 的全面清除策略
+- 對外 release artifact 的固定結構與版本標記
 
-這會讓專案容易持續增加設計與文件，但難以判定某一階段是否真正完成。
+也就是說，專案已經到達「可整理外部審查資料」階段，但還沒到「可直接當 release template 發布」階段。
 
 ## 五、整體判斷
 
@@ -173,10 +178,10 @@
 | 層次 | 目前狀態 | 判讀 |
 |---|---|---|
 | Concept / Architecture | 高 | 已相對成熟 |
-| Governance / Documentation | 高 | 已可作為 template base |
+| Governance / Documentation | 高 | 已可作為 template base，並可整理外部審查資料 |
 | Canonical Resource Adoption | 中高 | skills 主集已成形，其他資源類型已有 seed |
 
-綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 接近但尚未 fully hardened 的專案**。
+綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 已到達可整理外部審查資料階段，但尚未 fully hardened 的專案**。
 
 換句話說，這不是「還在想」的專案，而是「已經把規則、結構與治理框架搭好，正要進入大規模納管與產品化整理」的專案。
 
@@ -265,6 +270,7 @@
 2. 再補內容：精選 skills 主集正式進 registry
 3. 再補工具：scan / verify / batch adopt / safer sync / rollback / index generation
 4. 再補平衡：agents / mcp / workflow review seeds
-5. 最後補發布治理：template export、local-only cleanup、release packaging
+5. 再補審查整理：review package export 與 reviewer-facing guide
+6. 最後補發布治理：template export、local-only cleanup、release packaging
 
 整體來看，外部審核不是推翻目前的進度判斷，而是把原本的結論再推進一步：**UniText 現在最需要的不是更多設計，而是把既有設計快速轉成可驗證、可持續、可交付的實作成果。**

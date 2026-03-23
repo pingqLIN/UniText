@@ -160,8 +160,9 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Authoring repo vs. project template distinction |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
 | [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` essential skills set for the current review wave |
+| [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
 
-Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md`
+Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md`
 
 ---
 
@@ -200,6 +201,7 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 | Workflow registry | Draft seed — workflow doc plus plan template present |
 | Operations audit trail | Active |
 | Sync and review scripts | Active baseline in `local/scripts/` |
+| External review package | Active baseline — reviewer guide and export script present |
 
 ---
 

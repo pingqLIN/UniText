@@ -14,6 +14,8 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
+6. `MILESTONES.md`
+7. `EXTERNAL_REVIEW_PACKAGE.md`
 
 ## 2. Resource Catalog
 
@@ -54,6 +56,10 @@
 ### Review Shortlist
 
 目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
+
+### Review Package
+
+若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
 
 ### Skills
 
