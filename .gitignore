@@ -1,0 +1,9 @@
+backup/
+recovered_*/
+.bak_*/
+ops/history/backup_*/
+ops/history/drift_*/
+ops/history/inventory_*/
+ops/history/unify_*/
+ops/history/set_setting_*/
+

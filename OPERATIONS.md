@@ -1,0 +1,111 @@
+# UniText — Operations
+
+> 狀態：Template Base
+> 角色：定義 adapter / operations control plane 的責任、delivery 規則與安全邊界。
+
+所有 delivery 與 mutation 都應以 `UniText` 的純文本 registry / spec 契約為 source of truth。
+
+## 1. Scope
+
+本文件涵蓋：
+
+- adapter responsibilities
+- delivery modes
+- delivery triggers
+- adoption flow
+- drift / repair
+- logical-to-physical mapping
+
+本文件不涵蓋：
+
+- shared resource metadata schema
+- 單一平台的唯一實作方式
+- 本機 authoring repo 的歷史狀態
+
+## 2. Delivery Modes
+
+| Mode | When to use |
+|---|---|
+| `pointer` | discovery 或非機器註冊型資源 |
+| `mirror` | CLI 需要本地副本、或 symlink 不穩定 |
+| `symlink` | CLI 需要固定路徑，且環境支援穩定連結 |
+| `native-config` | CLI 有正式設定入口可註冊資源 |
+
+`delivery mode` 由 adapter 在操作時解析，不是資源的固定硬屬性。
+
+## 3. Delivery Resolution Rules
+
+adapter 應依優先序考慮：
+
+1. 有正式設定入口時，優先 `native-config`
+2. 需要固定路徑且平台支援穩定連結時，用 `symlink`
+3. 無法安全使用 symlink 時，用 `mirror`
+4. 主要用途是 discovery 或入口時，用 `pointer`
+
+## 4. Delivery Triggers
+
+delivery 只能由明確 trigger 啟動：
+
+- `bootstrap`
+- `sync`
+- `adopt`
+- `repair`
+
+## 5. Safety Rules
+
+### Dry-Run First
+
+以下操作應先產出 dry-run plan：
+
+- `adopt`
+- `repair`
+- 會覆寫既有狀態的 `sync`
+
+### Backup Before Mutation
+
+所有破壞性操作都應具備：
+
+- backup 或等價回復點
+- 可追溯的操作記錄
+- 失敗時的停止條件
+
+### No Silent Canonicalization
+
+若遇到同名異內容資源：
+
+- 必須停在 review
+- 必須讓 operator 明確決定 canonical source
+
+## 6. Adoption Flow
+
+1. `SCAN`
+2. `REVIEW`
+3. `DRY-RUN`
+4. `ADOPT`
+5. `DELIVER`
+6. `VERIFY`
+
+## 7. Operations State
+
+以下內容屬於 operations state，而非 shared resources：
+
+- inventories
+- baselines
+- backups
+- drift reports
+- repair plans
+- audit trails
+
+它們應位於 `/operations`，不應混入 `/registry`。
+
+## 8. Logical-to-Physical Mapping
+
+邏輯路徑是穩定契約；實體路徑是 deployment-specific mapping。
+
+| Logical area | Meaning | Physical mapping examples |
+|---|---|---|
+| `/registry/skills` | canonical skill sources | shared directory、repo subdir、mounted path |
+| `/registry/mcp` | canonical MCP definitions | config folder、generated manifest root |
+| `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
+| `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |
+| `/operations` | inventories、backups、drift logs | ops folder、state store、audit directory |

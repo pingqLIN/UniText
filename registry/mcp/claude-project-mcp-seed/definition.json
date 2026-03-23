@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "example-local-server": {
+      "transport": "stdio",
+      "command": "node",
+      "args": [
+        "path/to/server.js"
+      ],
+      "notes": "Example canonical seed. Replace with a real server definition during adoption."
+    }
+  }
+}
+

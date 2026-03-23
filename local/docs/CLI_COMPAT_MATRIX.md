@@ -1,0 +1,19 @@
+# CLI Compatibility Matrix
+
+> 狀態：Working Draft
+> 最後更新：2026-03-23
+
+| CLI | 版本基準 | UniText 依賴行為 | 目前狀態 | 最後驗證 |
+|---|---|---|---|---|
+| Claude Code | 2.1.63 | 讀取 `~/.claude/skills`、支援 project `.mcp.json` | 待重新驗證 | 2026-03-02 |
+| Codex CLI | 0.106.0 | 從 `config.toml` 的 `skills_path` 讀取 skills | 待重新驗證 | 2026-03-02 |
+| Gemini CLI | 0.31.0 | 讀取 `~/.gemini/skills` 與 `~/.agents/skills` | 待重新驗證 | 2026-03-02 |
+| GitHub CLI | 2.87.3 | workflow 僅作參考，無 native skills 支援 | 已知限制 | 2026-03-02 |
+| VS Code | 1.109.5 | 非直接 resource consumer，主要作 authoring environment | 已知限制 | 2026-03-02 |
+| Windsurf | 1.108.2 | 非直接 resource consumer，主要作 authoring environment | 已知限制 | 2026-03-02 |
+
+## Notes
+
+- 這份矩陣記錄的是 UniText 當前依賴的 CLI 行為，而不是各 CLI 的完整能力。
+- 每次 major version 變更後，應至少重新驗證一次 skills 與 mcp delivery。
+

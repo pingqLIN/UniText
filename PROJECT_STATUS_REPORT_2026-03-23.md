@@ -1,0 +1,261 @@
+# UniText 專案開發進度報告
+
+> 報告日期：2026-03-23
+> 報告性質：專案現況盤點 / Status Report
+> 盤點範圍：目前 workspace 內可見文件、`registry/`、`local/`、`ops/` 產物
+
+## 一、執行摘要
+
+`UniText` 目前已完成「概念定義、核心規格、治理邊界、本機 overlay 結構」等基礎建設，整體已脫離單純構想階段，進入可持續演進的 **template base + authoring scaffold** 狀態。
+
+外部審核文件 `C:\Dev\UniText\STRATEGIC_REVIEW_2026-03-23.md` 的判讀與本報告主結論一致：專案的架構與治理設計成熟，但執行落地、資源納管與自動化工具仍明顯落後。
+
+若以開發階段來看，專案目前最成熟的是：
+
+- 核心文件與設計原則
+- registry-first / operations-governed 架構定義
+- 本機部署與歷史操作留痕機制
+
+目前尚未完成、也是下一階段主軸的部分是：
+
+- 擴大 `skills` 正式納管覆蓋率
+- `agents` registry 建立
+- 從「文件與治理骨架」推進到「完整可運行的 canonical resource catalog」
+
+## 二、目前進度判讀
+
+### 1. 已完成項目
+
+- 核心文件骨架已建立完成：
+  - `README.md`
+  - `INDEX.md`
+  - `VISION.md`
+  - `RESOURCE_SPEC.md`
+  - `OPERATIONS.md`
+  - `PROJECT_MODES.md`
+- `registry/` 已建立 canonical roots，至少包含：
+  - `registry/skills/`
+  - `registry/mcp/`
+  - `registry/agents/`
+  - `registry/workflow/`
+- `local/` 與核心規格已明確分層，表示專案已完成一輪結構重整：
+  - `local/docs/`
+  - `local/scripts/`
+  - `local/docs/authoring/`
+- operations 治理痕跡存在，顯示曾實際執行過 inventory / backup / drift / unify 類操作，而不只是紙上設計。
+- 本機同步腳本已存在，代表至少有一條 skills delivery 路徑被做成 reference implementation。
+- Git repository 已初始化，專案已從不可追蹤狀態進入可版本化狀態。
+- 首批 5 個 skills 已完成 canonical adoption：
+  - `frontend-design`
+  - `pdf`
+  - `docx`
+  - `xlsx`
+  - `mcp-builder`
+- 最小 operations scripts 已補齊：
+  - `scan-skills.ps1`
+  - `verify-delivery.ps1`
+  - `health-check.ps1`
+  - `batch-adopt-skills.ps1`
+
+### 2. 進行中項目
+
+- `README.md` 已明確標示：
+  - Skills registry：已從純規劃轉為「first canonical batch adopted」
+  - Agents registry：已建立 root，entries 仍待補
+- `local/docs/authoring/` 中存在比根目錄更完整的 authoring 文件，代表目前仍處於「整理模板版」與「保留作者工作版」並行的過渡期。
+- 家目錄下既有 skills symlink 仍指向舊的 `AI_UNIFIED` 路徑，尚未完成環境級修正。
+
+### 3. 已有的可驗證成果
+
+- `ops/history/` 目前可見 14 組歷史目錄，包含：
+  - `backup_*`
+  - `drift_*`
+  - `inventory_*`
+  - `unify_*`
+  - `set_setting_*`
+- `ops/inventory.latest.json` 顯示此專案曾盤點多個 CLI / runtime：
+  - Codex
+  - Claude Code
+  - Gemini CLI
+  - GitHub CLI
+  - VS Code
+  - Windsurf
+  - Python / Node / Docker / WSL 等執行環境
+- `local/scripts/sync-skills.ps1` 已提供可執行的 skills mirror 流程，顯示本機對接不是停留在概念層。
+- `local/scripts/health-check.ps1` 已回報：
+  - adopted skills = `5`
+  - invalid skills = `0`
+  - overall check = `ok`
+
+## 三、里程碑判斷
+
+### 已達成的里程碑
+
+1. 完成專案定位與架構定義
+2. 完成 shared resource 最小契約定義
+3. 完成 operations safety model 與 adoption flow 定義
+4. 完成 local overlay 與 template core 的責任切分
+5. 建立初步 registry roots 與本機 delivery 參考腳本
+6. 完成首批 5 個 canonical skills adoption
+7. 完成 Git 初始化與最小審查腳本補齊
+
+### 尚未達成的里程碑
+
+1. 擴大 `skills` canonical registry 覆蓋率
+2. `agents` canonical registry 正式上線
+3. 建立更完整的 catalog coverage，而非僅有首批 entries
+4. 將 authoring state 與 template-safe 發布內容徹底分離
+5. 完成環境級 delivery 修正與實際 CLI 驗證
+
+## 四、目前風險與缺口
+
+### 1. 模板化與作者工作區仍有混線
+
+雖然 `PROJECT_MODES.md` 已定義 template 與 local development project 的區別，但目前 repo 內仍可見：
+
+- `backup/`
+- `recovered_20260318_165117/`
+- `ops/history/`
+
+這表示專案已經知道應該如何分離，但實際內容還未完全收斂成乾淨的對外 template 形態。
+
+### 2. canonical layout 與 legacy deployment 描述尚未完全一致
+
+目前根目錄主張的是 `registry/` 架構；但 `local/docs/PATH_MAP.md` 和 `ops/inventory.latest.json` 中仍保留了較早期的 `C:\Dev\UniText\skills`、`C:\Dev\UniText\mcp`、`C:\Dev\UniText\workflow` 路徑觀念。
+
+這代表：
+
+- 架構思路已升級
+- 但部分 deployment 說明與歷史盤點仍停留在前一版心智模型
+
+### 3. 環境級 delivery 尚未與 repo 狀態完全對齊
+
+目前 repo 內腳本與 canonical source 已改為 `registry/skills`，但驗證腳本顯示使用者家目錄下的既有 skills symlink 仍指向舊的 `AI_UNIFIED` 路徑。這代表 repo 已準備好，但環境級切換還沒完成。
+
+### 4. 核心 use case 還沒有完全穿透到 registry 層
+
+專案的主要價值主張之一是「共享 skills / mcp / agents / workflow」，目前已有首批 5 個 skills 進入 `registry/skills/`，但整體 canonical content coverage 仍不足以代表 full adoption。
+
+### 5. 缺少完整歷史提交脈絡
+
+雖然 repo 已於本次整理中初始化 Git，但目前仍缺少持續性的 commit history，因此這份報告能依據的長期證據主要還是：
+
+- 文件內容
+- 目錄結構
+- `ops/` 歷史產物
+
+可用來判斷「進展」，但不利於精準還原：
+
+- 每一階段由誰完成
+- 哪一天完成哪個里程碑
+- 目前與上一版相比差了哪些差異
+
+### 6. 缺少可量化成功標準
+
+目前文件清楚說明了 UniText「應該長什麼樣子」，但還沒有明確定義：
+
+- Phase 1 完成的量化條件
+- MVP 應包含哪些最小可交付內容
+- 哪些驗證通過後才能算完成 adoption / delivery
+
+這會讓專案容易持續增加設計與文件，但難以判定某一階段是否真正完成。
+
+## 五、整體判斷
+
+若把專案切成三個層次來看：
+
+| 層次 | 目前狀態 | 判讀 |
+|---|---|---|
+| Concept / Architecture | 高 | 已相對成熟 |
+| Governance / Documentation | 高 | 已可作為 template base |
+| Canonical Resource Adoption | 中 | 已有首批內容，但尚未 fully onboard |
+
+綜合判斷：`UniText` 目前屬於 **基礎架構已成形、已跨入首批內容落地、但尚未完成全面納管的 Phase 2 起步專案**。
+
+換句話說，這不是「還在想」的專案，而是「已經把規則、結構與治理框架搭好，正要進入大規模納管與產品化整理」的專案。
+
+## 六、建議下一步
+
+### 優先順序 1
+
+擴大 `registry/skills/` adoption 覆蓋率，把剩餘高價值 skills 轉成可被 catalog 發現、可被 adoption flow 管理的 canonical entries。
+
+### 優先順序 2
+
+建立 `registry/agents/` 的第一個最小 entry，補上 shared resource 類型的完整度，讓架構宣稱和實際內容一致。
+
+### 優先順序 3
+
+整理 `local/docs/PATH_MAP.md`、`ops/inventory.latest.json` 與目前 `registry/` 架構之間的差異，並完成家目錄 skills symlink 的環境級修正。
+
+### 優先順序 4
+
+把目前 repo 再切乾淨一次，將：
+
+- template-safe 內容
+- local-only state
+- recovery / backup artifacts
+
+做更明確的邊界分離，讓對外發布版本更乾淨。
+
+### 優先順序 5
+
+新增 `MILESTONES.md`，把目前的進度描述轉成可量化的 Definition of Done，例如：
+
+- adopted skills 數量
+- 已驗證 CLI 數量
+- delivery 驗證通過條件
+- template 發布前需要清掉的 local-only artifacts
+
+## 七、報告假設
+
+本報告採用以下假設：
+
+- 受眾為內部協作成員或專案 owner
+- 目的為盤點當前開發成熟度，而非對外行銷
+- 依據以目前 workspace 可見內容為主，未額外驗證腳本執行結果
+
+因此，本文最適合用於：
+
+- 週報 / 專案更新
+- 里程碑回顧
+- 下一階段規劃對齊
+
+若要再往管理層版本收斂，可把本報告壓縮成「已完成 / 風險 / 下週重點」三段式摘要。
+
+## 八、外部審核對照重點
+
+參考 `C:\Dev\UniText\STRATEGIC_REVIEW_2026-03-23.md`，外部觀點對本專案的補強重點如下：
+
+### 1. 外部審核確認的強項
+
+- `Registry-first, adapter-enabled, operations-governed` 的三層責任切分是正確且成熟的
+- `No Silent Changes` 的治理哲學具有清楚差異化價值
+- 六份核心文件的完整度，已接近可作為 template base 對外發布的水準
+- `ops/history/` 的 14 組歷史資料，使專案具備真實操作軌跡，而非僅是概念設計
+
+### 2. 外部審核放大的核心問題
+
+- 設計完成度高，但實施完成度偏低，存在明顯的「設計與落地倒掛」
+- `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VERIFY` 雖已定義，但目前只有少量腳本支撐
+- `skills` adoption 長期停滯，代表目前納管流程成本過高
+- 缺少 Git 版本控制，讓所有治理與備份能力都少了一層真正可靠的安全網
+
+### 3. 外部審核建議的最高優先回應
+
+1. 立即建立 Git 版本控制
+2. 先完成第一批 `skills` 遷入 `registry/skills/`
+3. 修正 `sync-skills.ps1` 的來源路徑與安全機制
+4. 建立批次 adoption 腳本，降低 27 個 skills 的人工門檻
+5. 新增 `MILESTONES.md`，補齊成功標準
+
+## 九、整合後建議結論
+
+若同時納入內部盤點與外部審核，UniText 現階段最合理的策略不是再擴張架構，而是進入一段明確的執行衝刺期：
+
+1. 先補安全網：Git 初始化與 baseline commit
+2. 再補內容：首批 skills 正式進 registry
+3. 再補工具：scan / verify / batch adopt / safer sync
+4. 最後補發布治理：milestones、template export、local-only cleanup
+
+整體來看，外部審核不是推翻目前的進度判斷，而是把原本的結論再推進一步：**UniText 現在最需要的不是更多設計，而是把既有設計快速轉成可驗證、可持續、可交付的實作成果。**

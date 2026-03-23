@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -type f -name *.json -o -name *.toml -o -name *.yaml -o -name *.yml)",
+      "Bash(find . -type f \\\\\\(-name *.py -o -name *.js -o -name *.ts -o -name *.sh -o -name *.ps1 \\\\\\))",
+      "mcp__MCP_DOCKER__read_file"
+    ]
+  }
+}
