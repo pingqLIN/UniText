@@ -1,0 +1,10 @@
+{
+  "id": "example-mcp",
+  "status": "draft",
+  "transport": "stdio",
+  "command": "example-mcp-server",
+  "args": [
+    "--stdio"
+  ],
+  "description": "Template-safe example MCP definition for a starter UniText package."
+}

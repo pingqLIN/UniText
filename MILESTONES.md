@@ -38,5 +38,8 @@
 
 - local-only artifacts 不進入發佈包
 - template export 流程已文件化
+- `TEMPLATE_RELEASE_PACKAGE.md` 與 `TEMPLATE_RELEASE_CHECKLIST.md` 已存在
+- `local/scripts/export-template-package.ps1` 可重複產出 starter package
+- 已有 template-safe generic examples 可覆蓋 `skills`、`mcp`、`agents`、`workflow`
 - canonical resource coverage 持續擴張到 `skills`、`mcp`、`agents`、`workflow`
 - 至少 2 個 CLI 實際通過 delivery 驗證

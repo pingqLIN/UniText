@@ -11,6 +11,8 @@ $required = @(
   "EXTERNAL_REVIEW_PACKAGE.md",
   "EXTERNAL_REVIEW_COVER_NOTE.md",
   "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+  "TEMPLATE_RELEASE_PACKAGE.md",
+  "TEMPLATE_RELEASE_CHECKLIST.md",
   "local\\scripts\\sync-skills.ps1",
   "local\\scripts\\scan-skills.ps1",
   "local\\scripts\\verify-delivery.ps1",
@@ -18,12 +20,17 @@ $required = @(
   "local\\scripts\\generate-index-entries.ps1",
   "local\\scripts\\rollback-skills.ps1",
   "local\\scripts\\export-review-package.ps1",
+  "local\\scripts\\export-template-package.ps1",
   "local\\docs\\ADOPTION_CHECKLIST.md",
   "local\\docs\\ENVIRONMENT.md",
   "local\\docs\\authoring\\README.md",
   "registry\\agents\\registry-curator\\AGENT.md",
   "registry\\mcp\\claude-project-mcp-seed\\definition.json",
-  "registry\\workflow\\claude-plans\\WORKFLOW.md"
+  "registry\\workflow\\claude-plans\\WORKFLOW.md",
+  "template\\examples\\skills\\example-skill\\SKILL.md",
+  "template\\examples\\agents\\example-agent\\AGENT.md",
+  "template\\examples\\mcp\\example-mcp\\definition.json",
+  "template\\examples\\workflow\\example-workflow\\WORKFLOW.md"
 )
 
 $missing = $required | Where-Object { -not (Test-Path $_) }

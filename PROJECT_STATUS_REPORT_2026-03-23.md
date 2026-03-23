@@ -20,7 +20,7 @@
 
 - 將精選主集以外的 skills 納管策略收斂清楚
 - 將 `mcp`、`agents`、`workflow` 從 seed 推進到更完整的 active baseline
-- 從「已可整理外部審查資料」推進到「template release ready」
+- 從「已可整理外部審查資料」推進到「template release cleanup baseline」再到 `template release ready`
 
 ## 二、目前進度判讀
 
@@ -64,6 +64,15 @@
 - reviewer-facing entry docs 已補齊：
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
   - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+- template release cleanup docs 與 export script 已補齊：
+  - `TEMPLATE_RELEASE_PACKAGE.md`
+  - `TEMPLATE_RELEASE_CHECKLIST.md`
+  - `local/scripts/export-template-package.ps1`
+- template-safe generic examples 已建立：
+  - `template/examples/skills/example-skill/`
+  - `template/examples/agents/example-agent/`
+  - `template/examples/mcp/example-mcp/`
+  - `template/examples/workflow/example-workflow/`
 
 ### 2. 進行中項目
 
@@ -73,6 +82,7 @@
 - `local/docs/authoring/` 中存在比根目錄更完整的 authoring 文件，代表目前仍處於「整理模板版」與「保留作者工作版」並行的過渡期。
 - 外部審查資料已可透過 review package 流程重複產出，不再只依賴人工整理。
 - 審查者現在已有最短入口文件，不必先自行消化完整 status report 才能理解專案定位。
+- template package 也已可重複產出，但仍屬 cleanup baseline，而非最終 release 版。
 - `mcp`、`workflow`、`agents` 雖已不是空殼，但仍屬 seed 狀態，尚未形成完整 coverage。
 
 ### 3. 已有的可驗證成果
@@ -114,6 +124,7 @@
 8. 完成第一個 agent entry 與 mcp / workflow seeds 補強
 9. 完成 reviewer-facing package guide 與可重複匯出流程
 10. 完成 reviewer-facing cover note 與 highlights summary
+11. 完成 template release cleanup guide、checklist、export flow 與 generic examples
 
 ### 尚未達成的里程碑
 
@@ -166,15 +177,16 @@
 - 哪一天完成哪個里程碑
 - 目前與上一版相比差了哪些差異
 
-### 6. release packaging 尚未完整產品化
+### 6. template release cleanup 已開始，但仍未完整產品化
 
-雖然目前已經具備 reviewer-facing package guide 與 export script，但仍未完成：
+雖然目前已經具備 reviewer-facing package guide、template cleanup guide 與兩條 export flow，但仍未完成：
 
 - template-safe export 的最終版型
 - local-only state 的全面清除策略
 - 對外 release artifact 的固定結構與版本標記
+- template package 內建 local overlay 範例的最終抽象化程度
 
-也就是說，專案已經到達「可整理外部審查資料」階段，但還沒到「可直接當 release template 發布」階段。
+也就是說，專案已經到達「可整理外部審查資料」與「可做 template release cleanup」階段，但還沒到「可直接當 release template 發布」階段。
 
 ## 五、整體判斷
 
@@ -183,10 +195,10 @@
 | 層次 | 目前狀態 | 判讀 |
 |---|---|---|
 | Concept / Architecture | 高 | 已相對成熟 |
-| Governance / Documentation | 高 | 已可作為 template base，並可整理外部審查資料 |
+| Governance / Documentation | 高 | 已可作為 template base，並支撐 review package 與 template cleanup |
 | Canonical Resource Adoption | 中高 | skills 主集已成形，其他資源類型已有 seed |
 
-綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 已到達可整理外部審查資料階段，但尚未 fully hardened 的專案**。
+綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 已到達可整理外部審查資料階段、Phase 4 已進入 template release cleanup baseline，但尚未 final release ready 的專案**。
 
 換句話說，這不是「還在想」的專案，而是「已經把規則、結構與治理框架搭好，正要進入大規模納管與產品化整理」的專案。
 
