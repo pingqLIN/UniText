@@ -18,9 +18,9 @@
 
 目前尚未完成、也是下一階段主軸的部分是：
 
-- 擴大 `skills` 正式納管覆蓋率
-- `agents` registry 建立
-- 從「文件與治理骨架」推進到「完整可運行的 canonical resource catalog」
+- 將精選主集以外的 skills 納管策略收斂清楚
+- 將 `mcp`、`agents`、`workflow` 從 seed 推進到更完整的 active baseline
+- 從「外部審查可讀」推進到「template release ready」
 
 ## 二、目前進度判讀
 
@@ -45,25 +45,27 @@
 - operations 治理痕跡存在，顯示曾實際執行過 inventory / backup / drift / unify 類操作，而不只是紙上設計。
 - 本機同步腳本已存在，代表至少有一條 skills delivery 路徑被做成 reference implementation。
 - Git repository 已初始化，專案已從不可追蹤狀態進入可版本化狀態。
-- 首批 5 個 skills 已完成 canonical adoption：
-  - `frontend-design`
-  - `pdf`
-  - `docx`
-  - `xlsx`
-  - `mcp-builder`
+- 外部審查主集已收斂為 `8 + 4` 精選 skills，並已完成 adoption：
+  - Core 8：`pdf`、`docx`、`xlsx`、`pptx`、`mcp-builder`、`skill-creator`、`webapp-testing`、`doc-coauthoring`
+  - Expansion 4：`frontend-design`、`web-artifacts-builder`、`internal-comms`、`theme-factory`
 - 最小 operations scripts 已補齊：
   - `scan-skills.ps1`
   - `verify-delivery.ps1`
   - `health-check.ps1`
   - `batch-adopt-skills.ps1`
+  - `generate-index-entries.ps1`
+  - `rollback-skills.ps1`
+- `agents` 已補上第一個可審查 entry：`registry-curator`
+- `mcp` seed 已補上說明文件與 adoption notes
+- `workflow` seed 已補上 workflow doc 與 plan template
 
 ### 2. 進行中項目
 
 - `README.md` 已明確標示：
-  - Skills registry：已從純規劃轉為「first canonical batch adopted」
-  - Agents registry：已建立 root，entries 仍待補
+  - Skills registry：已從首批 adoption 進一步收斂為 `8 + 4` 審查主集
+  - Agents registry：已從空 root 推進到第一個 active seed
 - `local/docs/authoring/` 中存在比根目錄更完整的 authoring 文件，代表目前仍處於「整理模板版」與「保留作者工作版」並行的過渡期。
-- 家目錄下既有 skills symlink 仍指向舊的 `AI_UNIFIED` 路徑，尚未完成環境級修正。
+- `mcp`、`workflow`、`agents` 雖已不是空殼，但仍屬 seed 狀態，尚未形成完整 coverage。
 
 ### 3. 已有的可驗證成果
 
@@ -83,8 +85,11 @@
   - Python / Node / Docker / WSL 等執行環境
 - `local/scripts/sync-skills.ps1` 已提供可執行的 skills mirror 流程，顯示本機對接不是停留在概念層。
 - `local/scripts/health-check.ps1` 已回報：
-  - adopted skills = `5`
+  - adopted skills = `13`
   - invalid skills = `0`
+  - agent seed = `true`
+  - mcp seed = `true`
+  - workflow seed = `true`
   - overall check = `ok`
 
 ## 三、里程碑判斷
@@ -96,16 +101,17 @@
 3. 完成 operations safety model 與 adoption flow 定義
 4. 完成 local overlay 與 template core 的責任切分
 5. 建立初步 registry roots 與本機 delivery 參考腳本
-6. 完成首批 5 個 canonical skills adoption
+6. 完成 `8 + 4` 審查主集 adoption
 7. 完成 Git 初始化與最小審查腳本補齊
+8. 完成第一個 agent entry 與 mcp / workflow seeds 補強
 
 ### 尚未達成的里程碑
 
-1. 擴大 `skills` canonical registry 覆蓋率
-2. `agents` canonical registry 正式上線
-3. 建立更完整的 catalog coverage，而非僅有首批 entries
-4. 將 authoring state 與 template-safe 發布內容徹底分離
-5. 完成環境級 delivery 修正與實際 CLI 驗證
+1. 明確界定精選主集以外 skills 的 adoption 策略
+2. 將 `agents`、`mcp`、`workflow` 從 seed 推進到更完整的 active baseline
+3. 將 authoring state 與 template-safe 發布內容徹底分離
+4. 補齊 template export 與 release 路徑
+5. 完成更完整的多 CLI 驗證與 catalog automation
 
 ## 四、目前風險與缺口
 
@@ -128,13 +134,13 @@
 - 架構思路已升級
 - 但部分 deployment 說明與歷史盤點仍停留在前一版心智模型
 
-### 3. 環境級 delivery 尚未與 repo 狀態完全對齊
+### 3. `mcp`、`agents`、`workflow` 仍以 seed 為主
 
-目前 repo 內腳本與 canonical source 已改為 `registry/skills`，但驗證腳本顯示使用者家目錄下的既有 skills symlink 仍指向舊的 `AI_UNIFIED` 路徑。這代表 repo 已準備好，但環境級切換還沒完成。
+目前這三類資源已不再是空 root，但仍偏向「最小可審查 seed」，尚未達到 `skills` 主集那種可展示廣度與深度並存的狀態。
 
-### 4. 核心 use case 還沒有完全穿透到 registry 層
+### 4. skills coverage 已提升，但仍是精選主集而非全面 adoption
 
-專案的主要價值主張之一是「共享 skills / mcp / agents / workflow」，目前已有首批 5 個 skills 進入 `registry/skills/`，但整體 canonical content coverage 仍不足以代表 full adoption。
+目前最有價值的 12 個 skill 已進 registry，但專案的共享資源主張若要進一步擴張，仍需決定哪些 skill 要納入主線、哪些保持候選池。
 
 ### 5. 缺少完整歷史提交脈絡
 
@@ -168,9 +174,9 @@
 |---|---|---|
 | Concept / Architecture | 高 | 已相對成熟 |
 | Governance / Documentation | 高 | 已可作為 template base |
-| Canonical Resource Adoption | 中 | 已有首批內容，但尚未 fully onboard |
+| Canonical Resource Adoption | 中高 | skills 主集已成形，其他資源類型已有 seed |
 
-綜合判斷：`UniText` 目前屬於 **基礎架構已成形、已跨入首批內容落地、但尚未完成全面納管的 Phase 2 起步專案**。
+綜合判斷：`UniText` 目前屬於 **Phase 2 已建立可審查 baseline、Phase 3 接近但尚未 fully hardened 的專案**。
 
 換句話說，這不是「還在想」的專案，而是「已經把規則、結構與治理框架搭好，正要進入大規模納管與產品化整理」的專案。
 
@@ -178,15 +184,15 @@
 
 ### 優先順序 1
 
-擴大 `registry/skills/` adoption 覆蓋率，把剩餘高價值 skills 轉成可被 catalog 發現、可被 adoption flow 管理的 canonical entries。
+明確定義「精選主集之外」的 skills adoption 策略，避免重新落回全量但未篩選的納管模式。
 
 ### 優先順序 2
 
-建立 `registry/agents/` 的第一個最小 entry，補上 shared resource 類型的完整度，讓架構宣稱和實際內容一致。
+將 `agents`、`mcp`、`workflow` 從 seed 推進到更完整的 active baseline，讓四類 shared resources 的完成度更平衡。
 
 ### 優先順序 3
 
-整理 `local/docs/PATH_MAP.md`、`ops/inventory.latest.json` 與目前 `registry/` 架構之間的差異，並完成家目錄 skills symlink 的環境級修正。
+整理 `local/docs/PATH_MAP.md`、`ops/inventory.latest.json` 與目前 `registry/` 架構之間的差異，避免歷史路徑繼續污染現行認知。
 
 ### 優先順序 4
 
@@ -249,13 +255,16 @@
 4. 建立批次 adoption 腳本，降低 27 個 skills 的人工門檻
 5. 新增 `MILESTONES.md`，補齊成功標準
 
+以上五項目前皆已完成。
+
 ## 九、整合後建議結論
 
 若同時納入內部盤點與外部審核，UniText 現階段最合理的策略不是再擴張架構，而是進入一段明確的執行衝刺期：
 
 1. 先補安全網：Git 初始化與 baseline commit
-2. 再補內容：首批 skills 正式進 registry
-3. 再補工具：scan / verify / batch adopt / safer sync
-4. 最後補發布治理：milestones、template export、local-only cleanup
+2. 再補內容：精選 skills 主集正式進 registry
+3. 再補工具：scan / verify / batch adopt / safer sync / rollback / index generation
+4. 再補平衡：agents / mcp / workflow review seeds
+5. 最後補發布治理：template export、local-only cleanup、release packaging
 
 整體來看，外部審核不是推翻目前的進度判斷，而是把原本的結論再推進一步：**UniText 現在最需要的不是更多設計，而是把既有設計快速轉成可驗證、可持續、可交付的實作成果。**
