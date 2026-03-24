@@ -22,7 +22,8 @@
 11. `TEMPLATE_RELEASE_CHECKLIST.md`
 12. `SECRET_HANDLING_GUIDELINES.md`
 13. `NO_PUBLISH_POLICY.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+14. `COPILOT_CLI_ADAPTER_NOTE.md`
+15. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -85,6 +86,8 @@
 - `local/scripts/verify-bootstrap.py`
 
 ### Related Concept Notes
+
+若要理解 `Copilot CLI` 為何已列入 starter template 目標、但目前仍屬 `adapter pending`，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 

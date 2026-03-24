@@ -18,3 +18,4 @@
 - 每次 major version 變更後，應至少重新驗證一次 skills 與 mcp delivery。
 - `delivery path verified` 代表已由 `verify-delivery.ps1` 確認 canonical skills path 對齊，並不等於完成端到端互動驗證。
 - `adapter pending` 代表該 CLI 已列入 starter template 目標，但目前只定義目標方向，尚未在 repo 內固定交付方式。
+- `Copilot CLI` 的目前定位、限制與後續 adapter 路線，另見 [../../COPILOT_CLI_ADAPTER_NOTE.md](../../COPILOT_CLI_ADAPTER_NOTE.md)。
