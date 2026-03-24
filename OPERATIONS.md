@@ -5,6 +5,8 @@
 
 所有 delivery 與 mutation 都應以 `UniText` 的純文本 registry / spec 契約為 source of truth。
 
+若操作涉及 password、API key、token、credential 等 sensitive material，請同時遵守 `SECRET_HANDLING_GUIDELINES.md`。
+
 ## 1. Scope
 
 本文件涵蓋：

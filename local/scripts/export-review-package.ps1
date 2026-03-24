@@ -34,6 +34,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; path = "VISION.md" },
   [pscustomobject]@{ kind = "file"; path = "RESOURCE_SPEC.md" },
   [pscustomobject]@{ kind = "file"; path = "OPERATIONS.md" },
+  [pscustomobject]@{ kind = "file"; path = "SECRET_HANDLING_GUIDELINES.md" },
   [pscustomobject]@{ kind = "file"; path = "PROJECT_MODES.md" },
   [pscustomobject]@{ kind = "file"; path = "MILESTONES.md" },
   [pscustomobject]@{ kind = "file"; path = "PROJECT_STATUS_REPORT_2026-03-23.md" },

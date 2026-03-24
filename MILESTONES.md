@@ -27,6 +27,7 @@
 - `README.md`、`INDEX.md`、`PROJECT_STATUS_REPORT_2026-03-23.md` 三者狀態一致
 - `EXTERNAL_REVIEW_PACKAGE.md` 已定義審查範圍、閱讀順序與排除項目
 - `EXTERNAL_REVIEW_COVER_NOTE.md` 與 `EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
+- `SECRET_HANDLING_GUIDELINES.md` 已建立治理邊界，並納入核心閱讀順序
 - `local/scripts/export-review-package.ps1` 可重複產出 review package
 - 外部審查可直接看到：
   - 核心架構文件
@@ -41,6 +42,7 @@
 - `TEMPLATE_RELEASE_PACKAGE.md` 與 `TEMPLATE_RELEASE_CHECKLIST.md` 已存在
 - `local/scripts/export-template-package.ps1` 可重複產出 starter package
 - `local/scripts/verify-template-package.ps1` 可驗證 starter package 結構
+- `SECRET_HANDLING_GUIDELINES.md` 已納入 starter package
 - 已有 template-safe generic examples 可覆蓋 `skills`、`mcp`、`agents`、`workflow`
 - 已有 template-safe `local/` skeleton
 - canonical resource coverage 持續擴張到 `skills`、`mcp`、`agents`、`workflow`

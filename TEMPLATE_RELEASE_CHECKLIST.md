@@ -7,6 +7,7 @@
 - [ ] `README.md` 沒有依賴作者個人背景才能理解
 - [ ] `INDEX.md` 可作為 discovery 入口
 - [ ] `PROJECT_MODES.md` 清楚區分 template 與 authoring workspace
+- [ ] `SECRET_HANDLING_GUIDELINES.md` 已定義 secret 邊界且不含真實 credential
 - [ ] `TEMPLATE_RELEASE_PACKAGE.md` 已更新
 - [ ] `MILESTONES.md` 已反映目前 phase 狀態
 

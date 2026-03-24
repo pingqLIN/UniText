@@ -8,3 +8,4 @@ ops/history/unify_*/
 ops/history/set_setting_*/
 ops/review-package/
 ops/template-package/
+local/todolist/
