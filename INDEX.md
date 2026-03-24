@@ -21,6 +21,7 @@
 10. `TEMPLATE_RELEASE_PACKAGE.md`
 11. `TEMPLATE_RELEASE_CHECKLIST.md`
 12. `SECRET_HANDLING_GUIDELINES.md`
+13. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -81,6 +82,10 @@
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
+
+### Related Concept Notes
+
+若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 
 ### Skills
 
