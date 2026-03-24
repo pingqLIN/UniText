@@ -91,7 +91,7 @@
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` 通過
 - `verify-bootstrap.py` = `ok`
-- Codex の `skills_path` が `Q:\UniText\registry\skills` に整合している
+- Codex の `skills_path` が `/registry/skills` に整合している
 - repo root の `.mcp.json` が正常に書き込まれている
 - `claude-project-mcp-seed/server.py` が最小 MCP protocol smoke test を通過した
 - `create-git-bundle.py` が bundle backup の生成に成功した
@@ -150,3 +150,4 @@ external review と first-run baseline を支えるには十分ですが、多�
 - review / template package の再生成
 
 したがって、もはや「設計は成熟しているが実装が足りない」段階ではありません。すでに「交付可能、検証可能、候補発行可能」な段階に入っています。
+

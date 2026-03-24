@@ -90,7 +90,7 @@ Les contenus suivants ne doivent pas constituer le corps principal de la revue e
 - les skills candidats non inclus dans la shortlist
 - les contenus non suivis ou expérimentaux
 
-`local/docs/authoring/` sert de référence à l’auteur ; ce n’est pas une source canonique pour la revue.
+authoring notes and review archives sert de référence à l’auteur ; ce n’est pas une source canonique pour la revue.
 
 ## 5. Commande d’export
 
@@ -145,4 +145,5 @@ La meilleure formulation actuelle est donc :
 et non :
 
 **fully generalized release template**
+
 

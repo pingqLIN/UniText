@@ -90,7 +90,7 @@
 - shortlist に入っていない candidate skills
 - 未追跡または実験中の内容
 
-`local/docs/authoring/` は作者の参考資料であり、canonical review source ではありません。
+authoring notes and review archives は作者の参考資料であり、canonical review source ではありません。
 
 ## 5. Export Command
 
@@ -145,3 +145,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 それよりも次のように呼ぶのは適切ではありません。
 
 **fully generalized release template**
+

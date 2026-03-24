@@ -64,7 +64,7 @@ El template package no debe incluir:
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - cuentas de usuario reales, home directory o rutas absolutas
 - docs específicas de revisión
@@ -144,3 +144,4 @@ Por tanto, la lectura más adecuada es:
 y no:
 
 **authoring workspace snapshot**
+

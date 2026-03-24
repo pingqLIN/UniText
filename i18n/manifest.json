@@ -30,18 +30,11 @@
     "TEMPLATE_RELEASE_CHECKLIST.md",
     "PROJECT_STATUS_REPORT_2026-03-23.md",
     "SKILL0_COLLABORATION_VISION.md",
-    "local/README.md",
     "local/scripts/README.md",
     "local/docs/ADOPTION_CHECKLIST.md",
-    "local/docs/CLI_COMPAT_MATRIX.md",
-    "local/docs/ENVIRONMENT.md",
-    "local/docs/MCP_DEPLOYMENT_NOTES.md",
-    "local/docs/PATH_MAP.md",
-    "local/docs/WORKFLOW_DEPLOYMENT_NOTES.md"
+    "local/docs/CLI_COMPAT_MATRIX.md"
   ],
   "excluded": [
-    "SOCIAL_POSTS_2026-03-24.md",
-    "STRATEGIC_REVIEW_2026-03-23.md",
     "local/docs/JOURNAL.md",
     "local/docs/authoring/**",
     "local/docs/reviews/**",

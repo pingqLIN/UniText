@@ -90,7 +90,7 @@
 - shortlist에 포함되지 않은 후보 skills
 - 추적되지 않았거나 실험 중인 내용
 
-`local/docs/authoring/`는 작성자 작업 참고 자료이며 canonical review source가 아닙니다.
+authoring notes and review archives는 작성자 작업 참고 자료이며 canonical review source가 아닙니다.
 
 ## 5. Export Command
 
@@ -145,3 +145,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 입니다.
 
 **fully generalized release template**는 아닙니다.
+

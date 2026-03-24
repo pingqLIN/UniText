@@ -91,7 +91,7 @@
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` 通過
 - `verify-bootstrap.py` = `ok`
-- Codex `skills_path` 已對齊 `Q:\UniText\registry\skills`
+- Codex `skills_path` 已對齊 `/registry/skills`
 - repo root `.mcp.json` 已成功寫入
 - `claude-project-mcp-seed/server.py` 已通過最小 MCP 協議 smoke test
 - `create-git-bundle.py` 已成功產出 bundle backup
@@ -150,3 +150,4 @@
 - 可重複產出的 review / template packages
 
 因此，專案已不再只是「設計成熟但落地不足」的狀態，而是已進入「可交付、可驗證、可候選發布」的階段。
+

@@ -63,7 +63,8 @@
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - shortlist に含まれない candidate resources
 
 これは、審査の焦点を **canonical baseline** に絞り、作者 workspace の履歴ノイズを避けるためです。
+

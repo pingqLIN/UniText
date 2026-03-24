@@ -90,7 +90,7 @@ Los siguientes contenidos no deben formar parte del sujeto principal de la revis
 - skills candidatos no incluidos en la shortlist
 - contenido no rastreado o experimental
 
-`local/docs/authoring/` pertenece a material de referencia del autor, no a la fuente canónica de revisión.
+authoring notes and review archives pertenece a material de referencia del autor, no a la fuente canónica de revisión.
 
 ## 5. Comando de Exportación
 
@@ -145,3 +145,4 @@ Por tanto, la posición más adecuada es:
 y no:
 
 **fully generalized release template**
+

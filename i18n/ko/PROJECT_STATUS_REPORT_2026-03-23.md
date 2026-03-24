@@ -91,7 +91,7 @@
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` 통과
 - `verify-bootstrap.py` = `ok`
-- Codex `skills_path`가 `Q:\UniText\registry\skills`와 맞음
+- Codex `skills_path`가 `/registry/skills`와 맞음
 - repo root `.mcp.json`이 정상적으로 작성됨
 - `claude-project-mcp-seed/server.py`가 최소 MCP protocol smoke test를 통과함
 - `create-git-bundle.py`가 bundle backup 생성에 성공함
@@ -150,3 +150,4 @@ external review와 first-run baseline을 뒷받침하기에는 충분하지만, 
 - review / template package를 반복 생성할 수 있음
 
 따라서 이제는 단순히 "설계는 성숙했지만 구현이 부족한" 단계가 아닙니다. 이미 "인도 가능, 검증 가능, 후보 발행 가능" 단계에 들어섰습니다.
+

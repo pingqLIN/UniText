@@ -91,7 +91,7 @@ En esta ronda se ha confirmado directamente:
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` pasa correctamente
 - `verify-bootstrap.py` = `ok`
-- el `skills_path` de Codex apunta a `Q:\UniText\registry\skills`
+- el `skills_path` de Codex apunta a `/registry/skills`
 - el `.mcp.json` de la raíz del repo se escribió con éxito
 - `claude-project-mcp-seed/server.py` pasó el smoke test mínimo del protocolo MCP
 - `create-git-bundle.py` generó con éxito el bundle de backup
@@ -150,3 +150,4 @@ Eso significa que el proyecto ya dispone de:
 - paquetes de review y template que se pueden generar repetidamente
 
 Por tanto, el proyecto ya no está en el estado de “arquitectura madura pero implementación insuficiente”, sino en una fase de “entregable, verificable y candidato a publicación”.
+

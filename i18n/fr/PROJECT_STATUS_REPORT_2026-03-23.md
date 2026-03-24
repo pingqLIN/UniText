@@ -91,7 +91,7 @@ Cette fois-ci, les vérifications suivantes ont été confirmées :
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` passe
 - `verify-bootstrap.py` = `ok`
-- `skills_path` de Codex est aligné sur `Q:\UniText\registry\skills`
+- `skills_path` de Codex est aligné sur `/registry/skills`
 - le `.mcp.json` à la racine du repo a bien été écrit
 - `claude-project-mcp-seed/server.py` a passé le smoke test du protocole MCP minimal
 - `create-git-bundle.py` a produit un bundle backup avec succès
@@ -150,4 +150,5 @@ Cela signifie que le projet offre désormais :
 - des review / template packages reproductibles
 
 Le projet n’est donc plus seulement « mature sur le plan de la conception mais pauvre en réalisation » ; il est maintenant entré dans une phase où il peut être livré, vérifié et proposé comme candidat à publication.
+
 

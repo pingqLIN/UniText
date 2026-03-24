@@ -44,7 +44,7 @@ Tous les agents qui travaillent dans ce dépôt doivent respecter les règles su
 
 Les sujets suivants doivent être traités avec une prudence particulière :
 
-- `SOCIAL_POSTS_2026-03-24.md`
+- social post drafts
 - `SKILL0_COLLABORATION_VISION.md`
 - toute autre discussion stratégique liée à `skill-0` ou à la revue externe
 
@@ -55,3 +55,4 @@ Si une publication devient nécessaire, procédez toujours dans cet ordre :
 1. confirmer le périmètre autorisé
 2. confirmer la destination autorisée
 3. exécuter seulement ensuite le `push`, l’`upload` ou le `posting`
+

@@ -64,7 +64,7 @@ template package 不应包含：
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - 实际使用者帐号、家目录、绝对路径
 - review-specific docs
@@ -144,3 +144,4 @@ python local/scripts/create-git-bundle.py
 而不是：
 
 **authoring workspace snapshot**
+

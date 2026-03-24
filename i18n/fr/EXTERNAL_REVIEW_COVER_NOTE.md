@@ -63,8 +63,9 @@ Ce review package exclut volontairement :
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - les ressources candidates non incluses dans la shortlist
 
 Le but est de concentrer la revue sur la **canonical baseline**, et non sur le bruit historique de l’espace de travail de l’auteur.
+
 

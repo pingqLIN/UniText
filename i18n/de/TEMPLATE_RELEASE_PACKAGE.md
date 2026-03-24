@@ -64,7 +64,7 @@ Das Template Package soll nicht enthalten:
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - reale Benutzernamen, Home-Verzeichnisse und absolute Pfade
 - review-spezifische Dokumente
@@ -144,3 +144,4 @@ Daher ist die passendste Einordnung:
 und nicht:
 
 **authoring workspace snapshot**
+

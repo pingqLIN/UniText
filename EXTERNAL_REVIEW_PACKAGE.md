@@ -90,7 +90,7 @@
 - 未納入 shortlist 的候選 skills
 - 未追蹤或實驗中的內容
 
-`local/docs/authoring/` 屬於作者工作參考資料，不是 canonical review source。
+作者工作筆記、審查 archive 與其他 local-only 補充材料不屬於 canonical review source。
 
 ## 5. Export Command
 

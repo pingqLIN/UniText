@@ -11,4 +11,15 @@ ops/history/set_setting_*/
 ops/review-package/
 ops/template-package/
 ops/git-bundles/
+ops/baseline.json
+ops/inventory.latest.json
 local/todolist/
+local/docs/ENVIRONMENT.md
+local/docs/JOURNAL.md
+local/docs/MCP_DEPLOYMENT_NOTES.md
+local/docs/PATH_MAP.md
+local/docs/WORKFLOW_DEPLOYMENT_NOTES.md
+local/docs/authoring/
+local/docs/reviews/
+SOCIAL_POSTS_*.md
+STRATEGIC_REVIEW_*.md

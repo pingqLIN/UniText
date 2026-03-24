@@ -90,7 +90,7 @@
 - 未纳入 shortlist 的候选 skills
 - 未追踪或实验中的内容
 
-`local/docs/authoring/` 属于作者工作参考资料，不是 canonical review source。
+authoring notes and review archives 属于作者工作参考资料，不是 canonical review source。
 
 ## 5. Export Command
 
@@ -145,3 +145,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 而不是：
 
 **fully generalized release template**
+

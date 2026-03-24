@@ -88,7 +88,7 @@ I seguenti contenuti non dovrebbero essere il centro della revisione esterna:
 - candidate skills non incluse nella shortlist
 - contenuti non tracciati o sperimentali
 
-`local/docs/authoring/` è materiale di riferimento per l’autore, non una canonical review source.
+authoring notes and review archives è materiale di riferimento per l’autore, non una canonical review source.
 
 ## 5. Comando di export
 
@@ -143,4 +143,5 @@ La posizione più corretta, oggi, è:
 e non:
 
 **fully generalized release template**
+
 

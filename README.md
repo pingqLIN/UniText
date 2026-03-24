@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← sync scripts for this machine
 │
 └── ops/               ← operations state (not shared resources)
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← timestamped audit trail
 ```
 
@@ -143,7 +141,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
 | **GitHub CLI** | native-config | `config.yml` |
 
-See [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) for the full per-CLI path reference.
+See [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) for the starter path-map stub used by the template export.
 
 ### Cross-Platform Baseline
 

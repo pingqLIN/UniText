@@ -69,9 +69,9 @@ template package 不應包含：
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
+- authoring notes、review archives 與其他 local-only 補充材料
 - review-specific docs
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `EXTERNAL_REVIEW_COVER_NOTE.md`

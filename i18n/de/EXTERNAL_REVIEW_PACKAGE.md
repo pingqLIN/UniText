@@ -90,7 +90,7 @@ Folgende Inhalte sollen nicht Hauptgegenstand des externen Reviews sein:
 - nicht in die Shortlist aufgenommene Kandidaten-Skills
 - nicht getrackte oder experimentelle Inhalte
 
-`local/docs/authoring/` ist Arbeitsreferenz des Autors und keine kanonische Review-Quelle.
+authoring notes and review archives ist Arbeitsreferenz des Autors und keine kanonische Review-Quelle.
 
 ## 5. Export Command
 
@@ -145,3 +145,4 @@ Damit ist die passendste Einordnung derzeit:
 und nicht:
 
 **fully generalized release template**
+

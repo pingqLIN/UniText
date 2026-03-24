@@ -44,7 +44,7 @@ Alle Agents in diesem Repo müssen Folgendes einhalten:
 
 Bis auf Weiteres sollten die folgenden Inhaltstypen besonders vorsichtig behandelt werden:
 
-- `SOCIAL_POSTS_2026-03-24.md`
+- social post drafts
 - `SKILL0_COLLABORATION_VISION.md`
 - weitere strategische Diskussionen rund um `skill-0` oder externe Reviews
 
@@ -55,3 +55,4 @@ Falls künftig veröffentlicht werden soll, empfiehlt sich die Aufteilung in dre
 1. Erst den Umfang der erlaubten Veröffentlichung bestätigen
 2. Dann das Zielsystem oder die Plattform bestätigen
 3. Erst danach `push` / `upload` / `posting` ausführen
+

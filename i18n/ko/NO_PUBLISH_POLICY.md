@@ -44,7 +44,7 @@
 
 현재 특히 조심해야 할 내용은 다음과 같습니다.
 
-- `SOCIAL_POSTS_2026-03-24.md`
+- social post drafts
 - `SKILL0_COLLABORATION_VISION.md`
 - `skill-0` 또는 외부 리뷰와 관련된 다른 전략 논의
 
@@ -55,3 +55,4 @@
 1. 먼저 허용 범위를 확인합니다.
 2. 그다음 허용 목적지를 확인합니다.
 3. 마지막에만 push / upload / posting을 실행합니다.
+

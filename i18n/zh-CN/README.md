@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← 这台机器要用的 sync scripts
 │
 └── ops/               ← operations state（不是 shared resources）
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← timestamped audit trail
 ```
 
@@ -141,7 +139,7 @@ python local/scripts/verify-bootstrap.py
 | **Codex** | native-config + project-local MCP | `~/.codex/config.toml` 中的 `skills_path` 与 `[mcp_servers.*]` |
 | **GitHub CLI** | native-config | `config.yml` |
 
-完整的每个 CLI 路径对照请见 [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md)。
+完整的每个 CLI 路径对照请见 [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md)。
 
 ---
 
@@ -230,3 +228,4 @@ MIT
 ---
 
 *给使用超过一个 AI 工具、并希望有单一真相来源的人。*
+

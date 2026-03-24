@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← このマシン用の sync scripts
 │
 └── ops/               ← operations state（shared resources ではない）
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← タイムスタンプ付き audit trail
 ```
 
@@ -141,7 +139,7 @@ python local/scripts/verify-bootstrap.py
 | **Codex** | native-config + project-local MCP | `skills_path` と `~/.codex/config.toml` の `[mcp_servers.*]` |
 | **GitHub CLI** | native-config | `config.yml` |
 
-完全な CLI ごとの path 参照は [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) を参照してください。
+完全な CLI ごとの path 参照は [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) を参照してください。
 
 ---
 
@@ -230,3 +228,4 @@ MIT
 ---
 
 *複数の AI tool を使い、単一の source of truth を求める人向け。*
+

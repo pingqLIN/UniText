@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← scripts de synchronisation pour cette machine
 │
 └── ops/               ← état opérationnel (pas des shared resources)
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← journal d’audit horodaté
 ```
 
@@ -141,7 +139,7 @@ python local/scripts/verify-bootstrap.py
 | **Codex** | `native-config` + MCP local au projet | `skills_path` et `[mcp_servers.*]` dans `~/.codex/config.toml` |
 | **GitHub CLI** | `native-config` | `config.yml` |
 
-Voir [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) pour la référence complète des chemins par CLI.
+Voir [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) pour la référence complète des chemins par CLI.
 
 ---
 
@@ -230,3 +228,4 @@ MIT
 ---
 
 *Pour les personnes qui utilisent plusieurs outils IA et veulent une source de vérité unique.*
+

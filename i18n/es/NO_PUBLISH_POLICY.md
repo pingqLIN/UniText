@@ -44,7 +44,7 @@ Todos los agentes en este repo deben seguir:
 
 Hasta ahora, los siguientes tipos de contenido deben tratarse con especial cautela:
 
-- `SOCIAL_POSTS_2026-03-24.md`
+- social post drafts
 - `SKILL0_COLLABORATION_VISION.md`
 - cualquier otra discusión estratégica relacionada con `skill-0` o con revisiones externas
 
@@ -55,3 +55,4 @@ Si en el futuro hace falta publicar algo, conviene dividir el proceso en tres pa
 1. Confirmar el alcance exacto permitido
 2. Confirmar el destino permitido
 3. Sólo entonces ejecutar `push` / upload / posting
+

@@ -44,7 +44,7 @@
 
 現時点では、以下の種類の内容は特に慎重に扱うべきです。
 
-- `SOCIAL_POSTS_2026-03-24.md`
+- social post drafts
 - `SKILL0_COLLABORATION_VISION.md`
 - `skill-0` または外部審査に関するその他の戦略的議論
 
@@ -55,3 +55,4 @@
 1. まず公開を許可する範囲を確認する
 2. 次に公開先を確認する
 3. 最後に push / upload / posting を実行する
+

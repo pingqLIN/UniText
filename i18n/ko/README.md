@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← 이 머신에서 쓰는 sync scripts
 │
 └── ops/               ← operations state (shared resources 아님)
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← timestamped audit trail
 ```
 
@@ -141,7 +139,7 @@ python local/scripts/verify-bootstrap.py
 | **Codex** | native-config + project-local MCP | `skills_path`와 `~/.codex/config.toml`의 `[mcp_servers.*]` |
 | **GitHub CLI** | native-config | `config.yml` |
 
-전체 CLI 경로 표는 [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md)를 보세요.
+전체 CLI 경로 표는 [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md)를 보세요.
 
 ---
 
@@ -230,3 +228,4 @@ MIT
 ---
 
 *여러 AI 도구를 사용하면서 단일 진실 소스를 원한다면.*
+

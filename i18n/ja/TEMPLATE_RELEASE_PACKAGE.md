@@ -64,7 +64,7 @@ template package に含めるべきではないものは次の通りです。
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - 実際の user account、home directory、absolute path
 - review-specific docs
@@ -144,3 +144,4 @@ export された template package が表すのは次の通りです。
 それよりも次のように呼ぶのは適切ではありません。
 
 **authoring workspace snapshot**
+

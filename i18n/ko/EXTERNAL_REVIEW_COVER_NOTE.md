@@ -63,7 +63,8 @@
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - shortlist에 포함되지 않은 후보 리소스
 
 이렇게 하는 목적은 리뷰를 **canonical baseline**에 집중시키고, 작성자 작업공간의 역사적 노이즈를 배제하기 위함입니다.
+

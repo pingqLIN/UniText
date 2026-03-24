@@ -63,7 +63,8 @@ Dieses Review Package schließt bewusst aus:
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - nicht in die Shortlist aufgenommene Ressourcen
 
 Damit soll die Review-Analyse auf die **kanonische Baseline** fokussieren und nicht auf historischen Lärm des Author-Workspaces.
+

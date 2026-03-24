@@ -36,8 +36,6 @@ UniText/
 │   └── scripts/       ← script di sync per questa macchina
 │
 └── ops/               ← stato operativo (non sono shared resources)
-    ├── baseline.json
-    ├── inventory.latest.json
     └── history/       ← audit trail con timestamp
 ```
 
@@ -141,7 +139,7 @@ python local/scripts/verify-bootstrap.py
 | **Codex** | native-config + project-local MCP | `skills_path` e `[mcp_servers.*]` in `~/.codex/config.toml` |
 | **GitHub CLI** | native-config | `config.yml` |
 
-Vedi [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) per il riferimento completo dei path per CLI.
+Vedi [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) per il riferimento completo dei path per CLI.
 
 ---
 
@@ -230,4 +228,5 @@ MIT
 ---
 
 *Per chi usa più di un tool AI e vuole una single source of truth.*
+
 

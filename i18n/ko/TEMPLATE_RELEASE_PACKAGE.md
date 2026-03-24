@@ -64,7 +64,7 @@ template package에는 다음이 포함되면 안 됩니다.
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - 실제 사용자 계정, home directory, 절대 경로
 - review-specific docs
@@ -144,3 +144,4 @@ export된 template package는 다음을 의미합니다.
 입니다.
 
 **authoring workspace snapshot**는 아닙니다.
+

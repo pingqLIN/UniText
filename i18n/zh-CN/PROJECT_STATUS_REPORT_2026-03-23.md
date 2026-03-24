@@ -91,7 +91,7 @@
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` 通过
 - `verify-bootstrap.py` = `ok`
-- Codex `skills_path` 已对齐 `Q:\UniText\registry\skills`
+- Codex `skills_path` 已对齐 `/registry/skills`
 - repo root `.mcp.json` 已成功写入
 - `claude-project-mcp-seed/server.py` 已通过最小 MCP 协议 smoke test
 - `create-git-bundle.py` 已成功产出 bundle backup
@@ -150,3 +150,4 @@
 - 可重复产出的 review / template packages
 
 因此，专案已不再只是「设计成熟但落地不足」的状态，而是已进入「可交付、可验证、可候选发布」的阶段。
+

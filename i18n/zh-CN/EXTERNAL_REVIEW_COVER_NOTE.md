@@ -63,7 +63,8 @@
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- `local/docs/authoring/`
+- authoring notes and review archives
 - 未纳入 shortlist 的候选资源
 
 这样做的目的，是让审查聚焦在 **canonical baseline**，而不是作者工作区的历史噪音。
+
