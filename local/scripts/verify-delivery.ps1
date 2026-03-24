@@ -27,6 +27,12 @@ $report += [pscustomobject]@{
   exists = Test-Path "$HOME\\.codex\\config.toml"
   attrs = if (Test-Path "$HOME\\.codex\\config.toml") { (Get-Item "$HOME\\.codex\\config.toml").Attributes.ToString() } else { $null }
   target = $null
+  expected_target = $resolvedSource
+  matches_expected = if (Test-Path "$HOME\\.codex\\config.toml") {
+    ((Get-Content "$HOME\\.codex\\config.toml" -Raw) -match [regex]::Escape($resolvedSource))
+  } else {
+    $null
+  }
 }
 
 foreach ($path in $targets) {
@@ -39,7 +45,7 @@ foreach ($path in $targets) {
     attrs = if ($item) { $item.Attributes.ToString() } else { $null }
     target = if ($item -and $item.LinkType) { $item.Target } else { $null }
     expected_target = $expectedSuffix
-    matches_expected = if ($item -and $item.LinkType) { $item.Target -like "*$expectedSuffix" } else { $null }
+    matches_expected = if ($item -and $item.LinkType) { [bool]($item.Target -like "*$expectedSuffix") } else { $null }
   }
 }
 

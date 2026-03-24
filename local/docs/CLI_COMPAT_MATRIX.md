@@ -6,7 +6,7 @@
 | CLI | 版本基準 | UniText 依賴行為 | 目前狀態 | 最後驗證 |
 |---|---|---|---|---|
 | Claude Code | 2.1.63 | 讀取 `~/.claude/skills`、支援 project `.mcp.json` | delivery path verified | 2026-03-24 |
-| Codex CLI | 0.106.0 | 從 `config.toml` 的 `skills_path` 讀取 skills | 待重新驗證 | 2026-03-02 |
+| Codex CLI | 0.106.0 | 從 `config.toml` 的 `skills_path` 讀取 skills，並可註冊 `[mcp_servers.unitext_registry]` | bootstrap verified | 2026-03-24 |
 | Gemini CLI | 0.31.0 | 讀取 `~/.gemini/skills` 與 `~/.agents/skills` | delivery path verified | 2026-03-24 |
 | GitHub CLI | 2.87.3 | workflow 僅作參考，無 native skills 支援 | 已知限制 | 2026-03-02 |
 | VS Code | 1.109.5 | 非直接 resource consumer，主要作 authoring environment | 已知限制 | 2026-03-02 |

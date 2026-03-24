@@ -28,6 +28,9 @@ $required = @(
   "registry\\workflow\\example-workflow\\WORKFLOW.md",
   "local\\README.md",
   "local\\docs\\PATH_MAP.md",
+  "local\\scripts\\bootstrap.py",
+  "local\\scripts\\verify-bootstrap.py",
+  "local\\scripts\\create-git-bundle.py",
   "local\\scripts\\sync-skills.ps1"
 )
 

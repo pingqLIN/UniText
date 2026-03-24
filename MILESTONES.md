@@ -29,6 +29,7 @@
 - `EXTERNAL_REVIEW_COVER_NOTE.md` 與 `EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
 - `SECRET_HANDLING_GUIDELINES.md` 已建立治理邊界，並納入核心閱讀順序
 - `local/scripts/export-review-package.ps1` 可重複產出 review package
+- 已提供跨平台 `bootstrap -> verify` first-run 路徑
 - 外部審查可直接看到：
   - 核心架構文件
   - 已 adoption 的 canonical skills
@@ -43,7 +44,9 @@
 - `local/scripts/export-template-package.ps1` 可重複產出 starter package
 - `local/scripts/verify-template-package.ps1` 可驗證 starter package 結構
 - `SECRET_HANDLING_GUIDELINES.md` 已納入 starter package
+- `local/scripts/create-git-bundle.py` 可產出可攜 backup artifact
 - 已有 template-safe generic examples 可覆蓋 `skills`、`mcp`、`agents`、`workflow`
 - 已有 template-safe `local/` skeleton
+- `mcp` 至少有一個真正可執行的 baseline
 - canonical resource coverage 持續擴張到 `skills`、`mcp`、`agents`、`workflow`
 - 至少 2 個 CLI 實際通過 delivery 驗證

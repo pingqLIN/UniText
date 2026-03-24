@@ -46,6 +46,9 @@
 - starter local overlay skeleton
   - `local/README.md`
   - `local/docs/PATH_MAP.md`
+  - `local/scripts/bootstrap.py`
+  - `local/scripts/verify-bootstrap.py`
+  - `local/scripts/create-git-bundle.py`
   - `local/scripts/sync-skills.ps1`
 - release metadata
   - `manifest.json`
@@ -96,6 +99,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
 ```
 
+匯出後，新使用者的 first-run 建議路徑：
+
+```bash
+python local/scripts/bootstrap.py --dry-run
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+python local/scripts/create-git-bundle.py
+```
+
 ## 5. Export Interpretation
 
 匯出的 template package 代表：
@@ -122,6 +134,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-templ
 - starter local overlay skeleton
 - template package verification script
 - release metadata
+- cross-platform first-run scripts
+- portable bundle backup flow
 
 因此目前最適合的判讀是：
 

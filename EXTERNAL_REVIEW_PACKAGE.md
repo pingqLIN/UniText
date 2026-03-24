@@ -36,7 +36,7 @@
 - `registry/agents/registry-curator/`
 - `registry/mcp/claude-project-mcp-seed/`
 - `registry/workflow/claude-plans/`
-- `local/scripts/` 中的最小治理腳本
+- `local/scripts/` 中的最小治理腳本與 cross-platform first-run 腳本
 
 ## 3. Review Scope
 
@@ -61,6 +61,9 @@
   - `local/docs/CLI_COMPAT_MATRIX.md`
   - `local/scripts/README.md`
 - 最小治理腳本
+  - `bootstrap.py`
+  - `verify-bootstrap.py`
+  - `create-git-bundle.py`
   - `scan-skills.ps1`
   - `sync-skills.ps1`
   - `verify-delivery.ps1`
@@ -130,8 +133,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 - reviewer-facing cover note 與 highlights summary
 - 外部審查可讀的核心文件
 - `8 + 4` 精選 skills 主集
-- agent / mcp / workflow 的最小可審查 seed
+- agent / workflow seed 與可實跑的 MCP baseline
 - 可重複產出 review package 的整理流程
+- cross-platform `bootstrap -> verify`
+- 可攜 `git bundle` 備份流程
 
 因此目前最適合的定位是：
 
@@ -139,4 +144,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 
 而不是：
 
-**template release ready**
+**fully generalized release template**

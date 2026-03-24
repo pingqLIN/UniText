@@ -90,8 +90,18 @@ delivery 只能由明確 trigger 啟動：
    - 將來源內容寫入 registry canonical location，若覆寫既有內容需先 backup
 5. `DELIVER`
    - 由 adapter 將 registry 內容送到對應 CLI，若會覆寫既有狀態需保留 log 與 backup
+   - 若 CLI 支援 `native-config`，可在 `bootstrap` 階段寫入 machine-local config，但 canonical definition 仍留在 `registry/`
 6. `VERIFY`
    - 驗證檔案存在性、路徑解析、delivery mode 與目標 CLI 載入條件是否成立
+
+## 6.1 First-Run Baseline
+
+若目標是讓新的 template 使用者在 macOS / Linux / Windows 都能完成最小初始化，應至少提供：
+
+- 一條跨平台 `bootstrap`
+- 一條跨平台 `verify`
+- 一條可攜的 repo backup 流程
+- 一個可實跑的最小 MCP baseline
 
 ## 7. Operations State
 

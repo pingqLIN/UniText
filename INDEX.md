@@ -77,6 +77,11 @@
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
 
+若要在新機器上完成第一輪 initialize → verify，優先使用：
+
+- `local/scripts/bootstrap.py`
+- `local/scripts/verify-bootstrap.py`
+
 ### Skills
 
 | `id` | Tier | `canonical_location` | `status` |
@@ -113,10 +118,10 @@
 | `id` | `claude-project-mcp-seed` |
 | `type` | `mcp` |
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
-| `status` | `draft` |
+| `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude` |
-| `delivery_guidance` | Register through the MCP adapter; the final delivery mode depends on CLI capabilities and local environment. |
+| `supported_clis` | `claude, codex` |
+| `delivery_guidance` | Bootstrap writes a project `.mcp.json` plus Codex native-config entry pointing to the bundled read-only MCP server. |
 
 ### Agents
 

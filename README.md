@@ -116,9 +116,17 @@ Add an entry to `INDEX.md`:
 | `status` | `active` |
 | `supported_clis` | `claude, codex, gemini` |
 
-### 4. Deliver to your CLIs
+### 4. Bootstrap your local CLI wiring
 
-Create a script in `local/scripts/` that mirrors `registry/skills/` to each CLI's expected path. See `local/scripts/sync-skills.ps1` as a reference implementation.
+Prefer the cross-platform bootstrap path:
+
+```bash
+python local/scripts/bootstrap.py --dry-run
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+```
+
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and writes a project-local `.mcp.json` for the bundled MCP baseline. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation.
 
 ---
 
@@ -128,7 +136,7 @@ Create a script in `local/scripts/` that mirrors `registry/skills/` to each CLI'
 |-----|--------------|-------|
 | **Claude Code** | mirror / symlink | `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | mirror + native-config | `skills_path` in `~/.codex/config.toml` |
+| **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
 | **GitHub CLI** | native-config | `config.yml` |
 
 See [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) for the full per-CLI path reference.
@@ -202,10 +210,10 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 | Registry structure | Active — `skills/`, `mcp/`, `workflow/`, `agents/` roots present |
 | Skills registry | Active baseline — first canonical batch adopted, broader adoption still in progress |
 | Agents registry | Active seed — `registry-curator` entry created |
-| MCP registry | Draft seed — canonical example plus adoption notes present |
+| MCP registry | Active baseline — canonical definition plus runnable read-only server present |
 | Workflow registry | Draft seed — workflow doc plus plan template present |
 | Operations audit trail | Active |
-| Sync and review scripts | Active baseline in `local/scripts/` |
+| Sync, bootstrap, and review scripts | Active baseline in `local/scripts/` |
 | External review package | Active baseline — reviewer guide and export script present |
 | Template release cleanup | Release candidate — template package guide, checklist, export + verify scripts, generic examples, and local overlay skeleton present |
 

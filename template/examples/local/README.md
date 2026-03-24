@@ -7,10 +7,14 @@
 ## Included Files
 
 - `local/docs/PATH_MAP.md`
+- `local/scripts/bootstrap.py`
+- `local/scripts/verify-bootstrap.py`
+- `local/scripts/create-git-bundle.py`
 - `local/scripts/sync-skills.ps1`
 
 ## Expected Customization
 
 - 將 path mapping 換成自己的實際環境
+- 先用 `bootstrap.py --dry-run` 看初始化會改哪些地方
 - 依使用的 CLI 增刪 delivery targets
-- 視平台改成 PowerShell、bash 或其他對應腳本
+- 視需要保留 PowerShell 版本或改寫其他平台腳本

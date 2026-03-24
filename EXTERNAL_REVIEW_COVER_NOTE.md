@@ -33,7 +33,7 @@
 
 - 最終 template export 產品化
 - local-only artifacts 的全面清理
-- 完整多 CLI 端到端驗證
+- 更廣的多 CLI 端到端驗證與遠端備份策略
 
 ## 3. 建議閱讀順序
 
@@ -53,6 +53,7 @@
 - review shortlist 的選樣是否合理
 - `agents / mcp / workflow` 目前 seed 深度是否足以支撐下一階段擴張
 - 現有治理腳本是否足以構成可信的 baseline
+- 新增的 cross-platform bootstrap 與 MCP baseline 是否足以支撐第一個非作者使用者
 
 ## 5. 補充說明
 

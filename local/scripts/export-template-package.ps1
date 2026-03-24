@@ -25,7 +25,10 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_CHECKLIST.md"; target = "TEMPLATE_RELEASE_CHECKLIST.md" },
   [pscustomobject]@{ kind = "file"; source = "template\\examples\\local\\README.md"; target = "local\\README.md" },
   [pscustomobject]@{ kind = "file"; source = "template\\examples\\local\\docs\\PATH_MAP.template.md"; target = "local\\docs\\PATH_MAP.md" },
-  [pscustomobject]@{ kind = "file"; source = "template\\examples\\local\\scripts\\sync-skills.template.ps1"; target = "local\\scripts\\sync-skills.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\bootstrap.py"; target = "local\\scripts\\bootstrap.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-bootstrap.py"; target = "local\\scripts\\verify-bootstrap.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\create-git-bundle.py"; target = "local\\scripts\\create-git-bundle.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\sync-skills.ps1"; target = "local\\scripts\\sync-skills.ps1" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\skills\\example-skill"; target = "registry\\skills\\example-skill" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\agents\\example-agent"; target = "registry\\agents\\example-agent" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\mcp\\example-mcp"; target = "registry\\mcp\\example-mcp" },
@@ -52,7 +55,8 @@ if ($DryRun) {
       "ops/history/",
       "ops/review-package/",
       "local/docs/authoring/",
-      "review-only docs"
+      "review-only docs",
+      "machine-local runtime state"
     )
   }
   return
@@ -96,7 +100,8 @@ $manifest = [ordered]@{
     "ops/history/",
     "ops/review-package/",
     "local/docs/authoring/",
-    "review-only docs"
+    "review-only docs",
+    "machine-local runtime state"
   )
   items = $items
 }

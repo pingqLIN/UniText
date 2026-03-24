@@ -1,13 +1,14 @@
 {
   "mcpServers": {
-    "example-local-server": {
+    "unitext-registry": {
       "transport": "stdio",
-      "command": "node",
+      "command": "python",
       "args": [
-        "path/to/server.js"
+        "registry/mcp/claude-project-mcp-seed/server.py",
+        "--root",
+        "."
       ],
-      "notes": "Example canonical seed. Replace with a real server definition during adoption."
+      "notes": "Project-local read-only UniText registry server. Bootstrap may replace command/args with absolute paths for the current machine."
     }
   }
 }
-

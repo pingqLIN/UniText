@@ -10,9 +10,9 @@
 | Core docs | Stable | 可作為外部審查主入口 |
 | Skills registry | Active baseline | 已收斂為 `8 + 4` 精選主集 |
 | Agents registry | Active seed | 已有第一個正式 entry |
-| MCP registry | Draft seed | 已有 example definition 與 adoption notes |
+| MCP registry | Active baseline | 已有 canonical definition、runnable server 與 bootstrap wiring |
 | Workflow registry | Draft seed | 已有 workflow doc 與 plan template |
-| Operations scripts | Active baseline | 已具備 scan / sync / verify / export |
+| Operations scripts | Active baseline | 已具備 scan / sync / verify / export / bootstrap / bundle backup |
 
 ## 2. What Is Already Strong
 
@@ -24,16 +24,17 @@
 
 ## 3. What Reviewers Should Not Over-Interpret
 
-- `agents / mcp / workflow` 的存在代表 baseline 已建立，不代表 coverage 已成熟
+- `agents / workflow` 的存在代表 baseline 已建立，不代表 coverage 已成熟
+- `mcp` 已可實跑，但仍屬最小 baseline，不代表 cross-CLI coverage 已完整
 - `delivery path verified` 代表路徑與對齊已確認，不代表所有 CLI 都完成端到端操作驗證
 - `adopted_skills = 13` 不等於外部審查主集有 13 個；正式主集仍是 `8 + 4`
 
 ## 4. Current Gaps
 
 - 精選主集之外的 adoption policy 尚未完全定稿
-- `agents / mcp / workflow` 仍以 seed 為主，深度尚不足
+- `agents / workflow` 仍以 seed 為主，深度尚不足
 - local-only 與 template-safe 邊界還沒徹底清乾淨
-- release packaging 仍未到最終產品化階段
+- release packaging 已接近 RC，但遠端 backup 仍建議補上
 
 ## 5. Recommended Review Conclusion
 
@@ -43,4 +44,4 @@
 
 而是：
 
-`UniText 已具備外部審查所需的結構化 baseline，可用來驗證架構、治理方式與第一批 canonical resources 的方向。`
+`UniText 已具備外部審查所需的結構化 baseline，可用來驗證架構、治理方式、跨平台 first-run 路徑與第一批 canonical resources 的方向。`

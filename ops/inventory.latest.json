@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-03-02T16:25:02",
-  "shared_root": "C:\\Dev\\UniText",
+  "generated_at": "2026-03-24T16:45:49",
+  "shared_root": "Q:\\UniText",
   "cli": [
     {
       "name": "codex",
@@ -200,28 +200,28 @@
       "target": null
     },
     {
-      "path": "C:\\Dev\\.mcp.json",
+      "path": "Q:\\UniText\\.mcp.json",
       "exists": true,
       "kind": "file",
       "attrs": "Archive",
       "target": null
     },
     {
-      "path": "C:\\Dev\\UniText\\mcp\\claude.mcp.json",
+      "path": "Q:\\UniText\\registry\\mcp\\claude-project-mcp-seed\\definition.json",
       "exists": true,
       "kind": "file",
       "attrs": "Archive",
       "target": null
     },
     {
-      "path": "C:\\Dev\\UniText\\skills",
+      "path": "Q:\\UniText\\registry\\skills",
       "exists": true,
       "kind": "dir",
-      "attrs": "Directory, ReparsePoint",
-      "target": "C:\\Users\\miles\\.codex\\skills"
+      "attrs": "Directory",
+      "target": null
     },
     {
-      "path": "C:\\Dev\\UniText\\workflow",
+      "path": "Q:\\UniText\\registry\\workflow\\claude-plans",
       "exists": true,
       "kind": "dir",
       "attrs": "Directory",
@@ -233,6 +233,6 @@
     "gemini.general.disableAutoUpdate": true,
     "gemini.general.enableAutoUpdate": true,
     "claude.plansDirectory": null,
-    "codex.skills_path": "skills_path = \"C:\\\\Users\\\\addra\\\\.codex\\\\skills\""
+    "codex.skills_path": "skills_path = \"Q:\\\\UniText\\\\registry\\\\skills\""
   }
 }

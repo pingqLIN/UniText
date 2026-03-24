@@ -1,11 +1,15 @@
 backup/
 recovered_*/
 .bak_*/
+.mcp.json
+**/__pycache__/
 ops/history/backup_*/
+ops/history/bootstrap_*/
 ops/history/drift_*/
 ops/history/inventory_*/
 ops/history/unify_*/
 ops/history/set_setting_*/
 ops/review-package/
 ops/template-package/
+ops/git-bundles/
 local/todolist/

@@ -27,6 +27,7 @@
 - [ ] 至少 1 個 generic mcp example
 - [ ] 至少 1 個 generic workflow example
 - [ ] 至少 1 份 generic local overlay skeleton
+- [ ] starter package 含跨平台 `bootstrap -> verify` 路徑
 
 ## 4. Validation
 
@@ -34,6 +35,8 @@
 - [ ] `export-template-package.ps1 -DryRun` 可列出 package 內容
 - [ ] `export-template-package.ps1` 可成功產出 package
 - [ ] `verify-template-package.ps1` 可通過
+- [ ] `bootstrap.py --dry-run` 可在乾淨環境預覽初始化內容
+- [ ] `verify-bootstrap.py` 可驗證 first-run wiring
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
 

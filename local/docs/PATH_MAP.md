@@ -1,64 +1,48 @@
-# AI CLI Path Map (Archived 2026-02-28)
+# AI CLI Path Map
 
-> 狀態：Archived Legacy Reference
-> 注意：本文件描述的是舊部署對照，不是 `UniText` 的現行 canonical path 真相。現行 skills source 以 repo 內 `registry/skills/` 與 `local/scripts/` 的相對路徑邏輯為準。
+> 狀態：Current Authoring Reference
+> 注意：本文件記錄這個 repo 目前的實際 deployment mapping，用來輔助驗證與審查；規格真相仍以 `registry/` 與 `local/scripts/` 的相對路徑邏輯為準。
 
-## Unified Targets
-- Skills: `C:\Dev\UniText\skills`（舊）
-- MCP: `C:\Dev\UniText\mcp`
-- Workflow: `C:\Dev\UniText\workflow`
+## Canonical Sources
 
-## Current Direction
+- Skills: `Q:\UniText\registry\skills`
+- MCP: `Q:\UniText\registry\mcp`
+- Agents: `Q:\UniText\registry\agents`
+- Workflow: `Q:\UniText\registry\workflow`
 
-- 現行 canonical skills source：`registry/skills/`
-- 現行 delivery 驗證目標：使用者家目錄下 `.claude/skills`、`.gemini/skills`、`.agents/skills`
-- 歷史 `C:\Dev\UniText\skills` 路徑應視為 pre-registry 版本
+## Runtime Targets
 
-## Codex
+### Claude Code
+
+- Skills: `%USERPROFILE%\.claude\skills`
+- Project MCP: `<repo>\.mcp.json`
+- Notes:
+  - skills target 應指向 `registry\skills`
+  - project-level MCP 由 `local/scripts/bootstrap.py` 產生
+
+### Gemini CLI
+
+- Skills: `%USERPROFILE%\.gemini\skills`
+- Secondary skills mirror: `%USERPROFILE%\.agents\skills`
+- MCP setting location: `%USERPROFILE%\.gemini\settings.json` 的 `mcpServers`
+
+### Codex
+
 - Config file: `%USERPROFILE%\.codex\config.toml`
-- Skills setting: `skills_path = "C:\\Dev\\UniText\\skills"`
-- MCP setting location: `[mcp_servers.*]` in `%USERPROFILE%\.codex\config.toml`
-- Workflow path setting: not found as standalone setting
+- Skills setting: `skills_path = "Q:\\UniText\\registry\\skills"`
+- MCP setting location: `[mcp_servers.unitext_registry]`
+- Notes:
+  - skills 與 MCP wiring 都由 `local/scripts/bootstrap.py` 寫入
+  - 不再使用舊的 `C:\Dev\UniText\skills` 路徑
 
-## Gemini CLI
-- Global settings: `%USERPROFILE%\.gemini\settings.json`
-- Workspace settings: `<project>\.gemini\settings.json`
-- Skills discovery (official docs/source):
-  - `%USERPROFILE%\.gemini\skills`
-  - `%USERPROFILE%\.agents\skills`
-  - `<project>\.gemini\skills`
-  - `<project>\.agents\skills`
-- MCP setting location: `mcpServers` in settings JSON
-- MCP OAuth token file: `%USERPROFILE%\.gemini\mcp-oauth-tokens.json`
-- Workflow temp/plans: internal `.gemini/tmp/...` (managed by CLI)
+### Workflow Notes
 
-## Claude Code
-- User runtime dir: `%USERPROFILE%\.claude`
-- User meta config: `%USERPROFILE%\.claude.json`
-- Session settings: `%USERPROFILE%\.claude\settings.json`
-- Skills path (supported by product behavior/changelog): `%USERPROFILE%\.claude\skills` and project `.claude/skills`
-- MCP config:
-  - user/project state in `%USERPROFILE%\.claude.json`
-  - project file `.mcp.json` (created at `C:\Dev\.mcp.json`)
-- Workflow/plans path:
-  - `plansDirectory` set to `C:\Dev\UniText\workflow\claude-plans`
+- Claude workflow source: `registry\workflow\claude-plans`
+- Gemini workflow temp state: CLI internal state
+- Codex: 無 standalone workflow directory setting
 
-## GitHub CLI (`gh`)
-- Config files: `%APPDATA%\GitHub CLI\config.yml`, `hosts.yml`
-- MCP: not native
-- Skills: not native
-- Workflow path (GitHub Actions): `<repo>\.github\workflows\*.yml`
+## Verification
 
-## Applied Changes
-- Updated `%USERPROFILE%\.codex\config.toml` skills path
-- Updated `%USERPROFILE%\.claude\settings.json` with `plansDirectory`
-- Created canonical folders under `C:\Dev\UniText`
-- Created `C:\Dev\UniText\local\scripts\sync-skills.ps1` to mirror skills to:
-  - `%USERPROFILE%\.claude\skills`
-  - `%USERPROFILE%\.gemini\skills`
-  - `%USERPROFILE%\.agents\skills`
-- Created MCP canonical seed file: `C:\Dev\UniText\mcp\claude.mcp.json`
-- Mirrored project MCP file: `C:\Dev\.mcp.json`
-
-## Backups
-- `C:\Dev\UniText\backup\20260228_185716\`
+- repo baseline: `local/scripts/health-check.ps1`
+- delivery paths: `local/scripts/verify-delivery.ps1`
+- first-run bootstrap: `local/scripts/verify-bootstrap.py`
