@@ -78,17 +78,24 @@ def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> d
 
 def update_line(text: str, pattern: str, replacement: str) -> str:
     if re.search(pattern, text, flags=re.MULTILINE):
-        return re.sub(pattern, replacement, text, flags=re.MULTILINE)
+        return re.sub(pattern, lambda _: replacement, text, flags=re.MULTILINE)
     return text + ("\n" if text and not text.endswith("\n") else "") + replacement + "\n"
 
 
+def toml_string(value: str) -> str:
+    if "'" not in value:
+        return f"'{value}'"
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
 def render_codex_mcp_block(server: Path, root: Path) -> str:
-    args = json.dumps([str(server), "--root", str(root)])
+    args = ", ".join(toml_string(item) for item in [str(server), "--root", str(root)])
     return "\n".join(
         [
             "[mcp_servers.unitext_registry]",
-            f"command = {json.dumps(sys.executable)}",
-            f"args = {args}",
+            f"command = {toml_string(sys.executable)}",
+            f"args = [{args}]",
             "",
         ]
     )
@@ -98,7 +105,7 @@ def upsert_codex_mcp_block(text: str, server: Path, root: Path) -> str:
     block = render_codex_mcp_block(server, root)
     pattern = r"(?ms)^\[mcp_servers\.unitext_registry\]\n.*?(?=^\[|\Z)"
     if re.search(pattern, text):
-        return re.sub(pattern, block, text)
+        return re.sub(pattern, lambda _: block, text)
     if not text.endswith("\n"):
         text += "\n"
     return text + "\n" + block
@@ -170,7 +177,7 @@ def main() -> int:
 
     if not args.skip_codex:
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
-        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {json.dumps(str(source))}")
+        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(source))}")
         updated = upsert_codex_mcp_block(updated, server, repo)
         changed = updated != original
         summary["codex"] = {
