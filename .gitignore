@@ -1,7 +1,6 @@
 backup/
 recovered_*/
 .bak_*/
-.mcp.json
 **/__pycache__/
 ops/history/backup_*/
 ops/history/bootstrap_*/
