@@ -41,7 +41,7 @@ UniText/
     └── history/       ← timestamped audit trail
 ```
 
-The `registry/` layer is platform-agnostic — it uses logical canonical paths (`/registry/skills`, `/registry/mcp`) rather than OS-specific absolute paths. The `local/` layer resolves those to your actual machine.
+The `registry/` layer is platform-agnostic — it uses logical canonical paths (`/registry/skills`, `/registry/mcp`) rather than OS-specific absolute paths. The `local/` layer resolves those to your actual machine. The shared repo baseline includes a template-safe `.mcp.json` seed and `.claude/settings.json`, while `bootstrap.py` upgrades them to active machine wiring when needed.
 
 ---
 
@@ -128,7 +128,9 @@ python local/scripts/bootstrap.py --force
 python local/scripts/verify-bootstrap.py
 ```
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and writes a project-local `.mcp.json` for the bundled MCP baseline. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation.
+If your system exposes Python as `python3`, replace `python` with `python3`.
+
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation.
 
 ---
 
@@ -136,12 +138,32 @@ python local/scripts/verify-bootstrap.py
 
 | CLI | Delivery Mode | Notes |
 |-----|--------------|-------|
-| **Claude Code** | mirror / symlink | `~/.claude/skills` |
+| **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
 | **GitHub CLI** | native-config | `config.yml` |
 
 See [local/docs/PATH_MAP.md](local/docs/PATH_MAP.md) for the full per-CLI path reference.
+
+### Cross-Platform Baseline
+
+The GitHub-hosted starter template is intended to support:
+
+- `Claude Code`
+- `Codex`
+- `Gemini CLI`
+- `Windows`
+- `macOS`
+- `Linux`
+
+The tracked `.mcp.json` is a relative-path seed for fresh clones. The supported first-run path is still:
+
+```bash
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+```
+
+That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
 
 ---
 
@@ -187,7 +209,7 @@ Reading order: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.m
 
 ### As a starter template
 
-Fork this repo. Strip `ops/history/`, `backup/`, and `local/` paths specific to this machine. Populate `registry/` with your own skills and MCP definitions. Wire up `local/scripts/` to your environment.
+Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
 
 ### As a reference implementation
 

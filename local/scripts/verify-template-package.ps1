@@ -10,6 +10,8 @@ if (-not $Path) {
 
 $required = @(
   ".gitignore",
+  ".mcp.json",
+  ".claude\\settings.json",
   "README.md",
   "INDEX.md",
   "VISION.md",
@@ -24,6 +26,8 @@ $required = @(
   "release.json",
   "registry\\skills\\example-skill\\SKILL.md",
   "registry\\agents\\example-agent\\AGENT.md",
+  "registry\\mcp\\claude-project-mcp-seed\\server.py",
+  "registry\\mcp\\claude-project-mcp-seed\\definition.json",
   "registry\\mcp\\example-mcp\\definition.json",
   "registry\\workflow\\example-workflow\\WORKFLOW.md",
   "local\\README.md",

@@ -1,6 +1,8 @@
 $ErrorActionPreference = "Stop"
 $skillsRoot = "registry\\skills"
 $required = @(
+  ".mcp.json",
+  ".claude\\settings.json",
   "README.md",
   "INDEX.md",
   "VISION.md",

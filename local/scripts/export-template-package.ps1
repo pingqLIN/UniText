@@ -13,6 +13,7 @@ $outputBase = if ([IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot } else { (
 $package = Join-Path $outputBase $folder
 $items = @(
   [pscustomobject]@{ kind = "file"; source = ".gitignore"; target = ".gitignore" },
+  [pscustomobject]@{ kind = "file"; source = ".mcp.json"; target = ".mcp.json" },
   [pscustomobject]@{ kind = "file"; source = "README.md"; target = "README.md" },
   [pscustomobject]@{ kind = "file"; source = "INDEX.md"; target = "INDEX.md" },
   [pscustomobject]@{ kind = "file"; source = "VISION.md"; target = "VISION.md" },
@@ -23,6 +24,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "MILESTONES.md"; target = "MILESTONES.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_PACKAGE.md"; target = "TEMPLATE_RELEASE_PACKAGE.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_CHECKLIST.md"; target = "TEMPLATE_RELEASE_CHECKLIST.md" },
+  [pscustomobject]@{ kind = "file"; source = ".claude\\settings.json"; target = ".claude\\settings.json" },
   [pscustomobject]@{ kind = "file"; source = "template\\examples\\local\\README.md"; target = "local\\README.md" },
   [pscustomobject]@{ kind = "file"; source = "template\\examples\\local\\docs\\PATH_MAP.template.md"; target = "local\\docs\\PATH_MAP.md" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\bootstrap.py"; target = "local\\scripts\\bootstrap.py" },
@@ -31,6 +33,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\sync-skills.ps1"; target = "local\\scripts\\sync-skills.ps1" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\skills\\example-skill"; target = "registry\\skills\\example-skill" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\agents\\example-agent"; target = "registry\\agents\\example-agent" },
+  [pscustomobject]@{ kind = "dir"; source = "registry\\mcp\\claude-project-mcp-seed"; target = "registry\\mcp\\claude-project-mcp-seed" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\mcp\\example-mcp"; target = "registry\\mcp\\example-mcp" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\workflow\\example-workflow"; target = "registry\\workflow\\example-workflow" }
 )

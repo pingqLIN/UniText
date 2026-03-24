@@ -20,11 +20,22 @@ def contains_path(text: str, value: str) -> bool:
     return value in text or value.replace("\\", "\\\\") in text
 
 
+def has_claude_registry_permissions(text: str) -> bool:
+    required = [
+        r"Bash(find . -type f \\(-name *.py -o -name *.js -o -name *.ts -o -name *.sh -o -name *.ps1 \\))",
+        "mcp__unitext-registry__registry_summary",
+        "mcp__unitext-registry__list_registry_entries",
+        "mcp__unitext-registry__read_registry_file",
+    ]
+    return all(item in text for item in required)
+
+
 def main() -> int:
     repo = get_repo_root()
     source = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     codex_config = Path.home() / ".codex" / "config.toml"
+    claude_settings = repo / ".claude" / "settings.json"
     project_mcp = repo / ".mcp.json"
     targets = [
         Path.home() / ".claude" / "skills",
@@ -63,6 +74,7 @@ def main() -> int:
             server_config.get("command") == sys.executable
             and server_config.get("args") == [str(server), "--root", str(repo)]
         )
+    claude_text = read_text(claude_settings)
 
     report = {
         "repo_root": str(repo),
@@ -75,6 +87,11 @@ def main() -> int:
             "mcp_command_matches": contains_path(codex_text, str(sys.executable)),
             "mcp_args_match": contains_path(codex_text, str(server)),
         },
+        "claude_project": {
+            "path": str(claude_settings),
+            "exists": claude_settings.exists(),
+            "registry_permissions_match": has_claude_registry_permissions(claude_text),
+        },
         "project_mcp": project_mcp_report,
     }
     report["ok"] = (
@@ -82,6 +99,7 @@ def main() -> int:
         and report["codex"]["skills_path_matches"]
         and report["codex"]["mcp_command_matches"]
         and report["codex"]["mcp_args_match"]
+        and report["claude_project"]["registry_permissions_match"]
         and report["project_mcp"]["matches_expected"]
     )
     print(json.dumps(report, indent=2))

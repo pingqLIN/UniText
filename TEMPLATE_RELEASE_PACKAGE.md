@@ -12,6 +12,7 @@
 - 排除 local-only state
 - 排除歷史治理殘留
 - 適合其他使用者 fork / clone 後自行擴充
+- 能讓 Claude、Codex、Gemini 在 Windows / macOS / Linux 上沿著同一條 first-run 路徑啟用 baseline
 
 這份 package 的定位是：
 
@@ -38,11 +39,15 @@
   - `TEMPLATE_RELEASE_CHECKLIST.md`
 - template-safe root config
   - `.gitignore`
+  - `.mcp.json`
+  - `.claude/settings.json`
 - generic examples
   - `registry/skills/example-skill/`
   - `registry/agents/example-agent/`
   - `registry/mcp/example-mcp/`
   - `registry/workflow/example-workflow/`
+- runnable MCP baseline
+  - `registry/mcp/claude-project-mcp-seed/`
 - starter local overlay skeleton
   - `local/README.md`
   - `local/docs/PATH_MAP.md`
@@ -108,6 +113,8 @@ python local/scripts/verify-bootstrap.py
 python local/scripts/create-git-bundle.py
 ```
 
+若系統只提供 `python3`，請將上述命令中的 `python` 改為 `python3`。
+
 ## 5. Export Interpretation
 
 匯出的 template package 代表：
@@ -115,6 +122,9 @@ python local/scripts/create-git-bundle.py
 - UniText 的核心契約
 - 一份乾淨的 starter layout
 - 一組最小 generic examples
+- 一條可重複的 cross-platform `bootstrap -> verify` 路徑
+- 一份可由 Claude 直接讀取的 `.claude/settings.json`
+- 一份可由 project-local MCP 使用的 `.mcp.json` seed
 
 它不代表：
 
@@ -122,6 +132,7 @@ python local/scripts/create-git-bundle.py
 - 所有已納管 skills
 - 所有 review / audit 證據
 - 已完成的本機 delivery wiring
+- 任意機器都已經完成的 interpreter pinning
 
 ## 6. Current Interpretation
 

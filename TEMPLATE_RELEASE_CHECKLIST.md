@@ -19,15 +19,19 @@
 - [ ] template package 不包含 `ops/history/`
 - [ ] template package 不包含 review-only docs
 - [ ] template package 不包含 machine-specific absolute paths
+- [ ] tracked `.mcp.json` 為 relative-path seed，而非作者本機絕對路徑
 
 ## 3. Examples
 
 - [ ] 至少 1 個 generic skill example
 - [ ] 至少 1 個 generic agent example
 - [ ] 至少 1 個 generic mcp example
+- [ ] 至少 1 個 runnable project-local MCP baseline
 - [ ] 至少 1 個 generic workflow example
 - [ ] 至少 1 份 generic local overlay skeleton
 - [ ] starter package 含跨平台 `bootstrap -> verify` 路徑
+- [ ] starter package 含 `.claude/settings.json`
+- [ ] starter package 含 `.mcp.json`
 
 ## 4. Validation
 
@@ -37,6 +41,7 @@
 - [ ] `verify-template-package.ps1` 可通過
 - [ ] `bootstrap.py --dry-run` 可在乾淨環境預覽初始化內容
 - [ ] `verify-bootstrap.py` 可驗證 first-run wiring
+- [ ] `.claude/settings.json` 指向 UniText MCP 工具而非錯誤服務
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
 
