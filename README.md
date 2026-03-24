@@ -4,7 +4,7 @@
 
 > **A text-native, registry-first shared resource hub for multiple AI CLIs.**
 >
-> 純文本作為共享介面，讓 Claude Code、Codex、Gemini CLI 等工具共用同一套資源定義。
+> 純文本作為共享介面，讓 Claude Code、Codex、Gemini CLI、Copilot CLI 等工具共用同一套資源定義。
 
 ---
 
@@ -128,7 +128,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation.
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot CLI is part of the target baseline, but its adapter wiring is still tracked as a follow-up item rather than a verified first-run path.
 
 ---
 
@@ -139,7 +139,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **GitHub CLI** | native-config | `config.yml` |
+| **Copilot CLI** | target baseline, adapter pending | intended to consume the shared MCP / skill baseline once a stable Copilot adapter path is defined |
 
 See [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) for the starter path-map stub used by the template export.
 
@@ -150,6 +150,7 @@ The GitHub-hosted starter template is intended to support:
 - `Claude Code`
 - `Codex`
 - `Gemini CLI`
+- `Copilot CLI`
 - `Windows`
 - `macOS`
 - `Linux`
@@ -207,7 +208,7 @@ Reading order: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.m
 
 ### As a starter template
 
-Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
+Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini, and treat Copilot CLI as a target adapter to wire once its local config path is defined for your environment. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
 
 ### As a reference implementation
 

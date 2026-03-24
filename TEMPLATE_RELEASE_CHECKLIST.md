@@ -32,6 +32,7 @@
 - [ ] starter package 含跨平台 `bootstrap -> verify` 路徑
 - [ ] starter package 含 `.claude/settings.json`
 - [ ] starter package 含 `.mcp.json`
+- [ ] starter package 對 `Claude / Codex / Gemini / Copilot` 的目標定位有明確說明
 
 ## 4. Validation
 
@@ -42,6 +43,7 @@
 - [ ] `bootstrap.py --dry-run` 可在乾淨環境預覽初始化內容
 - [ ] `verify-bootstrap.py` 可驗證 first-run wiring
 - [ ] `.claude/settings.json` 指向 UniText MCP 工具而非錯誤服務
+- [ ] 未宣稱 Copilot 已完成驗證，除非真的有 adapter 與實測證據
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
 

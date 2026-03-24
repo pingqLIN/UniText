@@ -12,7 +12,7 @@
 - 排除 local-only state
 - 排除歷史治理殘留
 - 適合其他使用者 fork / clone 後自行擴充
-- 能讓 Claude、Codex、Gemini 在 Windows / macOS / Linux 上沿著同一條 first-run 路徑啟用 baseline
+- 能讓 Claude、Codex、Gemini、Copilot 在 Windows / macOS / Linux 上朝同一套 shared baseline 對齊
 
 這份 package 的定位是：
 
@@ -125,6 +125,7 @@ python local/scripts/create-git-bundle.py
 - 一條可重複的 cross-platform `bootstrap -> verify` 路徑
 - 一份可由 Claude 直接讀取的 `.claude/settings.json`
 - 一份可由 project-local MCP 使用的 `.mcp.json` seed
+- 一個可供 Copilot CLI 未來 adapter 對接的 shared baseline
 
 它不代表：
 

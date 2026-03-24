@@ -9,6 +9,7 @@
 - `Claude Code`
 - `Codex`
 - `Gemini CLI`
+- `Copilot CLI`
 - `Windows`
 - `macOS`
 - `Linux`
