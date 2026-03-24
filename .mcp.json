@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "unitext-registry": {
+      "transport": "stdio",
+      "command": "python3",
+      "args": [
+        "registry/mcp/claude-project-mcp-seed/server.py",
+        "--root",
+        "."
+      ],
+      "notes": "Project-local read-only UniText registry server. Bootstrap may replace command/args with absolute paths for the current machine."
+    }
+  }
+}

@@ -2,8 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(find . -type f -name *.json -o -name *.toml -o -name *.yaml -o -name *.yml)",
-      "Bash(find . -type f \\\\\\(-name *.py -o -name *.js -o -name *.ts -o -name *.sh -o -name *.ps1 \\\\\\))",
-      "mcp__MCP_DOCKER__read_file"
+      "Bash(find . -type f \\(-name *.py -o -name *.js -o -name *.ts -o -name *.sh -o -name *.ps1 \\))",
+      "mcp__unitext-registry__registry_summary",
+      "mcp__unitext-registry__list_registry_entries",
+      "mcp__unitext-registry__read_registry_file"
     ]
   }
 }
