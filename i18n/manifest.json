@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "default_locale": "en",
+  "locales": [
+    "zh-TW",
+    "zh-CN",
+    "ja",
+    "de",
+    "fr",
+    "es",
+    "ko",
+    "it"
+  ],
+  "source_docs": [
+    "AGENTS.md",
+    "NO_PUBLISH_POLICY.md",
+    "README.md",
+    "INDEX.md",
+    "VISION.md",
+    "RESOURCE_SPEC.md",
+    "OPERATIONS.md",
+    "PROJECT_MODES.md",
+    "SECRET_HANDLING_GUIDELINES.md",
+    "MILESTONES.md",
+    "ESSENTIAL_SKILLS_SHORTLIST.md",
+    "EXTERNAL_REVIEW_PACKAGE.md",
+    "EXTERNAL_REVIEW_COVER_NOTE.md",
+    "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+    "TEMPLATE_RELEASE_PACKAGE.md",
+    "TEMPLATE_RELEASE_CHECKLIST.md",
+    "PROJECT_STATUS_REPORT_2026-03-23.md",
+    "SKILL0_COLLABORATION_VISION.md",
+    "local/README.md",
+    "local/scripts/README.md",
+    "local/docs/ADOPTION_CHECKLIST.md",
+    "local/docs/CLI_COMPAT_MATRIX.md",
+    "local/docs/ENVIRONMENT.md",
+    "local/docs/MCP_DEPLOYMENT_NOTES.md",
+    "local/docs/PATH_MAP.md",
+    "local/docs/WORKFLOW_DEPLOYMENT_NOTES.md"
+  ],
+  "excluded": [
+    "SOCIAL_POSTS_2026-03-24.md",
+    "STRATEGIC_REVIEW_2026-03-23.md",
+    "local/docs/JOURNAL.md",
+    "local/docs/authoring/**",
+    "local/docs/reviews/**",
+    "registry/**",
+    "template/**"
+  ]
+}

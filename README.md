@@ -1,3 +1,5 @@
+[English](README.md) | [繁體中文](i18n/zh-TW/README.md) | [简体中文](i18n/zh-CN/README.md) | [日本語](i18n/ja/README.md) | [Deutsch](i18n/de/README.md) | [Français](i18n/fr/README.md) | [Español](i18n/es/README.md) | [한국어](i18n/ko/README.md) | [Italiano](i18n/it/README.md)
+
 # UniText
 
 > **A text-native, registry-first shared resource hub for multiple AI CLIs.**
