@@ -102,7 +102,7 @@
 
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 為何已列入 starter template 目標、但目前仍屬 `adapter pending`，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 為何已列入 starter template 目標，以及目前如何透過 `.github/copilot-instructions.md`、`~/.copilot/skills` 與 `~/.copilot/mcp-config.json` 建立可驗證的 bootstrap baseline，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 

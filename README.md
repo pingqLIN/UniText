@@ -142,7 +142,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot CLI is part of the target baseline, but its adapter wiring is still tracked as a follow-up item rather than a verified first-run path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and next-step definition.
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, upgrades the project `.mcp.json` to the active machine interpreter and repo root, and writes the Copilot personal baseline at `~/.copilot/skills` plus `~/.copilot/mcp-config.json`. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot also has a tracked repo-level instructions surface at [.github/copilot-instructions.md](/mnt/q/UniText/.github/copilot-instructions.md). See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining runtime-verification boundary.
 
 ---
 
@@ -153,7 +153,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **Copilot CLI** | target baseline, adapter pending | intended to consume the shared MCP / skill baseline once a stable Copilot adapter path is defined |
+| **Copilot CLI** | bootstrap-verified personal config + repo instructions | `bootstrap.py` aligns `~/.copilot/skills` and `~/.copilot/mcp-config.json`, while `.github/copilot-instructions.md` provides repository guidance; broader interactive-session evidence still remains follow-up work |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
 
@@ -178,7 +178,7 @@ python local/scripts/bootstrap.py --force
 python local/scripts/verify-bootstrap.py
 ```
 
-That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
+That route is the authoritative setup path because it pins the current machine interpreter, repo root, Codex wiring, and Copilot personal MCP / skills baseline without baking author-specific absolute paths into the shared template.
 
 ---
 
@@ -214,7 +214,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Template release cleanup scope, exclusions, and export flow |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
-| [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
+| [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating verification |
 | [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
@@ -234,7 +234,7 @@ That output respects `registry/catalog-exclusions.json`, so explicit stray items
 
 ### As a starter template
 
-Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini, and treat Copilot CLI as a target adapter to wire once its local config path is defined for your environment. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
+Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, `.github/copilot-instructions.md`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini / Copilot. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
 
 ### As a reference implementation
 

@@ -23,6 +23,7 @@ PLANNED_STEPS = [
     "protect_existing_inputs",
     "sync_skills_targets",
     "update_codex_config",
+    "update_copilot_config",
     "update_project_mcp",
     "write_summary",
     "finalize",
@@ -56,6 +57,18 @@ def atomic_write_text(path: Path, text: str) -> None:
 
 def atomic_write_json(path: Path, body: object) -> None:
     atomic_write_text(path, json.dumps(body, indent=2, ensure_ascii=False) + "\n")
+
+
+def read_json_object(path: Path) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    try:
+        body = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"invalid JSON in {path}: {exc}") from exc
+    if not isinstance(body, dict):
+        raise RuntimeError(f"expected JSON object in {path}")
+    return body
 
 
 def backup_path(path: Path, destination: Path) -> None:
@@ -196,6 +209,30 @@ def render_project_mcp(server: Path, root: Path) -> dict[str, object]:
     }
 
 
+def render_copilot_mcp_server(server: Path, root: Path) -> dict[str, object]:
+    return {
+        "type": "local",
+        "command": sys.executable,
+        "args": [str(server), "--root", str(root)],
+        "env": {},
+        "tools": ["*"],
+    }
+
+
+def render_copilot_mcp_config(existing: dict[str, object] | None, server: Path, root: Path) -> dict[str, object]:
+    body = {} if existing is None else dict(existing)
+    raw_servers = body.get("mcpServers")
+    if raw_servers is None:
+        mcp_servers: dict[str, object] = {}
+    elif isinstance(raw_servers, dict):
+        mcp_servers = dict(raw_servers)
+    else:
+        raise RuntimeError("expected mcpServers to be an object in Copilot MCP config")
+    mcp_servers["unitext-registry"] = render_copilot_mcp_server(server, root)
+    body["mcpServers"] = mcp_servers
+    return body
+
+
 def validate_repo_surface(repo: Path) -> None:
     missing = [str(marker) for marker in REPO_MARKERS if not (repo / marker).exists()]
     if missing:
@@ -223,6 +260,7 @@ def main() -> int:
     parser.add_argument("--mode", choices=["auto", "symlink", "mirror"], default="auto")
     parser.add_argument("--skip-skills", action="store_true")
     parser.add_argument("--skip-codex", action="store_true")
+    parser.add_argument("--skip-copilot", action="store_true")
     parser.add_argument("--skip-project-mcp", action="store_true")
     args = parser.parse_args()
 
@@ -235,10 +273,12 @@ def main() -> int:
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
     codex_config = Path.home() / ".codex" / "config.toml"
+    copilot_mcp_config = Path.home() / ".copilot" / "mcp-config.json"
     skills_targets = [
         Path.home() / ".claude" / "skills",
         Path.home() / ".gemini" / "skills",
         Path.home() / ".agents" / "skills",
+        Path.home() / ".copilot" / "skills",
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -262,6 +302,7 @@ def main() -> int:
         "steps": make_step_log(),
         "skills": [],
         "codex": {},
+        "copilot": {},
         "project_mcp": {},
     }
 
@@ -286,6 +327,8 @@ def main() -> int:
                     backup_path(target, run_dir / "skills" / safe_name(target))
         if not args.skip_codex and codex_config.exists():
             backup_path(codex_config, run_dir / "codex" / "config.toml")
+        if not args.skip_copilot and copilot_mcp_config.exists():
+            backup_path(copilot_mcp_config, run_dir / "copilot" / "mcp-config.json")
         if not args.skip_project_mcp and project_mcp.exists():
             backup_path(project_mcp, run_dir / "project-mcp" / ".mcp.json")
         set_step_status(summary, "protect_existing_inputs", "complete")
@@ -318,6 +361,27 @@ def main() -> int:
             set_step_status(summary, "update_codex_config", "complete")
         else:
             set_step_status(summary, "update_codex_config", "skipped", "requested by --skip-codex")
+        atomic_write_json(state_path, summary)
+
+        if not args.skip_copilot:
+            set_step_status(summary, "update_copilot_config", "in_progress")
+            existing = read_json_object(copilot_mcp_config)
+            updated_body = render_copilot_mcp_config(existing, server, repo)
+            existing_text = copilot_mcp_config.read_text(encoding="utf-8") if copilot_mcp_config.exists() else ""
+            updated = json.dumps(updated_body, indent=2, ensure_ascii=False) + "\n"
+            changed = updated != existing_text
+            summary["copilot"] = {
+                "path": str(copilot_mcp_config),
+                "changed": changed,
+                "skills_path": str(Path.home() / ".copilot" / "skills"),
+                "mcp_server": "unitext-registry",
+            }
+            if changed:
+                copilot_mcp_config.parent.mkdir(parents=True, exist_ok=True)
+                atomic_write_text(copilot_mcp_config, updated)
+            set_step_status(summary, "update_copilot_config", "complete")
+        else:
+            set_step_status(summary, "update_copilot_config", "skipped", "requested by --skip-copilot")
         atomic_write_json(state_path, summary)
 
         if not args.skip_project_mcp:

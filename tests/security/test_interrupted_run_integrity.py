@@ -71,6 +71,7 @@ class InterruptedRunIntegrityTests(unittest.TestCase):
             self.assertFalse((repo_root / ".mcp.json").exists())
             self.assertFalse((repo_root / "ops" / "history").exists())
             self.assertFalse((home_root / ".codex" / "config.toml").exists())
+            self.assertFalse((home_root / ".copilot" / "mcp-config.json").exists())
 
     def test_bootstrap_force_writes_complete_state_in_isolated_repo(self):
         script = REPO_ROOT / "local" / "scripts" / "bootstrap.py"
@@ -106,6 +107,60 @@ class InterruptedRunIntegrityTests(unittest.TestCase):
             self.assertEqual(summary["generation_state"], "complete")
             self.assertEqual(state, summary)
             self.assertTrue((home_root / ".codex" / "config.toml").exists())
+            self.assertTrue((home_root / ".copilot" / "skills").exists())
+            copilot_config = home_root / ".copilot" / "mcp-config.json"
+            self.assertTrue(copilot_config.exists())
+            copilot_body = json.loads(copilot_config.read_text(encoding="utf-8"))
+            self.assertEqual(
+                copilot_body["mcpServers"]["unitext-registry"]["args"],
+                [str(repo_root / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"), "--root", str(repo_root)],
+            )
+
+    def test_bootstrap_force_merges_existing_copilot_mcp_config(self):
+        script = REPO_ROOT / "local" / "scripts" / "bootstrap.py"
+        with tempfile.TemporaryDirectory() as temp_dir:
+            sandbox = Path(temp_dir)
+            repo_root = sandbox / "repo"
+            home_root = sandbox / "home"
+            build_minimal_repo(repo_root)
+            existing_config = home_root / ".copilot" / "mcp-config.json"
+            write_text(
+                existing_config,
+                json.dumps(
+                    {
+                        "mcpServers": {
+                            "existing-server": {
+                                "type": "local",
+                                "command": "demo",
+                                "args": ["--demo"],
+                                "env": {},
+                                "tools": ["*"],
+                            }
+                        }
+                    }
+                ),
+            )
+            env = os.environ.copy()
+            env["HOME"] = str(home_root)
+
+            result = run_command(
+                [
+                    sys.executable,
+                    str(script),
+                    "--repo-root",
+                    str(repo_root),
+                    "--allow-external-repo-root",
+                    "--force",
+                    "--mode",
+                    "mirror",
+                ],
+                env=env,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            body = json.loads(existing_config.read_text(encoding="utf-8"))
+            self.assertIn("existing-server", body["mcpServers"])
+            self.assertIn("unitext-registry", body["mcpServers"])
 
     def test_verify_template_rejects_interrupted_residual(self):
         powershell = get_powershell_executable()

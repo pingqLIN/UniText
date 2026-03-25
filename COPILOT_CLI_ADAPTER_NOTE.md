@@ -1,6 +1,6 @@
 # UniText — Copilot CLI Adapter Note
 
-> Status: Target Baseline
+> Status: Bootstrap Baseline Verified
 > Scope: Define how `Copilot CLI` fits into the UniText starter template without overstating current support.
 
 ## 1. Purpose
@@ -17,7 +17,7 @@ This note records the current collaboration model between `UniText` and `Copilot
 - `macOS`
 - `Linux`
 
-At the same time, this note intentionally does **not** claim that `Copilot CLI` is already fully wired, verified, or feature-complete inside this repository.
+At the same time, this note intentionally does **not** claim that `Copilot CLI` is already feature-complete or end-to-end verified across every interactive workflow inside this repository.
 
 ## 2. Current Position
 
@@ -25,8 +25,11 @@ The current repo baseline is:
 
 - `registry/` is the canonical source of truth for shared resources
 - `.mcp.json` is shipped as a template-safe, relative-path seed
+- `.github/copilot-instructions.md` is the repo-level Copilot instructions surface
 - `.claude/settings.json` is tracked as part of the shared starter baseline
 - `bootstrap.py -> verify-bootstrap.py` is the preferred first-run path for the current cross-platform baseline
+- `bootstrap.py` now aligns `~/.copilot/skills` and writes `~/.copilot/mcp-config.json` with the local `unitext-registry` MCP server entry
+- `verify-bootstrap.py` now checks the Copilot skills target and MCP config contract alongside the existing Claude / Codex / Gemini targets
 
 For `Copilot CLI`, the intended direction is:
 
@@ -44,21 +47,23 @@ The project already has a clearer first-run path for:
 - `Codex CLI`
 - `Gemini CLI`
 
-But for `Copilot CLI`, this repository does not yet define a stable, repo-level adapter contract that is both:
+The main question used to be whether `Copilot CLI` exposed a stable enough config surface for the starter template. That question is now answered conservatively:
 
-- cross-platform
-- template-safe
-- verified by local bootstrap and validation flow
+- project guidance can live in `.github/copilot-instructions.md`
+- personal shared skills can live in `~/.copilot/skills`
+- local MCP wiring can live in `~/.copilot/mcp-config.json`
+- those two personal surfaces can be managed through `bootstrap.py -> verify-bootstrap.py`
 
 This note exists so the template can honestly say:
 
 - `Copilot CLI` is in scope
 - the direction is defined
-- the implementation is still pending
+- the bootstrap baseline exists and is locally verifiable
+- broader runtime evidence is still pending
 
 ## 4. Adapter Goals
 
-The future `Copilot CLI` adapter should satisfy these goals:
+The `Copilot CLI` adapter baseline should satisfy these goals:
 
 1. Read from the same canonical registry rather than introducing another source of truth.
 2. Work on `Windows`, `macOS`, and `Linux` without author-specific absolute paths.
@@ -66,40 +71,46 @@ The future `Copilot CLI` adapter should satisfy these goals:
 4. Be compatible with the template release boundary, meaning no local-only deployment assumptions should leak into the shared repo.
 5. Provide a verification path comparable to `bootstrap -> verify`.
 
-## 5. Proposed Integration Path
+## 5. Current Adapter Contract
 
-The most conservative integration path is:
+The current conservative contract is:
 
 1. Keep `registry/` as the single source of truth.
-2. Discover the stable `Copilot CLI` config surface that can point at shared resources or project-local MCP configuration.
-3. Add adapter-specific bootstrap logic only after the config surface is stable enough to support a GitHub-hosted starter template.
-4. Add an explicit verification step before changing the compatibility matrix from `adapter pending` to `verified`.
+2. Track repository guidance in `.github/copilot-instructions.md`.
+3. Deliver shared skills to `~/.copilot/skills` during bootstrap.
+4. Register the read-only `unitext-registry` server in `~/.copilot/mcp-config.json` during bootstrap.
+5. Verify those outputs through `verify-bootstrap.py`.
 
-In practice, this means the first implementation should answer:
+This contract is intentionally narrow. It does not depend on interactive `/mcp add`, plugins, or one-off operator steps. It only depends on documented file surfaces that can be written atomically and checked offline.
 
-- How does `Copilot CLI` discover project-local MCP definitions?
+In practice, the current implementation answers:
+
 - How does `Copilot CLI` discover or consume shared skills?
-- Which parts belong in tracked shared files, and which parts belong in local bootstrap output?
+  Through `~/.copilot/skills`, which bootstrap aligns to `registry/skills`.
+- How does `Copilot CLI` discover the shared UniText MCP surface?
+  Through `~/.copilot/mcp-config.json`, which bootstrap updates with the local `unitext-registry` entry.
+- Which parts belong in tracked shared files?
+  `.github/copilot-instructions.md` and the canonical registry.
+- Which parts belong in local bootstrap output?
+  `~/.copilot/skills` and `~/.copilot/mcp-config.json`.
 
 ## 6. Known Gaps
 
 The current repo still lacks these pieces for `Copilot CLI`:
 
-- a fixed adapter contract in the shared repo
-- a verified first-run initialization path
-- a repo-level verification command with evidence
-- a documented rule for how `Copilot CLI` should consume shared skills, MCP definitions, or agent resources
+- broader interactive-session evidence that Copilot actually invokes the seeded skills and MCP server as expected in day-to-day use
+- a richer verification path beyond first-run config checks
+- a documented policy for repository-level custom agents if UniText later wants to expose shared agent personas through Copilot-native locations
 
 Because of these gaps, the current compatibility status remains:
 
-`target baseline, adapter pending`
+`bootstrap baseline verified; broader runtime validation pending`
 
 ## 7. Non-Goals
 
 This note does not:
 
-- claim verified `Copilot CLI` support
-- freeze a tool-specific config format before it is stable
+- claim that every Copilot workflow is already end-to-end verified
 - require duplicated `skills` content just to satisfy one CLI
 - move canonical truth away from `registry/`
 
@@ -107,6 +118,6 @@ This note does not:
 
 The next practical milestone is:
 
-**define the first repo-level `Copilot CLI` adapter baseline, then add bootstrap + verification evidence**
+**collect end-to-end Copilot session evidence on top of the verified bootstrap baseline, then decide whether the status should be promoted beyond bootstrap verification**
 
-Only after that should the compatibility matrix or template release checklist be upgraded from target language to verified support.
+Only after that should the compatibility matrix or template release checklist be upgraded beyond bootstrap verification language.

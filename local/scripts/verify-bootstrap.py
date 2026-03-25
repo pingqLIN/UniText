@@ -118,12 +118,14 @@ def main() -> int:
     source = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     codex_config = Path.home() / ".codex" / "config.toml"
+    copilot_config = Path.home() / ".copilot" / "mcp-config.json"
     claude_settings = repo / ".claude" / "settings.json"
     project_mcp = repo / ".mcp.json"
     targets = [
         Path.home() / ".claude" / "skills",
         Path.home() / ".gemini" / "skills",
         Path.home() / ".agents" / "skills",
+        Path.home() / ".copilot" / "skills",
     ]
 
     target_report = []
@@ -158,6 +160,28 @@ def main() -> int:
             if isinstance(unitext_registry, dict):
                 codex_report["mcp_command_matches"] = unitext_registry.get("command") == sys.executable
                 codex_report["mcp_args_match"] = unitext_registry.get("args") == [str(server), "--root", str(repo)]
+
+    copilot_body = read_json(copilot_config)
+    copilot_report = {
+        "path": str(copilot_config),
+        "exists": copilot_config.exists(),
+        "parsed": copilot_body is not None,
+        "server_present": False,
+        "type_matches": False,
+        "command_matches": False,
+        "args_match": False,
+        "tools_match": False,
+    }
+    if copilot_body is not None:
+        mcp_servers = copilot_body.get("mcpServers")
+        if isinstance(mcp_servers, dict):
+            unitext_registry = mcp_servers.get("unitext-registry")
+            if isinstance(unitext_registry, dict):
+                copilot_report["server_present"] = True
+                copilot_report["type_matches"] = unitext_registry.get("type") == "local"
+                copilot_report["command_matches"] = unitext_registry.get("command") == sys.executable
+                copilot_report["args_match"] = unitext_registry.get("args") == [str(server), "--root", str(repo)]
+                copilot_report["tools_match"] = unitext_registry.get("tools") == ["*"]
 
     claude_body = read_json(claude_settings)
     claude_report = {
@@ -209,6 +233,7 @@ def main() -> int:
         "skills_source": str(source),
         "targets": target_report,
         "codex": codex_report,
+        "copilot": copilot_report,
         "claude_project": claude_report,
         "project_mcp": project_mcp_report,
         "bootstrap_run": bootstrap_run,
@@ -218,6 +243,11 @@ def main() -> int:
         and codex_report["skills_path_matches"]
         and codex_report["mcp_command_matches"]
         and codex_report["mcp_args_match"]
+        and copilot_report["server_present"]
+        and copilot_report["type_matches"]
+        and copilot_report["command_matches"]
+        and copilot_report["args_match"]
+        and copilot_report["tools_match"]
         and claude_report["registry_permissions_match"]
         and project_mcp_report["matches_expected"]
         and bootstrap_run["ok"]

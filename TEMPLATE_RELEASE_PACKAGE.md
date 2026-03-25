@@ -132,7 +132,7 @@ python local/scripts/create-git-bundle.py
 - 一條可重複的 cross-platform `bootstrap -> verify` 路徑
 - 一份可由 Claude 直接讀取的 `.claude/settings.json`
 - 一份可由 project-local MCP 使用的 `.mcp.json` seed
-- 一個可供 Copilot CLI 未來 adapter 對接的 shared baseline
+- 一個可供 Copilot CLI bootstrap baseline 直接對接的 shared baseline
 
 它不代表：
 
