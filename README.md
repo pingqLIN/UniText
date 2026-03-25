@@ -144,6 +144,8 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 
 `bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, upgrades the project `.mcp.json` to the active machine interpreter and repo root, and writes the Copilot personal baseline at `~/.copilot/skills` plus `~/.copilot/mcp-config.json`. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot also has a tracked repo-level instructions surface at [.github/copilot-instructions.md](/mnt/q/UniText/.github/copilot-instructions.md). See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining runtime-verification boundary.
 
+If you need additional runtime evidence on top of `bootstrap -> verify`, use `python local/scripts/verify-copilot-session.py --use-project-mcp` to collect a repeatable non-interactive Copilot session check.
+
 ---
 
 ## Supported CLIs
@@ -215,6 +217,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
 | [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating verification |
+| [COPILOT_SESSION_EVIDENCE_2026-03-26.md](COPILOT_SESSION_EVIDENCE_2026-03-26.md) | Runtime evidence note for the current non-interactive Copilot session boundary |
 | [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 

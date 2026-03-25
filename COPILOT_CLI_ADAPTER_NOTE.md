@@ -106,6 +106,8 @@ Because of these gaps, the current compatibility status remains:
 
 `bootstrap baseline verified; broader runtime validation pending`
 
+The repository now includes `local/scripts/verify-copilot-session.py` to collect repeatable non-interactive prompt evidence, and the current observed boundary is documented in `COPILOT_SESSION_EVIDENCE_2026-03-26.md`. That script is an evidence collector, not a status promotion by itself.
+
 ## 7. Non-Goals
 
 This note does not:

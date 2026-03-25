@@ -18,4 +18,5 @@
 - 每次 major version 變更後，應至少重新驗證一次 skills 與 mcp delivery。
 - `delivery path verified` 代表已由 `verify-delivery.ps1` 確認 canonical skills path 對齊，並不等於完成端到端互動驗證。
 - `bootstrap baseline verified` 代表 `bootstrap.py -> verify-bootstrap.py` 已能把該 CLI 的個人 skills / MCP baseline 對齊到 UniText registry，但仍不等於所有互動式工作流都已完成端到端驗證。
+- `local/scripts/verify-copilot-session.py` 可補非互動 prompt 證據，但若外部 MCP attach 發生 runtime timeout，狀態仍不應直接提升為 full E2E verified。
 - `Copilot CLI` 的目前定位、限制與後續 adapter 路線，另見 [../../COPILOT_CLI_ADAPTER_NOTE.md](../../COPILOT_CLI_ADAPTER_NOTE.md)。

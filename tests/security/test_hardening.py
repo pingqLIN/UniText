@@ -153,6 +153,19 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertIn(entry["status"], {"stray", "excluded"})
         self.assertIn("excluded", entry["reason"].lower())
 
+    def test_copilot_instructions_seed_documents_repo_level_baseline(self):
+        instructions = REPO_ROOT / ".github" / "copilot-instructions.md"
+        self.assertTrue(instructions.exists())
+        body = instructions.read_text(encoding="utf-8")
+        for needle in [
+            "registry/catalog-exclusions.json",
+            "local/scripts/bootstrap.py",
+            "local/scripts/verify-bootstrap.py",
+            "--additional-mcp-config @.mcp.json",
+            "registry/mcp/claude-project-mcp-seed/server.py",
+        ]:
+            self.assertIn(needle, body)
+
     def test_export_template_rejects_escape_output_root(self):
         script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
         powershell = get_powershell_executable()

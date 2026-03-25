@@ -1,22 +1,20 @@
-# I18N Wave Report 2026-03-25
+# I18n Wave Report 2026-03-25
 
 ## Scope
 
-This report captures the current `i18n/` dirty-tree wave after the release-integrity, catalog-governance, Copilot baseline, and release-hygiene tooling commits were separated out.
+This report classifies the current dirty `i18n/` tree without touching translation content.
 
-The goal is to determine whether the remaining `i18n` changes are substantive translation work or a formatting-only wave that should be handled separately.
+The goal is to answer one question: are these changes substantive translation edits, or are they line-ending-only drift that can be split into a separate technical cleanup commit?
 
-## Evidence
-
-Generated from:
+## Command
 
 ```bash
-python3 local/scripts/report-i18n-wave.py --json
+python3 local/scripts/report-i18n-wave.py --markdown
 ```
 
-Observed result at the time of writing:
+## Result
 
-- dirty i18n files: `63`
+- dirty entries: `63`
 - `eol_only`: `63`
 - `substantive`: `0`
 - `new_file`: `0`
@@ -24,32 +22,18 @@ Observed result at the time of writing:
 
 ## Interpretation
 
-The current `i18n` wave is not a translation-content update. It is a line-ending / formatting wave.
+Every currently dirty `i18n/` file in the worktree is line-ending-only after ignoring CR and trailing-space EOL changes.
 
-Representative checks:
+That means the `i18n` wave is safe to split as its own commit, and it should be treated as a formatting / normalization commit rather than a translation-content commit.
 
-- [i18n/zh-CN/README.md](/mnt/q/UniText/i18n/zh-CN/README.md)
-- [i18n/zh-CN/INDEX.md](/mnt/q/UniText/i18n/zh-CN/INDEX.md)
-- [i18n/zh-CN/local/docs/CLI_COMPAT_MATRIX.md](/mnt/q/UniText/i18n/zh-CN/local/docs/CLI_COMPAT_MATRIX.md)
-- [i18n/zh-CN/AGENTS.md](/mnt/q/UniText/i18n/zh-CN/AGENTS.md)
-- [i18n/zh-TW/README.md](/mnt/q/UniText/i18n/zh-TW/README.md)
-- [i18n/de/README.md](/mnt/q/UniText/i18n/de/README.md)
+## Recommended Boundary
 
-All of these classify as `eol_only`, with no remaining content delta after ignoring CR-at-EOL and trailing-space-at-EOL differences.
+The commit scope for the i18n wave should include only the `i18n/` files that are currently dirty.
 
-## Release Guidance
+It should exclude:
 
-This wave should not be mixed into release-infrastructure commits.
-
-It is safe to treat the current `i18n/` wave as its own formatting-only stream, but it should be reviewed and committed independently from:
-
-- release-integrity work
-- Copilot baseline work
+- `.mcp.json`
+- unrelated `registry/skills/` content waves
+- binary assets
+- security drafts
 - release-hygiene tooling
-- catalog / security governance work
-
-## Recommended Next Step
-
-If you want to clean the worktree further, handle the `i18n/` wave as a dedicated newline-normalization commit.
-
-If you do not need that cleanup immediately, it is also safe to leave the current `i18n/` wave out of release-facing commits, because it does not represent missing translation content.

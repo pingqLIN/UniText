@@ -22,9 +22,13 @@
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
 - `report-release-hygiene.py`
-  - 分類目前 dirty worktree，區分 release scope 與 blocker/noise
+  - 分類目前 dirty worktree，區分 release scope、acknowledged exclusions 與 blocker/noise
 - `report-i18n-wave.py`
   - 分類 `i18n/` dirty files 是否只是 line-ending-only，或已出現實質翻譯內容變動
+- `verify-copilot-session.py`
+  - 執行非互動 `copilot` prompt，收集 repo instructions / MCP 載入狀態與最終回應證據
+- `collect-release-evidence.py`
+  - 匯總 bootstrap、security tests、i18n wave、release hygiene、MCP smoke 與 Copilot session 證據
 - `batch-adopt-skills.ps1`
   - 將候選 skills 批次遷入 `registry/skills/`
 - `generate-index-entries.ps1`

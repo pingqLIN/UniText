@@ -50,6 +50,24 @@ class ReleaseHygieneTests(unittest.TestCase):
         self.assertEqual(report["summary"]["by_category"]["machine_specific"], 1)
         self.assertEqual(report["summary"]["by_category"]["translation_wave"], 1)
         self.assertEqual(report["summary"]["by_category"]["stray_registry"], 1)
+        self.assertEqual(report["summary"]["acknowledged"], 0)
+
+    def test_build_report_can_acknowledge_known_exclusions(self):
+        module = load_module()
+        entries = [
+            module.Entry(status=" M", path=".mcp.json"),
+            module.Entry(status="??", path="i18n/de/README.md"),
+            module.Entry(status="??", path="registry/skills/microsoft-foundry/SKILL.md"),
+        ]
+        report = module.build_report(
+            entries,
+            allowed_categories={"translation_wave"},
+            allowed_paths={".mcp.json"},
+            allowed_prefixes=("registry/skills/microsoft-foundry/",),
+        )
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["summary"]["acknowledged"], 3)
+        self.assertEqual(report["summary"]["blockers"], 0)
 
     def test_cli_reports_blockers_for_dirty_repo(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -86,6 +104,22 @@ class ReleaseHygieneTests(unittest.TestCase):
         self.assertFalse(payload["ok"])
         self.assertEqual(payload["summary"]["release_scope"], 1)
         self.assertEqual(payload["summary"]["blockers"], 3)
+
+    def test_cli_accepts_markdown_flag(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT),
+                "--repo-root",
+                str(REPO_ROOT),
+                "--markdown",
+            ],
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        self.assertIn("# Release Hygiene Report", result.stdout)
 
 
 if __name__ == "__main__":
