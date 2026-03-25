@@ -24,6 +24,7 @@ RELEASE_SCOPE_EXACT = {
     "COPILOT_CLI_ADAPTER_NOTE.md",
     "PROJECT_STATUS_REPORT_2026-03-23.md",
     "RELEASE_EVIDENCE_2026-03-25.md",
+    "RELEASE_HYGIENE_REPORT_2026-03-25.md",
     "FINAL_RELEASE_DEVELOPMENT_PLAN_2026-03-25.md",
     "local/docs/CLI_COMPAT_MATRIX.md",
     "local/scripts/README.md",
@@ -74,14 +75,26 @@ def collect_git_status(repo_root: Path) -> list[Entry]:
     return entries
 
 
-def classify_path(path: str) -> tuple[str, str]:
+def read_catalog_exclusions(repo_root: Path) -> set[str]:
+    path = repo_root / "registry" / "catalog-exclusions.json"
+    if not path.exists():
+        return {"microsoft-foundry"}
+    body = json.loads(path.read_text(encoding="utf-8"))
+    skills = body.get("skills", {})
+    if not isinstance(skills, dict):
+        return {"microsoft-foundry"}
+    return set(skills.keys()) or {"microsoft-foundry"}
+
+
+def classify_path(path: str, excluded_skills: set[str] | None = None) -> tuple[str, str]:
+    excluded_skills = {"microsoft-foundry"} if excluded_skills is None else excluded_skills
     if path in RELEASE_SCOPE_EXACT or any(path.startswith(prefix) for prefix in RELEASE_SCOPE_PREFIXES):
         return "release_scope", "belongs to the current release workstream"
     if path == ".mcp.json":
         return "machine_specific", "local bootstrap output should not be committed as portable source"
     if path.startswith("ops/history/"):
         return "generated_history", "history artifacts are evidence only"
-    if path.startswith("registry/skills/microsoft-foundry/"):
+    if any(path.startswith(f"registry/skills/{skill_id}/") for skill_id in excluded_skills):
         return "stray_registry", "explicitly excluded stray registry item"
     if path.startswith("i18n/"):
         return "translation_wave", "translation changes are outside the current release scope"
@@ -92,13 +105,14 @@ def classify_path(path: str) -> tuple[str, str]:
     return "outside_release_scope", "not part of the current release workstream"
 
 
-def build_report(entries: list[Entry]) -> dict[str, object]:
+def build_report(entries: list[Entry], repo_root: Path | None = None) -> dict[str, object]:
+    excluded_skills = read_catalog_exclusions(repo_root or Path(__file__).resolve().parents[2])
     release_scope: list[dict[str, str]] = []
     blockers: list[dict[str, str]] = []
     by_category: dict[str, int] = {}
 
     for entry in entries:
-        category, reason = classify_path(entry.path)
+        category, reason = classify_path(entry.path, excluded_skills)
         by_category[category] = by_category.get(category, 0) + 1
         payload = {"status": entry.status, "path": entry.path, "category": category, "reason": reason}
         if category == "release_scope":
@@ -152,7 +166,7 @@ def main() -> int:
 
     repo_root = Path(args.repo_root).resolve()
     entries = collect_git_status(repo_root)
-    report = build_report(entries)
+    report = build_report(entries, repo_root)
     report["repo_root"] = str(repo_root)
 
     if args.json:
