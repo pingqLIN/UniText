@@ -3,8 +3,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
+import tempfile
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +18,15 @@ REPO_MARKERS = [
     Path("README.md"),
     Path("INDEX.md"),
 ]
+PLANNED_STEPS = [
+    "prepare_run_directory",
+    "protect_existing_inputs",
+    "sync_skills_targets",
+    "update_codex_config",
+    "update_project_mcp",
+    "write_summary",
+    "finalize",
+]
 
 
 def get_repo_root() -> Path:
@@ -26,8 +37,25 @@ def safe_name(path: Path) -> str:
     return path.name or path.parent.name or "target"
 
 
-def write_json(path: Path, body: object) -> None:
-    path.write_text(json.dumps(body, indent=2), encoding="utf-8")
+def atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_name, path)
+    except Exception:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
+
+
+def atomic_write_json(path: Path, body: object) -> None:
+    atomic_write_text(path, json.dumps(body, indent=2, ensure_ascii=False) + "\n")
 
 
 def backup_path(path: Path, destination: Path) -> None:
@@ -35,7 +63,7 @@ def backup_path(path: Path, destination: Path) -> None:
         return
     if path.is_symlink():
         destination.parent.mkdir(parents=True, exist_ok=True)
-        write_json(
+        atomic_write_json(
             destination.with_suffix(destination.suffix + ".symlink.json"),
             {"path": str(path), "target": str(path.readlink())},
         )
@@ -84,10 +112,47 @@ def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> d
     return {"target": str(target), "action": "created", "mode": "mirror"}
 
 
+def make_step_log() -> list[dict[str, str]]:
+    return [{"name": step, "status": "pending"} for step in PLANNED_STEPS]
+
+
+def set_step_status(report: dict[str, object], step_name: str, status: str, detail: str | None = None) -> None:
+    steps = report["steps"]
+    for step in steps:
+        if step["name"] == step_name:
+            step["status"] = status
+            if detail is None:
+                step.pop("detail", None)
+            else:
+                step["detail"] = detail
+            break
+    else:
+        raise KeyError(step_name)
+    report["current_step"] = step_name
+    report["updated_at"] = datetime.now().isoformat(timespec="seconds")
+
+
 def update_line(text: str, pattern: str, replacement: str) -> str:
     if re.search(pattern, text, flags=re.MULTILINE):
         return re.sub(pattern, lambda _: replacement, text, flags=re.MULTILINE)
     return text + ("\n" if text and not text.endswith("\n") else "") + replacement + "\n"
+
+
+def upsert_top_level_toml_key(text: str, key: str, replacement: str) -> str:
+    pattern = rf"(?m)^{re.escape(key)}\s*=.*$"
+    stripped = re.sub(pattern, "", text)
+    lines = [line for line in stripped.splitlines() if line.strip() != "" or line == ""]
+    insert_at = len(lines)
+    for index, line in enumerate(lines):
+        if line.startswith("["):
+            insert_at = index
+            break
+
+    lines.insert(insert_at, replacement)
+    updated = "\n".join(lines)
+    if text.endswith("\n") or not text:
+        return updated + "\n"
+    return updated
 
 
 def toml_string(value: str) -> str:
@@ -176,15 +241,25 @@ def main() -> int:
         Path.home() / ".agents" / "skills",
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     run_dir = repo / "ops" / "history" / f"bootstrap_{stamp}"
+    state_path = run_dir / "state.json"
+    summary_path = run_dir / "summary.json"
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "updated_at": datetime.now().isoformat(timespec="seconds"),
+        "completed_at": None,
+        "generation_state": "dry_run" if args.dry_run else "in_progress",
+        "current_step": "validate_inputs",
         "repo_root": str(repo),
         "script_repo_root": str(root),
         "external_repo_root": repo != root,
         "dry_run": args.dry_run,
         "mode": args.mode,
+        "run_dir": str(run_dir),
+        "state_path": str(state_path),
+        "summary_path": str(summary_path),
+        "steps": make_step_log(),
         "skills": [],
         "codex": {},
         "project_mcp": {},
@@ -195,47 +270,89 @@ def main() -> int:
     if not server.exists():
         raise SystemExit(f"mcp server not found: {server}")
 
-    if not args.dry_run:
+    if args.dry_run:
+        print(json.dumps(summary, indent=2, ensure_ascii=False))
+        return 0
+
+    try:
         run_dir.mkdir(parents=True, exist_ok=False)
+        set_step_status(summary, "prepare_run_directory", "complete")
+        atomic_write_json(state_path, summary)
 
-    if not args.skip_skills:
-        for target in skills_targets:
-            if not args.dry_run and (target.exists() or target.is_symlink()):
-                backup_path(target, run_dir / "skills" / safe_name(target))
-            summary["skills"].append(set_skills_target(source, target, mode, args.dry_run))
+        set_step_status(summary, "protect_existing_inputs", "in_progress")
+        if not args.skip_skills:
+            for target in skills_targets:
+                if target.exists() or target.is_symlink():
+                    backup_path(target, run_dir / "skills" / safe_name(target))
+        if not args.skip_codex and codex_config.exists():
+            backup_path(codex_config, run_dir / "codex" / "config.toml")
+        if not args.skip_project_mcp and project_mcp.exists():
+            backup_path(project_mcp, run_dir / "project-mcp" / ".mcp.json")
+        set_step_status(summary, "protect_existing_inputs", "complete")
+        atomic_write_json(state_path, summary)
 
-    if not args.skip_codex:
-        original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
-        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(source))}")
-        updated = upsert_codex_mcp_block(updated, server, repo)
-        changed = updated != original
-        summary["codex"] = {
-            "path": str(codex_config),
-            "changed": changed,
-            "skills_path": str(source),
-            "mcp_server": "unitext_registry",
-        }
-        if changed and not args.dry_run:
-            codex_config.parent.mkdir(parents=True, exist_ok=True)
-            if codex_config.exists():
-                backup_path(codex_config, run_dir / "codex" / "config.toml")
-            codex_config.write_text(updated, encoding="utf-8")
+        if not args.skip_skills:
+            set_step_status(summary, "sync_skills_targets", "in_progress")
+            for target in skills_targets:
+                summary["skills"].append(set_skills_target(source, target, mode, args.dry_run))
+            set_step_status(summary, "sync_skills_targets", "complete")
+        else:
+            set_step_status(summary, "sync_skills_targets", "skipped", "requested by --skip-skills")
+        atomic_write_json(state_path, summary)
 
-    if not args.skip_project_mcp:
-        body = render_project_mcp(server, repo)
-        existing = project_mcp.read_text(encoding="utf-8") if project_mcp.exists() else ""
-        updated = json.dumps(body, indent=2)
-        changed = updated != existing
-        summary["project_mcp"] = {"path": str(project_mcp), "changed": changed}
-        if changed and not args.dry_run:
-            if project_mcp.exists():
-                backup_path(project_mcp, run_dir / "project-mcp" / ".mcp.json")
-            project_mcp.write_text(updated + "\n", encoding="utf-8")
+        if not args.skip_codex:
+            set_step_status(summary, "update_codex_config", "in_progress")
+            original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
+            updated = upsert_top_level_toml_key(original, "skills_path", f"skills_path = {toml_string(str(source))}")
+            updated = upsert_codex_mcp_block(updated, server, repo)
+            changed = updated != original
+            summary["codex"] = {
+                "path": str(codex_config),
+                "changed": changed,
+                "skills_path": str(source),
+                "mcp_server": "unitext_registry",
+            }
+            if changed:
+                codex_config.parent.mkdir(parents=True, exist_ok=True)
+                atomic_write_text(codex_config, updated)
+            set_step_status(summary, "update_codex_config", "complete")
+        else:
+            set_step_status(summary, "update_codex_config", "skipped", "requested by --skip-codex")
+        atomic_write_json(state_path, summary)
 
-    if not args.dry_run:
-        write_json(run_dir / "summary.json", summary)
-    print(json.dumps(summary, indent=2))
-    return 0
+        if not args.skip_project_mcp:
+            set_step_status(summary, "update_project_mcp", "in_progress")
+            body = render_project_mcp(server, repo)
+            existing = project_mcp.read_text(encoding="utf-8") if project_mcp.exists() else ""
+            updated = json.dumps(body, indent=2)
+            changed = updated != existing
+            summary["project_mcp"] = {"path": str(project_mcp), "changed": changed}
+            if changed:
+                atomic_write_text(project_mcp, updated + "\n")
+            set_step_status(summary, "update_project_mcp", "complete")
+        else:
+            set_step_status(summary, "update_project_mcp", "skipped", "requested by --skip-project-mcp")
+        atomic_write_json(state_path, summary)
+
+        set_step_status(summary, "write_summary", "complete")
+        set_step_status(summary, "finalize", "complete")
+        summary["generation_state"] = "complete"
+        summary["completed_at"] = datetime.now().isoformat(timespec="seconds")
+        atomic_write_json(summary_path, summary)
+        atomic_write_json(state_path, summary)
+        print(json.dumps(summary, indent=2, ensure_ascii=False))
+        return 0
+    except Exception as exc:
+        summary["generation_state"] = "failed"
+        summary["completed_at"] = datetime.now().isoformat(timespec="seconds")
+        summary["error"] = {"type": type(exc).__name__, "message": str(exc)}
+        summary["updated_at"] = datetime.now().isoformat(timespec="seconds")
+        if not args.dry_run:
+            try:
+                atomic_write_json(state_path, summary)
+            except Exception:
+                pass
+        raise
 
 
 if __name__ == "__main__":
