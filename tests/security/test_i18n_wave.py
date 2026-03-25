@@ -26,7 +26,10 @@ class I18nWaveTests(unittest.TestCase):
             repo.mkdir()
             baseline = repo / "i18n" / "zh-TW" / "README.md"
             baseline.parent.mkdir(parents=True)
+            second = repo / "i18n" / "zh-TW" / "INDEX.md"
+            second.parent.mkdir(parents=True, exist_ok=True)
             baseline.write_bytes(b"line one\nline two\n")
+            second.write_text("line one\nline two\n", encoding="utf-8")
             subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
             subprocess.run(["git", "-C", str(repo), "config", "user.email", "test@example.com"], check=True)
             subprocess.run(["git", "-C", str(repo), "config", "user.name", "Test User"], check=True)
@@ -34,14 +37,13 @@ class I18nWaveTests(unittest.TestCase):
             subprocess.run(["git", "-C", str(repo), "commit", "-m", "init"], check=True, capture_output=True)
 
             baseline.write_bytes(b"line one\r\nline two\r\n")
-            substantive = repo / "i18n" / "zh-TW" / "INDEX.md"
-            substantive.write_text("line one\nchanged text\n", encoding="utf-8")
+            second.write_text("line one\nchanged text\n", encoding="utf-8")
 
             report = module.classify_paths(
                 repo,
                 [
                     {"status": " M", "path": "i18n/zh-TW/README.md"},
-                    {"status": "??", "path": "i18n/zh-TW/INDEX.md"},
+                    {"status": " M", "path": "i18n/zh-TW/INDEX.md"},
                 ],
             )
             self.assertEqual(report["summary"]["eol_only"], 1)
