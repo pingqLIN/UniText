@@ -14,16 +14,13 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
-14. `COPILOT_CLI_ADAPTER_NOTE.md`
-15. `SKILL0_COLLABORATION_VISION.md`
+6. `TEMPLATE_RELEASE_PACKAGE.md`
+7. `TEMPLATE_RELEASE_CHECKLIST.md`
+8. `REBUILD_AS_NEW_PROJECT.md`
+9. `SECRET_HANDLING_GUIDELINES.md`
+10. `NO_PUBLISH_POLICY.md`
+11. `COPILOT_CLI_ADAPTER_NOTE.md`
+12. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -79,6 +76,11 @@
 若要整理成乾淨的 starter package，請看 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 並使用 `local/scripts/export-template-package.ps1`。
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
+
+若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
 
 若要在新機器上完成第一輪 initialize → verify，優先使用：
 

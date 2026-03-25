@@ -10,6 +10,7 @@ ops/history/unify_*/
 ops/history/set_setting_*/
 ops/review-package/
 ops/template-package/
+ops/rebuild-project/
 ops/git-bundles/
 ops/baseline.json
 ops/inventory.latest.json

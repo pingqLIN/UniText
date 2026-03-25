@@ -36,6 +36,23 @@
 - drift history
 - 單一部署預設值
 
+### Rebuilt Fresh Project
+
+用於把目前 repo 的核心契約與 starter layout 匯出成一份新的專案基線。
+
+它不是：
+
+- 作者當前工作區的完整鏡像
+- review package
+- 歷史審查快照
+
+它應該是：
+
+- 可重新命名
+- 可重新初始化
+- 可直接作為新 repo 起點
+- 保留 cross-platform bootstrap / verify 路徑
+
 ## 2. Rule Of Thumb
 
 如果某份內容是在描述：
@@ -53,3 +70,13 @@
 2. 移除 local-only state artifacts
 3. 移除本機 path / account / machine-specific values
 4. 將 reference implementation 改寫為抽象 examples
+
+## 4. Rebuild Rule
+
+當需求不是「發布 template」，而是「把 UniText 重整成全新的專案」時：
+
+1. 使用 `local/scripts/export-rebuild-project.ps1`
+2. 驗證輸出結果：
+   - `local/scripts/verify-rebuild-project.ps1`
+3. 以 rebuild package 作為新的 repo baseline
+4. 再替換 README、catalog 與 examples 為新的專案內容

@@ -33,6 +33,10 @@
   - 將 template-safe docs、generic examples 與 starter layout 匯出到 `ops/template-package/`
 - `verify-template-package.ps1`
   - 驗證輸出的 template package 是否包含必要 starter 結構，且不含 review-only / local-only 內容
+- `export-rebuild-project.ps1`
+  - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
+- `verify-rebuild-project.ps1`
+  - 在 template package 驗證之上，再確認 rebuild guide 與 fresh-project 入口存在
 
 ## Governance Note
 

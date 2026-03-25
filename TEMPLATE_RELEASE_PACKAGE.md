@@ -104,6 +104,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
 ```
 
+若要直接輸出成「全新的 starter project」而不是一般 template package：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-rebuild-project.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-rebuild-project.ps1 -Path .\ops\rebuild-project\<package-name>
+```
+
 匯出後，新使用者的 first-run 建議路徑：
 
 ```bash
