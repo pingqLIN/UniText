@@ -174,3 +174,5 @@ Reasons:
 - test coverage exists for the most important non-happy-path cases
 
 This does not mean the whole repository is release-clean. It means the interrupted-run / release-integrity workstream is now implemented, validated, and separable for commit and review.
+
+For the remaining dirty worktree, use `local/scripts/report-release-hygiene.py` to separate release-scope changes from machine-specific, generated, and stray blocker categories before deciding the next commit boundary.

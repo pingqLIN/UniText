@@ -21,6 +21,8 @@
   - 驗證 source 與常見 skills targets 是否存在、是否為連結、是否可解析
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
+- `report-release-hygiene.py`
+  - 分類目前 dirty worktree，區分 release scope 與 blocker/noise
 - `batch-adopt-skills.ps1`
   - 將候選 skills 批次遷入 `registry/skills/`
 - `generate-index-entries.ps1`

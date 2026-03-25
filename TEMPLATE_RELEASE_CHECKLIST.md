@@ -36,6 +36,7 @@
 
 ## 4. Validation
 
+- [ ] `python3 local/scripts/report-release-hygiene.py --json` 已把 dirty worktree 切成 release scope 與 blocker/noise 類別
 - [ ] `health-check.ps1` 可通過
 - [ ] `export-template-package.ps1 -DryRun` 可列出 package 內容
 - [ ] `export-template-package.ps1` 可成功產出 package
