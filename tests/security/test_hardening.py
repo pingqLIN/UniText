@@ -146,6 +146,13 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertTrue(payload["has_skill_md"])
         self.assertTrue(payload["has_frontmatter"])
 
+    def test_catalog_exclusions_marks_microsoft_foundry_as_non_catalog_surface(self):
+        policy = REPO_ROOT / "registry" / "catalog-exclusions.json"
+        payload = json.loads(policy.read_text(encoding="utf-8"))
+        entry = payload["skills"]["microsoft-foundry"]
+        self.assertIn(entry["status"], {"stray", "excluded"})
+        self.assertIn("excluded", entry["reason"].lower())
+
     def test_export_template_rejects_escape_output_root(self):
         script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
         powershell = get_powershell_executable()
