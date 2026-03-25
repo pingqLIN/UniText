@@ -6,7 +6,7 @@
 
 ## 一、執行摘要
 
-`UniText` 目前已從「可供外部審查的 baseline」推進到「可完成跨平台 first-run、可產出 template release candidate、可建立可攜 bundle backup」的階段。
+`UniText` 目前已從「可供外部審查的 baseline」推進到「可完成跨平台 first-run、可產出 template release candidate baseline、可建立可攜 bundle backup」的階段。
 
 本輪最重要的新增進展是：
 
@@ -111,7 +111,7 @@
 | Phase 1: Skills Registry Online | 已完成 |
 | Phase 2: Full Registry Baseline | 已完成 baseline，且 `mcp` 不再只是 stub |
 | Phase 3: External Review Ready | 已完成 |
-| Phase 4: Template Release Ready | 已達 release candidate 水準，但仍建議補遠端 backup 與更廣 CLI 驗證 |
+| Phase 4: Template Release Ready | 已達 candidate baseline，但仍需持續補 catalog 對齊、安全封口與更廣 CLI 驗證 |
 
 ## 五、目前仍存在的缺口
 
@@ -139,7 +139,7 @@
 
 `UniText` 目前最合理的定位是：
 
-**external-review-ready baseline + template release candidate**
+**external-review-ready baseline + template release candidate hardening in progress**
 
 這代表專案已經具備：
 
@@ -148,6 +148,7 @@
 - 可執行的跨平台 first-run
 - 可實跑的最小 MCP baseline
 - 可重複產出的 review / template packages
+- 持續收斂中的 release-integrity 與 catalog hardening
 
 因此，專案已不再只是「設計成熟但落地不足」的狀態，而是已進入「可交付、可驗證、可候選發布」的階段。
 

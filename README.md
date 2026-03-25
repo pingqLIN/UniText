@@ -106,7 +106,19 @@ Instructions for the AI agent...
 
 ### 3. Register it in the catalog
 
-Add an entry to `INDEX.md`:
+There are now two different catalog surfaces on purpose:
+
+- `INDEX.md` is the human/agent discovery entry and currently carries the curated review surface
+- `local/scripts/generate-index-entries.ps1 -AsJson` is the scriptable source for validated full-registry skill entries
+
+If you are adding a new registry skill:
+
+1. add the skill under `registry/skills/<skill-id>/SKILL.md`
+2. validate it through `quick_validate.py`
+3. use `generate-index-entries.ps1` when you need full-registry catalog objects
+4. only add it to `INDEX.md` if it belongs in the curated review / release-facing surface
+
+Example catalog entry shape:
 
 | Field | Value |
 |-------|-------|
@@ -186,7 +198,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 
 | File | Purpose |
 |------|---------|
-| [INDEX.md](INDEX.md) | Discovery entry point — what resources exist and where |
+| [INDEX.md](INDEX.md) | Discovery entry point — what the curated review/release-facing surface is and where canonical roots live |
 | [VISION.md](VISION.md) | Architecture principles and design rationale |
 | [RESOURCE_SPEC.md](RESOURCE_SPEC.md) | Metadata contract for all shared resources |
 | [OPERATIONS.md](OPERATIONS.md) | Delivery modes, triggers, and safety rules |
@@ -205,6 +217,12 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
 Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+
+For validated full-registry skill entries rather than the curated review shortlist, use:
+
+```powershell
+powershell -NoProfile -File .\local\scripts\generate-index-entries.ps1 -AsJson
+```
 
 ---
 

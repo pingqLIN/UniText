@@ -62,6 +62,18 @@
 
 目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
+這代表下方列出的 skills 表格是：
+
+- curated review surface
+- template / review 敘事中正式對外說明的 skills
+- 不是 `registry/skills` 目錄的 full catalog
+
+若要取得 full registry skills 的驗證後 catalog 物件，請使用：
+
+- `local/scripts/generate-index-entries.ps1 -AsJson`
+
+任何尚未被正式納入 catalog 的工作樹項目，即使目錄存在，也不自動等於正式發布 surface。
+
 ### Review Package
 
 若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
@@ -93,7 +105,7 @@
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 
-### Skills
+### Skills In Curated Review Surface
 
 | `id` | Tier | `canonical_location` | `status` |
 |---|---|---|---|
@@ -109,6 +121,16 @@
 | `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
+
+### Full Registry Note
+
+`registry/skills` 的實際目錄面可能大於目前 review shortlist。
+
+因此：
+
+- `INDEX.md` 負責 discovery 與 curated surface 敘事
+- full registry entries 應由驗證後腳本輸出取得
+- 不應再把手寫 shortlist 表格誤讀為 full catalog
 
 ### Workflow
 
