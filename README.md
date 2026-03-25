@@ -110,6 +110,7 @@ There are now two different catalog surfaces on purpose:
 
 - `INDEX.md` is the human/agent discovery entry and currently carries the curated review surface
 - `local/scripts/generate-index-entries.ps1 -AsJson` is the scriptable source for validated full-registry skill entries
+- `registry/catalog-exclusions.json` is the explicit exclusion manifest for stray or non-release-facing entries that must not be treated as official catalog entries
 
 If you are adding a new registry skill:
 
@@ -117,6 +118,7 @@ If you are adding a new registry skill:
 2. validate it through `quick_validate.py`
 3. use `generate-index-entries.ps1` when you need full-registry catalog objects
 4. only add it to `INDEX.md` if it belongs in the curated review / release-facing surface
+5. if a directory exists in the workspace but must stay out of the official catalog, record it in `registry/catalog-exclusions.json`
 
 Example catalog entry shape:
 
@@ -223,6 +225,8 @@ For validated full-registry skill entries rather than the curated review shortli
 ```powershell
 powershell -NoProfile -File .\local\scripts\generate-index-entries.ps1 -AsJson
 ```
+
+That output respects `registry/catalog-exclusions.json`, so explicit stray items do not silently become official catalog entries.
 
 ---
 

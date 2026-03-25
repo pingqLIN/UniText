@@ -71,6 +71,7 @@
 若要取得 full registry skills 的驗證後 catalog 物件，請使用：
 
 - `local/scripts/generate-index-entries.ps1 -AsJson`
+- `registry/catalog-exclusions.json` 會作為正式 catalog 的排除清單
 
 任何尚未被正式納入 catalog 的工作樹項目，即使目錄存在，也不自動等於正式發布 surface。
 
@@ -129,8 +130,13 @@
 因此：
 
 - `INDEX.md` 負責 discovery 與 curated surface 敘事
-- full registry entries 應由驗證後腳本輸出取得
+- full registry entries 應由驗證後腳本輸出取得，並尊重 `registry/catalog-exclusions.json`
 - 不應再把手寫 shortlist 表格誤讀為 full catalog
+
+目前已明確排除的 stray item：
+
+- `microsoft-foundry`
+- 若某些目錄存在於工作樹，但已被 [`catalog-exclusions.json`](/mnt/q/UniText/registry/catalog-exclusions.json) 明確排除，則它們不屬於正式 catalog；目前的 [`microsoft-foundry`](/mnt/q/UniText/registry/skills/microsoft-foundry) 即屬此類
 
 ### Workflow
 

@@ -134,6 +134,7 @@
 - local-only artifacts 的更徹底清理
 - release artifact 版本策略
 - 更廣的非作者使用者 first-run 驗證
+- stray item / catalog exclusion 的持續治理
 
 ## 六、整體判斷
 
