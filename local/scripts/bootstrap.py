@@ -10,6 +10,14 @@ from datetime import datetime
 from pathlib import Path
 
 
+REPO_MARKERS = [
+    Path("registry") / "skills",
+    Path("registry") / "mcp" / "claude-project-mcp-seed" / "server.py",
+    Path("README.md"),
+    Path("INDEX.md"),
+]
+
+
 def get_repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
@@ -123,10 +131,28 @@ def render_project_mcp(server: Path, root: Path) -> dict[str, object]:
     }
 
 
+def validate_repo_surface(repo: Path) -> None:
+    missing = [str(marker) for marker in REPO_MARKERS if not (repo / marker).exists()]
+    if missing:
+        raise SystemExit(f"repo root is missing required markers: {', '.join(missing)}")
+
+
+def validate_repo_root(candidate: Path, script_root: Path, allow_external: bool) -> None:
+    if candidate == script_root:
+        validate_repo_surface(candidate)
+        return
+    if not allow_external:
+        raise SystemExit(
+            "external --repo-root is disabled by default; rerun with --allow-external-repo-root if intentional"
+        )
+    validate_repo_surface(candidate)
+
+
 def main() -> int:
     root = get_repo_root()
     parser = argparse.ArgumentParser(description="Bootstrap UniText delivery for local CLI runtimes.")
     parser.add_argument("--repo-root", default=str(root))
+    parser.add_argument("--allow-external-repo-root", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--mode", choices=["auto", "symlink", "mirror"], default="auto")
@@ -139,6 +165,7 @@ def main() -> int:
         raise SystemExit("non-dry-run bootstrap requires --force")
 
     repo = Path(args.repo_root).resolve()
+    validate_repo_root(repo, root, args.allow_external_repo_root)
     source = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
@@ -154,6 +181,8 @@ def main() -> int:
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "repo_root": str(repo),
+        "script_repo_root": str(root),
+        "external_repo_root": repo != root,
         "dry_run": args.dry_run,
         "mode": args.mode,
         "skills": [],

@@ -7,9 +7,18 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
+. (Join-Path $PSScriptRoot "lib\path-safety.ps1")
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$folder = if ($Name) { $Name } else { "template_$stamp" }
-$outputBase = if ([IO.Path]::IsPathRooted($OutputRoot)) { $OutputRoot } else { (Join-Path $root $OutputRoot) }
+$folder = if ($Name) {
+  Assert-SafeSimpleName -Value $Name -Label "Name" -Pattern '^[a-z0-9][a-z0-9_-]{0,127}$'
+} else {
+  "template_$stamp"
+}
+$allowedOutputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath "ops/template-package"
+$outputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath $OutputRoot
+if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBase)) {
+  throw "OutputRoot must remain under ops/template-package: $outputBase"
+}
 $package = Join-Path $outputBase $folder
 $items = @(
   [pscustomobject]@{ kind = "file"; source = ".gitignore"; target = ".gitignore" },
@@ -38,9 +47,9 @@ $items = @(
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\workflow\\example-workflow"; target = "registry\\workflow\\example-workflow" }
 )
 
-$missing = $items | Where-Object {
+$missing = @($items | Where-Object {
   -not (Test-Path (Join-Path $root $_.source))
-}
+})
 
 if ($missing.Count -gt 0) {
   throw "Missing template package sources: $($missing.source -join ', ')"
@@ -49,6 +58,7 @@ if ($missing.Count -gt 0) {
 if ($DryRun) {
   [pscustomobject]@{
     package_path = $package
+    output_root = $outputBase
     item_count = $items.Count
     items = $items
     excluded = @(
@@ -90,7 +100,7 @@ foreach ($item in $items) {
 
 $manifest = [ordered]@{
   generated_at = (Get-Date).ToString("s")
-  source_root = $root
+  source_root = "."
   package_path = $package
   phase_target = "template-release-cleanup"
   release_channel = "candidate"

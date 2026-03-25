@@ -6,36 +6,72 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repo = Resolve-Path (Join-Path $PSScriptRoot "..\\..")
-$srcRoot = Resolve-Path $Source
-$dstRoot = Join-Path $repo $Destination
+$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
+. (Join-Path $PSScriptRoot "lib\path-safety.ps1")
+$srcRoot = (Resolve-Path $Source).Path
+$skillsRoot = Get-NormalizedFullPath -BasePath $repo -CandidatePath "registry\skills"
+$dstRoot = Get-NormalizedFullPath -BasePath $repo -CandidatePath $Destination
+if (-not (Test-IsUnderPath -RootPath $skillsRoot -CandidatePath $dstRoot)) {
+  throw "Destination must remain under registry/skills: $dstRoot"
+}
 $runId = Get-Date -Format "yyyyMMdd_HHmmss"
 $runDir = Join-Path $repo "ops\history\adopt_$runId"
-New-Item -ItemType Directory -Force -Path $dstRoot | Out-Null
+
+if (Test-ContainsReparsePoint -Path $srcRoot) {
+  throw "Source root contains a symlink or reparse point: $srcRoot"
+}
+
+if (-not $DryRun) {
+  New-Item -ItemType Directory -Force -Path $dstRoot | Out-Null
+}
 
 if (-not $DryRun) {
   New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 }
 
 foreach ($id in $Ids) {
-  $src = Join-Path $srcRoot $id
-  $dst = Join-Path $dstRoot $id
-  if (-not (Test-Path $src)) {
-    Write-Warning "missing source: $id"
+  $safeId = Assert-SafeSimpleName -Value $id -Label "Id" -Pattern '^[a-z0-9][a-z0-9-]{0,63}$'
+  $src = Get-NormalizedFullPath -BasePath $srcRoot -CandidatePath $safeId
+  $dst = Get-NormalizedFullPath -BasePath $dstRoot -CandidatePath $safeId
+
+  if (-not (Test-IsUnderPath -RootPath $srcRoot -CandidatePath $src)) {
+    throw "Resolved source escapes source root: $src"
+  }
+
+  if (-not (Test-IsUnderPath -RootPath $dstRoot -CandidatePath $dst)) {
+    throw "Resolved destination escapes destination root: $dst"
+  }
+
+  if (-not (Test-Path -LiteralPath $src)) {
+    Write-Warning "missing source: $safeId"
     continue
+  }
+
+  if (Test-ContainsReparsePoint -Path $src) {
+    throw "source contains a symlink or reparse point: $src"
   }
 
   if ($DryRun) {
-    Write-Output "would adopt $id -> $dst"
+    [pscustomobject]@{
+      action = "adopt"
+      id = $safeId
+      source = $src
+      destination = $dst
+      existing_destination = (Test-Path -LiteralPath $dst)
+    }
     continue
   }
 
-  if (Test-Path $dst) {
-    $backup = Join-Path $runDir $id
-    Copy-Item $dst $backup -Recurse
-    Remove-Item $dst -Recurse -Force
+  if (Test-Path -LiteralPath $dst) {
+    if (Test-ContainsReparsePoint -Path $dst) {
+      throw "destination contains a symlink or reparse point: $dst"
+    }
+
+    $backup = Join-Path $runDir $safeId
+    Copy-Item -LiteralPath $dst -Destination $backup -Recurse -Force
+    Remove-Item -LiteralPath $dst -Recurse -Force
   }
 
-  Copy-Item $src $dst -Recurse
-  Write-Output "adopted $id"
+  Copy-Item -LiteralPath $src -Destination $dst -Recurse -Force
+  Write-Output "adopted $safeId"
 }

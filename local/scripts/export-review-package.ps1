@@ -7,9 +7,19 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
+. (Join-Path $PSScriptRoot "lib\path-safety.ps1")
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$folder = if ($Name) { $Name } else { "review_$stamp" }
-$package = Join-Path (Join-Path $root $OutputRoot) $folder
+$folder = if ($Name) {
+  Assert-SafeSimpleName -Value $Name -Label "Name" -Pattern '^[a-z0-9][a-z0-9_-]{0,127}$'
+} else {
+  "review_$stamp"
+}
+$allowedOutputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath "ops/review-package"
+$outputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath $OutputRoot
+if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBase)) {
+  throw "OutputRoot must remain under ops/review-package: $outputBase"
+}
+$package = Join-Path $outputBase $folder
 $coreSkills = @(
   "pdf",
   "docx",
@@ -54,6 +64,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; path = "local\\scripts\\generate-index-entries.ps1" },
   [pscustomobject]@{ kind = "file"; path = "local\\scripts\\rollback-skills.ps1" },
   [pscustomobject]@{ kind = "file"; path = "local\\scripts\\export-review-package.ps1" },
+  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\lib\\path-safety.ps1" },
   [pscustomobject]@{ kind = "dir"; path = "registry\\agents\\registry-curator" },
   [pscustomobject]@{ kind = "dir"; path = "registry\\mcp\\claude-project-mcp-seed" },
   [pscustomobject]@{ kind = "dir"; path = "registry\\workflow\\claude-plans" }
@@ -73,9 +84,9 @@ $items += $expansionSkills | ForEach-Object {
   }
 }
 
-$missing = $items | Where-Object {
+$missing = @($items | Where-Object {
   -not (Test-Path (Join-Path $root $_.path))
-}
+})
 
 if ($missing.Count -gt 0) {
   throw "Missing review package sources: $($missing.path -join ', ')"
@@ -84,6 +95,7 @@ if ($missing.Count -gt 0) {
 if ($DryRun) {
   [pscustomobject]@{
     package_path = $package
+    output_root = $outputBase
     item_count = $items.Count
     skills_core = $coreSkills
     skills_expansion = $expansionSkills
@@ -117,7 +129,7 @@ foreach ($item in $items) {
 
 $manifest = [ordered]@{
   generated_at = (Get-Date).ToString("s")
-  source_root = $root
+  source_root = "."
   package_path = $package
   phase_target = "external-review-ready"
   item_count = $items.Count
