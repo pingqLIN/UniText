@@ -62,7 +62,12 @@ function Write-Utf8TextAtomic {
     [System.IO.File]::WriteAllText($tempPath, $Content, $utf8NoBom)
     if (Test-Path -LiteralPath $Path) {
       $backupPath = Join-Path $parent ".$([System.IO.Path]::GetFileName($Path)).$([guid]::NewGuid().ToString('N')).bak"
-      [System.IO.File]::Replace($tempPath, $Path, $backupPath, $false)
+      try {
+        [System.IO.File]::Replace($tempPath, $Path, $backupPath, $false)
+      } catch {
+        [System.IO.File]::Copy($tempPath, $Path, $true)
+        Remove-Item -LiteralPath $tempPath -Force -ErrorAction SilentlyContinue
+      }
       if (Test-Path -LiteralPath $backupPath) {
         Remove-Item -LiteralPath $backupPath -Force -ErrorAction SilentlyContinue
       }

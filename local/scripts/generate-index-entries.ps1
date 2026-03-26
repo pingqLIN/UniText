@@ -7,23 +7,31 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path $Root).Path
 $skillsRoot = Join-Path $repo "registry\skills"
+$scriptRepo = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $validator = Join-Path $repo "registry\skills\skill-creator\scripts\quick_validate.py"
+$fallbackValidator = Join-Path $scriptRepo "registry\skills\skill-creator\scripts\quick_validate.py"
 $catalogExclusionsPath = Join-Path $repo "registry\catalog-exclusions.json"
 
 if (-not (Test-Path -LiteralPath $skillsRoot)) {
   throw "registry/skills not found under root: $repo"
 }
 if (-not (Test-Path -LiteralPath $validator)) {
-  throw "quick_validate.py not found under root: $repo"
+  if (Test-Path -LiteralPath $fallbackValidator) {
+    $validator = $fallbackValidator
+  } else {
+    throw "quick_validate.py not found under root: $repo"
+  }
 }
 
 $catalogExclusions = @{}
 if (Test-Path -LiteralPath $catalogExclusionsPath) {
-  $catalogExclusions = Get-Content -LiteralPath $catalogExclusionsPath -Raw | ConvertFrom-Json -AsHashtable
+  $catalogExclusions = Get-Content -LiteralPath $catalogExclusionsPath -Raw | ConvertFrom-Json
 }
 $excludedSkills = @{}
-if ($catalogExclusions.ContainsKey("skills") -and $catalogExclusions.skills -is [hashtable]) {
-  $excludedSkills = $catalogExclusions.skills
+if ($catalogExclusions -and $catalogExclusions.PSObject.Properties["skills"]) {
+  foreach ($entry in $catalogExclusions.skills.PSObject.Properties) {
+    $excludedSkills[$entry.Name] = $entry.Value
+  }
 }
 
 $python = Get-Command python -ErrorAction SilentlyContinue
@@ -69,7 +77,7 @@ foreach ($skill in Get-ChildItem -LiteralPath $skillsRoot -Directory | Sort-Obje
 }
 
 if ($AsJson) {
-  $entries | ConvertTo-Json -Depth 4
+  ConvertTo-Json -InputObject @($entries) -Depth 4
   return
 }
 

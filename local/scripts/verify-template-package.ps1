@@ -14,6 +14,24 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 . (Join-Path $PSScriptRoot "lib\path-safety.ps1")
 . (Join-Path $PSScriptRoot "lib\release-integrity.ps1")
 
+function Get-OptionalPropertyValue {
+  param(
+    $Value,
+    [Parameter(Mandatory)][string]$Name
+  )
+
+  if ($null -eq $Value) {
+    return $null
+  }
+
+  $property = $Value.PSObject.Properties[$Name]
+  if ($null -eq $property) {
+    return $null
+  }
+
+  return $property.Value
+}
+
 $resolvedPath = Get-NormalizedFullPath -BasePath $root -CandidatePath $Path
 $required = @(
   ".gitignore",
@@ -95,8 +113,10 @@ try {
 }
 
 $actualRelative = $null
+$packageParentRelative = $null
 try {
   $actualRelative = Convert-ToRepoRelativePath -RepoRoot $root -Path $resolvedPath
+  $packageParentRelative = Convert-ToRepoRelativePath -RepoRoot $root -Path (Split-Path -Path $resolvedPath -Parent)
 } catch {
   $metadataIssues += "Package path is outside the repo root."
 }
@@ -110,53 +130,75 @@ foreach ($document in @(
     continue
   }
 
-  if ($document.expectedType -and $document.value.document_type -ne $document.expectedType) {
+  $documentType = Get-OptionalPropertyValue -Value $document.value -Name "document_type"
+  $releaseTarget = Get-OptionalPropertyValue -Value $document.value -Name "release_target"
+  $generationState = Get-OptionalPropertyValue -Value $document.value -Name "generation_state"
+  $packagePath = Get-OptionalPropertyValue -Value $document.value -Name "package_path"
+
+  if ($document.expectedType -and $documentType -ne $document.expectedType) {
     $metadataIssues += "$($document.label).document_type must be $($document.expectedType)."
   }
-  if ($document.value.release_target -ne $ExpectedReleaseTarget) {
+  if ($releaseTarget -ne $ExpectedReleaseTarget) {
     $metadataIssues += "$($document.label).release_target must be $ExpectedReleaseTarget."
   }
-  if ($document.value.generation_state -ne "complete") {
+  if ($generationState -ne "complete") {
     $metadataIssues += "$($document.label).generation_state must be complete."
   }
-  if ($actualRelative -and $document.value.package_path -ne $actualRelative) {
+  if ($actualRelative -and $packagePath -ne $actualRelative) {
     $metadataIssues += "$($document.label).package_path does not match the actual package path."
   }
 }
 
-if ($manifest -and $manifest.output_root -ne (Convert-ToRepoRelativePath -RepoRoot $root -Path (Split-Path -Path $resolvedPath -Parent))) {
-  $metadataIssues += "manifest.output_root does not match the package parent."
+if ($manifest) {
+  $manifestOutputRoot = Get-OptionalPropertyValue -Value $manifest -Name "output_root"
+  if ($packageParentRelative -and $manifestOutputRoot -ne $packageParentRelative) {
+    $metadataIssues += "manifest.output_root does not match the package parent."
+  }
 }
 
-if ($release -and $release.output_root -ne (Convert-ToRepoRelativePath -RepoRoot $root -Path (Split-Path -Path $resolvedPath -Parent))) {
-  $metadataIssues += "release.output_root does not match the package parent."
+if ($release) {
+  $releaseOutputRoot = Get-OptionalPropertyValue -Value $release -Name "output_root"
+  if ($packageParentRelative -and $releaseOutputRoot -ne $packageParentRelative) {
+    $metadataIssues += "release.output_root does not match the package parent."
+  }
 }
 
-if ($release -and $release.verify_script -ne $ExpectedVerifyScript) {
-  $metadataIssues += "release.verify_script does not match the expected verifier."
+if ($release) {
+  $verifyScript = Get-OptionalPropertyValue -Value $release -Name "verify_script"
+  if ($verifyScript -ne $ExpectedVerifyScript) {
+    $metadataIssues += "release.verify_script does not match the expected verifier."
+  }
+}
+
+if ($manifest) {
+  $manifestItemCount = Get-OptionalPropertyValue -Value $manifest -Name "item_count"
+  $manifestItems = Get-OptionalPropertyValue -Value $manifest -Name "items"
+  if ($manifestItemCount -ne @($manifestItems).Count) {
+    $metadataIssues += "manifest.item_count does not match manifest.items."
+  }
+}
+
+if ($release -and $manifest) {
+  $releaseItemCount = Get-OptionalPropertyValue -Value $release -Name "item_count"
+  $manifestItemCount = Get-OptionalPropertyValue -Value $manifest -Name "item_count"
+  if ($releaseItemCount -ne $manifestItemCount) {
+    $metadataIssues += "release.item_count does not match manifest.item_count."
+  }
 }
 
 foreach ($pathField in @(
-    [pscustomobject]@{ label = "manifest.package_path"; value = if ($manifest) { $manifest.package_path } else { $null } },
-    [pscustomobject]@{ label = "manifest.output_root"; value = if ($manifest) { $manifest.output_root } else { $null } },
-    [pscustomobject]@{ label = "manifest.source_root"; value = if ($manifest) { $manifest.source_root } else { $null } },
-    [pscustomobject]@{ label = "release.package_path"; value = if ($release) { $release.package_path } else { $null } },
-    [pscustomobject]@{ label = "release.output_root"; value = if ($release) { $release.output_root } else { $null } },
-    [pscustomobject]@{ label = "state.package_path"; value = if ($state) { $state.package_path } else { $null } },
-    [pscustomobject]@{ label = "state.output_root"; value = if ($state) { $state.output_root } else { $null } },
-    [pscustomobject]@{ label = "state.source_root"; value = if ($state) { $state.source_root } else { $null } }
+    [pscustomobject]@{ label = "manifest.package_path"; value = if ($manifest) { Get-OptionalPropertyValue -Value $manifest -Name "package_path" } else { $null } },
+    [pscustomobject]@{ label = "manifest.output_root"; value = if ($manifest) { Get-OptionalPropertyValue -Value $manifest -Name "output_root" } else { $null } },
+    [pscustomobject]@{ label = "manifest.source_root"; value = if ($manifest) { Get-OptionalPropertyValue -Value $manifest -Name "source_root" } else { $null } },
+    [pscustomobject]@{ label = "release.package_path"; value = if ($release) { Get-OptionalPropertyValue -Value $release -Name "package_path" } else { $null } },
+    [pscustomobject]@{ label = "release.output_root"; value = if ($release) { Get-OptionalPropertyValue -Value $release -Name "output_root" } else { $null } },
+    [pscustomobject]@{ label = "state.package_path"; value = if ($state) { Get-OptionalPropertyValue -Value $state -Name "package_path" } else { $null } },
+    [pscustomobject]@{ label = "state.output_root"; value = if ($state) { Get-OptionalPropertyValue -Value $state -Name "output_root" } else { $null } },
+    [pscustomobject]@{ label = "state.source_root"; value = if ($state) { Get-OptionalPropertyValue -Value $state -Name "source_root" } else { $null } }
   )) {
   if (Test-AbsoluteLikePathString -Value $pathField.value) {
     $metadataIssues += "$($pathField.label) must remain repo-relative."
   }
-}
-
-if ($manifest -and $manifest.item_count -ne @($manifest.items).Count) {
-  $metadataIssues += "manifest.item_count does not match manifest.items."
-}
-
-if ($release -and $manifest -and $release.item_count -ne $manifest.item_count) {
-  $metadataIssues += "release.item_count does not match manifest.item_count."
 }
 
 [pscustomobject]@{
@@ -166,4 +208,4 @@ if ($release -and $manifest -and $release.item_count -ne $manifest.item_count) {
   forbidden_present = $presentForbidden
   metadata_issues = $metadataIssues
   ok = ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and ($metadataIssues.Count -eq 0)
-}
+} | ConvertTo-Json -Depth 8

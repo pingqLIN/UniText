@@ -10,6 +10,8 @@ from pathlib import Path
 
 
 RELEASE_SCOPE_EXACT = {
+    ".gitignore",
+    "LICENSE",
     "README.md",
     "INDEX.md",
     "VISION.md",

@@ -1,7 +1,11 @@
 backup/
 recovered_*/
 .bak_*/
+.del/
 **/__pycache__/
+PRE_PUSH_AUDIT_*.md
+SECURITY_ATTACK_INPUT_CHECKLIST.md
+SECURITY_REVIEW_ADVISORY.md
 ops/history/backup_*/
 ops/history/bootstrap_*/
 ops/history/drift_*/

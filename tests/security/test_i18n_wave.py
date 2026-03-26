@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -66,7 +67,7 @@ class I18nWaveTests(unittest.TestCase):
 
             file_path.write_bytes(b"alpha\r\nbeta\r\n")
             result = subprocess.run(
-                ["python3", str(SCRIPT), "--repo-root", str(repo), "--json"],
+                [sys.executable, str(SCRIPT), "--repo-root", str(repo), "--json"],
                 text=True,
                 capture_output=True,
                 encoding="utf-8",

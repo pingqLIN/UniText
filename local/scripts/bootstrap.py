@@ -34,8 +34,19 @@ def get_repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def get_home_dir() -> Path:
+    override = os.environ.get("UNITEXT_HOME") or os.environ.get("HOME")
+    if override:
+        return Path(override).expanduser().resolve()
+    return Path.home()
+
+
 def safe_name(path: Path) -> str:
-    return path.name or path.parent.name or "target"
+    text = str(path).strip()
+    if not text:
+        return "target"
+    normalized = re.sub(r"[\\/:]+", "_", text)
+    return re.sub(r"[^A-Za-z0-9._-]", "_", normalized).strip("._") or "target"
 
 
 def atomic_write_text(path: Path, text: str) -> None:
@@ -272,13 +283,14 @@ def main() -> int:
     source = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
-    codex_config = Path.home() / ".codex" / "config.toml"
-    copilot_mcp_config = Path.home() / ".copilot" / "mcp-config.json"
+    home_dir = get_home_dir()
+    codex_config = home_dir / ".codex" / "config.toml"
+    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
     skills_targets = [
-        Path.home() / ".claude" / "skills",
-        Path.home() / ".gemini" / "skills",
-        Path.home() / ".agents" / "skills",
-        Path.home() / ".copilot" / "skills",
+        home_dir / ".claude" / "skills",
+        home_dir / ".gemini" / "skills",
+        home_dir / ".agents" / "skills",
+        home_dir / ".copilot" / "skills",
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -373,7 +385,7 @@ def main() -> int:
             summary["copilot"] = {
                 "path": str(copilot_mcp_config),
                 "changed": changed,
-                "skills_path": str(Path.home() / ".copilot" / "skills"),
+                "skills_path": str(home_dir / ".copilot" / "skills"),
                 "mcp_server": "unitext-registry",
             }
             if changed:
