@@ -53,10 +53,12 @@ description: Consolidated open-items list after the Phase 1-3 remediation pass a
 - 36 個 active skills 都有 `SOURCE.yaml`
 - schema 已擴充 `source_revision`、`license_scope_note`、`provenance_confidence`
 - `source_revision` 已補成 local source clone 的真實 commit pin
+- `license_scope_note` 已標準化區分 `repository-root` 與 `skill-subtree`
+- `provenance_confidence` 已依目前 evidence depth 區分 `repo-license-relied-upon` 與 `path-level-evidence-stronger`
 
 **尚缺**
 
-- 將 `license_scope_note` 從 repo-level 說明提升到更細的 path/file 判讀
+- 對目前仍停留在 `repository-root` 的 skills，補上更細的 subtree/path-level 證據 where available
 - 只在有更強證據時才把 `provenance_confidence` 從 `repo-license-relied-upon` 提高
 
 **影響**
@@ -78,11 +80,12 @@ description: Consolidated open-items list after the Phase 1-3 remediation pass a
 - `ja/de/es` 的 `README.md` 與 `TEMPLATE_RELEASE_PACKAGE.md` 已補上 2026-03-27 current-baseline 同步注記
 - `ja/de/es` 的 `README.md` 與 `TEMPLATE_RELEASE_PACKAGE.md` 已同步高風險章節，避免 support / release-boundary 判讀停留在舊版敘事
 - `fr/it/ko/zh-CN/zh-TW` 的 `README.md`、`TEMPLATE_RELEASE_PACKAGE.md`、`OPERATIONS.md` 已補上 current-baseline / authoritative markers
+- `fr/it/ko/zh-CN/zh-TW` 的 `README.md` 現在也明確列出仍應以英文主文件為準的未同步章節；`TEMPLATE_RELEASE_PACKAGE.md` 也明確標示 `5.1 Skills Release Rule` 仍由英文主文件管轄
 - 上述五種語言的高風險文件現在已明確標示 English 主文件為 authoritative version
 
 **尚缺**
 
-- 是否要對 `fr/it/ko/zh-CN/zh-TW` 進行更深入的低風險逐段同步，仍待決定
+- 是否要對 `fr/it/ko/zh-CN/zh-TW` 進行更深入的低風險逐段同步，仍待決定；目前只完成缺口顯式化與邊界收斂，尚未做完整逐段補譯
 - 其他語言是否需要同樣策略，仍待後續評估
 
 **影響**

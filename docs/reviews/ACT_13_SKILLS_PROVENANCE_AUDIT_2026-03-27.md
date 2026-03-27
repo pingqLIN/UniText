@@ -73,8 +73,8 @@ description: Provenance audit for active GitHub-backed skills, clarifying curren
 
 建議後續下一步改成：
 
-- 將 `license_scope_note` 進一步標準化為可稽查敘述，明確區分 `repository-root` 與 `skill-subtree`
-- 只在有更強人工審視證據時才提高 `provenance_confidence`
+- 將 `license_scope_note` / `provenance_confidence` 的對應規則固定成可重跑檢查，避免後續匯入把分級寫回較舊格式
+- 對目前仍停留在 `repository-root` 的 skills，只有在取得更細的 subtree/path-level 或人工審視證據後才提高 `provenance_confidence`
 
 欄位基準見 [SOURCE_SCHEMA.md](/Q:/UniText/registry/skills/SOURCE_SCHEMA.md)。
 

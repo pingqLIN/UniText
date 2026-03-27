@@ -68,6 +68,17 @@
 - 授權判讀依據停留在哪個層級
 - provenance 信心目前有多強
 
+## Current Confidence Mapping
+
+目前 repo 內的保守分級規則是：
+
+- `repo-license-relied-upon`
+  - 已找到可機械化記錄的授權證據，但只到 `repository-root` 層級，尚未主張更細的 subtree/path 證據
+- `path-level-evidence-stronger`
+  - 已找到落在 `skill-subtree` 的授權證據，代表 evidence depth 比單純 repo-root 更強
+
+這個分級仍不等於完整法務審查；它只是把目前可重跑、可機械化驗證的 evidence depth 記錄清楚。
+
 ## Confidence Guidance
 
 - `repo-license-relied-upon`
