@@ -3,7 +3,7 @@
 > 상태: Active Baseline  
 > 용도: template release cleanup의 목표, 범위, 반복 가능한 export 흐름을 정의합니다.
 
-> **동기화 नोट 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `TEMPLATE_RELEASE_PACKAGE.md`가 authoritative version입니다. release boundary, exclusions, skills 규칙에 관한 고위험 섹션은 맞춰 두었지만, 나머지는 더 오래되었을 수 있습니다.
+> **동기화 주석 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `TEMPLATE_RELEASE_PACKAGE.md`가 authoritative version입니다. release boundary, exclusions, skills 규칙에 관한 고위험 섹션은 맞춰 두었지만, 나머지는 더 오래되었을 수 있습니다.
 
 ## 1. Purpose
 

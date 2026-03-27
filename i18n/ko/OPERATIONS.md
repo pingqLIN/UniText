@@ -3,7 +3,7 @@
 > 상태: Template Base
 > 역할: adapter / operations control plane의 책임, delivery 규칙, 안전 경계를 정의합니다.
 
-> **동기화 नोट 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `OPERATIONS.md`가 authoritative version입니다. delivery 규칙, trigger, first-run baseline은 맞춰 두었지만 예시와 표현은 일부 다를 수 있습니다.
+> **동기화 주석 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `OPERATIONS.md`가 authoritative version입니다. delivery 규칙, trigger, first-run baseline은 맞춰 두었지만 예시와 표현은 일부 다를 수 있습니다.
 
 모든 delivery와 mutation은 `UniText`의 순수 텍스트 registry / spec 계약을 source of truth로 삼아야 합니다.
 
