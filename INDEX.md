@@ -17,10 +17,18 @@
 6. `TEMPLATE_RELEASE_PACKAGE.md`
 7. `TEMPLATE_RELEASE_CHECKLIST.md`
 8. `REBUILD_AS_NEW_PROJECT.md`
-9. `SECRET_HANDLING_GUIDELINES.md`
-10. `NO_PUBLISH_POLICY.md`
-11. `COPILOT_CLI_ADAPTER_NOTE.md`
-12. `SKILL0_COLLABORATION_VISION.md`
+9. `LICENSE`
+10. `THIRD_PARTY_LICENSES.md`
+11. `requirements.txt`
+12. `requirements-tooling.txt`
+13. `requirements-skill-local.txt`
+14. `requirements-dev.txt`
+15. `.github/workflows/ci.yml`
+16. `SECRET_HANDLING_GUIDELINES.md`
+17. `NO_PUBLISH_POLICY.md`
+18. `WORKSPACE_BOUNDARY.md`
+19. `COPILOT_CLI_ADAPTER_NOTE.md`
+20. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -71,11 +79,49 @@
 - [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
 - [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
+若要查看本輪魔鬼代言人審查、技術回應、綜合判定與修補計畫，請依序看：
+
+- [docs/reviews/README.md](docs/reviews/README.md)
+- [docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-26.md](docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-26.md)
+- [docs/reviews/DEVILS_ADVOCATE_REVIEW_RESPONSE_2026-03-26.md](docs/reviews/DEVILS_ADVOCATE_REVIEW_RESPONSE_2026-03-26.md)
+- [docs/reviews/DEVILS_ADVOCATE_REVIEW_COMBINED_REVIEW_2026-03-27.md](docs/reviews/DEVILS_ADVOCATE_REVIEW_COMBINED_REVIEW_2026-03-27.md)
+- [docs/reviews/DEVILS_ADVOCATE_REVIEW_CLOSURE_NOTE_2026-03-27.md](docs/reviews/DEVILS_ADVOCATE_REVIEW_CLOSURE_NOTE_2026-03-27.md)
+- [docs/reviews/ACT_11_I18N_SPOT_CHECK_2026-03-27.md](docs/reviews/ACT_11_I18N_SPOT_CHECK_2026-03-27.md)
+- [docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-27.md](docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-27.md)
+- [docs/reviews/SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md](docs/reviews/SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md)
+- [docs/reviews/ACT_12_DOCS_SCALE_BASELINE_2026-03-27.md](docs/reviews/ACT_12_DOCS_SCALE_BASELINE_2026-03-27.md)
+- [docs/reviews/ACT_13_SKILLS_PROVENANCE_AUDIT_2026-03-27.md](docs/reviews/ACT_13_SKILLS_PROVENANCE_AUDIT_2026-03-27.md)
+- [docs/reviews/ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md](docs/reviews/ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md)
+- [docs/reviews/OPEN_ITEMS_2026-03-27.md](docs/reviews/OPEN_ITEMS_2026-03-27.md)
+- [docs/reviews/REVIEW_FINDINGS_REMEDIATION_PLAN_2026-03-27.md](docs/reviews/REVIEW_FINDINGS_REMEDIATION_PLAN_2026-03-27.md)
+
+若要理解 skills 在 authoring、本地驗證、template package 與公開發布之間的邊界，請看：
+
+- [SKILLS_PUBLIC_RELEASE_POLICY.md](SKILLS_PUBLIC_RELEASE_POLICY.md)
+- [WORKSPACE_BOUNDARY.md](WORKSPACE_BOUNDARY.md)
+- [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)
+
+若要看目前 security findings 的 current-state 判讀與處置結果，請看：
+
+- [docs/reviews/SECURITY_REVIEW_ADVISORY.md](docs/reviews/SECURITY_REVIEW_ADVISORY.md)
+- [docs/reviews/SECURITY_ATTACK_INPUT_RESPONSE_REPORT.md](docs/reviews/SECURITY_ATTACK_INPUT_RESPONSE_REPORT.md)
+
 ### Template Release
 
 若要整理成乾淨的 starter package，請看 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 並使用 `local/scripts/export-template-package.ps1`。
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
+
+目前 repo 也已提供最小 CI baseline：
+
+- `.github/workflows/ci.yml`
+- `local/scripts/health-check.ps1`
+- `tests/security/test_hardening.py`
+- [local/docs/SUPPORT_PROOF_MATRIX.md](local/docs/SUPPORT_PROOF_MATRIX.md)
+- [local/docs/DOCS_GOVERNANCE_RULES.md](local/docs/DOCS_GOVERNANCE_RULES.md)
+- [local/docs/INDEPENDENT_VALIDATION_RUNBOOK.md](local/docs/INDEPENDENT_VALIDATION_RUNBOOK.md)
+- [local/docs/INDEPENDENT_VALIDATION_REPORT_TEMPLATE.md](local/docs/INDEPENDENT_VALIDATION_REPORT_TEMPLATE.md)
+- [registry/skills/SOURCE_SCHEMA.md](registry/skills/SOURCE_SCHEMA.md)
 
 若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
 
@@ -95,20 +141,12 @@
 
 ### Skills
 
-| `id` | Tier | `canonical_location` | `status` |
-|---|---|---|---|
-| `pdf` | Core 8 | `/registry/skills/pdf` | `active` |
-| `docx` | Core 8 | `/registry/skills/docx` | `active` |
-| `xlsx` | Core 8 | `/registry/skills/xlsx` | `active` |
-| `pptx` | Core 8 | `/registry/skills/pptx` | `active` |
-| `mcp-builder` | Core 8 | `/registry/skills/mcp-builder` | `active` |
-| `skill-creator` | Core 8 | `/registry/skills/skill-creator` | `active` |
-| `webapp-testing` | Core 8 | `/registry/skills/webapp-testing` | `active` |
-| `doc-coauthoring` | Core 8 | `/registry/skills/doc-coauthoring` | `active` |
-| `frontend-design` | Expansion 4 | `/registry/skills/frontend-design` | `active` |
-| `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
-| `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
-| `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
+目前 active skills 與來源資料請以這兩份為準：
+
+- [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md)
+- [registry/skills/SOURCES.md](registry/skills/SOURCES.md)
+
+這樣可避免 `INDEX.md` 與 registry 現況漂移。
 
 ### Workflow
 

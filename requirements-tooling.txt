@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Optional tooling used by active shared skills and local validation helpers.
+PyYAML>=6.0
+pytest>=8.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0

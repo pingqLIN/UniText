@@ -1,9 +1,9 @@
 # UniText — Operaciones
 
 > Estado: Template Base
-> Rol: definir responsabilidades del adapter / operations control plane, reglas de delivery y límites de seguridad.
+> Rol: definir responsabilidades del adapter / plano de control de operaciones, reglas de delivery y límites de seguridad.
 
-Todo delivery y toda mutation deben tomar como fuente de verdad el contrato textual de registry / spec de UniText.
+Toda entrega y toda mutación deben tomar como fuente de verdad el contrato textual de registry / spec de UniText.
 
 Si la operación involucra password, API key, token, credential u otro sensitive material, también debe cumplirse `SECRET_HANDLING_GUIDELINES.md`.
 
@@ -26,7 +26,7 @@ Este documento no cubre:
 
 ## 2. Modos de Delivery
 
-| Mode | When to use |
+| Modo | Cuándo usarlo |
 |---|---|
 | `pointer` | descubrimiento o recursos que no requieren registro en la máquina |
 | `mirror` | cuando la CLI necesita una copia local o el symlink no es estable |
@@ -120,10 +120,10 @@ Deben ubicarse en `/operations` y no mezclarse con `/registry`.
 
 La ruta lógica es un contrato estable; la ruta física depende del despliegue.
 
-| Logical area | Meaning | Physical mapping examples |
+| Área lógica | Significado | Ejemplos de mapeo físico |
 |---|---|---|
 | `/registry/skills` | fuentes canónicas de skills | directorio compartido, subdirectorio del repo, ruta montada |
-| `/registry/mcp` | definiciones canónicas de MCP | carpeta de config, raíz generada de manifest |
+| `/registry/mcp` | definiciones canónicas de MCP | carpeta de configuración, raíz generada de manifest |
 | `/registry/agents` | raíces canónicas de instrucciones de agentes | directorio de perfiles de agentes, biblioteca compartida de prompts |
 | `/registry/workflow` | docs de workflow / runbooks | carpeta de workflow, docs locales del proyecto |
-| `/operations` | inventories, backups, drift logs | carpeta ops, almacén de estado, directorio de auditoría |
+| `/operations` | inventories, backups, drift logs | carpeta `ops`, almacén de estado, directorio de auditoría |

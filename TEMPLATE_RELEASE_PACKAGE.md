@@ -35,6 +35,7 @@
   - `PROJECT_MODES.md`
   - `SECRET_HANDLING_GUIDELINES.md`
   - `MILESTONES.md`
+  - `SKILLS_PUBLIC_RELEASE_POLICY.md`
   - `TEMPLATE_RELEASE_PACKAGE.md`
   - `TEMPLATE_RELEASE_CHECKLIST.md`
 - template-safe root config
@@ -46,6 +47,9 @@
   - `registry/agents/example-agent/`
   - `registry/mcp/example-mcp/`
   - `registry/workflow/example-workflow/`
+- 公開授權且可再分發的 skills
+  - 僅限 license 邊界已確認可進公開 package 的 skill entries
+  - 若有納入 shared skills，應附 `SOURCE.yaml` 或同等來源資料
 - runnable MCP baseline
   - `registry/mcp/claude-project-mcp-seed/`
 - starter local overlay skeleton
@@ -72,6 +76,10 @@ template package 不應包含：
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
 - authoring notes、review archives 與其他 local-only 補充材料
+- local-only validation materials
+  - 曾用於 dry-run 或 authoring 驗證、但不屬於可公開再分發內容的 skills
+- proprietary / restricted-license skills
+  - 任何授權邊界未明確允許公開再分發的 skill 檔案或資產
 - review-specific docs
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
@@ -133,14 +141,36 @@ python local/scripts/create-git-bundle.py
 - 一份可由 Claude 直接讀取的 `.claude/settings.json`
 - 一份可由 project-local MCP 使用的 `.mcp.json` seed
 - 一個可供 Copilot CLI 未來 adapter 對接的 shared baseline
+- 一組 template-safe、可公開再分發的 skills/examples
+  - 若非 `example-skill`，則應可追溯到明確 upstream source
 
 它不代表：
 
 - 作者目前的完整工作狀態
 - 所有已納管 skills
+- authoring workspace 中所有本地驗證材料
 - 所有 review / audit 證據
 - 已完成的本機 delivery wiring
 - 任意機器都已經完成的 interpreter pinning
+
+## 5.1 Skills Release Rule
+
+template release 對 skills 採以下規則：
+
+- 可公開再分發的 skill：可納入 package
+- active shared skill 若納入 package，應帶來源資料
+- 授權不明或受限制的 skill：不得納入 package
+- 僅供本地驗證的 skill：可在 authoring workspace 使用，但不得作為公開 package 內容
+
+若某次 dry-run 或驗證使用了 local-only skills，文件可記錄：
+
+- 驗證曾在本地完成
+- 相關材料未被納入公開版本，原因是授權或發布邊界限制
+
+但不得讓讀者誤解為：
+
+- 公開 package 已附上那些 skills
+- 該些 skills 可由 UniText 再分發
 
 ## 6. Current Interpretation
 

@@ -43,6 +43,14 @@ def make_text(body: object) -> dict[str, object]:
     return {"type": "text", "text": text}
 
 
+def read_text_file(path: Path) -> str:
+    raw = path.read_bytes()
+    try:
+        return raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw.decode("utf-8", errors="replace")
+
+
 class Server:
     def __init__(self, root: Path) -> None:
         self.root = root.resolve()
@@ -142,7 +150,7 @@ class Server:
                     make_text(
                         {
                             "path": str(path.relative_to(self.root)),
-                            "content": path.read_text(encoding="utf-8"),
+                            "content": read_text_file(path),
                         }
                     )
                 ]

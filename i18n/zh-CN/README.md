@@ -6,6 +6,8 @@
 >
 > 将 Claude Code、Codex、Gemini CLI 等工具的资源定义统一到同一套文字契约中。
 
+> **同步注记（2026-03-27）：** 本译本仅反映 current-baseline 的一部分。英文 `README.md` 仍是 authoritative version。与 support、release boundary、review scope 相关的高风险段落已同步，其余内容可能仍保留较旧的解读。
+
 ---
 
 ## 为什么需要它

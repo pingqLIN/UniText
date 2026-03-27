@@ -6,6 +6,8 @@
 >
 > Claude Code, Codex, Gemini CLI 같은 도구들이 동일한 텍스트 계약 위에서 리소스를 공유하도록 합니다.
 
+> **동기화 नोट 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `README.md`가 authoritative version입니다. support, release boundary, review scope 같은 고위험 섹션은 맞춰 두었지만, 나머지는 이전 해석이 남아 있을 수 있습니다.
+
 ---
 
 ## Why This Exists

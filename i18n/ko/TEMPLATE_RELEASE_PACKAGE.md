@@ -3,6 +3,8 @@
 > 상태: Active Baseline  
 > 용도: template release cleanup의 목표, 범위, 반복 가능한 export 흐름을 정의합니다.
 
+> **동기화 नोट 2026-03-27:** 이 번역본은 current-baseline의 일부만 반영합니다. 영어 `TEMPLATE_RELEASE_PACKAGE.md`가 authoritative version입니다. release boundary, exclusions, skills 규칙에 관한 고위험 섹션은 맞춰 두었지만, 나머지는 더 오래되었을 수 있습니다.
+
 ## 1. Purpose
 
 `UniText`의 template release는 작성자 작업공간을 그대로 포장하는 것이 아니라 다음을 만족하는 package를 내보내야 합니다.
@@ -125,7 +127,7 @@ export된 template package는 다음을 의미합니다.
 
 ## 6. Current Interpretation
 
-2026-03-24 기준으로 `UniText`는 다음을 갖추었습니다.
+2026-03-27 기준으로 `UniText`는 다음을 갖추었습니다.
 
 - 외부 리뷰 package
 - reviewer-facing entry docs

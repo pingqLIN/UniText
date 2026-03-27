@@ -6,6 +6,8 @@
 >
 > Une interface textuelle commune pour que Claude Code, Codex, Gemini CLI et d’autres outils partagent la même définition de ressources.
 
+> **Note de synchronisation au 2026-03-27 :** cette traduction est en current-baseline partiel. Le `README.md` anglais reste la version autoritative. Les sections à haut risque liées au support, au release boundary et au review scope sont alignées; le reste peut encore refléter une lecture antérieure.
+
 ---
 
 ## Pourquoi UniText existe

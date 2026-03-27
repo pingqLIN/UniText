@@ -6,6 +6,16 @@
 >
 > 純文本を共有インターフェースとして、Claude Code、Codex、Gemini CLI などのツールが同じ資源定義を共有できるようにします。
 
+## 2026-03-27 同期注記
+
+この翻訳で優先して読むべき current baseline は次の通りです。
+
+- support labels は `verified` / `partial` / `target`
+- `Copilot CLI` は `target` / `adapter pending`
+- material sets は `authoring review shortlist` / `public release subset` / `local-only validation materials`
+
+この翻訳と英語主文書の間に差分がある場合は、[English README](../../README.md) を authoritative version として扱ってください。
+
 ---
 
 ## なぜこれが必要か
@@ -132,14 +142,58 @@ python local/scripts/verify-bootstrap.py
 
 ## サポートされる CLI
 
-| CLI | Delivery Mode | Notes |
-|-----|--------------|-------|
-| **Claude Code** | mirror / symlink | `~/.claude/skills` |
-| **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + project-local MCP | `skills_path` と `~/.codex/config.toml` の `[mcp_servers.*]` |
-| **GitHub CLI** | native-config | `config.yml` |
+この repository では 3 種類の support label を使います。
 
-完全な CLI ごとの path 参照は [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) を参照してください。
+- `verified`
+  - 記載された範囲に対して、repo 内に再現可能な証拠がある
+- `partial`
+  - 一部の検証はあるが、repo はまだ full end-to-end coverage を主張していない
+- `target`
+  - 目標面として定義されているだけで、この repo ではまだ検証されていない
+
+| CLI | Support Class | Verification Scope | Notes |
+|-----|---------------|--------------------|-------|
+| **Claude Code** | `verified` | `delivery path verified` | `.claude/settings.json`、project-local `.mcp.json`、shared skills の delivery path は maintained baseline に含まれるが、まだ end-to-end task verification を主張していない |
+| **Gemini CLI** | `verified` | `delivery path verified` | shared skills の delivery path は maintained baseline に含まれるが、end-to-end interaction は現時点で主張していない |
+| **Codex** | `partial` | `bootstrap path defined` | native config wiring は `bootstrap.py` と `config.toml` で実装されているが、fresh machine で完全に再現可能な end-to-end bootstrap verification はまだ主張していない |
+| **Copilot CLI** | `target` | `adapter pending` | stable な repo-level adapter path が定義された後に、shared MCP / skill baseline を消費する想定 |
+
+[template/examples/local/README.md](../../template/examples/local/README.md) と `template/examples/local/docs/PATH_MAP.template.md` を参照してください。
+[local/docs/SUPPORT_PROOF_MATRIX.md](../../local/docs/SUPPORT_PROOF_MATRIX.md) は support claim と proof artifact の対応表です。
+
+authoring workspace をそのまま使うのではなく、clean な starter project に再構成したい場合は [REBUILD_AS_NEW_PROJECT.md](../../REBUILD_AS_NEW_PROJECT.md) を参照してください。
+
+### Cross-Platform Baseline
+
+GitHub-hosted の starter template は、現在 verified と言える範囲より広い target surface を持ちます。
+
+| Platform | Support Class | Verification Scope | Notes |
+|----------|---------------|--------------------|-------|
+| `Windows` | `verified` | `authoring + export baseline verified` | 現在の scripts、review export flow、template export flow は Windows 上で維持・再検証されている |
+| `macOS` | `target` | `template target` | Python ベースの `bootstrap -> verify` path は portable に設計されているが、この repo はまだ反復的な macOS evidence を主張していない |
+| `Linux` | `target` | `template target` | Python ベースの `bootstrap -> verify` path は portable に設計されているが、この repo はまだ反復的な Linux evidence を主張していない |
+
+tracked `.mcp.json` は fresh clone 向けの relative-path seed です。サポートされる first-run path は引き続き次の通りです。
+
+```bash
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+```
+
+この README にある platform は、明示的にそう書かれていない限り `end-to-end verified` と読んではいけません。
+
+### Current Material Sets
+
+UniText は現在、3 つの material set を区別しています。
+
+- `authoring review shortlist`
+  - maintainer が candidate skills を review / compare するための working set
+- `public release subset`
+  - exported review package に含められる GitHub-backed かつ publicly redistributable な subset
+- `local-only validation materials`
+  - maintainer local で dry-run validation に使われることはあるが、public release surface には入らない素材
+
+これらが一致しない場合、release truth は authoring workspace ではなく exported package です。
 
 ---
 

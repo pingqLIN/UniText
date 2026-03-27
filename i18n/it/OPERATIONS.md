@@ -3,6 +3,8 @@
 > Stato: Template Base
 > Ruolo: definire responsabilità dell’adapter / operations control plane, regole di delivery e confini di sicurezza.
 
+> **Nota di sincronizzazione al 2026-03-27:** questa traduzione è un current-baseline parziale. Il `OPERATIONS.md` inglese resta la versione autoritativa. Le regole di delivery, i trigger e il first-run baseline sono allineati; esempi e formulazioni possono ancora divergere in alcuni punti.
+
 Ogni delivery e mutation dovrebbe usare il contratto testuale di `UniText` come source of truth per registry e spec.
 
 Se un’operazione tocca password, API key, token o credential, segui anche `SECRET_HANDLING_GUIDELINES.md`.
@@ -127,4 +129,3 @@ Il path logico è un contratto stabile; il path fisico dipende dal deployment.
 | `/registry/agents` | root canonici per le istruzioni degli agent | directory dei profili agent, libreria di prompt condivisa |
 | `/registry/workflow` | documenti workflow / runbook | cartella workflow, documenti locali del progetto |
 | `/operations` | inventari, backup, drift log | cartella ops, state store, directory audit |
-

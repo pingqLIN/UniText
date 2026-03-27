@@ -9,6 +9,7 @@
 - [ ] `PROJECT_MODES.md` 清楚區分 template 與 authoring workspace
 - [ ] `SECRET_HANDLING_GUIDELINES.md` 已定義 secret 邊界且不含真實 credential
 - [ ] `TEMPLATE_RELEASE_PACKAGE.md` 已更新
+- [ ] `SKILLS_PUBLIC_RELEASE_POLICY.md` 已定義公開版 skills 邊界
 - [ ] `MILESTONES.md` 已反映目前 phase 狀態
 
 ## 2. Cleanup Boundaries
@@ -19,6 +20,9 @@
 - [ ] template package 不包含 `ops/history/`
 - [ ] template package 不包含 review-only docs
 - [ ] template package 不包含 machine-specific absolute paths
+- [ ] template package 不包含 restricted-license skills
+- [ ] template package 若引用 local-only validation skills，已附正式說明且未附原始檔案
+- [ ] 若 template package 納入 shared skills，已附來源資料或 `SOURCE.yaml`
 - [ ] tracked `.mcp.json` 為 relative-path seed，而非作者本機絕對路徑
 
 ## 3. Examples

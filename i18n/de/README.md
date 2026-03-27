@@ -6,6 +6,16 @@
 >
 > Reiner Text als gemeinsame Schnittstelle, damit Claude Code, Codex, Gemini CLI und andere Tools dieselben Ressourcendefinitionen nutzen können.
 
+## 2026-03-27 Synchronisierungshinweis
+
+Für den aktuellen Baseline-Stand dieser Übersetzung sind vor allem diese Punkte maßgeblich:
+
+- die Support-Labels heißen jetzt `verified` / `partial` / `target`
+- `Copilot CLI` ist derzeit `target` / `adapter pending`
+- die Material-Sets werden als `authoring review shortlist`, `public release subset` und `local-only validation materials` unterschieden
+
+Falls diese Übersetzung vom englischen Hauptdokument abweicht, gilt das [English README](../../README.md) als authoritative version.
+
 ---
 
 ## Warum es das gibt
@@ -132,14 +142,58 @@ python local/scripts/verify-bootstrap.py
 
 ## Unterstützte CLIs
 
-| CLI | Delivery-Modus | Hinweise |
-|-----|----------------|----------|
-| **Claude Code** | mirror / symlink | `~/.claude/skills` |
-| **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + project-local MCP | `skills_path` und `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **GitHub CLI** | native-config | `config.yml` |
+UniText verwendet in diesem Repository drei Support-Labels:
 
-Siehe [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) für die vollständige Pfadreferenz je CLI.
+- `verified`
+  - für den angegebenen Umfang existiert wiederholbare Repo-Evidenz
+- `partial`
+  - es gibt Teilvalidierung, aber das Repo behauptet noch keine vollständige End-to-End-Abdeckung
+- `target`
+  - nur beabsichtigte Support-Oberfläche; in diesem Repo noch nicht verifiziert
+
+| CLI | Support Class | Verification Scope | Hinweise |
+|-----|---------------|--------------------|----------|
+| **Claude Code** | `verified` | `delivery path verified` | `.claude/settings.json`, die projektlokale `.mcp.json` und der Shared-Skills-Lieferpfad gehören zur gepflegten Baseline; dies wird noch nicht als End-to-End-Task-Verifikation behauptet |
+| **Gemini CLI** | `verified` | `delivery path verified` | der Shared-Skills-Lieferpfad gehört zur gepflegten Baseline; End-to-End-Interaktion wird derzeit nicht behauptet |
+| **Codex** | `partial` | `bootstrap path defined` | Native-Config-Wiring ist über `bootstrap.py` und `config.toml` implementiert, aber dieses Repo beansprucht noch keine vollständig wiederholbare End-to-End-Bootstrap-Verifikation auf frischen Maschinen |
+| **Copilot CLI** | `target` | `adapter pending` | soll die gemeinsame MCP-/Skill-Baseline konsumieren, sobald ein stabiler Repo-Level-Adapterpfad definiert ist |
+
+Siehe [template/examples/local/README.md](../../template/examples/local/README.md) für das Starter-Local-Overlay, einschließlich `template/examples/local/docs/PATH_MAP.template.md`.
+Siehe [local/docs/SUPPORT_PROOF_MATRIX.md](../../local/docs/SUPPORT_PROOF_MATRIX.md) für die aktuelle Zuordnung zwischen Support-Claims und Proof-Artefakten.
+
+Wenn du dieses Repository in ein sauberes neues Starter-Projekt umwandeln willst, statt direkt den Authoring-Workspace zu verwenden, folge [REBUILD_AS_NEW_PROJECT.md](../../REBUILD_AS_NEW_PROJECT.md).
+
+### Plattformübergreifende Baseline
+
+Das GitHub-hosted Starter-Template hat eine breitere Zieloberfläche als die aktuell verifizierte Oberfläche.
+
+| Plattform | Support Class | Verification Scope | Hinweise |
+|----------|---------------|--------------------|----------|
+| `Windows` | `verified` | `authoring + export baseline verified` | aktuelle Skripte, der Review-Export-Flow und der Template-Export-Flow werden auf Windows gepflegt und revalidiert |
+| `macOS` | `target` | `template target` | der Python-basierte `bootstrap -> verify`-Pfad ist auf Portabilität ausgelegt, aber dieses Repo behauptet noch keine wiederholte macOS-Evidenz |
+| `Linux` | `target` | `template target` | der Python-basierte `bootstrap -> verify`-Pfad ist auf Portabilität ausgelegt, aber dieses Repo behauptet noch keine wiederholte Linux-Evidenz |
+
+Die versionierte `.mcp.json` ist ein relativer Seed für frische Klone. Der unterstützte First-Run-Pfad bleibt:
+
+```bash
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+```
+
+Keine Plattform in diesem README sollte als `end-to-end verified` gelesen werden, sofern dies nicht ausdrücklich so gesagt wird.
+
+### Aktuelle Material-Sets
+
+UniText unterscheidet derzeit drei Material-Sets:
+
+- `authoring review shortlist`
+  - maintainer-orientiertes Working Set zum Review und Vergleich von Candidate Skills
+- `public release subset`
+  - GitHub-backed, öffentlich redistributable Teilmenge, die in exportierten Review-Packages ausgeliefert werden kann
+- `local-only validation materials`
+  - maintainer-lokale oder nicht für Release bestimmte Materialien, die in Dry-Run-Validierung genutzt werden können, aber nicht zur öffentlichen Release-Oberfläche gehören
+
+Wenn diese Sets voneinander abweichen, ist das exported package die release truth, nicht der Authoring-Workspace.
 
 ---
 

@@ -11,12 +11,12 @@
 
 この文書が扱うのは次の項目です。
 
-- adapter responsibilities
-- delivery modes
-- delivery triggers
+- adapter の責務
+- delivery mode
+- delivery trigger
 - adoption flow
 - drift / repair
-- logical-to-physical mapping
+- 論理パスから物理パスへの対応
 
 この文書が扱わないのは次の項目です。
 
@@ -26,7 +26,7 @@
 
 ## 2. Delivery Modes
 
-| Mode | When to use |
+| Mode | 使う場面 |
 |---|---|
 | `pointer` | discovery または非機械登録型の資源 |
 | `mirror` | CLI がローカル副本を必要とする、または symlink が不安定な場合 |
@@ -120,7 +120,7 @@ delivery は明示的な trigger でのみ開始できます。
 
 論理 path は安定した契約であり、物理 path は deployment-specific mapping です。
 
-| Logical area | Meaning | Physical mapping examples |
+| Logical area | 意味 | 物理マッピング例 |
 |---|---|---|
 | `/registry/skills` | canonical skill sources | shared directory、repo subdir、mounted path |
 | `/registry/mcp` | canonical MCP definitions | config folder、generated manifest root |

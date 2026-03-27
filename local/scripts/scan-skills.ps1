@@ -28,21 +28,31 @@ Get-ChildItem -LiteralPath $skillsRoot -Directory | Where-Object {
   $_.Name -notlike ".*" -and $_.Name -notlike "_*" -and $_.Name -notlike "*Copy*"
 } | ForEach-Object {
   $skill = $_
-  $file = Join-Path $skill.FullName "SKILL.md"
-  $body = if (Test-Path -LiteralPath $file) { Get-Content -LiteralPath $file -Raw } else { "" }
-  $hasFrontmatter = $body.StartsWith("---")
-  $name = if ($body -match "(?m)^name:\s*(.+)$") { $Matches[1].Trim("`r", '"', ' ') } else { $null }
-  $description = if ($body -match "(?m)^description:\s*(.+)$") { $Matches[1].Trim("`r", '"', ' ') } else { $null }
-
-  $result = & $pythonArgs[0] @($validatorArgs + @($validator, $skill.FullName, "--json")) 2>$null
+  $result = & $pythonArgs[0] @($validatorArgs + @($validator, $skill.FullName, "--metadata-json")) 2>$null
   $parsed = if ($LASTEXITCODE -eq 0 -or $LASTEXITCODE -eq 1) { $result | ConvertFrom-Json } else { [pscustomobject]@{ ok = $false; message = "validator execution failed" } }
+  $frontmatter = $parsed.frontmatter
+  $name = if ($frontmatter -and $frontmatter.name) { $frontmatter.name } else { $null }
+  $description = if ($frontmatter -and $frontmatter.description) { $frontmatter.description } else { $null }
+  $license = if ($frontmatter -and $frontmatter.license) { $frontmatter.license } else { $null }
+  $source = if ($frontmatter -and $frontmatter.source) { $frontmatter.source } else { $null }
+  $category = if ($frontmatter -and $frontmatter.category) { $frontmatter.category } else { $null }
+  $tags = if ($frontmatter -and $frontmatter.tags) { $frontmatter.tags } else { $null }
+  $risk = if ($frontmatter -and $frontmatter.risk) { $frontmatter.risk } else { $null }
+  $dateAdded = if ($frontmatter -and $frontmatter.date_added) { $frontmatter.date_added } else { $null }
 
   [pscustomobject]@{
     id = $skill.Name
-    has_skill_md = Test-Path -LiteralPath $file
-    has_frontmatter = $hasFrontmatter
+    has_skill_md = [bool]$parsed.skill_md_exists
+    has_frontmatter = [bool]$parsed.has_frontmatter
     name = $name
+    description = $description
     has_description = [bool]$description
+    license = $license
+    source = $source
+    category = $category
+    tags = $tags
+    risk = $risk
+    date_added = $dateAdded
     validation_ok = [bool]$parsed.ok
     validation_message = $parsed.message
     canonical_location = "/registry/skills/$($skill.Name)"

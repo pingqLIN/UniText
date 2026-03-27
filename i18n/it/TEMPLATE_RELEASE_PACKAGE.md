@@ -3,6 +3,8 @@
 > Stato: Active Baseline  
 > Uso: definire gli obiettivi del template release cleanup, il perimetro e il flusso di export ripetibile.
 
+> **Nota di sincronizzazione al 2026-03-27:** questa traduzione è un current-baseline parziale. Il `TEMPLATE_RELEASE_PACKAGE.md` inglese resta la versione autoritativa. Le sezioni su release boundary, esclusioni e regole per le skills sono allineate; il resto può ancora essere più vecchio o più nuovo in alcuni punti.
+
 ## 1. Scopo
 
 Il template release di `UniText` non deve essere un dump del workspace dell’autore, ma un package che:
@@ -125,7 +127,7 @@ Non rappresenta:
 
 ## 6. Interpretazione attuale
 
-Al 2026-03-24, `UniText` dispone di:
+Al 2026-03-27, `UniText` dispone di:
 
 - review package esterno
 - documenti entry per reviewer

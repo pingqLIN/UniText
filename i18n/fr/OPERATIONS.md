@@ -3,6 +3,8 @@
 > Statut : `Template Base`
 > Rôle : définir les responsabilités de l’adapter / operations control plane, les règles de delivery et les frontières de sécurité.
 
+> **Note de synchronisation au 2026-03-27 :** cette traduction est un current-baseline partiel. Le `OPERATIONS.md` anglais reste la version autoritative. Les règles de delivery, les triggers et le first-run baseline ont été alignés; les exemples et formulations peuvent encore diverger par endroits.
+
 Toutes les deliverys et mutations doivent s’appuyer sur le contrat texte brut du registry / spec de `UniText` comme source de vérité.
 
 Si une opération implique des mots de passe, clés API, tokens, credentials ou tout autre matériau sensible, appliquez aussi `SECRET_HANDLING_GUIDELINES.md`.
@@ -127,4 +129,3 @@ Les chemins logiques sont un contrat stable ; les chemins physiques sont un mapp
 | `/registry/agents` | racines canoniques des instructions d’agent | dossier de profils d’agent, bibliothèque de prompts partagée |
 | `/registry/workflow` | docs de workflow / runbooks | dossier workflow, docs locaux du projet |
 | `/operations` | inventaires, backups, journaux de dérive | dossier ops, store d’état, répertoire d’audit |
-

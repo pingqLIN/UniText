@@ -1,0 +1,4 @@
+-r requirements-tooling.txt
+-r requirements-skill-local.txt
+
+# Full contributor environment for repo validation and skill-local script work.

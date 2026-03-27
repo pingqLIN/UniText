@@ -1,7 +1,10 @@
 ---
 name: internal-comms
-description: A set of resources to help me write all kinds of internal communications, using the formats that my company likes to use. Claude should use this skill whenever asked to write some sort of internal communications (status reports, leadership updates, 3P updates, company newsletters, FAQs, incident reports, project updates, etc.).
-license: Complete terms in LICENSE.txt
+description: "Use when writing internal communications such as status reports, updates, FAQs, newsletters, and incident notes."
+license: "Apache-2.0"
+risk: unknown
+source: "https://github.com/anthropics/skills"
+date_added: "2026-03-21"
 ---
 
 ## When to use this skill
@@ -30,3 +33,4 @@ If the communication type doesn't match any existing guideline, ask for clarific
 
 ## Keywords
 3P updates, company newsletter, company comms, weekly update, faqs, common questions, updates, internal comms
+

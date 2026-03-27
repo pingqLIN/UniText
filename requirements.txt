@@ -1,0 +1,7 @@
+# UniText core runtime dependencies
+#
+# Root-level bootstrap, verify, export, and MCP seed scripts currently rely only
+# on the Python standard library. This file remains as the single stable install
+# entry point for the core runtime path:
+#
+#   python -m pip install -r requirements.txt

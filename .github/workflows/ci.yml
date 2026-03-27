@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  baseline-windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-tooling.txt
+            requirements-skill-local.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements-dev.txt
+
+      - name: Health check
+        run: ./local/scripts/health-check.ps1
+
+      - name: Python regression tests
+        run: python -m unittest discover -s tests -p "test_*.py"
+
+      - name: Review package dry-run
+        run: ./local/scripts/export-review-package.ps1 -DryRun | Out-Null
+
+      - name: Template package export
+        run: ./local/scripts/export-template-package.ps1 -Name ci-smoke | Out-Null
+
+      - name: Template package verify
+        run: ./local/scripts/verify-template-package.ps1 -Path ./ops/template-package/ci-smoke
+
+  portable-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-tooling.txt
+            requirements-skill-local.txt
+            requirements-dev.txt
+
+      - name: Install core dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Bootstrap dry-run smoke
+        run: python local/scripts/bootstrap.py --dry-run
+
+      - name: Portable proof tests
+        run: python -m unittest tests.test_portable_proofs

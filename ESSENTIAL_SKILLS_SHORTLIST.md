@@ -3,6 +3,8 @@
 > 狀態：Active
 > 用途：定義目前外部審查主集，只保留 `8 + 4` 的精選 skills，而不是全量候選池。
 
+> 注意：這份 shortlist 說明的是 **authoring / review selection set**，不是公開 package 的再分發清單。公開發布邊界請見 [SKILLS_PUBLIC_RELEASE_POLICY.md](SKILLS_PUBLIC_RELEASE_POLICY.md)。
+
 ## Selection Rule
 
 這份 shortlist 以「必備 skill」為主題，篩選標準如下：
@@ -51,6 +53,28 @@
 - reference docs
 - template / example assets
 
+## Public Release Subset
+
+基於目前 repo 內已附的授權資訊，以下 skills 可先作為公開版第一波 release-safe subset：
+
+- `frontend-design`
+- `internal-comms`
+- `mcp-builder`
+- `skill-creator`
+- `theme-factory`
+- `web-artifacts-builder`
+- `webapp-testing`
+
+這批 public subset 目前都已切換為 GitHub-backed entries，並附 `SOURCE.yaml` 供審查追溯。
+
+以下 skills 目前應先 holdback，不進公開 package：
+
+- `pdf`
+- `docx`
+- `xlsx`
+- `pptx`
+- `doc-coauthoring`
+
 ## Out Of Scope For This Review Wave
 
 以下類型目前不列入外部審查主集：
@@ -60,4 +84,3 @@
 - 其他高專用性但非必備的技能
 
 它們不是無價值，而是暫時不屬於「必備 skill」主題。
-

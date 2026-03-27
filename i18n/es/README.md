@@ -6,6 +6,16 @@
 >
 > Una interfaz compartida en texto plano para que Claude Code, Codex, Gemini CLI y otras herramientas compartan la misma definición de recursos.
 
+## Nota de sincronización 2026-03-27
+
+Para esta traducción, el current baseline debe leerse con estas reglas:
+
+- las etiquetas de soporte ahora son `verified` / `partial` / `target`
+- `Copilot CLI` sigue en `target` / `adapter pending`
+- los material sets se distinguen como `authoring review shortlist`, `public release subset` y `local-only validation materials`
+
+Si esta traducción difiere del documento principal en inglés, el [English README](../../README.md) debe tratarse como authoritative version.
+
 ---
 
 ## Por qué existe
@@ -132,14 +142,58 @@ python local/scripts/verify-bootstrap.py
 
 ## CLIs compatibles
 
-| CLI | Modo de entrega | Notas |
-|-----|----------------|-------|
-| **Claude Code** | mirror / symlink | `~/.claude/skills` |
-| **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + MCP local de proyecto | `skills_path` y `[mcp_servers.*]` en `~/.codex/config.toml` |
-| **GitHub CLI** | native-config | `config.yml` |
+UniText usa tres etiquetas de soporte en este repositorio:
 
-Consulta [template/examples/local/docs/PATH_MAP.template.md](template/examples/local/docs/PATH_MAP.template.md) para la referencia completa de rutas por CLI.
+- `verified`
+  - existe evidencia repetible en el repo para el alcance declarado
+- `partial`
+  - existe validación parcial, pero el repo no afirma cobertura end-to-end completa
+- `target`
+  - superficie de soporte prevista solamente; todavía no verificada en este repo
+
+| CLI | Support Class | Verification Scope | Notas |
+|-----|---------------|--------------------|-------|
+| **Claude Code** | `verified` | `delivery path verified` | `.claude/settings.json`, `.mcp.json` local al proyecto y la ruta de entrega de shared skills forman parte del baseline mantenido; esto todavía no se afirma como verificación end-to-end de tareas |
+| **Gemini CLI** | `verified` | `delivery path verified` | la ruta de entrega de shared skills forma parte del baseline mantenido; actualmente no se afirma interacción end-to-end |
+| **Codex** | `partial` | `bootstrap path defined` | el wiring de native config se implementa mediante `bootstrap.py` y `config.toml`, pero este repo todavía no afirma una verificación end-to-end completamente repetible en máquinas limpias |
+| **Copilot CLI** | `target` | `adapter pending` | previsto para consumir el baseline compartido de MCP / skills cuando exista una ruta estable de adapter a nivel de repo |
+
+Consulta [template/examples/local/README.md](../../template/examples/local/README.md) para el starter local overlay, incluyendo `template/examples/local/docs/PATH_MAP.template.md`.
+Consulta [local/docs/SUPPORT_PROOF_MATRIX.md](../../local/docs/SUPPORT_PROOF_MATRIX.md) para el mapeo actual entre support claims y proof artifacts.
+
+Si quieres convertir este repositorio en un starter project limpio en vez de usar directamente el authoring workspace, sigue [REBUILD_AS_NEW_PROJECT.md](../../REBUILD_AS_NEW_PROJECT.md).
+
+### Baseline multiplataforma
+
+La plantilla starter alojada en GitHub tiene una superficie objetivo más amplia que la superficie actualmente verificada.
+
+| Plataforma | Support Class | Verification Scope | Notas |
+|-----------|---------------|--------------------|-------|
+| `Windows` | `verified` | `authoring + export baseline verified` | los scripts actuales, el flujo de exportación para review y el flujo de exportación para template se mantienen y se revalidan en Windows |
+| `macOS` | `target` | `template target` | el flujo `bootstrap -> verify` basado en Python está diseñado para ser portable, pero este repo todavía no afirma evidencia repetida en macOS |
+| `Linux` | `target` | `template target` | el flujo `bootstrap -> verify` basado en Python está diseñado para ser portable, pero este repo todavía no afirma evidencia repetida en Linux |
+
+La `.mcp.json` versionada es un seed relativo para clones nuevos. La ruta soportada de first-run sigue siendo:
+
+```bash
+python local/scripts/bootstrap.py --force
+python local/scripts/verify-bootstrap.py
+```
+
+Ninguna plataforma en este README debe leerse como `end-to-end verified` salvo que se diga exactamente así.
+
+### Material sets actuales
+
+UniText distingue actualmente tres material sets:
+
+- `authoring review shortlist`
+  - conjunto de trabajo orientado al mantenedor para revisar y comparar candidate skills
+- `public release subset`
+  - subconjunto GitHub-backed y públicamente redistributable que puede salir en los exported review packages
+- `local-only validation materials`
+  - materiales locales del mantenedor o no destinados a release que pueden usarse en dry-run validation, pero no forman parte de la superficie pública de release
+
+Cuando estos sets difieren, la release truth es el exported package, no el authoring workspace.
 
 ---
 

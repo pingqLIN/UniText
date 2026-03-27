@@ -130,32 +130,80 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 
 `bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot CLI is part of the target baseline, but its adapter wiring is still tracked as a follow-up item rather than a verified first-run path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and next-step definition.
 
+### 5. Install Python dependencies
+
+UniText now defines root-level dependency manifests with three layers:
+
+- `requirements.txt`
+  - core runtime for root-level bootstrap / verify / export flow
+- `requirements-tooling.txt`
+  - optional tooling used by validation helpers and active skill tooling
+- `requirements-skill-local.txt`
+  - skill-local dependencies for bundled scripts that are not part of the minimal starter runtime
+- `requirements-dev.txt`
+  - full contributor environment
+
+Core runtime:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+Full contributor environment:
+
+```bash
+python -m pip install -r requirements-dev.txt
+```
+
+### 6. Run the baseline checks
+
+Local validation mirrors the minimum GitHub Actions baseline:
+
+```bash
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\health-check.ps1
+python -m unittest tests.security.test_hardening
+```
+
+The repository also ships a GitHub Actions baseline at `.github/workflows/ci.yml` with:
+
+- a full Windows baseline job for health checks, regression tests, and export / verify smoke
+- a macOS / Linux Python smoke job for portable bootstrap and proof-oriented tests
+
 ---
 
 ## Supported CLIs
 
-| CLI | Delivery Mode | Notes |
-|-----|--------------|-------|
-| **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
-| **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **Copilot CLI** | target baseline, adapter pending | intended to consume the shared MCP / skill baseline once a stable Copilot adapter path is defined |
+UniText uses three support labels in this repository:
+
+- `verified`
+  - repeatable repo evidence exists for the stated scope
+- `partial`
+  - some validation exists, but the repo does not yet claim full end-to-end coverage
+- `target`
+  - intended support surface only; not yet verified in this repo
+
+| CLI | Support Class | Verification Scope | Notes |
+|-----|---------------|--------------------|-------|
+| **Claude Code** | `verified` | `delivery path verified` | `.claude/settings.json`, project `.mcp.json`, and shared skills delivery path are part of the maintained baseline; this is not yet claimed as end-to-end task verification |
+| **Gemini CLI** | `verified` | `delivery path verified` | shared skills delivery path is part of the maintained baseline; end-to-end interaction is not currently claimed |
+| **Codex** | `partial` | `bootstrap path defined` | native config wiring is implemented through `bootstrap.py` and `config.toml`, but this repo does not currently claim a fully repeatable end-to-end bootstrap verification across fresh machines |
+| **Copilot CLI** | `target` | `adapter pending` | intended to consume the shared MCP / skill baseline once a stable repo-level adapter path is defined |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
+See [local/docs/SUPPORT_PROOF_MATRIX.md](local/docs/SUPPORT_PROOF_MATRIX.md) for the current mapping between support claims and proof artifacts.
+See [local/docs/DOCS_GOVERNANCE_RULES.md](local/docs/DOCS_GOVERNANCE_RULES.md) for the current interpretation rules around authoritative docs, review archive, translations, and workspace residue.
 
 If you want to turn this repository into a clean new starter project rather than use the authoring workspace directly, follow [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md).
 
 ### Cross-Platform Baseline
 
-The GitHub-hosted starter template is intended to support:
+The GitHub-hosted starter template has a broader target surface than the currently verified surface.
 
-- `Claude Code`
-- `Codex`
-- `Gemini CLI`
-- `Copilot CLI`
-- `Windows`
-- `macOS`
-- `Linux`
+| Platform | Support Class | Verification Scope | Notes |
+|----------|---------------|--------------------|-------|
+| `Windows` | `verified` | `authoring + export baseline verified` | current scripts, review export flow, and template export flow are maintained and revalidated on Windows |
+| `macOS` | `target` | `template target` | Python-based bootstrap flow is designed to be portable, but this repo does not currently claim repeated macOS validation evidence |
+| `Linux` | `target` | `template target` | Python-based bootstrap flow is designed to be portable, but this repo does not currently claim repeated Linux validation evidence |
 
 The tracked `.mcp.json` is a relative-path seed for fresh clones. The supported first-run path is still:
 
@@ -165,6 +213,21 @@ python local/scripts/verify-bootstrap.py
 ```
 
 That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
+
+No platform in this README should be read as `end-to-end verified` unless that exact phrase is stated.
+
+### Current Material Sets
+
+UniText currently distinguishes three different material sets:
+
+- `authoring review shortlist`
+  - the maintainer-facing working set used to review and compare candidate skills
+- `public release subset`
+  - the GitHub-backed, publicly redistributable subset that can ship in exported review packages
+- `local-only validation materials`
+  - maintainer-local or non-release materials that may be used during dry-run validation but are not part of the public release surface
+
+When these sets differ, exported packages are the release truth, not the authoring workspace.
 
 ---
 
@@ -193,7 +256,21 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Authoring repo vs. project template distinction |
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Secret storage, redaction, and password/API key handling boundaries |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
+| [requirements.txt](requirements.txt) | Root-level Python dependency entry point for the core runtime path |
+| [requirements-tooling.txt](requirements-tooling.txt) | Optional tooling dependencies used by validation helpers and active skill tooling |
+| [requirements-skill-local.txt](requirements-skill-local.txt) | Skill-local Python dependencies for bundled scripts outside the minimal runtime |
+| [requirements-dev.txt](requirements-dev.txt) | Full contributor Python environment |
+| [LICENSE](LICENSE) | License for the UniText project itself |
+| [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) | Summary of third-party skill-source licenses and current holdback materials |
+| `.github/workflows/ci.yml` | Minimal GitHub Actions baseline for dependency install, health checks, security tests, and export smoke checks |
+| [local/docs/SUPPORT_PROOF_MATRIX.md](local/docs/SUPPORT_PROOF_MATRIX.md) | Current support-claim to proof-artifact mapping for CLI and platform surfaces |
+| [local/docs/INDEPENDENT_VALIDATION_RUNBOOK.md](local/docs/INDEPENDENT_VALIDATION_RUNBOOK.md) | Checklist for non-author validation of bootstrap, export, and verify flows |
+| [local/docs/INDEPENDENT_VALIDATION_REPORT_TEMPLATE.md](local/docs/INDEPENDENT_VALIDATION_REPORT_TEMPLATE.md) | Fill-in template for independent operator validation results |
+| [registry/skills/SOURCE_SCHEMA.md](registry/skills/SOURCE_SCHEMA.md) | Current schema and provenance expectations for `SOURCE.yaml` metadata |
+| [docs/reviews/README.md](docs/reviews/README.md) | Review, audit, and advisory archive, including the decision chain and security review set |
 | [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` essential skills set for the current review wave |
+| [SKILLS_PUBLIC_RELEASE_POLICY.md](SKILLS_PUBLIC_RELEASE_POLICY.md) | Public-release boundary for skills, including local-only validation materials vs publicly redistributable examples |
+| [WORKSPACE_BOUNDARY.md](WORKSPACE_BOUNDARY.md) | Boundary between authoring workspace, tracked source, and exported package |
 | [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
 | [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
 | [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Short-form review summary for fast orientation |
@@ -206,6 +283,8 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 
 Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
 
+Review, audit, advisory, and remediation history is now grouped under [docs/reviews/README.md](docs/reviews/README.md) so the root stays focused on starter and architecture docs.
+
 ---
 
 ## Two Ways to Use This
@@ -213,6 +292,10 @@ Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS
 ### As a starter template
 
 Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini, and treat Copilot CLI as a target adapter to wire once its local config path is defined for your environment. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
+
+The public starter package is intended to include only template-safe, publicly redistributable examples and skills. Authoring-only or restricted-license local validation materials may exist in the maintainer workspace, but they are not part of the public release surface.
+
+Do not treat the current authoring workspace as the release source. Use exported packages as the publishable surface, and see [WORKSPACE_BOUNDARY.md](WORKSPACE_BOUNDARY.md) for the workspace / tracked / exported boundary.
 
 ### As a reference implementation
 
@@ -251,6 +334,8 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 ## License
 
 MIT
+
+See [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for third-party skill-source attribution and the current holdback set that is excluded from public packages.
 
 ---
 

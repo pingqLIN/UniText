@@ -29,10 +29,19 @@
 9. `MILESTONES.md`
 10. `PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
+12. `docs/reviews/README.md`
+13. `docs/reviews/DEVILS_ADVOCATE_REVIEW_CLOSURE_NOTE_2026-03-27.md`
+14. `docs/reviews/ACT_11_I18N_SPOT_CHECK_2026-03-27.md`
+15. `docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-27.md`
+16. `docs/reviews/SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md`
+17. `docs/reviews/ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md`
 
 若要看實際資源樣本，再往下看：
 
-- `registry/skills/` 的 `8 + 4` 精選主集
+- `ESSENTIAL_SKILLS_SHORTLIST.md` 與 `SKILLS_PUBLIC_RELEASE_POLICY.md`
+- `registry/skills/SOURCES.md`
+- `registry/skills/example-skill/`
+- 目前可公開再分發的 public subset skills
 - `registry/agents/registry-curator/`
 - `registry/mcp/claude-project-mcp-seed/`
 - `registry/workflow/claude-plans/`
@@ -55,10 +64,29 @@
   - `MILESTONES.md`
   - `PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
+  - `docs/reviews/README.md`
+  - `docs/reviews/DEVILS_ADVOCATE_REVIEW_COMBINED_REVIEW_2026-03-27.md`
+  - `docs/reviews/DEVILS_ADVOCATE_REVIEW_CLOSURE_NOTE_2026-03-27.md`
+  - `docs/reviews/ACT_11_I18N_SPOT_CHECK_2026-03-27.md`
+  - `docs/reviews/DEVILS_ADVOCATE_REVIEW_2026-03-27.md`
+  - `docs/reviews/SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md`
+  - `docs/reviews/ACT_12_DOCS_SCALE_BASELINE_2026-03-27.md`
+  - `docs/reviews/ACT_13_SKILLS_PROVENANCE_AUDIT_2026-03-27.md`
+  - `docs/reviews/ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md`
+  - `docs/reviews/REVIEW_FINDINGS_REMEDIATION_PLAN_2026-03-27.md`
+  - `docs/reviews/SECURITY_REVIEW_ADVISORY.md`
+  - `docs/reviews/SECURITY_ATTACK_INPUT_RESPONSE_REPORT.md`
+  - `SKILLS_PUBLIC_RELEASE_POLICY.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
+  - `registry/skills/SOURCES.md`
 - 最小治理文件
   - `local/docs/ADOPTION_CHECKLIST.md`
   - `local/docs/CLI_COMPAT_MATRIX.md`
+  - `local/docs/SUPPORT_PROOF_MATRIX.md`
+  - `local/docs/DOCS_GOVERNANCE_RULES.md`
+  - `local/docs/INDEPENDENT_VALIDATION_RUNBOOK.md`
+  - `local/docs/INDEPENDENT_VALIDATION_REPORT_TEMPLATE.md`
+  - `registry/skills/SOURCE_SCHEMA.md`
   - `local/scripts/README.md`
 - 最小治理腳本
   - `bootstrap.py`
@@ -73,7 +101,10 @@
   - `rollback-skills.ps1`
   - `export-review-package.ps1`
 - 精選 shared resources
-  - `registry/skills/` 的 `8 + 4` 主集
+  - `ESSENTIAL_SKILLS_SHORTLIST.md` 中的 skills metadata 與收錄理由
+  - `registry/skills/SOURCES.md`
+  - `registry/skills/example-skill/`
+  - GitHub-backed public subset skills
   - `registry/agents/registry-curator/`
   - `registry/mcp/claude-project-mcp-seed/`
   - `registry/workflow/claude-plans/`
@@ -91,6 +122,8 @@
 - 未追蹤或實驗中的內容
 
 作者工作筆記、審查 archive 與其他 local-only 補充材料不屬於 canonical review source。
+
+另外，授權邊界不明或限制再分發的 skills 不應納入公開 review package；若本地驗證曾使用這些 materials，應僅以說明文件記錄，不附原始檔案。公開版目前優先納入附 `SOURCE.yaml` 的 GitHub-backed public subset skills。
 
 ## 5. Export Command
 
@@ -133,6 +166,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 - reviewer-facing cover note 與 highlights summary
 - 外部審查可讀的核心文件
 - `8 + 4` 精選 skills 主集
+- skills public release boundary 說明
+- 一批可實際檢視的 public subset skills
 - agent / workflow seed 與可實跑的 MCP baseline
 - 可重複產出 review package 的整理流程
 - cross-platform `bootstrap -> verify`

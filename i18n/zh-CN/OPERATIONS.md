@@ -3,6 +3,8 @@
 > 状态：Template Base
 > 角色：定义 adapter / operations control plane 的责任、delivery 规则与安全边界。
 
+> **同步注记（2026-03-27）：** 本译本仅反映 current-baseline 的一部分。英文 `OPERATIONS.md` 仍是 authoritative version。delivery 规则、trigger 与 first-run baseline 已对齐，但示例与措辞仍可能存在差异。
+
 所有 delivery 与 mutation 都应以 `UniText` 的纯文本 registry / spec 契约为 source of truth。
 
 若操作涉及 password、API key、token、credential 等 sensitive material，请同时遵守 `SECRET_HANDLING_GUIDELINES.md`。

@@ -3,6 +3,8 @@
 > 状态：Active Baseline  
 > 用途：定义 template release cleanup 的目标、范围与可重复汇出流程。
 
+> **同步注记（2026-03-27）：** 本译本仅反映 current-baseline 的一部分。英文 `TEMPLATE_RELEASE_PACKAGE.md` 仍是 authoritative version。与 release boundary、排除项、skills 规则相关的高风险段落已同步，其余内容可能仍保留旧版解读。
+
 ## 1. Purpose
 
 `UniText` 的 template release 不应该是把作者工作区原样打包出去，而应该是输出一份：
@@ -125,7 +127,7 @@ python local/scripts/create-git-bundle.py
 
 ## 6. Current Interpretation
 
-截至 2026-03-24，`UniText` 已具备：
+截至 2026-03-27，`UniText` 已具备：
 
 - 外部审查 package
 - reviewer-facing entry docs

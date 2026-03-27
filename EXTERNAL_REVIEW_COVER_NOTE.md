@@ -11,6 +11,7 @@
 - `skills / mcp / agents / workflow` 四類 shared resources 的切分是否清楚
 - `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VERIFY` 治理流程是否可執行
 - 目前的 `8 + 4` 精選 skills 主集是否足以代表 UniText 的第一波 canonical resource baseline
+- skills 的公開發布邊界是否定義清楚
 
 ## 2. 專案目前定位
 
@@ -27,12 +28,13 @@
 - 可審查的核心架構文件
 - 可驗證的 canonical registry 結構
 - 最小可執行的 operations scripts
-- 精選主集與 seed resources
+- 精選主集、GitHub-backed public subset skills 與 seed resources
 
 但尚未完成：
 
 - 最終 template export 產品化
 - local-only artifacts 的全面清理
+- document-class / holdback 類型的 replacement wave
 - 更廣的多 CLI 端到端驗證與遠端備份策略
 
 ## 3. 建議閱讀順序
@@ -65,5 +67,6 @@
 - `ops/history/`
 - 作者工作筆記、審查 archive 與其他 local-only 補充材料
 - 未納入 shortlist 的候選資源
+- 授權邊界不明或限制再分發的 local-only skills 檔案
 
 這樣做的目的，是讓審查聚焦在 **canonical baseline**，而不是作者工作區的歷史噪音。

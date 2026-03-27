@@ -6,6 +6,8 @@
 >
 > Testo puro come interfaccia condivisa, così Claude Code, Codex, Gemini CLI e altri strumenti possono usare la stessa definizione di risorse.
 
+> **Nota di sincronizzazione al 2026-03-27:** questa traduzione è un current-baseline parziale. Il `README.md` inglese resta la versione autoritativa. Le sezioni ad alto rischio su support, release boundary e review scope sono allineate; il resto può ancora riflettere una lettura precedente.
+
 ---
 
 ## Perché esiste

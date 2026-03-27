@@ -21,10 +21,14 @@
   - 驗證 source 與常見 skills targets 是否存在、是否為連結、是否可解析
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
+- `verify-workspace-hygiene.ps1`
+  - 檢查 `.gitignore`、tracked source 與 seed config 是否符合 release hygiene 邊界
 - `batch-adopt-skills.ps1`
   - 將候選 skills 批次遷入 `registry/skills/`
 - `generate-index-entries.ps1`
   - 由 `registry/skills/` 生成 INDEX 所需的 catalog 區塊
+- `report-docs-scale.ps1`
+  - 依 canonical docs / review archive / i18n / workspace residue 口徑輸出 markdown 規模報表
 - `rollback-skills.ps1`
   - 從 `ops/history/adopt_*` 的 backup 回復指定 skill
 - `export-review-package.ps1`

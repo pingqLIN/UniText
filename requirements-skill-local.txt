@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# Skill-local Python dependencies for scripts that are not part of the minimal
+# bootstrap/export runtime, but are bundled in active registry skills.
+anthropic>=0.39.0
+mcp>=1.1.0

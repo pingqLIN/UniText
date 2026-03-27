@@ -21,8 +21,15 @@ if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBa
 }
 $package = Join-Path $outputBase $folder
 $items = @(
+  [pscustomobject]@{ kind = "file"; source = ".github\\workflows\\ci.yml"; target = ".github\\workflows\\ci.yml" },
   [pscustomobject]@{ kind = "file"; source = ".gitignore"; target = ".gitignore" },
   [pscustomobject]@{ kind = "file"; source = ".mcp.json"; target = ".mcp.json" },
+  [pscustomobject]@{ kind = "file"; source = "LICENSE"; target = "LICENSE" },
+  [pscustomobject]@{ kind = "file"; source = "THIRD_PARTY_LICENSES.md"; target = "THIRD_PARTY_LICENSES.md" },
+  [pscustomobject]@{ kind = "file"; source = "requirements.txt"; target = "requirements.txt" },
+  [pscustomobject]@{ kind = "file"; source = "requirements-tooling.txt"; target = "requirements-tooling.txt" },
+  [pscustomobject]@{ kind = "file"; source = "requirements-skill-local.txt"; target = "requirements-skill-local.txt" },
+  [pscustomobject]@{ kind = "file"; source = "requirements-dev.txt"; target = "requirements-dev.txt" },
   [pscustomobject]@{ kind = "file"; source = "README.md"; target = "README.md" },
   [pscustomobject]@{ kind = "file"; source = "INDEX.md"; target = "INDEX.md" },
   [pscustomobject]@{ kind = "file"; source = "VISION.md"; target = "VISION.md" },
@@ -31,6 +38,8 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "PROJECT_MODES.md"; target = "PROJECT_MODES.md" },
   [pscustomobject]@{ kind = "file"; source = "SECRET_HANDLING_GUIDELINES.md"; target = "SECRET_HANDLING_GUIDELINES.md" },
   [pscustomobject]@{ kind = "file"; source = "MILESTONES.md"; target = "MILESTONES.md" },
+  [pscustomobject]@{ kind = "file"; source = "SKILLS_PUBLIC_RELEASE_POLICY.md"; target = "SKILLS_PUBLIC_RELEASE_POLICY.md" },
+  [pscustomobject]@{ kind = "file"; source = "WORKSPACE_BOUNDARY.md"; target = "WORKSPACE_BOUNDARY.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_PACKAGE.md"; target = "TEMPLATE_RELEASE_PACKAGE.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_CHECKLIST.md"; target = "TEMPLATE_RELEASE_CHECKLIST.md" },
   [pscustomobject]@{ kind = "file"; source = ".claude\\settings.json"; target = ".claude\\settings.json" },
@@ -40,6 +49,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-bootstrap.py"; target = "local\\scripts\\verify-bootstrap.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\create-git-bundle.py"; target = "local\\scripts\\create-git-bundle.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\sync-skills.ps1"; target = "local\\scripts\\sync-skills.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-workspace-hygiene.ps1"; target = "local\\scripts\\verify-workspace-hygiene.ps1" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\skills\\example-skill"; target = "registry\\skills\\example-skill" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\agents\\example-agent"; target = "registry\\agents\\example-agent" },
   [pscustomobject]@{ kind = "dir"; source = "registry\\mcp\\claude-project-mcp-seed"; target = "registry\\mcp\\claude-project-mcp-seed" },
@@ -69,7 +79,9 @@ if ($DryRun) {
       "ops/review-package/",
       "local/docs/authoring/",
       "review-only docs",
-      "machine-local runtime state"
+      "machine-local runtime state",
+      "local-only validation skills",
+      "restricted-license skills"
     )
   }
   return
@@ -114,7 +126,9 @@ $manifest = [ordered]@{
     "ops/review-package/",
     "local/docs/authoring/",
     "review-only docs",
-    "machine-local runtime state"
+    "machine-local runtime state",
+    "local-only validation skills",
+    "restricted-license skills"
   )
   items = $items
 }

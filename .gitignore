@@ -1,7 +1,9 @@
 backup/
 recovered_*/
 .bak_*/
+.tmp/
 **/__pycache__/
+ops/history/*
 ops/history/backup_*/
 ops/history/bootstrap_*/
 ops/history/drift_*/

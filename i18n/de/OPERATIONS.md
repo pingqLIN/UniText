@@ -118,7 +118,7 @@ Sie sollen unter `/operations` liegen und nicht mit `/registry` vermischt werden
 
 ## 8. Logical-to-Physical Mapping
 
-Logische Pfade sind ein stabiler Vertrag; physische Pfade sind deployment-specific mapping.
+Logische Pfade sind ein stabiler Vertrag; physische Pfade sind deployment-spezifische Zuordnungen.
 
 | Logischer Bereich | Bedeutung | Beispiele für physische Zuordnung |
 |---|---|---|
