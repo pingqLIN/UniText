@@ -25,6 +25,16 @@ def load_mcp_server_module():
     return module
 
 
+def read_simple_yaml_fields(path):
+    fields = {}
+    for raw_line in Path(path).read_text(encoding="utf-8").splitlines():
+        if not raw_line or raw_line.startswith(" ") or ":" not in raw_line:
+            continue
+        key, value = raw_line.split(":", 1)
+        fields[key.strip()] = value.strip().strip('"')
+    return fields
+
+
 class PortableProofTests(unittest.TestCase):
     def test_bootstrap_dry_run_remains_machine_readable(self):
         result = run_command([sys.executable, "local/scripts/bootstrap.py", "--dry-run"])
@@ -115,3 +125,22 @@ class PortableProofTests(unittest.TestCase):
         skill_payload = json.loads(skill["content"][0]["text"])
         self.assertEqual(Path(skill_payload["path"]).as_posix(), "registry/skills/mcp-builder/SKILL.md")
         self.assertIn("mcp-builder", skill_payload["content"])
+
+    def test_source_yaml_provenance_confidence_matches_license_scope(self):
+        for source_file in sorted((REPO_ROOT / "registry" / "skills").glob("*/SOURCE.yaml")):
+            fields = read_simple_yaml_fields(source_file)
+            scope = fields["license_evidence_scope"]
+            confidence = fields["provenance_confidence"]
+            note = fields["license_scope_note"]
+
+            if scope == "repository-root":
+                self.assertEqual(confidence, "repo-license-relied-upon", msg=str(source_file))
+                self.assertIn("Repository-root", note, msg=str(source_file))
+                continue
+
+            if scope == "skill-subtree":
+                self.assertEqual(confidence, "path-level-evidence-stronger", msg=str(source_file))
+                self.assertIn("skill-subtree", note, msg=str(source_file))
+                continue
+
+            self.fail(f"Unexpected license_evidence_scope in {source_file}: {scope}")

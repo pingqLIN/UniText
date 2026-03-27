@@ -434,7 +434,11 @@ foreach ($info in $imports) {
         LicenseEvidencePath = $licenseEvidence.Path
         LicenseEvidenceScope = $licenseEvidence.Scope
         LicenseScopeNote = "$($licenseEvidence.Note) source_path and source_revision recorded from the local source clone."
-        ProvenanceConfidence = if ($licenseEvidence.Path) { "path-level-evidence-available" } else { "repo-license-relied-upon" }
+        ProvenanceConfidence = switch ($licenseEvidence.Scope) {
+            "skill-subtree" { "path-level-evidence-stronger" }
+            "repository-root" { "repo-license-relied-upon" }
+            default { "repo-license-relied-upon" }
+        }
         ImportMethod = "curated-copy"
         Notes = $info.Notes
     }

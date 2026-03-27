@@ -67,3 +67,11 @@
 - 是否已記錄上游快照
 - 授權判讀依據停留在哪個層級
 - provenance 信心目前有多強
+
+## Confidence Guidance
+
+- `repo-license-relied-upon`
+  - 適用於 `license_evidence_scope = repository-root`，代表已記錄 repo 與 path，但授權證據仍主要停留在 repo 根層級
+- `path-level-evidence-stronger`
+  - 適用於 `license_evidence_scope = skill-subtree`，代表在 skill 子樹內已有更接近匯入內容的授權證據
+- 不應僅因為找到了任一 LICENSE 路徑就一律升級為較強 confidence；confidence 應反映 scope，而不只是檔案存在與否
