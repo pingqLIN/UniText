@@ -3,7 +3,7 @@
 > 狀態：Active Baseline  
 > 用途：定義 template release cleanup 的目標、範圍與可重複匯出流程。
 
-> **同步註記（2026-03-27）：** 本譯本僅反映 current-baseline 的一部分。英文 `TEMPLATE_RELEASE_PACKAGE.md` 仍是 authoritative version。與 release boundary、排除項、skills 規則相關的高風險段落已同步，其餘內容可能仍保留舊版解讀。
+> **同步註記（2026-03-27）：** 本譯本僅反映 current-baseline 的一部分。英文 `TEMPLATE_RELEASE_PACKAGE.md` 仍是 authoritative version。與 release boundary、排除項、skills 規則相關的高風險段落已同步，其餘內容可能仍保留舊版解讀。`5.1 Skills Release Rule` 這一節尚未在這裡同步，相關規則應以英文原文為準。
 
 ## 1. Purpose
 

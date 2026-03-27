@@ -6,7 +6,7 @@
 >
 > 將 Claude Code、Codex、Gemini CLI 等工具的資源定義統一到同一套文字契約中。
 
-> **同步註記（2026-03-27）：** 本譯本僅反映 current-baseline 的一部分。英文 `README.md` 仍是 authoritative version。與 support、release boundary、review scope 相關的高風險段落已同步，其餘內容可能仍保留較舊的解讀。
+> **同步註記（2026-03-27）：** 本譯本僅反映 current-baseline 的一部分。英文 `README.md` 仍是 authoritative version。與 support、release boundary、review scope 相關的高風險段落已同步，其餘內容可能仍保留較舊的解讀。另外，`Install Python dependencies`、`Run the baseline checks`、`Cross-Platform Baseline`、`Current Material Sets` 這幾個章節尚未在這裡完整同步，相關內容應以英文 `README.md` 為準。
 
 ---
 

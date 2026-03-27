@@ -3,7 +3,7 @@
 > Stato: Active Baseline  
 > Uso: definire gli obiettivi del template release cleanup, il perimetro e il flusso di export ripetibile.
 
-> **Nota di sincronizzazione al 2026-03-27:** questa traduzione è un current-baseline parziale. Il `TEMPLATE_RELEASE_PACKAGE.md` inglese resta la versione autoritativa. Le sezioni su release boundary, esclusioni e regole per le skills sono allineate; il resto può ancora essere più vecchio o più nuovo in alcuni punti.
+> **Nota di sincronizzazione al 2026-03-27:** questa traduzione è un current-baseline parziale. Il `TEMPLATE_RELEASE_PACKAGE.md` inglese resta la versione autoritativa. Le sezioni su release boundary, esclusioni e regole per le skills sono allineate; il resto può ancora essere più vecchio o più nuovo in alcuni punti. La sezione `5.1 Skills Release Rule` non è ancora sincronizzata qui; per quella regola fa fede il file inglese.
 
 ## 1. Scopo
 
