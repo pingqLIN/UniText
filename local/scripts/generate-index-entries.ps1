@@ -1,5 +1,15 @@
+param(
+  [string]$Root = ""
+)
+
 $ErrorActionPreference = "Stop"
-$root = Resolve-Path (Join-Path $PSScriptRoot "..\\..")
+. (Join-Path $PSScriptRoot "lib\path-safety.ps1")
+
+$root = if ($Root) {
+  Resolve-PortablePath -Path $Root
+} else {
+  Resolve-PortablePath -Path (Join-Path $PSScriptRoot "..\\..")
+}
 $skills = Get-ChildItem (Join-Path $root "registry\skills") -Directory | Sort-Object Name
 
 foreach ($skill in $skills) {

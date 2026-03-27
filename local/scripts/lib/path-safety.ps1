@@ -16,6 +16,34 @@ function Get-NormalizedFullPath {
   return [System.IO.Path]::GetFullPath($combined)
 }
 
+function Resolve-PortablePath {
+  param(
+    [Parameter(Mandatory)][string]$Path
+  )
+
+  if ([string]::IsNullOrWhiteSpace($Path)) {
+    throw "Path cannot be empty or whitespace."
+  }
+
+  $candidate = $Path.Trim()
+
+  if (Test-Path -LiteralPath $candidate) {
+    return (Resolve-Path -LiteralPath $candidate).Path
+  }
+
+  if ($candidate.StartsWith('/')) {
+    $wsl = Get-Command wsl.exe -ErrorAction SilentlyContinue
+    if ($null -ne $wsl) {
+      $translated = & wsl.exe wslpath -w -- $candidate 2>$null
+      if ($LASTEXITCODE -eq 0 -and -not [string]::IsNullOrWhiteSpace($translated)) {
+        return [System.IO.Path]::GetFullPath($translated.Trim())
+      }
+    }
+  }
+
+  return [System.IO.Path]::GetFullPath($candidate)
+}
+
 function Test-IsUnderPath {
   param(
     [Parameter(Mandatory)][string]$RootPath,

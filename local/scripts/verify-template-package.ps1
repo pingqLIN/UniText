@@ -9,8 +9,15 @@ if (-not $Path) {
 }
 
 $required = @(
+  ".github\\workflows\\ci.yml",
   ".gitignore",
   ".mcp.json",
+  "LICENSE",
+  "THIRD_PARTY_LICENSES.md",
+  "requirements.txt",
+  "requirements-tooling.txt",
+  "requirements-skill-local.txt",
+  "requirements-dev.txt",
   ".claude\\settings.json",
   "README.md",
   "INDEX.md",
@@ -19,7 +26,9 @@ $required = @(
   "OPERATIONS.md",
   "PROJECT_MODES.md",
   "SECRET_HANDLING_GUIDELINES.md",
+  "WORKSPACE_BOUNDARY.md",
   "MILESTONES.md",
+  "SKILLS_PUBLIC_RELEASE_POLICY.md",
   "TEMPLATE_RELEASE_PACKAGE.md",
   "TEMPLATE_RELEASE_CHECKLIST.md",
   "manifest.json",
@@ -35,7 +44,8 @@ $required = @(
   "local\\scripts\\bootstrap.py",
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
-  "local\\scripts\\sync-skills.ps1"
+  "local\\scripts\\sync-skills.ps1",
+  "local\\scripts\\verify-workspace-hygiene.ps1"
 )
 
 $forbidden = @(
@@ -49,12 +59,18 @@ $forbidden = @(
   "PROJECT_STATUS_REPORT_2026-03-23.md"
 )
 
-$missing = $required | Where-Object {
-  -not (Test-Path (Join-Path $Path $_))
+$missing = New-Object System.Collections.Generic.List[string]
+foreach ($item in $required) {
+  if (-not (Test-Path (Join-Path $Path $item))) {
+    [void]$missing.Add($item)
+  }
 }
 
-$presentForbidden = $forbidden | Where-Object {
-  Test-Path (Join-Path $Path $_)
+$presentForbidden = New-Object System.Collections.Generic.List[string]
+foreach ($item in $forbidden) {
+  if (Test-Path (Join-Path $Path $item)) {
+    [void]$presentForbidden.Add($item)
+  }
 }
 
 [pscustomobject]@{
