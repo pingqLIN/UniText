@@ -555,7 +555,7 @@ Phase 3
 - `ACT-13` skills provenance 強化
   - 回應目前多數 skill 僅具 repo-level license / source mapping，缺少 path-level provenance 與 confidence 分級
 - `ACT-14` cross-platform confidence expansion
-  - 回應目前 CI 僅有 `windows-latest`，無法支撐 macOS / Linux 的 portable 敘事
+  - 回應當時 CI 僅有 `windows-latest`、無法支撐 macOS / Linux 的 portable 敘事；目前已補上 cross-platform smoke workflow 與 branch / PR hosted evidence
 - `ACT-15` CLI functional proof tests
   - 回應目前測試偏重 wiring / export / hygiene，而缺少 shared skill / MCP 真正可被消費的 proof artifact
 - `ACT-16` independent operator validation

@@ -223,7 +223,7 @@ UniText 本身**不創作任何 canonical resource**。它是一個 re-aggregati
 |------|-----------|---------|------|
 | 文件膨脹 | HIGH | 🔴 **WORSE** | 1,224 → 6,761 個 .md，22 倍增長 |
 | 授權合規 | CRITICAL → 聲稱 fixed | 🟡 **PARTIALLY FIXED** | 問題轉移到 36 個外部 skills 的 skill-level 授權 |
-| 跨平台 CI | HIGH | 🔴 **UNRESOLVED** | CI 仍只跑 windows-latest |
+| 跨平台 CI | HIGH | 🟡 **PARTIALLY FIXED** | CI 已不再是 windows-only；但 hosted evidence 目前主要落在 branch / PR scope，仍未完全等同於 default-branch baseline closure |
 | 外部驗證 | HIGH | 🔴 **UNRESOLVED** | 依然 0 個外部使用者 |
 | 功能測試覆蓋 | HIGH | 🔴 **UNRESOLVED** | 仍然沒有任何技能端對端測試 |
 | ops/ 清理 | CRITICAL → 聲稱 fixed | 🟡 **PARTIALLY** | 11,557 檔案仍存在，只是 export 邊界隔離 |
@@ -242,7 +242,7 @@ UniText 本身**不創作任何 canonical resource**。它是一個 re-aggregati
 但「閉合」本身仍然是**自我宣告的**，且有三個根本未解決的問題：
 
 1. **沒有一個外部使用者驗證過核心流程**
-2. **Windows-only CI 無法支撐跨平台宣稱**
+2. **branch / PR hosted CI 雖已補上跨平台證據，但 default-branch baseline 與長期穩定性仍需分開處理**
 3. **沒有任何功能測試驗證「技能真的能被 CLI 使用」這個核心主張**
 
 在這三個問題解決之前，「external review ready」應該被理解為：
