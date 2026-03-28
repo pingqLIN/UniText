@@ -122,7 +122,7 @@ class SecurityHardeningTests(unittest.TestCase):
     @unittest.skipUnless(HAS_POWERSHELL, f"{POWERSHELL} is required for PowerShell security tests")
     def test_batch_adopt_rejects_invalid_skill_id(self):
         script = REPO_ROOT / "local" / "scripts" / "batch-adopt-skills.ps1"
-        result = run_powershell_file(script, "-Ids", "bad/skill", "-DryRun")
+        result = run_powershell_file(script, "-Source", REPO_ROOT / "registry" / "skills", "-Ids", "bad/skill", "-DryRun")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Id", result.stdout + result.stderr)
 

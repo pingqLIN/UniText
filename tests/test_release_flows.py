@@ -78,7 +78,8 @@ def run_powershell_json(script_path, *script_args, depth=5):
 
     script_parts.extend(["|", "ConvertTo-Json", "-Depth", str(depth), "-Compress"])
     result = run_command([POWERSHELL, "-NoProfile", "-Command", " ".join(script_parts)])
-    return result, json.loads(result.stdout)
+    payload = json.loads(result.stdout) if result.returncode == 0 and result.stdout.strip() else None
+    return result, payload
 
 
 def run_powershell_file(script_path, *script_args):
