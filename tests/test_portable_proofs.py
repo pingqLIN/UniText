@@ -143,4 +143,9 @@ class PortableProofTests(unittest.TestCase):
                 self.assertIn("skill-subtree", note, msg=str(source_file))
                 continue
 
+            if scope == "path-ancestor":
+                self.assertEqual(confidence, "path-level-evidence-stronger", msg=str(source_file))
+                self.assertIn("path-ancestor", note, msg=str(source_file))
+                continue
+
             self.fail(f"Unexpected license_evidence_scope in {source_file}: {scope}")

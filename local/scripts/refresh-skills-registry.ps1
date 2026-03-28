@@ -196,6 +196,30 @@ function Get-LicenseEvidence {
         }
     }
 
+    $resolvedSourceRoot = (Resolve-Path $sourceRoot).Path
+    $searchDirectory = Split-Path (Resolve-Path $SkillDirectory).Path -Parent
+    while ($searchDirectory -and $searchDirectory -ne $resolvedSourceRoot) {
+        $ancestorMatches = Get-ChildItem -Path $searchDirectory -File | Where-Object {
+            $_.Name -match "^(LICENSE|COPYING|COPYRIGHT)(\..*)?$"
+        } | Sort-Object @{ Expression = { $_.FullName.Length } }, FullName
+
+        $ancestorSelected = $ancestorMatches | Select-Object -First 1
+        if ($ancestorSelected) {
+            $relativePath = Get-RelativePath -BasePath $resolvedSourceRoot -TargetPath $ancestorSelected.FullName
+            return @{
+                Path = $relativePath
+                Scope = "path-ancestor"
+                Note = "Ancestor-path license evidence discovered at $relativePath; scope recorded as path-ancestor."
+            }
+        }
+
+        $parentDirectory = Split-Path $searchDirectory -Parent
+        if (-not $parentDirectory -or $parentDirectory -eq $searchDirectory) {
+            break
+        }
+        $searchDirectory = $parentDirectory
+    }
+
     $rootMatches = Get-ChildItem -Path $sourceRoot -File | Where-Object {
         $_.Name -match "^(LICENSE|COPYING|COPYRIGHT)(\..*)?$"
     } | Sort-Object @{ Expression = { $_.FullName.Length } }, FullName
@@ -436,6 +460,7 @@ foreach ($info in $imports) {
         LicenseScopeNote = "$($licenseEvidence.Note) source_path and source_revision recorded from the local source clone."
         ProvenanceConfidence = switch ($licenseEvidence.Scope) {
             "skill-subtree" { "path-level-evidence-stronger" }
+            "path-ancestor" { "path-level-evidence-stronger" }
             "repository-root" { "repo-license-relied-upon" }
             default { "repo-license-relied-upon" }
         }

@@ -48,6 +48,7 @@ class SourceProvenanceTests(unittest.TestCase):
         expected_by_scope = {
             "repository-root": "repo-license-relied-upon",
             "skill-subtree": "path-level-evidence-stronger",
+            "path-ancestor": "path-level-evidence-stronger",
         }
         allowed_scopes = set(expected_by_scope) | {"not-found"}
 
@@ -77,6 +78,11 @@ class SourceProvenanceTests(unittest.TestCase):
                 self.assertIn("source_path and source_revision recorded from the local source clone.", note)
                 if scope == "skill-subtree":
                     self.assertIn(f"License evidence discovered at {evidence_path}; scope recorded as skill-subtree.", note)
+                elif scope == "path-ancestor":
+                    self.assertIn(
+                        f"Ancestor-path license evidence discovered at {evidence_path}; scope recorded as path-ancestor.",
+                        note,
+                    )
                 elif scope == "repository-root":
                     self.assertTrue(
                         note.startswith(f"Repository-root license evidence discovered at {evidence_path};")
@@ -89,6 +95,7 @@ class SourceProvenanceTests(unittest.TestCase):
     def test_refresh_script_uses_same_scope_to_confidence_mapping(self):
         script = (REPO_ROOT / "local" / "scripts" / "refresh-skills-registry.ps1").read_text(encoding="utf-8")
         self.assertIn('"skill-subtree" { "path-level-evidence-stronger" }', script)
+        self.assertIn('"path-ancestor" { "path-level-evidence-stronger" }', script)
         self.assertIn('"repository-root" { "repo-license-relied-upon" }', script)
         self.assertIn('default { "repo-license-relied-upon" }', script)
 

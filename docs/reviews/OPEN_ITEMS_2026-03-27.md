@@ -53,8 +53,9 @@ description: Consolidated open-items list after the Phase 1-3 remediation pass a
 - 36 個 active skills 都有 `SOURCE.yaml`
 - schema 已擴充 `source_revision`、`license_scope_note`、`provenance_confidence`
 - `source_revision` 已補成 local source clone 的真實 commit pin
-- `license_scope_note` 已標準化區分 `repository-root` 與 `skill-subtree`
+- `license_scope_note` 已標準化區分 `repository-root`、`path-ancestor` 與 `skill-subtree`
 - `provenance_confidence` 已依目前 evidence depth 區分 `repo-license-relied-upon` 與 `path-level-evidence-stronger`
+- `refresh-skills-registry.ps1` 現在也已支援 `path-ancestor` 偵測，避免未來匯入把介於 skill 與 repo root 之間的授權證據誤降為 repo-root
 
 **尚缺**
 

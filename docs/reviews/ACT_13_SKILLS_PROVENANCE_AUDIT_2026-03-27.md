@@ -47,13 +47,14 @@ description: Provenance audit for active GitHub-backed skills, clarifying curren
 
 - `source_revision = source clone HEAD commit`
 - `license_evidence_path = detected LICENSE/COPYING/COPYRIGHT path when available`
-- `license_evidence_scope = repository-root / skill-subtree / not-found`
+- `license_evidence_scope = repository-root / path-ancestor / skill-subtree / not-found`
 - `license_scope_note = evidence path plus conservative scope note`
 - `provenance_confidence` 仍保守分級，預設不把機械偵測誤寫成法律審查
 
 目前 `license_evidence_scope` 的分布是：
 
 - `repository-root`：25
+- `path-ancestor`：0
 - `skill-subtree`：11
 - `not-found`：0
 
@@ -66,6 +67,7 @@ description: Provenance audit for active GitHub-backed skills, clarifying curren
 - active skills 已具有 `repo + path + source-revision + license evidence path + confidence` 層級的來源資料
 - 能找到的 LICENSE / COPYING / COPYRIGHT 文件已記錄其相對路徑與 scope
 - `skill-subtree` evidence 已能區分出來，不再只寫成模糊的 repo-level note
+- 2026-03-28 也已補上對 `path-ancestor` 的生成規則；目前 active imports 的 local source clone 掃描結果仍為 `0`
 - 但 license 判讀仍主要是機械化 evidence capture，不等於完整法務結論
 - `provenance_confidence` 仍應保守使用，不應因為找到了 path 就直接升格成已完全解決
 

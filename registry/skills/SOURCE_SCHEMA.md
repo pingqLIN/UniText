@@ -26,7 +26,7 @@
 |---|---|
 | `source_revision` | 上游 commit / tag / snapshot 識別 |
 | `license_evidence_path` | 在本地 source clone 中實際找到的 LICENSE / COPYING / COPYRIGHT 相對路徑 |
-| `license_evidence_scope` | 該授權證據屬於 `repository-root`、`skill-subtree`、或 `not-found` |
+| `license_evidence_scope` | 該授權證據屬於 `repository-root`、`path-ancestor`、`skill-subtree`、或 `not-found` |
 | `license_scope_note` | 說明授權判讀是 repo-level、path-level 或其他依據 |
 | `provenance_confidence` | 例如 `repo-license-relied-upon`、`path-level-evidence-stronger` |
 
@@ -75,7 +75,7 @@
 - `repo-license-relied-upon`
   - 已找到可機械化記錄的授權證據，但只到 `repository-root` 層級，尚未主張更細的 subtree/path 證據
 - `path-level-evidence-stronger`
-  - 已找到落在 `skill-subtree` 的授權證據，代表 evidence depth 比單純 repo-root 更強
+  - 已找到落在 `path-ancestor` 或 `skill-subtree` 的授權證據，代表 evidence depth 比單純 repo-root 更強
 
 這個分級仍不等於完整法務審查；它只是把目前可重跑、可機械化驗證的 evidence depth 記錄清楚。
 
@@ -84,5 +84,7 @@
 - `repo-license-relied-upon`
   - 適用於 `license_evidence_scope = repository-root`，代表已記錄 repo 與 path，但授權證據仍主要停留在 repo 根層級
 - `path-level-evidence-stronger`
-  - 適用於 `license_evidence_scope = skill-subtree`，代表在 skill 子樹內已有更接近匯入內容的授權證據
+  - 適用於 `license_evidence_scope = path-ancestor` 或 `skill-subtree`
+  - `path-ancestor` 代表授權證據位於 source repo 中、介於 skill 目錄與 repo root 之間的祖先路徑
+  - `skill-subtree` 代表在 skill 子樹內已有更接近匯入內容的授權證據
 - 不應僅因為找到了任一 LICENSE 路徑就一律升級為較強 confidence；confidence 應反映 scope，而不只是檔案存在與否
