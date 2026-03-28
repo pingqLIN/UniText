@@ -98,27 +98,34 @@ description: Consolidated open-items list after the Phase 1-3 remediation pass a
 
 ## 3. Configured but Evidence-Pending
 
-### OI-04 — ACT-14 已配置 cross-platform smoke，但 hosted evidence 目前被 remote workflow 缺失阻塞
+### OI-04 — ACT-14 已有 branch-level hosted CI evidence，但 default-branch visibility 仍待補齊
 
 **狀態**
 
-- `blocked`
+- `follow-up`
 
 **目前已完成**
 
 - `.github/workflows/ci.yml` 已包含 `windows-latest`
 - 也已加入 `ubuntu-latest` 與 `macos-latest` 的 portable smoke
+- 目前 branch / PR 已有可引用的 GitHub Actions run：
+  - `23674160299` (`pull_request`)
+  - `23674159554` (`push`)
+- 上述兩組 run 都已包含：
+  - `baseline-windows`
+  - `portable-smoke (ubuntu-latest)`
+  - `portable-smoke (macos-latest)`
 
 **尚缺**
 
 - 將 `.github/workflows/ci.yml` 發布到 remote default branch
-- 一組可引用的 hosted CI 執行證據，證明 Linux / macOS smoke 實際跑綠
+- 一組可引用的 `main` branch hosted CI 執行證據，證明 Linux / macOS smoke 在 default branch 也實際跑綠
 
 **影響**
 
-- 目前較準確的說法是 `cross-platform smoke configured locally`
+- 目前較準確的說法是 `branch-level hosted CI evidence available; default-branch visibility pending`
 - 尚不宜過度擴大為「已完成外部可見的 cross-platform validation」
-- 在 `No-Publish Rule` 下，若無明確授權，這個證據缺口不會自行消失
+- 在 `No-Publish Rule` 下，若無明確授權或後續承接，default-branch 這個證據缺口不會自行消失
 
 依據見 [SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md](SECOND_ROUND_REMEDIATION_ADDENDUM_2026-03-27.md) 與 [ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md](ACT_14_HOSTED_CI_EVIDENCE_2026-03-27.md)。
 
