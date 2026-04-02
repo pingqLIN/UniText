@@ -29,3 +29,10 @@
 - 若系統只提供 `python3`，將命令中的 `python` 改為 `python3`
 - 依使用的 CLI 增刪 delivery targets
 - 視需要保留 PowerShell 版本或改寫其他平台腳本
+
+`Copilot CLI` 若已安裝，`bootstrap.py` 會將 `unitext-registry` 寫入 `~/.copilot/mcp-config.json`；其 repo instructions 則由 `AGENTS.md` / related files 提供，而不是透過另一份 skills copy。
+
+`verify-bootstrap.py` 會接受兩種 `.mcp.json` 狀態：
+
+- tracked template-safe seed
+- 已由 `bootstrap.py` 升級成目前機器解譯器與 repo root 的本機 wiring

@@ -128,7 +128,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot CLI is part of the target baseline, but its adapter wiring is still tracked as a follow-up item rather than a verified first-run path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and next-step definition.
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, upgrades the project `.mcp.json` to the active machine interpreter and repo root, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -139,7 +139,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **Copilot CLI** | target baseline, adapter pending | intended to consume the shared MCP / skill baseline once a stable Copilot adapter path is defined |
+| **Copilot CLI** | global MCP config + repo instructions | `~/.copilot/mcp-config.json` for MCP wiring; repo instructions come from `AGENTS.md` / related files |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
 
@@ -165,6 +165,11 @@ python local/scripts/verify-bootstrap.py
 ```
 
 That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
+
+`verify-bootstrap.py` accepts either:
+
+- the tracked template-safe `.mcp.json` seed
+- or the locally bootstrapped `.mcp.json` that points at the current machine interpreter and repo root
 
 ---
 
@@ -217,7 +222,7 @@ The authoring repo is not automatically publish-safe just because template or re
 
 ### As a starter template
 
-Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini, and treat Copilot CLI as a target adapter to wire once its local config path is defined for your environment. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
+Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini. If `Copilot CLI` is installed, the same bootstrap flow also registers `unitext-registry` into `~/.copilot/mcp-config.json` while leaving repo instructions to `AGENTS.md` / related files. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
 
 ### As a reference implementation
 

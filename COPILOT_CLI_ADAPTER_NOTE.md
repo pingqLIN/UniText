@@ -1,7 +1,7 @@
 # UniText — Copilot CLI Adapter Note
 
-> Status: Target Baseline
-> Scope: Define how `Copilot CLI` fits into the UniText starter template without overstating current support.
+> Status: Active Baseline
+> Scope: Define the first repo-level `Copilot CLI` adapter baseline without overstating remaining gaps.
 
 ## 1. Purpose
 
@@ -17,7 +17,7 @@ This note records the current collaboration model between `UniText` and `Copilot
 - `macOS`
 - `Linux`
 
-At the same time, this note intentionally does **not** claim that `Copilot CLI` is already fully wired, verified, or feature-complete inside this repository.
+At the same time, this note intentionally does **not** claim that `Copilot CLI` is already feature-complete across every platform or that it consumes UniText in exactly the same way as every other CLI.
 
 ## 2. Current Position
 
@@ -28,10 +28,10 @@ The current repo baseline is:
 - `.claude/settings.json` is tracked as part of the shared starter baseline
 - `bootstrap.py -> verify-bootstrap.py` is the preferred first-run path for the current cross-platform baseline
 
-For `Copilot CLI`, the intended direction is:
+For `Copilot CLI`, the current repo-level baseline is:
 
-- consume the same shared `skills / mcp / agents / workflow` baseline
-- avoid duplicating per-tool resource copies unless the CLI requires it
+- consume repo instructions from `AGENTS.md` and related files
+- consume the same shared `unitext-registry` MCP server via `~/.copilot/mcp-config.json`
 - keep machine-specific wiring in the adapter/bootstrap layer rather than in canonical files
 
 ## 3. Why An Adapter Note Exists
@@ -44,11 +44,13 @@ The project already has a clearer first-run path for:
 - `Codex CLI`
 - `Gemini CLI`
 
-But for `Copilot CLI`, this repository does not yet define a stable, repo-level adapter contract that is both:
+The repo now defines a first adapter contract that is:
 
-- cross-platform
 - template-safe
-- verified by local bootstrap and validation flow
+- repo-level
+- validated by `bootstrap.py -> verify-bootstrap.py` on the current Windows authoring host
+
+What still remains open is broader cross-platform validation and the exact long-term story for any Copilot-specific skill surface beyond repo instructions.
 
 This note exists so the template can honestly say:
 
@@ -61,44 +63,47 @@ This note exists so the template can honestly say:
 The future `Copilot CLI` adapter should satisfy these goals:
 
 1. Read from the same canonical registry rather than introducing another source of truth.
-2. Work on `Windows`, `macOS`, and `Linux` without author-specific absolute paths.
-3. Keep initialization steps explicit and automatable.
-4. Be compatible with the template release boundary, meaning no local-only deployment assumptions should leak into the shared repo.
-5. Provide a verification path comparable to `bootstrap -> verify`.
+2. Keep initialization steps explicit and automatable.
+3. Be compatible with the template release boundary, meaning no local-only deployment assumptions should leak into the shared repo.
+4. Provide a verification path comparable to `bootstrap -> verify`.
+5. Stay honest about what is verified now versus what is still only intended.
 
 ## 5. Proposed Integration Path
 
-The most conservative integration path is:
+The current conservative integration path is:
 
 1. Keep `registry/` as the single source of truth.
-2. Discover the stable `Copilot CLI` config surface that can point at shared resources or project-local MCP configuration.
-3. Add adapter-specific bootstrap logic only after the config surface is stable enough to support a GitHub-hosted starter template.
-4. Add an explicit verification step before changing the compatibility matrix from `adapter pending` to `verified`.
+2. Use repo instructions from `AGENTS.md` / related files as the primary instruction surface.
+3. Use `bootstrap.py` to upsert `unitext-registry` into `~/.copilot/mcp-config.json`.
+4. Use `verify-bootstrap.py` to confirm the expected `unitext-registry` command, args, and config shape when `Copilot CLI` is installed.
 
-In practice, this means the first implementation should answer:
+In practice, the first implementation answers:
 
 - How does `Copilot CLI` discover project-local MCP definitions?
-- How does `Copilot CLI` discover or consume shared skills?
+  - through `~/.copilot/mcp-config.json`, written by bootstrap
+- How does `Copilot CLI` discover repo instructions?
+  - through built-in loading of `AGENTS.md` / related files
 - Which parts belong in tracked shared files, and which parts belong in local bootstrap output?
+  - instructions stay shared; machine-local MCP wiring stays in bootstrap output
 
 ## 6. Known Gaps
 
 The current repo still lacks these pieces for `Copilot CLI`:
 
-- a fixed adapter contract in the shared repo
-- a verified first-run initialization path
-- a repo-level verification command with evidence
-- a documented rule for how `Copilot CLI` should consume shared skills, MCP definitions, or agent resources
+- macOS validation evidence
+- Linux validation evidence
+- a documented long-term rule for whether Copilot needs any separate skills surface beyond repo instructions
+- a compatibility status stronger than the currently observed bootstrap evidence
 
-Because of these gaps, the current compatibility status remains:
+Because of these gaps, the compatibility status should be interpreted as:
 
-`target baseline, adapter pending`
+`repo-level MCP baseline defined; broader platform verification still pending`
 
 ## 7. Non-Goals
 
 This note does not:
 
-- claim verified `Copilot CLI` support
+- claim full cross-platform `Copilot CLI` support
 - freeze a tool-specific config format before it is stable
 - require duplicated `skills` content just to satisfy one CLI
 - move canonical truth away from `registry/`
@@ -107,6 +112,6 @@ This note does not:
 
 The next practical milestone is:
 
-**define the first repo-level `Copilot CLI` adapter baseline, then add bootstrap + verification evidence**
+**revalidate the same `Copilot CLI` bootstrap + verify path on macOS and Linux, then decide whether the compatibility matrix can move from baseline evidence to broader verified support**
 
-Only after that should the compatibility matrix or template release checklist be upgraded from target language to verified support.
+Only after that should the compatibility matrix or template release checklist be upgraded to stronger verified language.
