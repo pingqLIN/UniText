@@ -23,18 +23,10 @@ $localOnlyChanges = @($changed | Where-Object {
 
 $opsChanges = @($changed | Where-Object { $_ -match '^ops/' })
 $sharedChanges = @($changed | Where-Object {
-  $_ -match '^registry/' -or
-  $_ -match '^README\.md$' -or
-  $_ -match '^INDEX\.md$' -or
-  $_ -match '^OPERATIONS\.md$' -or
-  $_ -match '^PROJECT_MODES\.md$' -or
-  $_ -match '^SECRET_HANDLING_GUIDELINES\.md$' -or
-  $_ -match '^TEMPLATE_RELEASE_PACKAGE\.md$' -or
-  $_ -match '^TEMPLATE_RELEASE_CHECKLIST\.md$' -or
-  $_ -match '^REBUILD_AS_NEW_PROJECT\.md$' -or
-  $_ -match '^DOCUMENT_PLACEMENT_POLICY\.md$' -or
-  $_ -match '^BOUNDARY_INCIDENT_REVIEW_TEMPLATE\.md$' -or
-  $_ -match '^NO_PUBLISH_POLICY\.md$'
+  $_ -notmatch '^ops/' -and
+  $_ -notmatch '^local/docs/authoring/' -and
+  $_ -notmatch '^local/docs/.+_LIVE\.md$' -and
+  $_ -notmatch '^local/docs/.+_WORKSPACE_BASELINE\.md$'
 })
 
 [pscustomobject]@{
@@ -48,5 +40,5 @@ $sharedChanges = @($changed | Where-Object {
   boundary_ok = [bool]$boundary.ok
   boundary_path_violations = @($boundary.path_violations)
   boundary_content_violations = @($boundary.content_violations)
-  structurally_publishable_if_permission_is_granted = [bool]$boundary.ok -and ($localOnlyChanges.Count -eq 0) -and ($opsChanges.Count -eq 0)
+  structurally_publishable_if_permission_is_granted = [bool]$boundary.ok -and ($changed.Count -eq 0) -and ($localOnlyChanges.Count -eq 0) -and ($opsChanges.Count -eq 0)
 }

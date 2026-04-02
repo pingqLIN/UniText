@@ -55,6 +55,8 @@
   - `local/scripts/verify-bootstrap.py`
   - `local/scripts/create-git-bundle.py`
   - `local/scripts/sync-skills.ps1`
+  - `local/scripts/verify-workspace-boundaries.ps1`
+  - `local/scripts/get-publishability-report.ps1`
 - release metadata
   - `manifest.json`
   - `release.json`

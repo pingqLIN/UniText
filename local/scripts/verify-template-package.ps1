@@ -40,7 +40,8 @@ $required = @(
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
   "local\\scripts\\sync-skills.ps1",
-  "local\\scripts\\verify-workspace-boundaries.ps1"
+  "local\\scripts\\verify-workspace-boundaries.ps1",
+  "local\\scripts\\get-publishability-report.ps1"
 )
 
 $forbidden = @(
@@ -56,7 +57,7 @@ $forbidden = @(
 
 $contentPatterns = @(
   [pscustomobject]@{ label = "machine-specific Windows path"; regex = '(?i)\b[A-Z]:\\(Users|Services|Projects)\\' },
-  [pscustomobject]@{ label = "live workspace hostname"; regex = '(?i)\b(?:[\w-]+\.)?colorgeek\.co\b' },
+  [pscustomobject]@{ label = "live workspace hostname"; regex = '(?i)\b(?:zone hostname|ingress|hostnames?|domain|redirect uris?)\b[^\r\n]*\b(?!workspace\.example\.com\b)(?!example\.com\b)(?:[a-z0-9-]+\.)+[a-z]{2,}\b' },
   [pscustomobject]@{ label = "live connector redirect URI"; regex = '(?i)https://chatgpt\.com/connector/oauth/' }
 )
 
