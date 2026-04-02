@@ -40,6 +40,7 @@
   - `TEMPLATE_RELEASE_PACKAGE.md`
   - `TEMPLATE_RELEASE_CHECKLIST.md`
 - template-safe root config
+  - `.gitattributes`
   - `.gitignore`
   - `.mcp.json`
   - `.claude/settings.json`
@@ -62,8 +63,10 @@
   - `local/scripts/verify-workspace-boundaries.ps1`
   - `local/scripts/get-publishability-report.ps1`
 - release metadata
-  - `manifest.json`
-  - `release.json`
+- `manifest.json`
+- `release.json`
+
+starter template 也應保留 repo-level line-ending policy，避免不同機器上的 `core.autocrlf` 在首次修改 shared docs 或 scripts 時產生不必要的 CRLF 噪音。
 
 ## 3. Exclude
 

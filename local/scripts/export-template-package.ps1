@@ -21,6 +21,7 @@ if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBa
 }
 $package = Join-Path $outputBase $folder
 $items = @(
+  [pscustomobject]@{ kind = "file"; source = ".gitattributes"; target = ".gitattributes" },
   [pscustomobject]@{ kind = "file"; source = ".gitignore"; target = ".gitignore" },
   [pscustomobject]@{ kind = "file"; source = ".mcp.json"; target = ".mcp.json" },
   [pscustomobject]@{ kind = "file"; source = "README.md"; target = "README.md" },

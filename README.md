@@ -235,6 +235,7 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 - **Registry first** — define before you deliver
 - **Discovery before automation** — know what exists before syncing it
 - **Platform-agnostic contracts** — logical paths in specs, absolute paths only in local overlay
+- **Repo-level line ending policy** — keep text normalization in tracked `.gitattributes`, not in author-specific Git settings
 - **Minimum viable metadata** — `id`, `type`, `canonical_location`, `status` is enough to start
 - **Safe mutation** — dry-run + backup + explicit trigger, always
 - **AI as consumer** — models read and act on the registry; they don't own the delivery guarantee

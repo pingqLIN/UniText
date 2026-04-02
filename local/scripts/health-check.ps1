@@ -2,6 +2,7 @@ $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $skillsRoot = "registry\\skills"
 $required = @(
+  ".gitattributes",
   ".mcp.json",
   ".claude\\settings.json",
   "README.md",

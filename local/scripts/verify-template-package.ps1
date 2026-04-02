@@ -15,6 +15,7 @@ $rules = Get-WorkspaceSensitiveMetadataRules -RootPath $resolvedPath
 $rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules
 
 $required = @(
+  ".gitattributes",
   ".gitignore",
   ".mcp.json",
   ".claude\\settings.json",
