@@ -97,7 +97,7 @@
 
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 為何已列入 starter template 目標、但目前仍屬 `adapter pending`，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 
@@ -154,8 +154,8 @@
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap writes a project `.mcp.json` plus Codex native-config entry pointing to the bundled read-only MCP server. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap writes a project `.mcp.json`, a Codex native-config entry, and a Copilot `~/.copilot/mcp-config.json` entry pointing to the bundled read-only MCP server. |
 
 ### Agents
 

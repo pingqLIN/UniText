@@ -47,7 +47,7 @@
 - [ ] `bootstrap.py --dry-run` 可在乾淨環境預覽初始化內容
 - [ ] `verify-bootstrap.py` 可驗證 first-run wiring
 - [ ] `.claude/settings.json` 指向 UniText MCP 工具而非錯誤服務
-- [ ] 未宣稱 Copilot 已完成驗證，除非真的有 adapter 與實測證據
+- [ ] 未宣稱 Copilot 已完成跨平台驗證，除非真的有對應平台的 bootstrap / verify 實測證據
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
 
