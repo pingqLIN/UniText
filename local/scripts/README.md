@@ -13,6 +13,8 @@
   - 跨平台檢查 first-run 結果是否與目前 repo 對齊
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
+- `git-startup.ps1`
+  - 為新 session 解析 canonical base branch、要求乾淨工作樹、顯式 fast-forward 更新，並建立新的 feature branch
 - `sync-skills.ps1`
   - 將 `registry/skills/` 同步到本機 skills targets
 - `scan-skills.ps1`

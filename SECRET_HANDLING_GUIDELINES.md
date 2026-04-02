@@ -39,6 +39,15 @@
 - key exists / missing 狀態
 - key 最後更新時間
 
+以下內容雖然通常不是 secret，但在 template / rebuild / review export 中仍應預設視為 `workspace-sensitive metadata`：
+
+- Cloudflare account ID、zone ID、tunnel ID、Access app ID
+- 真實 redirect URI allowlists
+- 真實 hostnames 與 internal service ports
+- 本機 authoring repo 路徑
+- 本機 runtime / staging / production 路徑
+- 任何足以重建單一作者工作區拓樸的 machine-specific baseline
+
 ## 3. Core Principle
 
 UniText 的基本原則是：
@@ -141,6 +150,7 @@ Authorization: Bearer token-example-redacted
 - 移除 secret value
 - 移除可重放 credential
 - 保留必要的 redacted state
+- 移除或改寫 workspace-sensitive metadata，使其無法還原單一作者工作區
 
 允許保留：
 
@@ -150,6 +160,11 @@ Authorization: Bearer token-example-redacted
 - key scope 或 label
 - last rotated at
 - storage backend type
+
+若某份 reference 同時包含 canonical guidance 與 live workspace values，應拆成：
+
+- 可共享的 sanitized guidance / template example
+- 僅留在 authoring repo 的 live baseline reference
 
 ## 9. Recommendation Ladder
 

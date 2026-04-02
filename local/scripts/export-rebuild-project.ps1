@@ -56,10 +56,14 @@ $releasePath = Join-Path $package "release.json"
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $release = Get-Content -LiteralPath $releasePath -Raw | ConvertFrom-Json
 
+$manifest.package_path = "."
+$manifest | Add-Member -NotePropertyName package_name -NotePropertyValue $folder -Force
 $manifest | Add-Member -NotePropertyName rebuild_mode -NotePropertyValue "fresh-project" -Force
 $manifest | Add-Member -NotePropertyName rebuild_guide -NotePropertyValue "REBUILD_AS_NEW_PROJECT.md" -Force
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath
 
+$release.package_path = "."
+$release | Add-Member -NotePropertyName package_name -NotePropertyValue $folder -Force
 $release | Add-Member -NotePropertyName release_channel -NotePropertyValue "rebuild-project" -Force
 $release | Add-Member -NotePropertyName rebuild_guide -NotePropertyValue "REBUILD_AS_NEW_PROJECT.md" -Force
 $release | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $releasePath

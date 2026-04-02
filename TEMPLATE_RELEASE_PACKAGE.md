@@ -71,6 +71,7 @@ template package 不應包含：
 - `ops/template-package/`
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
+- workspace-specific Cloudflare baseline references with live IDs、hostnames、redirect URIs、or runtime paths
 - authoring notes、review archives 與其他 local-only 補充材料
 - review-specific docs
   - `EXTERNAL_REVIEW_PACKAGE.md`
@@ -141,6 +142,7 @@ python local/scripts/create-git-bundle.py
 - 所有 review / audit 證據
 - 已完成的本機 delivery wiring
 - 任意機器都已經完成的 interpreter pinning
+- live workspace-specific infrastructure references；若需要保留結構，只能改成 sanitized placeholder docs
 
 ## 6. Current Interpretation
 

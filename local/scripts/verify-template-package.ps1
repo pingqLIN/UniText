@@ -8,6 +8,8 @@ if (-not $Path) {
   throw "Path is required."
 }
 
+$resolvedPath = (Resolve-Path -LiteralPath $Path).Path
+
 $required = @(
   ".gitignore",
   ".mcp.json",
@@ -46,20 +48,48 @@ $forbidden = @(
   "EXTERNAL_REVIEW_PACKAGE.md",
   "EXTERNAL_REVIEW_COVER_NOTE.md",
   "EXTERNAL_REVIEW_HIGHLIGHTS.md",
-  "PROJECT_STATUS_REPORT_2026-03-23.md"
+  "PROJECT_STATUS_REPORT_2026-03-23.md",
+  "registry\\skills\\cloudflare-governance\\references\\current-baseline.md",
+  "registry\\skills\\cloudflare-governance\\references\\workflow-guide.md"
 )
 
+$contentPatterns = @(
+  [pscustomobject]@{ label = "machine-specific Windows path"; regex = '(?i)\b[A-Z]:\\(Users|Services|Projects)\\' },
+  [pscustomobject]@{ label = "live workspace hostname"; regex = '(?i)\b(?:[\w-]+\.)?colorgeek\.co\b' },
+  [pscustomobject]@{ label = "live connector redirect URI"; regex = '(?i)https://chatgpt\.com/connector/oauth/' }
+)
+
+$contentFiles = Get-ChildItem -LiteralPath $resolvedPath -Recurse -File | Where-Object {
+  $_.Extension -in @(".md", ".json", ".jsonc", ".txt", ".ps1", ".py", ".toml", ".yml", ".yaml")
+}
+
 $missing = $required | Where-Object {
-  -not (Test-Path (Join-Path $Path $_))
+  -not (Test-Path (Join-Path $resolvedPath $_))
 }
 
 $presentForbidden = $forbidden | Where-Object {
-  Test-Path (Join-Path $Path $_)
+  Test-Path (Join-Path $resolvedPath $_)
+}
+
+$contentViolations = foreach ($file in $contentFiles) {
+  $relativePath = $file.FullName.Substring($resolvedPath.Length).TrimStart('\', '/')
+  foreach ($pattern in $contentPatterns) {
+    $matches = Select-String -LiteralPath $file.FullName -Pattern $pattern.regex -AllMatches
+    foreach ($match in $matches) {
+      [pscustomobject]@{
+        path = $relativePath
+        label = $pattern.label
+        line = $match.LineNumber
+        text = $match.Line.Trim()
+      }
+    }
+  }
 }
 
 [pscustomobject]@{
-  package_path = $Path
+  package_path = $resolvedPath
   missing = $missing
   forbidden_present = $presentForbidden
-  ok = ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0)
+  content_violations = @($contentViolations)
+  ok = ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and (@($contentViolations).Count -eq 0)
 }

@@ -19,6 +19,7 @@
 - [ ] template package 不包含 `ops/history/`
 - [ ] template package 不包含 review-only docs
 - [ ] template package 不包含 machine-specific absolute paths
+- [ ] template package 不包含 live Cloudflare baseline refs、真實 hostnames、真實 IDs、或 runtime 路徑
 - [ ] tracked `.mcp.json` 為 relative-path seed，而非作者本機絕對路徑
 
 ## 3. Examples

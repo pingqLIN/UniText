@@ -56,11 +56,11 @@ if ($missing.Count -gt 0) {
 }
 
 if ($DryRun) {
-  [pscustomobject]@{
-    package_path = $package
-    output_root = $outputBase
-    item_count = $items.Count
-    items = $items
+[pscustomobject]@{
+  package_path = "."
+  output_root = $outputBase
+  item_count = $items.Count
+  items = $items
     excluded = @(
       "backup/",
       "recovered_*/",
@@ -69,7 +69,8 @@ if ($DryRun) {
       "ops/review-package/",
       "local/docs/authoring/",
       "review-only docs",
-      "machine-local runtime state"
+      "machine-local runtime state",
+      "live workspace-specific Cloudflare baseline refs"
     )
   }
   return
@@ -101,7 +102,8 @@ foreach ($item in $items) {
 $manifest = [ordered]@{
   generated_at = (Get-Date).ToString("s")
   source_root = "."
-  package_path = $package
+  package_path = "."
+  package_name = $folder
   phase_target = "template-release-cleanup"
   release_channel = "candidate"
   release_version = "$((Get-Date).ToString('yyyy.MM.dd'))-template-candidate"
@@ -114,7 +116,8 @@ $manifest = [ordered]@{
     "ops/review-package/",
     "local/docs/authoring/",
     "review-only docs",
-    "machine-local runtime state"
+    "machine-local runtime state",
+    "live workspace-specific Cloudflare baseline refs"
   )
   items = $items
 }
