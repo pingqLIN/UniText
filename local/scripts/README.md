@@ -39,6 +39,8 @@
   - 驗證目前 authoring repo 的 tracked shared surfaces 是否混入 live workspace metadata、authoring-only docs、或 operations state
 - `get-publishability-report.ps1`
   - 彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
+- `lib/workspace-sensitive-metadata.ps1`
+  - 載入 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json`，讓 boundary / template / publishability 驗證共用同一套規則
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

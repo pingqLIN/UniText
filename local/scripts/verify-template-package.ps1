@@ -3,6 +3,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
+$libPath = Join-Path $PSScriptRoot "lib\\workspace-sensitive-metadata.ps1"
+. $libPath
+$rules = Get-WorkspaceSensitiveMetadataRules -RootPath $root
 
 if (-not $Path) {
   throw "Path is required."
@@ -20,6 +24,7 @@ $required = @(
   "RESOURCE_SPEC.md",
   "OPERATIONS.md",
   "PROJECT_MODES.md",
+  "WORKSPACE_SENSITIVE_METADATA_RULES.json",
   "DOCUMENT_PLACEMENT_POLICY.md",
   "SECRET_HANDLING_GUIDELINES.md",
   "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
@@ -40,6 +45,7 @@ $required = @(
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
   "local\\scripts\\sync-skills.ps1",
+  "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
   "local\\scripts\\get-publishability-report.ps1"
 )
@@ -56,9 +62,13 @@ $forbidden = @(
 )
 
 $contentPatterns = @(
-  [pscustomobject]@{ label = "machine-specific Windows path"; regex = '(?i)\b[A-Z]:\\(Users|Services|Projects)\\' },
-  [pscustomobject]@{ label = "live workspace hostname"; regex = '(?i)\b(?:zone hostname|ingress|hostnames?|domain|redirect uris?)\b[^\r\n]*\b(?!workspace\.example\.com\b)(?!example\.com\b)(?:[a-z0-9-]+\.)+[a-z]{2,}\b' },
-  [pscustomobject]@{ label = "live connector redirect URI"; regex = '(?i)https://chatgpt\.com/connector/oauth/' }
+  @($rules.content_patterns | Where-Object {
+    $_.label -in @(
+      "machine-specific Windows path",
+      "live workspace hostname",
+      "live connector redirect URI"
+    )
+  })
 )
 
 $contentFiles = Get-ChildItem -LiteralPath $resolvedPath -Recurse -File | Where-Object {
@@ -73,20 +83,18 @@ $presentForbidden = $forbidden | Where-Object {
   Test-Path (Join-Path $resolvedPath $_)
 }
 
-$contentViolations = foreach ($file in $contentFiles) {
-  $relativePath = $file.FullName.Substring($resolvedPath.Length).TrimStart('\', '/')
-  foreach ($pattern in $contentPatterns) {
-    $matches = Select-String -LiteralPath $file.FullName -Pattern $pattern.regex -AllMatches
-    foreach ($match in $matches) {
-      [pscustomobject]@{
-        path = $relativePath
-        label = $pattern.label
-        line = $match.LineNumber
-        text = $match.Line.Trim()
-      }
-    }
+$relativeContentFiles = @($contentFiles | ForEach-Object {
+  $_.FullName.Substring($resolvedPath.Length).TrimStart('\', '/')
+})
+$rawViolations = @(Find-WorkspaceSensitiveContentViolations -RootPath $resolvedPath -Files $relativeContentFiles -ContentPatterns $contentPatterns)
+$contentViolations = @($rawViolations | ForEach-Object {
+  [pscustomobject]@{
+    path = $_.path
+    label = $_.label
+    line = $_.line
+    text = $_.text
   }
-}
+})
 
 [pscustomobject]@{
   package_path = $resolvedPath
