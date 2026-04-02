@@ -45,6 +45,8 @@
   - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性與自帶案例是否通過
 - `preview-renormalize.ps1`
   - 只做 dry-run，預覽 `git add --renormalize .` 會碰到多少 tracked files，讓 line-ending cleanup 可以先看 blast radius 再決定是否執行
+- `audit-i18n-drift.py`
+  - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

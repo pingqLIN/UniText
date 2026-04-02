@@ -23,3 +23,8 @@ This directory contains locale-specific translations for official UniText docume
 The manifest lists the official docs that should be translated into each locale.
 Registry content, template examples, archived reviews, and social drafts are excluded by default.
 
+To audit missing or stale translations against the manifest, run:
+
+```bash
+python local/scripts/audit-i18n-drift.py
+```
