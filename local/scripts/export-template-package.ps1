@@ -44,6 +44,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\bootstrap.py"; target = "local\\scripts\\bootstrap.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-bootstrap.py"; target = "local\\scripts\\verify-bootstrap.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\create-git-bundle.py"; target = "local\\scripts\\create-git-bundle.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\run-renormalize.ps1"; target = "local\\scripts\\run-renormalize.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\sync-skills.ps1"; target = "local\\scripts\\sync-skills.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1"; target = "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1"; target = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1" },

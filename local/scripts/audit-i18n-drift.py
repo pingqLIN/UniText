@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
@@ -31,14 +32,102 @@ def run_git(repo: Path, path: str) -> tuple[str | None, int | None]:
     return sha, int(stamp)
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--format", choices=("json", "markdown"), default="json")
+    parser.add_argument("--sample-size", type=int, default=40)
+    parser.add_argument("--locale", action="append", dest="locales")
+    parser.add_argument("--source-doc", action="append", dest="source_docs")
+    parser.add_argument("--output")
+    parser.add_argument("--exit-zero", action="store_true")
+    return parser.parse_args()
+
+
+def render_markdown(summary: dict[str, object]) -> str:
+    lines = [
+        "# UniText i18n Drift Report",
+        "",
+        f"- manifest: `{summary['manifest_path']}`",
+        f"- default locale: `{summary['default_locale']}`",
+        f"- locale count: `{summary['locale_count']}`",
+        f"- source doc count: `{summary['source_doc_count']}`",
+        f"- issues found: `{summary['issues_found']}`",
+        "",
+        "## By Locale",
+        "",
+        "| locale | missing | stale | untracked | source missing |",
+        "|---|---:|---:|---:|---:|",
+    ]
+
+    for locale, counts in summary["by_locale"].items():
+        lines.append(
+            f"| `{locale}` | {counts['missing']} | {counts['stale']} | {counts['untracked']} | {counts['source_missing']} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## By Source Doc",
+            "",
+            "| source doc | missing | stale | untracked | source missing |",
+            "|---|---:|---:|---:|---:|",
+        ]
+    )
+
+    for source_doc, counts in summary["by_source_doc"].items():
+        lines.append(
+            f"| `{source_doc}` | {counts['missing']} | {counts['stale']} | {counts['untracked']} | {counts['source_missing']} |"
+        )
+
+    sample_issues = summary["sample_issues"]
+    if sample_issues:
+        lines.extend(
+            [
+                "",
+                "## Sample Issues",
+                "",
+                "| locale | source doc | status | translated doc |",
+                "|---|---|---|---|",
+            ]
+        )
+        for issue in sample_issues:
+            lines.append(
+                f"| `{issue['locale']}` | `{issue['source_doc']}` | `{issue['status']}` | `{issue['translated_doc']}` |"
+            )
+
+    return "\n".join(lines) + "\n"
+
+
+def write_output(text: str, output: str | None) -> None:
+    if output is None:
+        print(text)
+        return
+
+    path = Path(output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    print(path)
+
+
 def main() -> int:
+    args = parse_args()
     repo = get_repo_root()
     manifest_path = repo / "i18n" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    locales = list(manifest["locales"])
-    source_docs = list(manifest["source_docs"])
+    manifest_locales = list(manifest["locales"])
+    manifest_source_docs = list(manifest["source_docs"])
+    locales = args.locales or manifest_locales
+    source_docs = args.source_docs or manifest_source_docs
+    unknown_locales = sorted(set(locales) - set(manifest_locales))
+    unknown_source_docs = sorted(set(source_docs) - set(manifest_source_docs))
+    if unknown_locales:
+        raise SystemExit(f"Unknown locales: {', '.join(unknown_locales)}")
+    if unknown_source_docs:
+        raise SystemExit(f"Unknown source docs: {', '.join(unknown_source_docs)}")
+
     issues: list[dict[str, object]] = []
     locale_counts: dict[str, Counter[str]] = {locale: Counter() for locale in locales}
+    source_counts: dict[str, Counter[str]] = {source_doc: Counter() for source_doc in source_docs}
 
     for source_doc in source_docs:
         source_path = repo / source_doc
@@ -50,6 +139,7 @@ def main() -> int:
             translated_path = repo / translated_doc
             if not source_exists:
                 locale_counts[locale]["source_missing"] += 1
+                source_counts[source_doc]["source_missing"] += 1
                 issues.append(
                     {
                         "locale": locale,
@@ -62,6 +152,7 @@ def main() -> int:
 
             if not translated_path.exists():
                 locale_counts[locale]["missing"] += 1
+                source_counts[source_doc]["missing"] += 1
                 issues.append(
                     {
                         "locale": locale,
@@ -81,6 +172,7 @@ def main() -> int:
                 status = "stale"
 
             locale_counts[locale][status] += 1
+            source_counts[source_doc][status] += 1
             if status != "up-to-date":
                 issues.append(
                     {
@@ -98,6 +190,8 @@ def main() -> int:
         "default_locale": manifest["default_locale"],
         "locale_count": len(locales),
         "source_doc_count": len(source_docs),
+        "selected_locales": locales,
+        "selected_source_docs": source_docs,
         "issues_found": len(issues),
         "by_locale": {
             locale: {
@@ -108,10 +202,22 @@ def main() -> int:
             }
             for locale in locales
         },
-        "sample_issues": issues[:40],
+        "by_source_doc": {
+            source_doc: {
+                "missing": source_counts[source_doc]["missing"],
+                "stale": source_counts[source_doc]["stale"],
+                "untracked": source_counts[source_doc]["untracked"],
+                "source_missing": source_counts[source_doc]["source_missing"],
+            }
+            for source_doc in source_docs
+        },
+        "sample_issues": issues[: args.sample_size],
         "ok": len(issues) == 0,
     }
-    print(json.dumps(summary, indent=2))
+    output = json.dumps(summary, indent=2) if args.format == "json" else render_markdown(summary)
+    write_output(output, args.output)
+    if args.exit_zero:
+        return 0
     return 0 if summary["ok"] else 1
 
 

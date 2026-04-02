@@ -26,6 +26,7 @@ $required = @(
   "local\\scripts\\bootstrap.py",
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
+  "local\\scripts\\run-renormalize.ps1",
   "local\\scripts\\scan-skills.ps1",
   "local\\scripts\\verify-delivery.ps1",
   "local\\scripts\\batch-adopt-skills.ps1",

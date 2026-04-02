@@ -4,7 +4,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
-$lines = @((& git -C $root add -n --renormalize .) | Where-Object { $_ -match "^add '" })
+$output = @((& git -C $root add -n --renormalize . 2>&1))
+if ($LASTEXITCODE -ne 0) {
+  throw "git add --renormalize preview failed: $($output -join [Environment]::NewLine)"
+}
+
+$lines = @($output | Where-Object { $_ -match "^add '" })
 $paths = @($lines | ForEach-Object {
   if ($_ -match "^add '(.+)'$") {
     $Matches[1]
