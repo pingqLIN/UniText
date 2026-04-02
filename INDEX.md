@@ -110,6 +110,21 @@
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
+### Workspace-Specific Skills
+
+以下 skills 已存在於 shared registry，但不屬於目前外部審查主集的 `8 + 4` shortlist。
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+
 ### Workflow
 
 | Field | Value |
