@@ -22,6 +22,8 @@ local/todolist/
 local/docs/ENVIRONMENT.md
 local/docs/JOURNAL.md
 local/docs/MCP_DEPLOYMENT_NOTES.md
+local/docs/CLOUDFLARE_WORKFLOW_LIVE.md
+local/docs/CLOUDFLARE_WORKSPACE_BASELINE.md
 local/docs/PATH_MAP.md
 local/docs/WORKFLOW_DEPLOYMENT_NOTES.md
 local/docs/authoring/

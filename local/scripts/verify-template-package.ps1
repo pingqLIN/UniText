@@ -48,9 +48,7 @@ $forbidden = @(
   "EXTERNAL_REVIEW_PACKAGE.md",
   "EXTERNAL_REVIEW_COVER_NOTE.md",
   "EXTERNAL_REVIEW_HIGHLIGHTS.md",
-  "PROJECT_STATUS_REPORT_2026-03-23.md",
-  "registry\\skills\\cloudflare-governance\\references\\current-baseline.md",
-  "registry\\skills\\cloudflare-governance\\references\\workflow-guide.md"
+  "PROJECT_STATUS_REPORT_2026-03-23.md"
 )
 
 $contentPatterns = @(
