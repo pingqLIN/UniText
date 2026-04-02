@@ -191,6 +191,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [RESOURCE_SPEC.md](RESOURCE_SPEC.md) | Metadata contract for all shared resources |
 | [OPERATIONS.md](OPERATIONS.md) | Delivery modes, triggers, and safety rules |
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Authoring repo vs. project template distinction |
+| [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md) | Schema, maintenance rules, and validation flow for workspace-sensitive metadata detection |
 | [DOCUMENT_PLACEMENT_POLICY.md](DOCUMENT_PLACEMENT_POLICY.md) | Placement matrix for shared, local, authoring, and operations documents |
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Secret storage, redaction, and password/API key handling boundaries |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
@@ -206,7 +207,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
-Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
 
 The authoring repo is not automatically publish-safe just because template or rebuild exports validate cleanly. Use `local/scripts/verify-workspace-boundaries.ps1` when you need a repo-side boundary check for tracked shared surfaces.
 

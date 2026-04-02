@@ -7,6 +7,7 @@
     "RESOURCE_SPEC.md",
     "OPERATIONS.md",
     "PROJECT_MODES.md",
+    "WORKSPACE_SENSITIVE_METADATA_RULES.md",
     "SECRET_HANDLING_GUIDELINES.md",
     "TEMPLATE_RELEASE_PACKAGE.md",
     "TEMPLATE_RELEASE_CHECKLIST.md",
@@ -30,8 +31,11 @@
     "local/scripts/verify-template-package.ps1",
     "local/scripts/export-rebuild-project.ps1",
     "local/scripts/verify-rebuild-project.ps1",
+    "local/scripts/validate-workspace-sensitive-metadata-rules.ps1",
     "local/scripts/verify-workspace-boundaries.ps1",
     "local/scripts/get-publishability-report.ps1",
+    "local/scripts/lib/workspace-sensitive-metadata.ps1",
+    "WORKSPACE_SENSITIVE_METADATA_RULES.json",
     "registry"
   ],
   "path_rules": [
@@ -60,7 +64,7 @@
     },
     {
       "label": "live workspace hostname",
-      "regex": "(?i)\\b(?:zone hostname|ingress|hostnames?|domain|redirect uris?)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
+      "regex": "(?i)\\b(?:zone hostname|ingress|hostnames?|domain)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
       "skip_script_pattern_lines": true
     },
     {
@@ -77,6 +81,36 @@
       "label": "live Cloudflare tunnel or access app identifier",
       "regex": "(?i)\\b(?:Tunnel ID|Access app ID)\\b[^\\r\\n]*\\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\\b",
       "skip_script_pattern_lines": false
+    }
+  ],
+  "self_test_cases": [
+    {
+      "label": "allow sanitized placeholder hostname",
+      "sample": "Zone hostname: workspace.example.com",
+      "expected_labels": []
+    },
+    {
+      "label": "flag live hostname in governance text",
+      "sample": "Zone hostname: colorgeek.co",
+      "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "flag machine-specific path",
+      "sample": "Prod runtime: Q:\\Services\\tb2-prod",
+      "expected_labels": ["machine-specific Windows path"]
+    },
+    {
+      "label": "flag redirect uri",
+      "sample": "Redirect URI: https://chatgpt.com/connector/oauth/Sfv7Ark1LNcp",
+      "expected_labels": ["live connector redirect URI"]
+    },
+    {
+      "label": "flag cloudflare identifiers",
+      "sample": "Account ID: 00ba863c722b4372fa7efdd0e7c63b8d; Tunnel ID: 8f494f33-5983-4933-bb71-5812b56cad56",
+      "expected_labels": [
+        "live Cloudflare account or zone identifier",
+        "live Cloudflare tunnel or access app identifier"
+      ]
     }
   ]
 }

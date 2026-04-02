@@ -7,6 +7,7 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $libPath = Join-Path $PSScriptRoot "lib\\workspace-sensitive-metadata.ps1"
 . $libPath
 $rules = Get-WorkspaceSensitiveMetadataRules -RootPath $root
+$rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules
 $effectiveScope = if ($Scope -and $Scope.Count -gt 0) { $Scope } else { @($rules.shared_surface_scope) }
 $tracked = & git -C $root ls-files -- $effectiveScope
 
@@ -28,7 +29,9 @@ $contentViolations = @(Find-WorkspaceSensitiveContentViolations -RootPath $root 
 [pscustomobject]@{
   scanned_scope = $effectiveScope
   scanned_file_count = $trackedFiles.Count
+  rules_ok = [bool]$rulesCheck.ok
+  rules_errors = @($rulesCheck.errors)
   path_violations = @($pathViolations)
   content_violations = @($contentViolations)
-  ok = (@($pathViolations).Count -eq 0) -and (@($contentViolations).Count -eq 0)
+  ok = [bool]$rulesCheck.ok -and (@($pathViolations).Count -eq 0) -and (@($contentViolations).Count -eq 0)
 }

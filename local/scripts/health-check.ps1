@@ -11,6 +11,7 @@ $required = @(
   "OPERATIONS.md",
   "PROJECT_MODES.md",
   "WORKSPACE_SENSITIVE_METADATA_RULES.json",
+  "WORKSPACE_SENSITIVE_METADATA_RULES.md",
   "DOCUMENT_PLACEMENT_POLICY.md",
   "SECRET_HANDLING_GUIDELINES.md",
   "MILESTONES.md",
@@ -31,6 +32,7 @@ $required = @(
   "local\\scripts\\rollback-skills.ps1",
   "local\\scripts\\export-review-package.ps1",
   "local\\scripts\\export-template-package.ps1",
+  "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
   "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
   "local\\scripts\\verify-template-package.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
@@ -54,6 +56,7 @@ $missing = $required | Where-Object { -not (Test-Path (Join-Path $root $_)) }
 $trackedSkillFiles = @((& git -C $root ls-files "$skillsRoot/*/SKILL.md") | Where-Object { $_ })
 $skills = @($trackedSkillFiles | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
 $invalid = @()
+$rulesScript = Join-Path $root "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1"
 
 foreach ($skill in $skills) {
   $path = Join-Path $root (Join-Path $skill "SKILL.md")
@@ -68,6 +71,9 @@ foreach ($skill in $skills) {
   }
 }
 
+$rulesCheck = & $rulesScript
+$rulesOk = [bool]$rulesCheck.ok
+
 [pscustomobject]@{
   missing_files = $missing
   adopted_skills = $skills.Count
@@ -75,5 +81,7 @@ foreach ($skill in $skills) {
   agent_seed = Test-Path "registry\\agents\\registry-curator\\AGENT.md"
   mcp_seed = Test-Path "registry\\mcp\\claude-project-mcp-seed\\definition.json"
   workflow_seed = Test-Path "registry\\workflow\\claude-plans\\WORKFLOW.md"
-  ok = ($missing.Count -eq 0) -and ($invalid.Count -eq 0) -and ($skills.Count -ge 1)
+  boundary_rules_ok = $rulesOk
+  boundary_rule_errors = @($rulesCheck.errors)
+  ok = ($missing.Count -eq 0) -and ($invalid.Count -eq 0) -and ($skills.Count -ge 1) -and $rulesOk
 }

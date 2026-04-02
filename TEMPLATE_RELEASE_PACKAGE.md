@@ -34,6 +34,7 @@
   - `OPERATIONS.md`
   - `PROJECT_MODES.md`
   - `WORKSPACE_SENSITIVE_METADATA_RULES.json`
+  - `WORKSPACE_SENSITIVE_METADATA_RULES.md`
   - `SECRET_HANDLING_GUIDELINES.md`
   - `MILESTONES.md`
   - `TEMPLATE_RELEASE_PACKAGE.md`
@@ -56,6 +57,7 @@
   - `local/scripts/verify-bootstrap.py`
   - `local/scripts/create-git-bundle.py`
   - `local/scripts/sync-skills.ps1`
+  - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
   - `local/scripts/lib/workspace-sensitive-metadata.ps1`
   - `local/scripts/verify-workspace-boundaries.ps1`
   - `local/scripts/get-publishability-report.ps1`

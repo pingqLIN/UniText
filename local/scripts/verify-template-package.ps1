@@ -3,16 +3,16 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $libPath = Join-Path $PSScriptRoot "lib\\workspace-sensitive-metadata.ps1"
 . $libPath
-$rules = Get-WorkspaceSensitiveMetadataRules -RootPath $root
 
 if (-not $Path) {
   throw "Path is required."
 }
 
 $resolvedPath = (Resolve-Path -LiteralPath $Path).Path
+$rules = Get-WorkspaceSensitiveMetadataRules -RootPath $resolvedPath
+$rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules
 
 $required = @(
   ".gitignore",
@@ -25,6 +25,7 @@ $required = @(
   "OPERATIONS.md",
   "PROJECT_MODES.md",
   "WORKSPACE_SENSITIVE_METADATA_RULES.json",
+  "WORKSPACE_SENSITIVE_METADATA_RULES.md",
   "DOCUMENT_PLACEMENT_POLICY.md",
   "SECRET_HANDLING_GUIDELINES.md",
   "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
@@ -45,6 +46,7 @@ $required = @(
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
   "local\\scripts\\sync-skills.ps1",
+  "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
   "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
   "local\\scripts\\get-publishability-report.ps1"
@@ -98,8 +100,10 @@ $contentViolations = @($rawViolations | ForEach-Object {
 
 [pscustomobject]@{
   package_path = $resolvedPath
+  rules_ok = [bool]$rulesCheck.ok
+  rules_errors = @($rulesCheck.errors)
   missing = $missing
   forbidden_present = $presentForbidden
   content_violations = @($contentViolations)
-  ok = ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and (@($contentViolations).Count -eq 0)
+  ok = [bool]$rulesCheck.ok -and ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and (@($contentViolations).Count -eq 0)
 }

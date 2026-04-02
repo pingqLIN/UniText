@@ -15,13 +15,14 @@
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
 6. `DOCUMENT_PLACEMENT_POLICY.md`
-7. `TEMPLATE_RELEASE_PACKAGE.md`
-8. `TEMPLATE_RELEASE_CHECKLIST.md`
-9. `REBUILD_AS_NEW_PROJECT.md`
-10. `SECRET_HANDLING_GUIDELINES.md`
-11. `NO_PUBLISH_POLICY.md`
-12. `COPILOT_CLI_ADAPTER_NOTE.md`
-13. `SKILL0_COLLABORATION_VISION.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
+14. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -81,6 +82,8 @@
 若要先驗證 authoring repo 的 tracked shared surfaces 沒有混入 live workspace metadata，請使用 `local/scripts/verify-workspace-boundaries.ps1`。
 
 若要在未來討論 push suitability 前先做本地報告，請使用 `local/scripts/get-publishability-report.ps1`。
+
+若要調整 shared metadata 偵測規則或理解規則案例，請先看 [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md)，再使用 `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`。
 
 若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
 
