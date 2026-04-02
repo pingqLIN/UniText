@@ -102,6 +102,7 @@ def render_codex_mcp_block(server: Path, root: Path) -> str:
     return "\n".join(
         [
             "[mcp_servers.unitext_registry]",
+            "startup_timeout_sec = 60",
             f"command = {toml_string(sys.executable)}",
             f"args = [{args}]",
             "",

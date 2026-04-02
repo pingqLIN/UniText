@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $skillsRoot = "registry\\skills"
 $required = @(
   ".mcp.json",
@@ -47,20 +48,21 @@ $required = @(
   "template\\examples\\local\\scripts\\sync-skills.template.ps1"
 )
 
-$missing = $required | Where-Object { -not (Test-Path $_) }
-$skills = if (Test-Path $skillsRoot) { Get-ChildItem $skillsRoot -Directory } else { @() }
+$missing = $required | Where-Object { -not (Test-Path (Join-Path $root $_)) }
+$trackedSkillFiles = @((& git -C $root ls-files "$skillsRoot/*/SKILL.md") | Where-Object { $_ })
+$skills = @($trackedSkillFiles | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
 $invalid = @()
 
 foreach ($skill in $skills) {
-  $path = Join-Path $skill.FullName "SKILL.md"
+  $path = Join-Path $root (Join-Path $skill "SKILL.md")
   if (-not (Test-Path $path)) {
-    $invalid += $skill.Name
+    $invalid += (Split-Path $skill -Leaf)
     continue
   }
 
   $body = Get-Content $path -Raw
   if (-not $body.StartsWith("---")) {
-    $invalid += $skill.Name
+    $invalid += (Split-Path $skill -Leaf)
   }
 }
 
