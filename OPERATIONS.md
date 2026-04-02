@@ -24,6 +24,8 @@
 - 單一平台的唯一實作方式
 - 本機 authoring repo 的歷史狀態
 
+若需要判斷治理文件、reference、authoring notes、與 operations artifacts 應該放在哪一層，請搭配 `DOCUMENT_PLACEMENT_POLICY.md`。
+
 ## 2. Delivery Modes
 
 | Mode | When to use |
@@ -115,6 +117,8 @@ delivery 只能由明確 trigger 啟動：
 - audit trails
 
 它們應位於 `/operations`，不應混入 `/registry`。
+
+在目前 repo 的實體目錄上，`/operations` 對應的是 `ops/`。`ops/` 屬於 state layer，不是 canonical definition layer。
 
 ## 8. Logical-to-Physical Mapping
 

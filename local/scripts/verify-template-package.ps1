@@ -20,7 +20,9 @@ $required = @(
   "RESOURCE_SPEC.md",
   "OPERATIONS.md",
   "PROJECT_MODES.md",
+  "DOCUMENT_PLACEMENT_POLICY.md",
   "SECRET_HANDLING_GUIDELINES.md",
+  "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
   "MILESTONES.md",
   "TEMPLATE_RELEASE_PACKAGE.md",
   "TEMPLATE_RELEASE_CHECKLIST.md",
@@ -37,7 +39,8 @@ $required = @(
   "local\\scripts\\bootstrap.py",
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
-  "local\\scripts\\sync-skills.ps1"
+  "local\\scripts\\sync-skills.ps1",
+  "local\\scripts\\verify-workspace-boundaries.ps1"
 )
 
 $forbidden = @(

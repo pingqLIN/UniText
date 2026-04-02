@@ -38,6 +38,7 @@
 ## 4. Validation
 
 - [ ] `health-check.ps1` 可通過
+- [ ] `verify-workspace-boundaries.ps1` 可通過
 - [ ] `export-template-package.ps1 -DryRun` 可列出 package 內容
 - [ ] `export-template-package.ps1` 可成功產出 package
 - [ ] `verify-template-package.ps1` 可通過

@@ -14,13 +14,14 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `TEMPLATE_RELEASE_PACKAGE.md`
-7. `TEMPLATE_RELEASE_CHECKLIST.md`
-8. `REBUILD_AS_NEW_PROJECT.md`
-9. `SECRET_HANDLING_GUIDELINES.md`
-10. `NO_PUBLISH_POLICY.md`
-11. `COPILOT_CLI_ADAPTER_NOTE.md`
-12. `SKILL0_COLLABORATION_VISION.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `TEMPLATE_RELEASE_PACKAGE.md`
+8. `TEMPLATE_RELEASE_CHECKLIST.md`
+9. `REBUILD_AS_NEW_PROJECT.md`
+10. `SECRET_HANDLING_GUIDELINES.md`
+11. `NO_PUBLISH_POLICY.md`
+12. `COPILOT_CLI_ADAPTER_NOTE.md`
+13. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -76,6 +77,10 @@
 若要整理成乾淨的 starter package，請看 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 並使用 `local/scripts/export-template-package.ps1`。
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
+
+若要先驗證 authoring repo 的 tracked shared surfaces 沒有混入 live workspace metadata，請使用 `local/scripts/verify-workspace-boundaries.ps1`。
+
+若要在未來討論 push suitability 前先做本地報告，請使用 `local/scripts/get-publishability-report.ps1`。
 
 若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
 
@@ -200,6 +205,7 @@
 - 某個平台的絕對路徑
 - 最終已解析完成的 delivery mode
 - 某個作者工作區的本機配置
+- local authoring plans、review notes、或 live workspace baselines 應放哪裡；這部分請看 `DOCUMENT_PLACEMENT_POLICY.md`
 
 ## 7. How To Use This Baseline
 

@@ -105,6 +105,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
 ```
 
+若要在匯出前先檢查 authoring repo 的 tracked shared surfaces：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-workspace-boundaries.ps1
+```
+
 若要直接輸出成「全新的 starter project」而不是一般 template package：
 
 ```powershell
@@ -143,6 +149,7 @@ python local/scripts/create-git-bundle.py
 - 已完成的本機 delivery wiring
 - 任意機器都已經完成的 interpreter pinning
 - live workspace-specific infrastructure references；若需要保留結構，只能改成 sanitized placeholder docs
+- authoring repo branch 本身已可安全推送；push suitability 仍需另做 repo-side boundary review
 
 ## 6. Current Interpretation
 
