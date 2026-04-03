@@ -8,6 +8,14 @@
 
 ---
 
+## Che Cosa Sta Facendo Davvero UniText
+
+UniText non è solo una cartella che raccoglie prompts, skills o modelli MCP. È un modo governato per mantenere una sola canonical definition delle risorse AI condivise, separando allo stesso tempo machine-local wiring, project-local activation e cronologia operativa. L’obiettivo è impedire che ogni CLI sviluppi una propria copia, sempre più in drift, della stessa capacità.
+
+Per questo il repository tiene insieme `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap e publishability checks nello stesso sistema. Quello che UniText sta davvero cercando di fare è rendere il tooling AI condiviso portable, reviewable e repeatable attraverso CLI diverse, macchine diverse e fasi diverse del ciclo di vita di un progetto.
+
+---
+
 ## Perché esiste
 
 Se usi più di un tool AI CLI, le tue risorse finiscono per disperdersi:

@@ -14,14 +14,14 @@ Ordre de lecture recommandé :
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Catalogue des ressources
@@ -79,12 +79,25 @@ Pour préparer un starter package propre, lisez [TEMPLATE_RELEASE_PACKAGE.md](TE
 
 Pour vérifier le starter package exporté, utilisez `local/scripts/verify-template-package.ps1`.
 
+Pour vérifier d’abord que les tracked shared surfaces du repo d’authoring ne contiennent pas de live workspace metadata, utilisez `local/scripts/verify-workspace-boundaries.ps1`.
+
+Pour générer un rapport local avant toute discussion future sur la push suitability, utilisez `local/scripts/get-publishability-report.ps1`.
+
+Pour ajuster les règles de détection des shared metadata ou comprendre les cas de règles, lisez d’abord [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md), puis utilisez `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`.
+
+Pour reconstruire directement le repo actuel en un nouveau starter project, lisez [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md), puis utilisez :
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
+
 Pour terminer un premier cycle `initialize → verify` sur une nouvelle machine, privilégiez :
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
 ### Notes conceptuelles associées
+
+Pour comprendre la repo-level bootstrap baseline actuelle de `Copilot CLI`, ses limites et la direction de validation cross-platform à venir, consultez [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md).
 
 Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
 
@@ -104,6 +117,21 @@ Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez
 | `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
+
+### Workspace-Specific Skills
+
+Les skills suivants existent déjà dans le shared registry, mais ne font pas partie de la shortlist externe actuelle `8 + 4`.
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
 
 ### Workflow
 
@@ -126,8 +154,8 @@ Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Le bootstrap écrit un `.mcp.json` de projet plus une entrée native-config Codex pointant vers le serveur MCP read-only intégré. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Le bootstrap écrit un `.mcp.json` de projet, une entrée native-config de Codex et une entrée `~/.copilot/mcp-config.json` pour Copilot pointant vers le MCP server read-only embarqué. |
 
 ### Agents
 
@@ -139,9 +167,9 @@ Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | À utiliser comme persona d’agent partagé pour les tâches de revue et d’adoption ; le câblage réel dépend des capacités du CLI. |
+| `delivery_guidance` | Peut être utilisé comme persona d’agent partagé pour les tâches de review et d’adoption ; le wiring réel dépend toujours des capacités du CLI. |
 
-## 5. Exemples d’entrées du catalogue
+## 5. Exemples d’entrées de catalogue
 
 ### Exemple : Skill
 
@@ -153,9 +181,9 @@ Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | Utiliser l’adaptateur de skills ; le mode final dépend des capacités du CLI et de l’environnement local. |
+| `delivery_guidance` | Utiliser l’adaptateur de skills ; le mode de résolution dépend des capacités du CLI et de l’environnement local. |
 
-### Exemple : définition MCP
+### Exemple : MCP Definition
 
 | Champ | Valeur |
 |---|---|
@@ -165,34 +193,35 @@ Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez
 | `status` | `draft` |
 | `source_of_truth` | `/registry/mcp/example-mcp/definition` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | Enregistrer via l’adaptateur MCP ; le mode de livraison final dépend des capacités du CLI et de l’environnement local. |
+| `delivery_guidance` | Enregistrer via l’adaptateur MCP ; le delivery mode final dépend des capacités du CLI et de l’environnement local. |
 
-## 6. Règles de discovery
+## 6. Discovery Rules
 
 `INDEX.md` répond à :
 
 - quelles ressources existent ici
-- où se trouve leur emplacement logique
-- quels documents de spec ou d’opérations consulter ensuite
+- où se trouvent leurs positions logiques
+- quel document de spécification ou d’exploitation il faut lire
 
 `INDEX.md` ne répond pas directement à :
 
-- le chemin absolu d’une plateforme
-- le mode de delivery final une fois résolu
-- la configuration locale d’un espace de travail auteur
+- un chemin absolu pour une plateforme donnée
+- le delivery mode final une fois résolu
+- la configuration locale d’un workspace d’auteur donné
+- l’endroit où doivent aller les local authoring plans, review notes ou live workspace baselines ; pour cela, voir `DOCUMENT_PLACEMENT_POLICY.md`
 
-## 7. Comment utiliser cette base
+## 7. How To Use This Baseline
 
-### Pour les humains
+### For Humans
 
 1. Lire d’abord `VISION.md`
-2. Utiliser `INDEX.md` pour construire son starter catalog
-3. Utiliser `RESOURCE_SPEC.md` pour définir les champs des ressources
-4. Utiliser `OPERATIONS.md` pour définir les liens entre plateformes et CLI
+2. Utiliser `INDEX.md` pour construire son propre starter catalog
+3. Utiliser `RESOURCE_SPEC.md` pour définir les champs de ressources
+4. Utiliser `OPERATIONS.md` pour définir l’intégration plateforme / CLI
 
-### Pour les agents IA
+### For AI Agents
 
-1. Commencer par utiliser `INDEX.md` comme point d’entrée de la discovery
-2. Lire `RESOURCE_SPEC.md` lorsqu’un schéma est nécessaire
-3. Lire `OPERATIONS.md` lorsqu’un delivery ou une mutation est nécessaire
-4. Ne jamais considérer le chemin d’un déploiement unique comme la vérité du contrat
+1. Traiter `INDEX.md` comme point d’entrée de discovery
+2. Lire `RESOURCE_SPEC.md` quand un schéma est nécessaire
+3. Lire `OPERATIONS.md` quand delivery / mutation est nécessaire
+4. Ne pas traiter les chemins d’un déploiement unique comme vérité de spécification

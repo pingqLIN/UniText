@@ -8,6 +8,14 @@
 
 ---
 
+## What UniText Is Actually For
+
+UniText is not just a folder of prompts, skills, or MCP stubs. It is a governed way to keep one canonical definition of shared AI resources while separating machine-local wiring, project-local activation, and operational history. The point is to stop every CLI from growing its own drifting copy of the same capability.
+
+That is why this repository includes `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, and publishability checks in one place. UniText is trying to make shared AI tooling portable, reviewable, and repeatable across different CLIs, different machines, and different stages of a project lifecycle.
+
+---
+
 ## Why This Exists
 
 If you use more than one AI CLI tool, your resources end up scattered:

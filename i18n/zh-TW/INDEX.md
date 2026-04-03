@@ -5,7 +5,7 @@
 
 `UniText` 以純文本作為共享介面，強調跨 CLI 的統一相容與 AI-first discovery。
 
-## 1. 核心文件
+## 1. Core Docs
 
 建議閱讀順序：
 
@@ -14,17 +14,17 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
-## 2. 資源目錄
+## 2. Resource Catalog
 
 目前 registry 關心以下 shared resource types：
 
@@ -43,7 +43,7 @@
 
 ## 3. Starter Catalog Shape
 
-一個最小 catalog entry 至少要包含：
+一個最小 catalog entry 應至少包含：
 
 - `id`
 - `type`
@@ -56,9 +56,9 @@
 - `supported_clis`
 - `delivery_guidance`
 
-完整欄位規則請見 `RESOURCE_SPEC.md`。
+完整欄位規則見 `RESOURCE_SPEC.md`。
 
-## 4. 目前 Catalog Entries
+## 4. Current Catalog Entries
 
 ### Review Shortlist
 
@@ -79,12 +79,25 @@
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
 
+若要先驗證 authoring repo 的 tracked shared surfaces 沒有混入 live workspace metadata，請使用 `local/scripts/verify-workspace-boundaries.ps1`。
+
+若要在未來討論 push suitability 前先做本地報告，請使用 `local/scripts/get-publishability-report.ps1`。
+
+若要調整 shared metadata 偵測規則或理解規則案例，請先看 [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md)，再使用 `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`。
+
+若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
+
 若要在新機器上完成第一輪 initialize → verify，優先使用：
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
-### 相關概念筆記
+### Related Concept Notes
+
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 
@@ -105,6 +118,21 @@
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
+### Workspace-Specific Skills
+
+以下 skills 已存在於 shared registry，但不屬於目前外部審查主集的 `8 + 4` shortlist。
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+
 ### Workflow
 
 | Field | Value |
@@ -115,7 +143,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/workflow/claude-plans` |
 | `supported_clis` | `claude` |
-| `delivery_guidance` | 依 CLI 能力使用 workflow adapter 或 project-local plan mapping。 |
+| `delivery_guidance` | Use workflow adapter or project-local plan mapping depending on CLI capability. |
 
 ### MCP
 
@@ -126,8 +154,8 @@
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap 會寫入 project `.mcp.json` 與 Codex native-config，指向 bundled read-only MCP server。 |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap writes a project `.mcp.json`, a Codex native-config entry, and a Copilot `~/.copilot/mcp-config.json` entry pointing to the bundled read-only MCP server. |
 
 ### Agents
 
@@ -139,11 +167,11 @@
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | 可作為 review 與 adoption 任務共用的 agent persona；實際 wiring 仍依 CLI 能力而定。 |
+| `delivery_guidance` | Use as a shared agent persona for review and adoption tasks; actual wiring depends on CLI capability. |
 
-## 5. 範例 Catalog Entries
+## 5. Example Catalog Entries
 
-### 範例：Skill
+### Example: Skill
 
 | Field | Value |
 |---|---|
@@ -153,9 +181,9 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | 使用 skills adapter；實際解析模式依 CLI 能力與本機環境而定。 |
+| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
 
-### 範例：MCP Definition
+### Example: MCP Definition
 
 | Field | Value |
 |---|---|
@@ -165,7 +193,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/mcp/example-mcp/definition` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | 透過 MCP adapter 註冊；最終 delivery mode 依 CLI 能力與本機環境而定。 |
+| `delivery_guidance` | Register through the MCP adapter; the final delivery mode depends on CLI capabilities and local environment. |
 
 ## 6. Discovery Rules
 
@@ -173,13 +201,14 @@
 
 - 這裡有什麼資源
 - 各資源的邏輯位置在哪裡
-- 應該先看哪份規格或操作文件
+- 應該去看哪份規格或操作文件
 
 `INDEX.md` 不直接回答：
 
 - 某個平台的絕對路徑
 - 最終已解析完成的 delivery mode
 - 某個作者工作區的本機配置
+- local authoring plans、review notes、或 live workspace baselines 應放哪裡；這部分請看 `DOCUMENT_PLACEMENT_POLICY.md`
 
 ## 7. How To Use This Baseline
 

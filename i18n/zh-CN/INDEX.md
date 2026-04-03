@@ -3,9 +3,9 @@
 > 状态：Template Base
 > 角色：所有 human / AI 的第一读取点，用于 discovery。
 
-`UniText` 以纯文本作为共享介面，强调跨 CLI 的统一相容与 AI-first discovery。
+`UniText` 以纯文本作为共享接口，强调跨 CLI 的统一兼容与 AI-first discovery。
 
-## 1. 核心文件
+## 1. Core Docs
 
 建议阅读顺序：
 
@@ -14,19 +14,19 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
-## 2. 资源目录
+## 2. Resource Catalog
 
-目前 registry 关心以下 shared resource types：
+目前 registry 关注以下 shared resource types：
 
 | Type | Logical root | Purpose |
 |---|---|---|
@@ -43,7 +43,7 @@
 
 ## 3. Starter Catalog Shape
 
-一个最小 catalog entry 至少要包含：
+一个最小 catalog entry 应至少包含：
 
 - `id`
 - `type`
@@ -56,9 +56,9 @@
 - `supported_clis`
 - `delivery_guidance`
 
-完整栏位规则请见 `RESOURCE_SPEC.md`。
+完整字段规则见 `RESOURCE_SPEC.md`。
 
-## 4. 目前 Catalog Entries
+## 4. Current Catalog Entries
 
 ### Review Shortlist
 
@@ -77,14 +77,27 @@
 
 若要整理成干净的 starter package，请看 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 并使用 `local/scripts/export-template-package.ps1`。
 
-若要验证汇出的 starter package，请使用 `local/scripts/verify-template-package.ps1`。
+若要验证导出的 starter package，请使用 `local/scripts/verify-template-package.ps1`。
+
+若要先验证 authoring repo 的 tracked shared surfaces 没有混入 live workspace metadata，请使用 `local/scripts/verify-workspace-boundaries.ps1`。
+
+若要在未来讨论 push suitability 前先做本地报告，请使用 `local/scripts/get-publishability-report.ps1`。
+
+若要调整 shared metadata 检测规则或理解规则案例，请先看 [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md)，再使用 `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`。
+
+若要直接把当前 repo 重建成一份新的 starter project，请看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，并使用：
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
 
 若要在新机器上完成第一轮 initialize → verify，优先使用：
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
-### 相关概念笔记
+### Related Concept Notes
+
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制与后续跨平台验证方向，请看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要评估 `UniText` 与 `skill-0` 的合作方式，请看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
 
@@ -105,6 +118,21 @@
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
+### Workspace-Specific Skills
+
+以下 skills 已存在于 shared registry，但不属于目前外部审查主集的 `8 + 4` shortlist。
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+
 ### Workflow
 
 | Field | Value |
@@ -115,7 +143,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/workflow/claude-plans` |
 | `supported_clis` | `claude` |
-| `delivery_guidance` | 依 CLI 能力使用 workflow adapter 或 project-local plan mapping。 |
+| `delivery_guidance` | Use workflow adapter or project-local plan mapping depending on CLI capability. |
 
 ### MCP
 
@@ -126,8 +154,8 @@
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap 会写入 project `.mcp.json` 与 Codex native-config，指向 bundled read-only MCP server。 |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap 会写入 project `.mcp.json`、Codex native-config 条目，以及指向 bundled read-only MCP server 的 Copilot `~/.copilot/mcp-config.json` 条目。 |
 
 ### Agents
 
@@ -139,11 +167,11 @@
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | 可作为 review 与 adoption 任务共用的 agent persona；实际 wiring 仍依 CLI 能力而定。 |
+| `delivery_guidance` | Use as a shared agent persona for review and adoption tasks; actual wiring depends on CLI capability. |
 
-## 5. 范例 Catalog Entries
+## 5. Example Catalog Entries
 
-### 范例：Skill
+### Example: Skill
 
 | Field | Value |
 |---|---|
@@ -153,9 +181,9 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | 使用 skills adapter；实际解析模式依 CLI 能力与本机环境而定。 |
+| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
 
-### 范例：MCP Definition
+### Example: MCP Definition
 
 | Field | Value |
 |---|---|
@@ -165,7 +193,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/mcp/example-mcp/definition` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | 透过 MCP adapter 注册；最终 delivery mode 依 CLI 能力与本机环境而定。 |
+| `delivery_guidance` | Register through the MCP adapter; the final delivery mode depends on CLI capabilities and local environment. |
 
 ## 6. Discovery Rules
 
@@ -173,13 +201,14 @@
 
 - 这里有什么资源
 - 各资源的逻辑位置在哪里
-- 应该先看哪份规格或操作文件
+- 应该去看哪份规格或操作文件
 
 `INDEX.md` 不直接回答：
 
 - 某个平台的绝对路径
 - 最终已解析完成的 delivery mode
 - 某个作者工作区的本机配置
+- local authoring plans、review notes、或 live workspace baselines 应放在哪里；这部分请看 `DOCUMENT_PLACEMENT_POLICY.md`
 
 ## 7. How To Use This Baseline
 
@@ -187,7 +216,7 @@
 
 1. 先读 `VISION.md`
 2. 用 `INDEX.md` 建立自己的 starter catalog
-3. 用 `RESOURCE_SPEC.md` 定义资源栏位
+3. 用 `RESOURCE_SPEC.md` 定义资源字段
 4. 用 `OPERATIONS.md` 定义平台与 CLI 对接方式
 
 ### For AI Agents

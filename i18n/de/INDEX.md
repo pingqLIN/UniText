@@ -14,26 +14,26 @@ Empfohlene Lesereihenfolge:
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
-## 2. Resource-Katalog
+## 2. Ressourcenkatalog
 
-Aktuell betrachtet das Registry die folgenden Shared-Resource-Typen:
+Das Registry betrachtet aktuell die folgenden Shared-Resource-Typen:
 
 | Typ | Logische Wurzel | Zweck |
 |---|---|---|
 | `skills` | `/registry/skills` | Skill-Definitionen, die von mehreren CLIs genutzt werden können |
 | `mcp` | `/registry/mcp` | kanonische MCP-Definitionen |
 | `agents` | `/registry/agents` | gemeinsame Agent-Anweisungen und Persona-Definitionen |
-| `workflow` | `/registry/workflow` | gemeinsame Prozesse, Runbooks, Planning-Guidance |
+| `workflow` | `/registry/workflow` | gemeinsame Abläufe, Runbooks und Planning-Guidance |
 
 Die folgenden Bereiche sind keine Shared-Resource-Typen:
 
@@ -41,7 +41,7 @@ Die folgenden Bereiche sind keine Shared-Resource-Typen:
 |---|---|---|
 | `operations state` | `/operations` | Inventories, Backups, Drift-Logs, History-Records |
 
-## 3. Grundform eines Starter-Katalogs
+## 3. Form eines Starter-Katalogs
 
 Ein minimaler Katalogeintrag sollte mindestens enthalten:
 
@@ -62,7 +62,7 @@ Die vollständigen Feldregeln stehen in `RESOURCE_SPEC.md`.
 
 ### Review Shortlist
 
-Die aktuelle externe Review-Topliste folgt [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) und dessen `8 + 4`-Auswahl statt des vollständigen Kandidatenpools.
+Die aktuelle externe Review-Basis folgt dem `8 + 4`-Set aus [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) und nicht dem vollständigen Kandidatenpool.
 
 ### Review Package
 
@@ -79,6 +79,17 @@ Wenn du ein sauberes Starter Package aufbereiten willst, lies [TEMPLATE_RELEASE_
 
 Wenn du das exportierte Starter Package verifizieren willst, nutze `local/scripts/verify-template-package.ps1`.
 
+Wenn du zuerst prüfen willst, ob die tracked shared surfaces im Authoring-Repo keine live workspace metadata enthalten, nutze `local/scripts/verify-workspace-boundaries.ps1`.
+
+Wenn du vor einer künftigen Diskussion über Push-Suitability erst einen lokalen Bericht erstellen willst, nutze `local/scripts/get-publishability-report.ps1`.
+
+Wenn du Shared-Metadata-Erkennungsregeln anpassen oder deren Beispiele verstehen willst, lies zuerst [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md) und nutze danach `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`.
+
+Wenn du das aktuelle Repo direkt zu einem neuen Starter Project umbauen willst, lies [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) und nutze:
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
+
 Wenn du auf einem neuen Rechner den ersten `initialize -> verify`-Durchlauf ausführen willst, verwende bevorzugt:
 
 - `local/scripts/bootstrap.py`
@@ -86,7 +97,9 @@ Wenn du auf einem neuen Rechner den ersten `initialize -> verify`-Durchlauf ausf
 
 ### Verwandte Konzeptnotizen
 
-Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
+Wenn du die aktuelle repo-level Bootstrap-Baseline, die Einschränkungen und die weitere Cross-Platform-Verifikationsrichtung für `Copilot CLI` verstehen willst, lies [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md).
+
+Wenn du bewerten willst, wie `UniText` mit `skill-0` zusammenarbeiten kann, lies [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
 
 ### Skills
 
@@ -104,6 +117,21 @@ Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SK
 | `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
+
+### Workspace-Specific Skills
+
+Die folgenden Skills existieren bereits im shared registry, gehören aber nicht zur aktuellen externen `8 + 4`-Shortlist.
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
 
 ### Workflow
 
@@ -126,8 +154,8 @@ Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SK
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap schreibt eine projektlokale `.mcp.json` und einen Codex-Native-Config-Eintrag, der auf den mitgelieferten read-only MCP-Server zeigt. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap schreibt eine Projekt-`.mcp.json`, einen Codex-native-config-Eintrag und einen Copilot-`~/.copilot/mcp-config.json`-Eintrag, der auf den gebündelten read-only MCP-Server zeigt. |
 
 ### Agents
 
@@ -139,9 +167,9 @@ Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SK
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Als gemeinsame Agent-Persona für Review- und Adoption-Aufgaben verwenden; das tatsächliche Wiring hängt von der CLI-Fähigkeit ab. |
+| `delivery_guidance` | Als gemeinsame Agent-Persona für Review- und Adoption-Aufgaben nutzbar; das tatsächliche Wiring hängt weiterhin von den CLI-Fähigkeiten ab. |
 
-## 5. Beispiel-Katalogeinträge
+## 5. Beispielhafte Katalogeinträge
 
 ### Beispiel: Skill
 
@@ -153,9 +181,9 @@ Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SK
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | Nutze den Skills-Adapter; der aufgelöste Modus hängt von CLI-Fähigkeiten und lokaler Umgebung ab. |
+| `delivery_guidance` | Nutze den Skills-Adapter; der tatsächliche Modus hängt von CLI-Fähigkeiten und lokaler Umgebung ab. |
 
-### Beispiel: MCP-Definition
+### Beispiel: MCP Definition
 
 | Feld | Wert |
 |---|---|
@@ -171,28 +199,29 @@ Wenn du die Zusammenarbeit von `UniText` und `skill-0` bewerten willst, lies [SK
 
 `INDEX.md` beantwortet:
 
-- welche Ressourcen es hier gibt
-- wo ihre logische Position liegt
-- welche CLIs unterstützt werden
+- Welche Ressourcen es hier gibt
+- Wo ihre logischen Positionen liegen
+- Welche Spezifikation oder Betriebsdokumentation zuerst gelesen werden sollte
 
 `INDEX.md` beantwortet nicht direkt:
 
-- absolute Pfade einer bestimmten Plattform
-- den endgültig aufgelösten Delivery-Modus
-- lokale Konfigurationen einer einzelnen Authoring-Umgebung
+- Absolute Pfade einer bestimmten Plattform
+- Den final aufgelösten Delivery-Modus
+- Die lokale Konfiguration eines bestimmten Author-Workspaces
+- Wo local authoring plans, review notes oder live workspace baselines hingehören; dafür siehe `DOCUMENT_PLACEMENT_POLICY.md`
 
-## 7. Nutzung dieser Baseline
+## 7. Wie dieses Baseline zu nutzen ist
 
 ### Für Menschen
 
-1. zuerst `VISION.md` lesen
-2. mit `INDEX.md` den eigenen Starter-Katalog aufbauen
-3. mit `RESOURCE_SPEC.md` die Ressourcenfelder definieren
-4. mit `OPERATIONS.md` Plattform- und CLI-Anbindung definieren
+1. Zuerst `VISION.md` lesen
+2. Mit `INDEX.md` den eigenen Starter-Katalog aufbauen
+3. Mit `RESOURCE_SPEC.md` die Ressourcenfelder definieren
+4. Mit `OPERATIONS.md` die Plattform- und CLI-Anbindung definieren
 
 ### Für AI-Agents
 
-1. `INDEX.md` zuerst als Discovery-Einstieg lesen
-2. bei Bedarf an Schema `RESOURCE_SPEC.md` lesen
-3. bei Bedarf an Delivery / Mutation `OPERATIONS.md` lesen
-4. niemals einen einzelnen Deployment-Pfad als Spezifikationstheorie behandeln
+1. `INDEX.md` zuerst als Discovery-Einstieg behandeln
+2. Für Schema-Fragen `RESOURCE_SPEC.md` lesen
+3. Für Delivery / Mutation `OPERATIONS.md` lesen
+4. Niemals die Pfade einer einzelnen Bereitstellung als Spezifikationswahrheit behandeln

@@ -8,6 +8,14 @@
 
 ---
 
+## UniText 到底在做什么
+
+UniText 不只是收纳 prompts、skills 或 MCP 范本的文件夹，而是一种受治理的协作方式：把 shared AI resources 维持在同一份 canonical definition，同时把 machine-local wiring、project-local activation 与 operations history 分开管理。它要解决的，是每个 CLI 都各自长出一份会慢慢漂移的能力副本。
+
+也因为如此，这个 repository 才会把 `registry/`、`local/`、`ops/`、template export、rebuild flow、boundary verification、bootstrap 与 publishability checks 放在同一个系统里。UniText 真正想做的，是让 shared AI tooling 可以跨 CLI、跨机器、跨项目生命周期地被携带、审查与重复建立。
+
+---
+
 ## 为什么需要它
 
 如果你同时使用多个 AI CLI 工具，资源很容易散落各处：

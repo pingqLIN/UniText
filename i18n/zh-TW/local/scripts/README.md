@@ -8,11 +8,13 @@
 ## Current Scripts
 
 - `bootstrap.py`
-  - 跨平台初始化 skills delivery、Codex native-config 與 project `.mcp.json`
+  - 跨平台初始化 skills delivery、Codex native-config、Copilot MCP config 與 project `.mcp.json`
 - `verify-bootstrap.py`
-  - 跨平台檢查 first-run 結果是否與目前 repo 對齊
+  - 跨平台檢查 first-run 結果是否與目前 repo 對齊，並接受 template-safe `.mcp.json` seed 或已 bootstrapped 的本機 wiring
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
+- `git-startup.ps1`
+  - 為新 session 解析 canonical base branch、要求乾淨工作樹、顯式 fast-forward 更新，並建立新的 feature branch
 - `sync-skills.ps1`
   - 將 `registry/skills/` 同步到本機 skills targets
 - `scan-skills.ps1`
@@ -33,6 +35,24 @@
   - 將 template-safe docs、generic examples 與 starter layout 匯出到 `ops/template-package/`
 - `verify-template-package.ps1`
   - 驗證輸出的 template package 是否包含必要 starter 結構，且不含 review-only / local-only 內容
+- `verify-workspace-boundaries.ps1`
+  - 驗證目前 authoring repo 的 tracked shared surfaces 是否混入 live workspace metadata、authoring-only docs、或 operations state
+- `get-publishability-report.ps1`
+  - 彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
+- `lib/workspace-sensitive-metadata.ps1`
+  - 載入 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json`，讓 boundary / template / publishability 驗證共用同一套規則
+- `validate-workspace-sensitive-metadata-rules.ps1`
+  - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性與自帶案例是否通過
+- `preview-renormalize.ps1`
+  - 只做 dry-run，預覽 `git add --renormalize .` 會碰到多少 tracked files，讓 line-ending cleanup 可以先看 blast radius 再決定是否執行
+- `run-renormalize.ps1`
+  - 以 `repo / root / registry / i18n / local / template` 為 scope 執行受控的 renormalize；預設仍是 dry-run，只有明確加上 `-Apply` 才會 stage 變更，並有 `MaxFiles` guard
+- `audit-i18n-drift.py`
+  - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
+- `export-rebuild-project.ps1`
+  - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
+- `verify-rebuild-project.ps1`
+  - 在 template package 驗證之上，再確認 rebuild guide 與 fresh-project 入口存在
 
 ## Governance Note
 

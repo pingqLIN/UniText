@@ -1,11 +1,11 @@
-# UniText — Índice
+# UniText — Index
 
-> Estado: Template Base
-> Rol: punto de primera lectura para todas las personas y agentes AI, usado para discovery.
+> Estado: `Template Base`
+> Rol: primer punto de lectura para humanos y AI, usado como entrada de discovery.
 
-`UniText` usa texto plano como interfaz compartida y pone el foco en compatibilidad unificada entre CLIs y discovery AI-first.
+`UniText` utiliza texto plano como interfaz compartida y pone énfasis en una compatibilidad unificada entre CLI y en una discovery AI-first.
 
-## 1. Documentos Base
+## 1. Core Docs
 
 Orden de lectura recomendado:
 
@@ -14,34 +14,34 @@ Orden de lectura recomendado:
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
-## 2. Catálogo de Recursos
+## 2. Catálogo de recursos
 
-Actualmente el registry cubre los siguientes tipos de shared resource:
+El registry considera actualmente los siguientes tipos de shared resources:
 
-| Type | Logical root | Purpose |
+| Tipo | Raíz lógica | Propósito |
 |---|---|---|
-| `skills` | `/registry/skills` | Definiciones de skill compartidas entre múltiples CLIs |
-| `mcp` | `/registry/mcp` | definiciones canónicas de MCP |
-| `agents` | `/registry/agents` | instrucciones y personas compartidas de agentes |
-| `workflow` | `/registry/workflow` | procesos compartidos, runbooks y guías de planeación |
+| `skills` | `/registry/skills` | Definiciones de skills reutilizables entre varios CLI |
+| `mcp` | `/registry/mcp` | Definiciones MCP canónicas |
+| `agents` | `/registry/agents` | Instrucciones y personas de agent compartidas |
+| `workflow` | `/registry/workflow` | Flujos compartidos, runbooks y guidance de planificación |
 
-Los siguientes contenidos no son tipos de shared resource:
+Los siguientes elementos no son shared resource types:
 
-| Area | Logical root | Role |
+| Área | Raíz lógica | Rol |
 |---|---|---|
-| `operations state` | `/operations` | inventories, backups, drift logs y registros de historial |
+| `operations state` | `/operations` | inventarios, backups, registros de drift e historiales |
 
-## 3. Forma Mínima del Catálogo
+## 3. Forma del starter catalog
 
 Una entrada mínima del catálogo debe incluir al menos:
 
@@ -50,43 +50,56 @@ Una entrada mínima del catálogo debe incluir al menos:
 - `canonical_location`
 - `status`
 
-Se recomienda además incluir:
+También se recomienda añadir:
 
 - `source_of_truth`
 - `supported_clis`
 - `delivery_guidance`
 
-Las reglas completas de los campos están en `RESOURCE_SPEC.md`.
+Las reglas completas de campos están en `RESOURCE_SPEC.md`.
 
-## 4. Entradas Actuales del Catálogo
+## 4. Entradas actuales del catálogo
 
-### Lista de Skills para Revisión
+### Review Shortlist
 
-La revisión externa actual se basa en el conjunto curado `8 + 4` de [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md), y no en todo el pool de candidatos.
+La base actual de revisión externa sigue el conjunto `8 + 4` definido en [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md), y no el conjunto completo de candidatos.
 
-### Paquete de Revisión
+### Review Package
 
-Si quieres organizar material para revisores externos, usa [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) como entrada y ejecuta `local/scripts/export-review-package.ps1` para generar un review package reproducible.
+Si quieres preparar material para revisores externos, usa [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) como punto de entrada y `local/scripts/export-review-package.ps1` para producir un review package reproducible.
 
-Si quieres una entrada mínima para revisores, primero mira:
+Si quieres dar a los revisores la entrada más corta posible, empieza por:
 
 - [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
 - [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
-### Release de Template
+### Template Release
 
-Si quieres organizar un starter package limpio, consulta [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) y usa `local/scripts/export-template-package.ps1`.
+Si quieres preparar un starter package limpio, lee [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) y usa `local/scripts/export-template-package.ps1`.
 
 Si quieres verificar el starter package exportado, usa `local/scripts/verify-template-package.ps1`.
 
-Si quieres completar el primer `initialize → verify` en una máquina nueva, usa preferentemente:
+Si primero quieres comprobar que las tracked shared surfaces del repo de authoring no contienen live workspace metadata, usa `local/scripts/verify-workspace-boundaries.ps1`.
+
+Si quieres generar un informe local antes de una futura discusión sobre push suitability, usa `local/scripts/get-publishability-report.ps1`.
+
+Si quieres ajustar las reglas de detección de shared metadata o entender sus casos, lee primero [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md) y después usa `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`.
+
+Si quieres reconstruir directamente el repo actual como un nuevo starter project, lee [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) y usa:
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
+
+Si quieres completar el primer flujo `initialize → verify` en una máquina nueva, prioriza:
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
-### Notas Relacionadas
+### Notas conceptuales relacionadas
 
-Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
+Si quieres entender la repo-level bootstrap baseline actual de `Copilot CLI`, sus límites y la dirección de validación cross-platform, consulta [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md).
+
+Si quieres evaluar cómo puede colaborar `UniText` con `skill-0`, consulta [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
 
 ### Skills
 
@@ -105,9 +118,24 @@ Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKIL
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
+### Workspace-Specific Skills
+
+Los siguientes skills ya existen en el shared registry, pero no forman parte de la shortlist externa actual `8 + 4`.
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+
 ### Workflow
 
-| Field | Value |
+| Campo | Valor |
 |---|---|
 | `id` | `claude-plans` |
 | `type` | `workflow` |
@@ -115,23 +143,23 @@ Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKIL
 | `status` | `draft` |
 | `source_of_truth` | `/registry/workflow/claude-plans` |
 | `supported_clis` | `claude` |
-| `delivery_guidance` | Usa un workflow adapter o un mapeo de plan local del proyecto, según la capacidad de la CLI. |
+| `delivery_guidance` | Usar un workflow adapter o un project-local plan mapping según la capacidad del CLI. |
 
 ### MCP
 
-| Field | Value |
+| Campo | Valor |
 |---|---|
 | `id` | `claude-project-mcp-seed` |
 | `type` | `mcp` |
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap escribe un `.mcp.json` del proyecto y una entrada native-config de Codex que apunta al servidor MCP read-only incluido. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | El bootstrap escribe un `.mcp.json` de proyecto, una entrada native-config de Codex y una entrada `~/.copilot/mcp-config.json` para Copilot que apunta al MCP server read-only incluido. |
 
 ### Agents
 
-| Field | Value |
+| Campo | Valor |
 |---|---|
 | `id` | `registry-curator` |
 | `type` | `agents` |
@@ -139,13 +167,13 @@ Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKIL
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | Úsalo como persona de agente compartida para tareas de revisión y adopción; el wiring real depende de la capacidad de la CLI. |
+| `delivery_guidance` | Puede usarse como persona de agent compartida para tareas de revisión y adopción; el wiring real sigue dependiendo de la capacidad del CLI. |
 
-## 5. Ejemplos de Entradas de Catálogo
+## 5. Ejemplos de entradas de catálogo
 
 ### Ejemplo: Skill
 
-| Field | Value |
+| Campo | Valor |
 |---|---|
 | `id` | `example-skill` |
 | `type` | `skills` |
@@ -153,11 +181,11 @@ Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKIL
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | Usa el skills adapter; el modo final depende de las capacidades de la CLI y del entorno local. |
+| `delivery_guidance` | Usa el adaptador de skills; el modo final depende de las capacidades del CLI y del entorno local. |
 
-### Ejemplo: Definición MCP
+### Ejemplo: MCP Definition
 
-| Field | Value |
+| Campo | Valor |
 |---|---|
 | `id` | `example-mcp` |
 | `type` | `mcp` |
@@ -165,34 +193,35 @@ Si quieres evaluar cómo `UniText` puede colaborar con `skill-0`, consulta [SKIL
 | `status` | `draft` |
 | `source_of_truth` | `/registry/mcp/example-mcp/definition` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | Regístralo a través del MCP adapter; el modo final de entrega depende de las capacidades de la CLI y del entorno local. |
+| `delivery_guidance` | Regístralo mediante el adaptador MCP; el delivery mode final depende de las capacidades del CLI y del entorno local. |
 
-## 6. Reglas de Discovery
+## 6. Discovery Rules
 
 `INDEX.md` responde a:
 
 - qué recursos existen aquí
-- dónde está la ubicación lógica de cada recurso
-- qué CLI están soportadas
+- dónde están sus ubicaciones lógicas
+- qué documento de especificación u operación conviene leer
 
 `INDEX.md` no responde directamente a:
 
-- rutas absolutas de una plataforma
-- el modo de entrega final ya resuelto
-- la configuración local del workspace de un autor
+- una ruta absoluta de una plataforma concreta
+- el delivery mode final ya resuelto
+- la configuración local de un author workspace específico
+- dónde deben ir local authoring plans, review notes o live workspace baselines; para eso, consulta `DOCUMENT_PLACEMENT_POLICY.md`
 
-## 7. Cómo Usar Esta Base
+## 7. How To Use This Baseline
 
-### Para Humanos
+### For Humans
 
-1. Primero lee `VISION.md`
-2. Usa `INDEX.md` para construir tu propio starter catalog
-3. Usa `RESOURCE_SPEC.md` para definir los campos del recurso
-4. Usa `OPERATIONS.md` para definir el acoplamiento entre plataformas y CLIs
+1. Leer primero `VISION.md`
+2. Usar `INDEX.md` para construir tu propio starter catalog
+3. Usar `RESOURCE_SPEC.md` para definir los campos de recursos
+4. Usar `OPERATIONS.md` para definir la integración entre plataforma y CLI
 
-### Para Agentes AI
+### For AI Agents
 
-1. Usa `INDEX.md` como entrada de discovery
-2. Si necesitas schema, lee `RESOURCE_SPEC.md`
-3. Si necesitas delivery o mutation, lee `OPERATIONS.md`
-4. No tomes ninguna ruta de despliegue específica como verdad normativa
+1. Tratar `INDEX.md` como entrada de discovery
+2. Leer `RESOURCE_SPEC.md` cuando se necesite esquema
+3. Leer `OPERATIONS.md` cuando se necesite delivery / mutation
+4. No tratar las rutas de un único despliegue como verdad de especificación
