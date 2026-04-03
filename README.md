@@ -174,6 +174,8 @@ python local/scripts/verify-bootstrap.py
 
 That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
 
+The repo baseline also ships a minimal GitHub review scaffold through `.github/pull_request_template.md`, so human review, validation notes, and follow-up risks have a stable shape instead of being improvised per branch.
+
 `verify-bootstrap.py` accepts either:
 
 - the tracked template-safe `.mcp.json` seed

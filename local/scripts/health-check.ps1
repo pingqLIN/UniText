@@ -3,6 +3,7 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $skillsRoot = "registry\\skills"
 $required = @(
   ".gitattributes",
+  ".github\\pull_request_template.md",
   ".mcp.json",
   ".claude\\settings.json",
   "README.md",

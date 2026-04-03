@@ -17,6 +17,7 @@ $rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules
 $required = @(
   ".gitattributes",
   ".gitignore",
+  ".github\\pull_request_template.md",
   ".mcp.json",
   ".claude\\settings.json",
   "README.md",

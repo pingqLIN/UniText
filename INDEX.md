@@ -79,6 +79,8 @@
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
 
+starter package 目前也保留 `.github/pull_request_template.md`，作為最小 GitHub review baseline。
+
 若要先驗證 authoring repo 的 tracked shared surfaces 沒有混入 live workspace metadata，請使用 `local/scripts/verify-workspace-boundaries.ps1`。
 
 若要在未來討論 push suitability 前先做本地報告，請使用 `local/scripts/get-publishability-report.ps1`。
