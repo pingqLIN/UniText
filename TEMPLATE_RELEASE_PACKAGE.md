@@ -58,7 +58,11 @@
   - `local/scripts/bootstrap.py`
   - `local/scripts/verify-bootstrap.py`
   - `local/scripts/create-git-bundle.py`
+  - `local/scripts/preview-renormalize.py`
+  - `local/scripts/preview-renormalize.ps1`
   - `local/scripts/run-renormalize.ps1`
+  - `local/scripts/run-renormalize.py`
+  - `local/scripts/lib/renormalize_core.py`
   - `local/scripts/sync-skills.ps1`
   - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
   - `local/scripts/lib/workspace-sensitive-metadata.ps1`
@@ -69,7 +73,7 @@
 - `release.json`
 
 starter template 也應保留 repo-level line-ending policy，避免不同機器上的 `core.autocrlf` 在首次修改 shared docs 或 scripts 時產生不必要的 CRLF 噪音。
-若要做 line-ending cleanup，應優先使用 `preview-renormalize.ps1` 看 blast radius，再用 `run-renormalize.ps1 -Scope ...` 做受控批次，而不是直接對整個 repo 無差別套用。
+若要做 line-ending cleanup，應優先使用 `preview-renormalize.py` 或 `preview-renormalize.ps1` 看 blast radius，再用 `run-renormalize.py` 或 `run-renormalize.ps1 -Scope ...` 做受控批次，而不是直接對整個 repo 無差別套用。
 starter template 也應保留最小 GitHub collaboration baseline，至少包含 `.github/pull_request_template.md`，讓 review 與驗證欄位有一致格式，而不是每次重新手寫。
 
 ## 3. Exclude

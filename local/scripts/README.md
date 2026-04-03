@@ -3,7 +3,7 @@
 這裡放的是 **本機操作腳本**。
 
 - `*.ps1` 保留 Windows-first 參考實作
-- `*.py` 提供跨平台 bootstrap / verify / backup 路徑
+- `*.py` 提供跨平台 bootstrap / verify / backup 路徑，並逐步承接更多 shared governance core logic
 
 ## Current Scripts
 
@@ -13,6 +13,10 @@
   - 跨平台檢查 first-run 結果是否與目前 repo 對齊，並接受 template-safe `.mcp.json` seed 或已 bootstrapped 的本機 wiring
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
+- `preview-renormalize.py`
+  - 跨平台 dry-run 預覽 `git add --renormalize` 的 candidate files 與 top-level scope 分布
+- `run-renormalize.py`
+  - 跨平台執行受控的 renormalize core；支援 `scope`、`dry-run`、`MaxFiles` guard 與真正的 apply mode
 - `git-startup.ps1`
   - 為新 session 解析 canonical base branch、要求乾淨工作樹、顯式 fast-forward 更新，並建立新的 feature branch
 - `sync-skills.ps1`
@@ -44,9 +48,9 @@
 - `validate-workspace-sensitive-metadata-rules.ps1`
   - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性與自帶案例是否通過
 - `preview-renormalize.ps1`
-  - 只做 dry-run，預覽 `git add --renormalize .` 會碰到多少 tracked files，讓 line-ending cleanup 可以先看 blast radius 再決定是否執行
+  - Windows PowerShell wrapper；呼叫 `preview-renormalize.py` 並回傳 PowerShell object
 - `run-renormalize.ps1`
-  - 以 `repo / root / registry / i18n / local / template` 為 scope 執行受控的 renormalize；預設仍是 dry-run，只有明確加上 `-Apply` 才會 stage 變更，並有 `MaxFiles` guard
+  - Windows PowerShell wrapper；呼叫 `run-renormalize.py`，保留既有 `Scope / Apply / Force` 入口
 - `audit-i18n-drift.py`
   - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
 - `export-rebuild-project.ps1`
@@ -64,4 +68,5 @@
 ## Platform Note
 
 - 新的 first-run 路徑優先使用 `bootstrap.py` 與 `verify-bootstrap.py`。
+- `preview-renormalize` / `run-renormalize` 已進入第一批 `Python core + PowerShell wrapper` 改寫。
 - `sync-skills.ps1` 仍保留作 Windows PowerShell 參考實作與治理樣板。
