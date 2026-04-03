@@ -50,6 +50,11 @@ The repo now defines a first adapter contract that is:
 - repo-level
 - validated by `bootstrap.py -> verify-bootstrap.py` on the current Windows authoring host
 
+At this stage, that validation should be read literally:
+
+- complete authoring-host evidence exists on `Windows / PC`
+- `macOS` and `Linux` are still planned validation targets, not complete support claims
+
 What still remains open is broader cross-platform validation and the exact long-term story for any Copilot-specific skill surface beyond repo instructions.
 
 This note exists so the template can honestly say:
