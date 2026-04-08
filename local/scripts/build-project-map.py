@@ -623,6 +623,11 @@ def render_html(payload: dict[str, object]) -> str:
       font-size: 12px;
       margin-bottom: 5px;
     }}
+    .edge-visibility {{
+      margin-top: 6px;
+      font-size: 11px;
+      color: #7a705e;
+    }}
     .empty {{
       color: var(--muted);
       line-height: 1.6;
@@ -832,9 +837,9 @@ def render_html(payload: dict[str, object]) -> str:
         return;
       }}
 
-      const related = relatedEdges(selected.id, visibleIds);
-      const outgoing = related.filter((edge) => edge.from === selected.id);
-      const incoming = related.filter((edge) => edge.to === selected.id);
+      const relatedAll = relatedEdges(selected.id);
+      const outgoing = relatedAll.filter((edge) => edge.from === selected.id);
+      const incoming = relatedAll.filter((edge) => edge.to === selected.id);
       const detailParts = [
         `<h3>${{selected.label}}</h3>`,
         `<p>${{selected.description || "沒有額外描述。"}}</p>`,
@@ -872,14 +877,16 @@ def render_html(payload: dict[str, object]) -> str:
             const directionText = mode === "outgoing"
               ? `${{selected.label}} → ${{peer.label}}`
               : `${{peer.label}} → ${{selected.label}}`;
+            const visible = visibleIds.has(peer.id);
+            const visibilityText = visible ? "目前可見於地圖與節點清單" : "目前被搜尋或類型篩選隱藏";
             detailParts.push(
-              `<div class="edge-item"><strong>${{EDGE_LABELS[edge.kind] || edge.kind}}</strong><div class="edge-direction">${{directionText}}</div><div>${{peer.path}}</div></div>`
+              `<div class="edge-item"><strong>${{EDGE_LABELS[edge.kind] || edge.kind}}</strong><div class="edge-direction">${{directionText}}</div><div>${{peer.path}}</div><div class="edge-visibility">${{visibilityText}}</div></div>`
             );
           }});
         detailParts.push("</div>");
       }}
 
-      if (related.length) {{
+      if (relatedAll.length) {{
         pushEdgeSection("Outgoing", outgoing, "outgoing");
         pushEdgeSection("Incoming", incoming, "incoming");
       }} else {{
