@@ -381,15 +381,81 @@
     return { positions, width: baseX + TYPE_ORDER.length * columnWidth + 120, height: Math.max(920, topPadding + maxRows * rowGap + 120) };
   }
 
-  function layoutOrbit(visible, mode) {
+  function layoutFan(visible) {
     const depths = computeDepths(visible);
     const positions = new Map();
     const selectedId = state.selectedId && nodeById.has(state.selectedId) ? state.selectedId : visible[0]?.id ?? null;
-    const width = mode === "fan" ? 1760 : 1500;
-    const height = mode === "fan" ? 1120 : 1020;
-    const center = mode === "fan" ? { x: 250, y: 560 } : { x: width / 2, y: height / 2 };
-    const ringBase = mode === "fan" ? 210 : 180;
-    const ringGap = mode === "fan" ? 180 : 150;
+    const width = 2320;
+    const height = 1360;
+    const center = { x: 230, y: height / 2 };
+    const depthGap = 240;
+    const laneGap = 88;
+    const selectedWidth = 248;
+    const selectedHeight = 72;
+    if (selectedId) {
+      positions.set(selectedId, {
+        x: center.x - (selectedWidth / 2),
+        y: center.y - (selectedHeight / 2),
+        width: selectedWidth,
+        height: selectedHeight,
+        type: nodeById.get(selectedId)?.type || "directory",
+      });
+    }
+
+    const tierGroups = new Map();
+    visible.forEach((node) => {
+      if (node.id === selectedId) return;
+      const depth = depths.get(node.id) || 1;
+      if (!tierGroups.has(depth)) tierGroups.set(depth, []);
+      tierGroups.get(depth).push(node);
+    });
+
+    Array.from(tierGroups.entries()).sort((a, b) => a[0] - b[0]).forEach(([depth, items]) => {
+      const sorted = items.slice().sort((a, b) => {
+        if (a.type !== b.type) return TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type);
+        return a.label.localeCompare(b.label);
+      });
+      const bandRadius = Math.min(470, 170 + (depth * 108));
+      const minGap = depth === 1 ? 88 : 78;
+      const laneCapacity = Math.max(1, Math.floor((bandRadius * 2) / minGap) + 1);
+      const laneCount = Math.max(1, Math.ceil(sorted.length / laneCapacity));
+      const laneOffsets = Array.from({ length: laneCount }, (_, index) => index - ((laneCount - 1) / 2));
+
+      laneOffsets.forEach((laneOffset, laneIndex) => {
+        const laneItems = sorted.slice(laneIndex * laneCapacity, (laneIndex + 1) * laneCapacity);
+        if (!laneItems.length) return;
+        const localBand = Math.min(560, bandRadius + (Math.abs(laneOffset) * 42));
+        const laneCenterX = center.x + (depth * depthGap) + (laneOffset * laneGap) + (Math.max(0, depth - 2) * 10);
+        laneItems.forEach((node, index) => {
+          const boxWidth = depth === 1 ? 214 : 188;
+          const boxHeight = depth === 1 ? 62 : 56;
+          const y = laneItems.length === 1
+            ? center.y
+            : (center.y - localBand) + ((localBand * 2) * index) / (laneItems.length - 1);
+          positions.set(node.id, {
+            x: laneCenterX - (boxWidth / 2),
+            y: y - (boxHeight / 2),
+            width: boxWidth,
+            height: boxHeight,
+            type: node.type,
+          });
+        });
+      });
+    });
+
+    return { positions, width, height, center, depths, depthGap, fanBandBase: 170, fanBandStep: 108 };
+  }
+
+  function layoutOrbit(visible, mode) {
+    if (mode === "fan") return layoutFan(visible);
+    const depths = computeDepths(visible);
+    const positions = new Map();
+    const selectedId = state.selectedId && nodeById.has(state.selectedId) ? state.selectedId : visible[0]?.id ?? null;
+    const width = 1500;
+    const height = 1020;
+    const center = { x: width / 2, y: height / 2 };
+    const ringBase = 180;
+    const ringGap = 150;
     if (selectedId) {
       positions.set(selectedId, { x: center.x - 118, y: center.y - 34, width: 236, height: 68, type: nodeById.get(selectedId)?.type || "directory" });
     }
@@ -408,20 +474,12 @@
       });
       const count = sorted.length;
       sorted.forEach((node, index) => {
-        const boxWidth = mode === "fan" ? (depth === 1 ? 210 : 184) : (depth === 1 ? 190 : 176);
-        const boxHeight = mode === "fan" && depth === 1 ? 60 : 56;
+        const boxWidth = depth === 1 ? 190 : 176;
+        const boxHeight = 56;
         let angle = -Math.PI / 2;
-        if (mode === "radial") {
-          angle = count === 1 ? -Math.PI / 2 : (-Math.PI / 2) + ((Math.PI * 2) * index) / count;
-        } else {
-          const spread = Math.min(Math.PI * 1.22, Math.PI * (0.42 + depth * 0.1));
-          const baseAngle = 0;
-          const start = baseAngle - spread / 2;
-          angle = count === 1 ? baseAngle : start + (spread * index) / (count - 1);
-        }
-        const depthLift = mode === "fan" ? (depth - 1) * 14 : 0;
+        angle = count === 1 ? -Math.PI / 2 : (-Math.PI / 2) + ((Math.PI * 2) * index) / count;
         const x = center.x + Math.cos(angle) * radius - boxWidth / 2;
-        const y = center.y + Math.sin(angle) * radius - boxHeight / 2 - depthLift;
+        const y = center.y + Math.sin(angle) * radius - boxHeight / 2;
         positions.set(node.id, { x, y, width: boxWidth, height: boxHeight, type: node.type });
       });
     });
@@ -456,15 +514,15 @@
       for (let depth = 1; depth <= maxDepth; depth += 1) {
         if (state.mapMode === "fan") {
           const guide = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          const radius = 210 + ((depth - 1) * 180);
-          const spread = Math.min(Math.PI * 1.22, Math.PI * (0.42 + depth * 0.1));
-          const startAngle = -spread / 2;
-          const endAngle = spread / 2;
-          const startX = layout.center.x + Math.cos(startAngle) * radius;
-          const startY = layout.center.y + Math.sin(startAngle) * radius - ((depth - 1) * 14);
-          const endX = layout.center.x + Math.cos(endAngle) * radius;
-          const endY = layout.center.y + Math.sin(endAngle) * radius - ((depth - 1) * 14);
-          guide.setAttribute("d", `M ${layout.center.x} ${layout.center.y} L ${startX} ${startY} A ${radius} ${radius} 0 0 1 ${endX} ${endY} L ${layout.center.x} ${layout.center.y}`);
+          const startX = layout.center.x + ((depth - 1) * layout.depthGap) + 80;
+          const endX = layout.center.x + (depth * layout.depthGap) + 170;
+          const startSpread = Math.min(540, (layout.fanBandBase || 170) + ((depth - 1) * (layout.fanBandStep || 108)));
+          const endSpread = Math.min(610, startSpread + 110);
+          const topStartY = layout.center.y - startSpread;
+          const bottomStartY = layout.center.y + startSpread;
+          const topEndY = layout.center.y - endSpread;
+          const bottomEndY = layout.center.y + endSpread;
+          guide.setAttribute("d", `M ${layout.center.x} ${layout.center.y} L ${startX} ${topStartY} L ${endX} ${topEndY} L ${endX} ${bottomEndY} L ${startX} ${bottomStartY} Z`);
           guide.setAttribute("fill", depth % 2 === 0 ? "rgba(15, 118, 110, 0.03)" : "rgba(202, 138, 4, 0.035)");
           guide.setAttribute("stroke", "rgba(131, 114, 82, 0.16)");
           guide.setAttribute("stroke-width", "1");
@@ -582,7 +640,7 @@
       mapCaptionEl.textContent = "第一圈優先是直接關聯節點，越外圈代表越遠或未連通的節點。";
     } else {
       mapModeNoteEl.textContent = "扇形視圖：以所選節點為圓心，朝單側閱讀面擴展";
-      mapCaptionEl.textContent = "扇形視圖將第一層關聯壓在視線前方，越外圈越像往右展開的閱讀路徑，更適合沿關聯鏈逐步追蹤。";
+      mapCaptionEl.textContent = "扇形視圖改用分層扇面與多欄排布，先保留中心到外圈的閱讀方向，再把同層節點拆進不同縱列，降低重疊與標籤互撞。";
     }
   }
 
