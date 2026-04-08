@@ -49,6 +49,7 @@
   const sidebarEl = document.getElementById("sidebar");
   const detailEl = document.getElementById("detail");
   const mapEl = document.getElementById("map");
+  const mapWrapEl = document.getElementById("map-wrap");
   const searchEl = document.getElementById("search");
   const typeFilterEl = document.getElementById("type-filter");
   const mapModeEl = document.getElementById("map-mode");
@@ -375,7 +376,7 @@
       const items = (grouped.get(type) || []).slice().sort((a, b) => a.label.localeCompare(b.label));
       maxRows = Math.max(maxRows, items.length);
       items.forEach((node, rowIndex) => {
-        positions.set(node.id, { x: baseX + index * columnWidth, y: topPadding + rowIndex * rowGap, width: 188, height: boxHeight, type });
+        positions.set(node.id, { nodeId: node.id, x: baseX + index * columnWidth, y: topPadding + rowIndex * rowGap, width: 188, height: boxHeight, type });
       });
     });
     return { positions, width: baseX + TYPE_ORDER.length * columnWidth + 120, height: Math.max(920, topPadding + maxRows * rowGap + 120) };
@@ -394,6 +395,7 @@
     const selectedHeight = 72;
     if (selectedId) {
       positions.set(selectedId, {
+        nodeId: selectedId,
         x: center.x - (selectedWidth / 2),
         y: center.y - (selectedHeight / 2),
         width: selectedWidth,
@@ -433,6 +435,7 @@
             ? center.y
             : (center.y - localBand) + ((localBand * 2) * index) / (laneItems.length - 1);
           positions.set(node.id, {
+            nodeId: node.id,
             x: laneCenterX - (boxWidth / 2),
             y: y - (boxHeight / 2),
             width: boxWidth,
@@ -457,7 +460,7 @@
     const ringBase = 180;
     const ringGap = 150;
     if (selectedId) {
-      positions.set(selectedId, { x: center.x - 118, y: center.y - 34, width: 236, height: 68, type: nodeById.get(selectedId)?.type || "directory" });
+      positions.set(selectedId, { nodeId: selectedId, x: center.x - 118, y: center.y - 34, width: 236, height: 68, type: nodeById.get(selectedId)?.type || "directory" });
     }
     const tierGroups = new Map();
     visible.forEach((node) => {
@@ -480,10 +483,89 @@
         angle = count === 1 ? -Math.PI / 2 : (-Math.PI / 2) + ((Math.PI * 2) * index) / count;
         const x = center.x + Math.cos(angle) * radius - boxWidth / 2;
         const y = center.y + Math.sin(angle) * radius - boxHeight / 2;
-        positions.set(node.id, { x, y, width: boxWidth, height: boxHeight, type: node.type });
+        positions.set(node.id, { nodeId: node.id, x, y, width: boxWidth, height: boxHeight, type: node.type });
       });
     });
     return { positions, width, height, center, depths };
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function anchorYForNode(box, targetY) {
+    const top = box.y + 14;
+    const bottom = box.y + box.height - 14;
+    return clamp(targetY, top, bottom);
+  }
+
+  function buildFanEdgePath(from, to, selectedId, edge) {
+    const fromCenter = { x: from.x + (from.width / 2), y: from.y + (from.height / 2) };
+    const toCenter = { x: to.x + (to.width / 2), y: to.y + (to.height / 2) };
+    const forward = fromCenter.x <= toCenter.x;
+    const startNode = forward ? from : to;
+    const endNode = forward ? to : from;
+    const start = forward ? fromCenter : toCenter;
+    const end = forward ? toCenter : fromCenter;
+    const startAnchorX = startNode.x + startNode.width;
+    const endAnchorX = endNode.x;
+    const startAnchorY = startNode.nodeId === selectedId ? anchorYForNode(startNode, end.y) : start.y;
+    const endAnchorY = endNode.nodeId === selectedId ? anchorYForNode(endNode, start.y) : end.y;
+    const verticalDrift = endAnchorY - startAnchorY;
+    const laneBias = clamp(verticalDrift * 0.18, -70, 70);
+    const selectedLift = edge.from === selectedId || edge.to === selectedId ? clamp(verticalDrift * 0.1, -30, 30) : 0;
+    const c1x = startAnchorX + (startNode.nodeId === selectedId ? 64 : 42);
+    const c2x = Math.max(c1x + 56, endAnchorX - 84);
+    const c1y = startAnchorY + selectedLift;
+    const c2y = endAnchorY - laneBias;
+    return `M ${startAnchorX} ${startAnchorY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${endAnchorX} ${endAnchorY}`;
+  }
+
+  function unionBoxes(boxes) {
+    const available = boxes.filter(Boolean);
+    if (!available.length) return null;
+    const left = Math.min(...available.map((box) => box.x));
+    const top = Math.min(...available.map((box) => box.y));
+    const right = Math.max(...available.map((box) => box.x + box.width));
+    const bottom = Math.max(...available.map((box) => box.y + box.height));
+    return {
+      x: left,
+      y: top,
+      width: right - left,
+      height: bottom - top,
+    };
+  }
+
+  function getFocusBox(selectedId, positions) {
+    const selected = positions.get(selectedId);
+    if (!selected) return null;
+    if (state.mapMode === "grid") return selected;
+    const neighborBoxes = allEdges
+      .filter((edge) => edge.from === selectedId || edge.to === selectedId)
+      .map((edge) => positions.get(edge.from === selectedId ? edge.to : edge.from))
+      .filter(Boolean);
+    return unionBoxes([selected, ...neighborBoxes.slice(0, 8)]) || selected;
+  }
+
+  function focusSelectedNode(box) {
+    if (!mapWrapEl || !box) return;
+    const paddingX = state.mapMode === "grid" ? 64 : 120;
+    const paddingY = state.mapMode === "grid" ? 56 : 96;
+    const targetLeft = clamp(
+      box.x + (box.width / 2) - (mapWrapEl.clientWidth / 2),
+      0,
+      Math.max(0, mapWrapEl.scrollWidth - mapWrapEl.clientWidth),
+    );
+    const targetTop = clamp(
+      box.y + (box.height / 2) - (mapWrapEl.clientHeight / 2),
+      0,
+      Math.max(0, mapWrapEl.scrollHeight - mapWrapEl.clientHeight),
+    );
+    mapWrapEl.scrollTo({
+      left: Math.max(0, targetLeft - paddingX),
+      top: Math.max(0, targetTop - paddingY),
+      behavior: "smooth",
+    });
   }
 
   function renderMap(visible, visibleIds) {
@@ -491,6 +573,8 @@
     const layout = state.mapMode === "grid" ? layoutGrid(visible) : layoutOrbit(visible, state.mapMode);
     const positions = layout.positions;
     mapEl.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
+    mapEl.style.width = `${layout.width}px`;
+    mapEl.style.height = `${layout.height}px`;
     mapEl.innerHTML = "";
     const titleLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     if (state.mapMode === "grid") {
@@ -565,16 +649,22 @@
       if (!from || !to) return;
       const style = EDGE_STYLES[edge.kind] || EDGE_STYLES.contains;
       const active = edge.from === selectedId || edge.to === selectedId;
-      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-      line.setAttribute("x1", String(from.x + from.width / 2));
-      line.setAttribute("y1", String(from.y + from.height / 2));
-      line.setAttribute("x2", String(to.x + to.width / 2));
-      line.setAttribute("y2", String(to.y + to.height / 2));
-      line.setAttribute("stroke", active ? "#0f766e" : style.stroke);
-      line.setAttribute("stroke-width", active ? String(style.width + 0.9) : String(style.width));
-      line.setAttribute("stroke-opacity", active ? "0.96" : String(style.opacity));
-      if (style.dash) line.setAttribute("stroke-dasharray", style.dash);
-      edgeLayer.appendChild(line);
+      const edgeShape = document.createElementNS("http://www.w3.org/2000/svg", state.mapMode === "fan" ? "path" : "line");
+      if (state.mapMode === "fan") {
+        edgeShape.setAttribute("d", buildFanEdgePath(from, to, selectedId, edge));
+        edgeShape.setAttribute("fill", "none");
+        edgeShape.setAttribute("stroke-linecap", "round");
+      } else {
+        edgeShape.setAttribute("x1", String(from.x + from.width / 2));
+        edgeShape.setAttribute("y1", String(from.y + from.height / 2));
+        edgeShape.setAttribute("x2", String(to.x + to.width / 2));
+        edgeShape.setAttribute("y2", String(to.y + to.height / 2));
+      }
+      edgeShape.setAttribute("stroke", active ? "#0f766e" : style.stroke);
+      edgeShape.setAttribute("stroke-width", active ? String(style.width + 0.9) : String(style.width));
+      edgeShape.setAttribute("stroke-opacity", active ? "0.96" : String(style.opacity));
+      if (style.dash) edgeShape.setAttribute("stroke-dasharray", style.dash);
+      edgeLayer.appendChild(edgeShape);
     });
     mapEl.appendChild(edgeLayer);
 
@@ -640,7 +730,11 @@
       mapCaptionEl.textContent = "第一圈優先是直接關聯節點，越外圈代表越遠或未連通的節點。";
     } else {
       mapModeNoteEl.textContent = "扇形視圖：以所選節點為圓心，朝單側閱讀面擴展";
-      mapCaptionEl.textContent = "扇形視圖改用分層扇面與多欄排布，先保留中心到外圈的閱讀方向，再把同層節點拆進不同縱列，降低重疊與標籤互撞。";
+      mapCaptionEl.textContent = "扇形視圖改用分層扇面、多欄排布與曲線束邊線，先保留中心到外圈的閱讀方向，再把同層節點拆進不同縱列，降低重疊與中心糾結。";
+    }
+    const selectedBox = getFocusBox(selectedId, positions);
+    if (selectedBox) {
+      requestAnimationFrame(() => focusSelectedNode(selectedBox));
     }
   }
 
