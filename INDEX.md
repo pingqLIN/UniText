@@ -24,6 +24,7 @@
 13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
 15. `SKILL0_COLLABORATION_VISION.md`
+16. `PROJECT_MAP_WEB_AUTOMATION_REPORT.md`
 
 ## 2. Resource Catalog
 
@@ -105,6 +106,10 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 若要規劃如何逐步把目前偏 `PowerShell-first` 的治理腳本改寫成更通用的跨平台工具鏈，請看 [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
+
+若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [PROJECT_MAP_WEB_AUTOMATION_REPORT.md](PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
+
+目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
 ### Skills
 

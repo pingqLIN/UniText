@@ -17,6 +17,7 @@ ops/ci-evidence/
 ops/review-package/
 ops/template-package/
 ops/rebuild-project/
+ops/project-map/
 ops/git-bundles/
 ops/baseline.json
 ops/inventory.latest.json
