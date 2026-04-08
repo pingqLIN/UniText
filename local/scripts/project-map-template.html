@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UniText Project Map</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f0e8;
+      --panel: rgba(255, 252, 246, 0.94);
+      --panel-strong: #fffdf8;
+      --ink: #1f1c16;
+      --muted: #6b6457;
+      --line: #d7cfbf;
+      --accent: #0f766e;
+      --accent-soft: #d7f3ed;
+      --accent-deep: #0b5a54;
+      --shadow: 0 14px 36px rgba(34, 28, 19, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(202, 138, 4, 0.08), transparent 22%),
+        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
+      color: var(--ink);
+    }
+    header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 252, 246, 0.92);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+    }
+    header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
+    header p { margin: 0; color: var(--muted); max-width: 980px; line-height: 1.6; }
+    .summary {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .chip {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #effaf7 0%, var(--accent-soft) 100%);
+      color: var(--accent-deep);
+      font-size: 13px;
+      border: 1px solid rgba(15, 118, 110, 0.15);
+    }
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(170, 160, 138, 0.35);
+      border-radius: 999px;
+    }
+    .legend i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .toolbar {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .toolbar-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .control-group {
+      display: grid;
+      gap: 6px;
+      min-width: 180px;
+    }
+    .control-group label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .control-group input,
+    .control-group select {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-strong);
+      min-width: 0;
+    }
+    .inline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(68px, 88px));
+      gap: 8px;
+      align-items: end;
+    }
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button.action {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      background: linear-gradient(180deg, #ffffff 0%, #eefaf7 100%);
+      color: var(--accent-deep);
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.07);
+    }
+    button.action.secondary {
+      border-color: rgba(202, 138, 4, 0.2);
+      background: linear-gradient(180deg, #fffef8 0%, #fff4d8 100%);
+      color: #8a5b06;
+    }
+    button.action:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+    button.action[data-state="success"] {
+      border-color: rgba(15, 118, 110, 0.28);
+      background: linear-gradient(180deg, #fcfffd 0%, #dff7ef 100%);
+    }
+    button.action[data-state="error"] {
+      border-color: rgba(181, 74, 42, 0.26);
+      background: linear-gradient(180deg, #fff9f7 0%, #ffe6de 100%);
+      color: #8c3d21;
+    }
+    button.action[data-state="progress"] {
+      border-color: rgba(202, 138, 4, 0.3);
+      background: linear-gradient(180deg, #fffef9 0%, #fff0c9 100%);
+      color: #8a5b06;
+    }
+    .status-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(169, 155, 127, 0.28);
+      color: #50493c;
+      line-height: 1.6;
+      font-size: 13px;
+      transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+    }
+    .status-card strong { color: var(--accent-deep); }
+    .status-card.success {
+      border-color: rgba(15, 118, 110, 0.28);
+      background: linear-gradient(180deg, rgba(243, 255, 250, 0.95) 0%, rgba(231, 250, 243, 0.92) 100%);
+      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.08);
+    }
+    .status-card.progress {
+      border-color: rgba(202, 138, 4, 0.3);
+      background: linear-gradient(180deg, rgba(255, 250, 239, 0.95) 0%, rgba(255, 244, 216, 0.96) 100%);
+      box-shadow: 0 12px 24px rgba(202, 138, 4, 0.08);
+    }
+    .status-card.error {
+      border-color: rgba(181, 74, 42, 0.28);
+      background: linear-gradient(180deg, rgba(255, 246, 242, 0.95) 0%, rgba(255, 233, 224, 0.94) 100%);
+      box-shadow: 0 12px 24px rgba(181, 74, 42, 0.08);
+    }
+    .status-card.error strong { color: #8c3d21; }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 76px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(107, 100, 87, 0.12);
+      color: #4e473a;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .status-card.success .status-pill {
+      background: rgba(15, 118, 110, 0.16);
+      color: #0b5a54;
+    }
+    .status-card.progress .status-pill {
+      background: rgba(202, 138, 4, 0.18);
+      color: #8a5b06;
+    }
+    .status-card.error .status-pill {
+      background: rgba(181, 74, 42, 0.16);
+      color: #8c3d21;
+    }
+    .status-inline-note {
+      color: #5e5647;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(520px, 1fr) 340px;
+      gap: 16px;
+      padding: 16px;
+      min-height: calc(100vh - 260px);
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(155, 145, 120, 0.25);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 400px;
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head .mini-note { color: var(--muted); font-size: 12px; }
+    .sidebar {
+      padding: 8px 8px 18px;
+      overflow: auto;
+      max-height: calc(100vh - 330px);
+    }
+    .group-title {
+      margin: 14px 8px 6px;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .node-button {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      color: inherit;
+      transition: background 120ms ease, transform 120ms ease;
+    }
+    .node-button:hover,
+    .node-button.active {
+      background: #f2eee2;
+      transform: translateX(2px);
+    }
+    .node-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: space-between;
+    }
+    .node-head strong { font-size: 14px; line-height: 1.35; }
+    .node-type {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 58px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #453d2f;
+      background: #efe7d4;
+    }
+    .node-description {
+      display: block;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.45;
+      font-size: 12px;
+    }
+    .node-path {
+      display: block;
+      color: #8b816d;
+      margin-top: 6px;
+      line-height: 1.35;
+      font-size: 11px;
+    }
+    .map-wrap {
+      overflow: auto;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(15, 118, 110, 0.06), transparent 24%),
+        radial-gradient(circle at 80% 15%, rgba(202, 138, 4, 0.05), transparent 20%),
+        linear-gradient(180deg, #fffdf8 0%, #f9f7f1 100%);
+    }
+    svg {
+      width: 100%;
+      min-height: 900px;
+      display: block;
+    }
+    .detail {
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(100vh - 330px);
+    }
+    .detail h3 { margin: 0 0 10px; font-size: 22px; }
+    .detail p { line-height: 1.7; color: #50493c; }
+    .detail .meta { display: grid; gap: 8px; margin-top: 16px; }
+    .meta-row {
+      padding: 10px 12px;
+      background: #f9f6ee;
+      border-radius: 12px;
+    }
+    .meta-row strong {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .section-title {
+      margin: 22px 0 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .edge-list { display: grid; gap: 8px; }
+    .edge-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f9f6ef;
+      border: 1px solid #e4dbc7;
+      font-size: 14px;
+    }
+    .edge-item strong {
+      color: var(--accent-deep);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+    .edge-direction { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .edge-visibility { margin-top: 6px; font-size: 11px; color: #7a705e; }
+    .empty { color: var(--muted); line-height: 1.6; }
+    .map-caption { padding: 0 16px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    @media (max-width: 1320px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar, .detail { max-height: none; }
+      .inline-grid { grid-template-columns: repeat(3, minmax(72px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>UniText Project Map</h1>
+    <p>一次性生成、純靜態、可直接用瀏覽器開啟的專案 MAP 頁面。若瀏覽器支援 File System Access API，頁面本身也能在不啟動 backend 的情況下讀取 repo 並重新整理內容。</p>
+    <div class="summary" id="summary"></div>
+    <div class="legend">
+      <span><i style="background:#ffe9b8"></i>Docs</span>
+      <span><i style="background:#d6efe9"></i>Directories</span>
+      <span><i style="background:#dbe8ff"></i>Skills</span>
+      <span><i style="background:#f5d9ff"></i>MCP</span>
+      <span><i style="background:#ffd8cb"></i>Agents</span>
+      <span><i style="background:#d8f0ce"></i>Workflow</span>
+    </div>
+    <div class="toolbar">
+      <div class="toolbar-row">
+        <div class="control-group" style="min-width:260px;">
+          <label for="search">搜尋</label>
+          <input id="search" type="search" placeholder="搜尋節點名稱、描述、路徑" />
+        </div>
+        <div class="control-group">
+          <label for="type-filter">類型篩選</label>
+          <select id="type-filter"><option value="all">全部類型</option></select>
+        </div>
+        <div class="control-group">
+          <label for="map-mode">Map View</label>
+          <select id="map-mode">
+            <option value="grid">欄式</option>
+            <option value="radial">圓形</option>
+            <option value="fan">扇形</option>
+          </select>
+        </div>
+      </div>
+      <div class="toolbar-row">
+        <div class="control-group">
+          <label for="update-mode">更新模式</label>
+          <select id="update-mode">
+            <option value="manual">手動更新</option>
+            <option value="on-open">開啟網頁時自動更新</option>
+            <option value="interval">定時更新</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>定時頻率</label>
+          <div class="inline-grid">
+            <input id="interval-days" type="number" min="0" step="1" value="1" placeholder="天" />
+            <input id="interval-hours" type="number" min="0" step="1" value="0" placeholder="時" />
+            <input id="interval-minutes" type="number" min="0" step="1" value="0" placeholder="分" />
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="action secondary" id="link-repo">連結專案目錄</button>
+          <button class="action" id="refresh-now">立即更新</button>
+        </div>
+      </div>
+      <div class="status-card" id="update-status"></div>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-head"><h2>Nodes</h2><div class="mini-note" id="node-count-label"></div></div>
+      <div class="sidebar" id="sidebar"></div>
+    </section>
+    <section class="panel map-wrap">
+      <div class="panel-head"><h2>Map View</h2><div class="mini-note" id="map-mode-note"></div></div>
+      <div class="map-caption" id="map-caption"></div>
+      <svg id="map" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Details</h2><div class="mini-note" id="detail-note"></div></div>
+      <div class="detail" id="detail"></div>
+    </section>
+  </main>
+  <script>
+    window.PROJECT_MAP_BOOTSTRAP = __BOOTSTRAP_DATA__;
+    window.PROJECT_MAP_CONSTANTS = {
+      TYPE_ORDER: __TYPE_ORDER__,
+      CORE_DOCS: __CORE_DOCS__,
+      ROOT_DIRECTORIES: __ROOT_DIRECTORIES__,
+      REPO_MARKERS: __REPO_MARKERS__
+    };
+  </script>
+  <script>
+__RUNTIME_SOURCE__
+  </script>
+</body>
+</html>
