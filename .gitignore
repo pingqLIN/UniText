@@ -1,6 +1,8 @@
 backup/
 recovered_*/
 .bak_*/
+.playwright-mcp/
+.tmp_unitext_protocol.log
 **/__pycache__/
 ops/history/backup_*/
 ops/history/bootstrap_*/
