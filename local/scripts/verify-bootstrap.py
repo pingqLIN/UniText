@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
+
+
+UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 360
 
 
 def get_repo_root() -> Path:
@@ -19,6 +23,11 @@ def read_text(path: Path) -> str:
 
 def contains_path(text: str, value: str) -> bool:
     return value in text or value.replace("\\", "\\\\") in text
+
+
+def contains_timeout_value(text: str, seconds: int) -> bool:
+    pattern = rf"(?m)^\s*startup_timeout_sec\s*=\s*{seconds}(?:\.0)?\s*$"
+    return re.search(pattern, text) is not None
 
 
 def has_claude_registry_permissions(text: str) -> bool:
@@ -137,6 +146,7 @@ def main() -> int:
             "path": str(codex_config),
             "exists": codex_config.exists(),
             "skills_path_matches": contains_path(codex_text, str(source)),
+            "startup_timeout_matches": contains_timeout_value(codex_text, UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC),
             "mcp_command_matches": contains_path(codex_text, str(sys.executable)),
             "mcp_args_match": contains_path(codex_text, str(server)),
         },
@@ -151,6 +161,7 @@ def main() -> int:
     report["ok"] = (
         all(item["matches_expected"] for item in target_report)
         and report["codex"]["skills_path_matches"]
+        and report["codex"]["startup_timeout_matches"]
         and report["codex"]["mcp_command_matches"]
         and report["codex"]["mcp_args_match"]
         and (not report["copilot"]["cli_present"] or report["copilot"]["mcp_server_matches"])

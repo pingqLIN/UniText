@@ -18,6 +18,9 @@ CORE_DOCS = {
     "SECRET_HANDLING_GUIDELINES.md",
 }
 
+SERVER_INFO = {"name": "unitext-registry", "version": "0.2.0"}
+SUPPORTED_PROTOCOL_VERSIONS = ("2025-11-05", "2025-06-18", "2024-11-05")
+
 
 def list_entries(root: Path, kind: str) -> list[str]:
     path = root / "registry" / kind
@@ -28,13 +31,16 @@ def list_entries(root: Path, kind: str) -> list[str]:
 
 def safe_repo_path(root: Path, relative: str) -> Path:
     candidate = (root / relative).resolve()
-    if root.resolve() not in candidate.parents and candidate != root.resolve():
+    root_path = root.resolve()
+    if root_path not in candidate.parents and candidate != root_path:
         raise ValueError("path escapes repo root")
-    relative_path = candidate.relative_to(root.resolve())
+
+    relative_path = candidate.relative_to(root_path)
     if relative_path.parts and relative_path.parts[0] == "registry":
         return candidate
     if relative_path.name in CORE_DOCS and len(relative_path.parts) == 1:
         return candidate
+
     raise ValueError("path is outside the read-only registry surface")
 
 
@@ -48,26 +54,47 @@ class Server:
         self.root = root.resolve()
 
     def handle(self, request: dict[str, object]) -> dict[str, object] | None:
-        method = request.get("method")
+        method = str(request.get("method", ""))
+        params = request.get("params", {})
+        if not isinstance(params, dict):
+            params = {}
+
         if method == "notifications/initialized":
             return None
+
         if method == "initialize":
+            protocol = str(params.get("protocolVersion", SUPPORTED_PROTOCOL_VERSIONS[0]))
+            if protocol not in SUPPORTED_PROTOCOL_VERSIONS:
+                protocol = SUPPORTED_PROTOCOL_VERSIONS[0]
             return {
-                "protocolVersion": "2024-11-05",
-                "capabilities": {"tools": {}},
-                "serverInfo": {"name": "unitext-registry", "version": "0.1.0"},
+                "protocolVersion": protocol,
+                "capabilities": {
+                    "tools": {"listChanged": False},
+                    "resources": {},
+                    "prompts": {},
+                },
+                "serverInfo": SERVER_INFO,
             }
+
         if method == "ping":
             return {}
+
         if method == "shutdown":
             return {}
+
+        if method == "resources/list":
+            return {"resources": []}
+
+        if method == "prompts/list":
+            return {"prompts": []}
+
         if method == "tools/list":
             return {
                 "tools": [
                     {
                         "name": "registry_summary",
                         "description": "Return registry counts and the core UniText doc surface.",
-                        "inputSchema": {"type": "object", "properties": {}},
+                        "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
                     },
                     {
                         "name": "list_registry_entries",
@@ -80,6 +107,7 @@ class Server:
                                     "enum": ["skills", "mcp", "agents", "workflow"],
                                 }
                             },
+                            "additionalProperties": False,
                         },
                     },
                     {
@@ -89,15 +117,15 @@ class Server:
                             "type": "object",
                             "properties": {"path": {"type": "string"}},
                             "required": ["path"],
+                            "additionalProperties": False,
                         },
                     },
                 ]
             }
+
         if method == "tools/call":
-            params = request.get("params", {})
-            if not isinstance(params, dict):
-                raise ValueError("invalid tool params")
             return self.call_tool(params)
+
         raise ValueError(f"unsupported method: {method}")
 
     def call_tool(self, params: dict[str, object]) -> dict[str, object]:
@@ -105,6 +133,7 @@ class Server:
         arguments = params.get("arguments", {})
         if not isinstance(arguments, dict):
             raise ValueError("tool arguments must be an object")
+
         if name == "registry_summary":
             return {
                 "content": [
@@ -120,6 +149,7 @@ class Server:
                     )
                 ]
             }
+
         if name == "list_registry_entries":
             kinds = ["skills", "mcp", "agents", "workflow"]
             kind = arguments.get("kind")
@@ -132,6 +162,7 @@ class Server:
             if kind not in kinds:
                 raise ValueError(f"unknown kind: {kind}")
             return {"content": [make_text({"kind": kind, "entries": list_entries(self.root, str(kind))})]}
+
         if name == "read_registry_file":
             relative = arguments.get("path")
             if not isinstance(relative, str):
@@ -147,6 +178,7 @@ class Server:
                     )
                 ]
             }
+
         raise ValueError(f"unknown tool: {name}")
 
 
@@ -160,9 +192,11 @@ def read_message() -> dict[str, object] | None:
             break
         key, _, value = line.decode("utf-8").partition(":")
         headers[key.strip().lower()] = value.strip()
+
     length = int(headers.get("content-length", "0"))
     if length <= 0:
         return None
+
     body = sys.stdin.buffer.read(length)
     return json.loads(body.decode("utf-8"))
 
@@ -185,6 +219,7 @@ def main() -> int:
         request = read_message()
         if request is None:
             return 0
+
         request_id = request.get("id")
         try:
             result = server.handle(request)

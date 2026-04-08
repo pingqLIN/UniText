@@ -18,6 +18,8 @@ REPO_MARKERS = [
     Path("INDEX.md"),
 ]
 
+UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 360
+
 
 def get_repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -103,7 +105,7 @@ def render_codex_mcp_block(server: Path, root: Path) -> str:
     return "\n".join(
         [
             "[mcp_servers.unitext_registry]",
-            "startup_timeout_sec = 60",
+            f"startup_timeout_sec = {UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC}",
             f"command = {toml_string(sys.executable)}",
             f"args = [{args}]",
             "",
