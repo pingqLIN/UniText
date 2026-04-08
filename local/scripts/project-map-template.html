@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UniText Project Map</title>
+  <meta name="description" content="UniText 專案 MAP 靜態頁面，可瀏覽核心文件、registry 資源與其關聯，並在支援的瀏覽器中直接重掃 repo 內容。" />
   <style>
     :root {
       color-scheme: light;
@@ -11,7 +12,7 @@
       --panel: rgba(255, 252, 246, 0.94);
       --panel-strong: #fffdf8;
       --ink: #1f1c16;
-      --muted: #6b6457;
+      --muted: #4f493d;
       --line: #d7cfbf;
       --accent: #0f766e;
       --accent-soft: #d7f3ed;
@@ -27,6 +28,9 @@
         radial-gradient(circle at top right, rgba(202, 138, 4, 0.08), transparent 22%),
         linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
       color: var(--ink);
+    }
+    .page-mode-share-safe [data-share-hide] {
+      display: none !important;
     }
     header {
       padding: 20px 24px 16px;
@@ -212,7 +216,7 @@
       color: #8c3d21;
     }
     .status-inline-note {
-      color: #5e5647;
+      color: #4f493d;
       font-size: 13px;
       font-weight: 600;
     }
@@ -297,7 +301,7 @@
     }
     .node-path {
       display: block;
-      color: #8b816d;
+      color: #5f5649;
       margin-top: 6px;
       line-height: 1.35;
       font-size: 11px;
@@ -343,11 +347,26 @@
     }
     .edge-list { display: grid; gap: 8px; }
     .edge-item {
+      width: 100%;
+      text-align: left;
       padding: 10px 12px;
       border-radius: 12px;
       background: #f9f6ef;
       border: 1px solid #e4dbc7;
       font-size: 14px;
+    }
+    button.edge-item {
+      cursor: pointer;
+      color: inherit;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+    button.edge-item:hover,
+    button.edge-item:focus-visible {
+      background: #fffaf1;
+      border-color: rgba(15, 118, 110, 0.3);
+      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
+      transform: translateY(-1px);
+      outline: none;
     }
     .edge-item strong {
       color: var(--accent-deep);
@@ -356,7 +375,7 @@
       letter-spacing: 0.08em;
     }
     .edge-direction { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
-    .edge-visibility { margin-top: 6px; font-size: 11px; color: #7a705e; }
+    .edge-visibility { margin-top: 6px; font-size: 11px; color: #5c5448; }
     .empty { color: var(--muted); line-height: 1.6; }
     .map-caption { padding: 0 16px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
     @media (max-width: 1320px) {
@@ -366,10 +385,10 @@
     }
   </style>
 </head>
-<body>
+<body class="page-mode-__PAGE_MODE__">
   <header>
     <h1>UniText Project Map</h1>
-    <p>一次性生成、純靜態、可直接用瀏覽器開啟的專案 MAP 頁面。若瀏覽器支援 File System Access API，頁面本身也能在不啟動 backend 的情況下讀取 repo 並重新整理內容。</p>
+    <p>__HEADER_DESCRIPTION__</p>
     <div class="summary" id="summary"></div>
     <div class="legend">
       <span><i style="background:#ffe9b8"></i>Docs</span>
@@ -397,7 +416,7 @@
           </select>
         </div>
       </div>
-      <div class="toolbar-row">
+      <div class="toolbar-row" data-share-hide>
         <div class="control-group">
           <label for="update-mode">更新模式</label>
           <select id="update-mode">
@@ -419,7 +438,7 @@
           <button class="action" id="refresh-now">立即更新</button>
         </div>
       </div>
-      <div class="status-card" id="update-status"></div>
+      <div class="status-card" id="update-status" data-share-hide></div>
     </div>
   </header>
   <main class="layout">
@@ -439,6 +458,7 @@
   </main>
   <script>
     window.PROJECT_MAP_BOOTSTRAP = __BOOTSTRAP_DATA__;
+    window.PROJECT_MAP_PAGE_MODE = "__PAGE_MODE__";
     window.PROJECT_MAP_CONSTANTS = {
       TYPE_ORDER: __TYPE_ORDER__,
       CORE_DOCS: __CORE_DOCS__,

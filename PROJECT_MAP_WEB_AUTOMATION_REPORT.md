@@ -308,7 +308,8 @@
 3. 一次產出：
    - `ops/project-map/project-map.json`
    - `ops/project-map/site/project-map.html`
-4. 需要分享時，再額外 export 成 template-safe artifact
+   - `ops/project-map/site/project-map-share.html`
+4. 需要分享時，優先使用 `project-map-share.html` 作為 share-safe artifact
 
 這裡刻意把 generated output 放進 `ops/`，因為它屬於 generated state，不是 canonical source。
 
@@ -420,7 +421,7 @@
 ### Batch 3
 
 - 補互動篩選與搜尋
-- 規劃是否需要 export 專用的 share-safe map artifact
+- 補 export 專用的 share-safe map artifact
 
 ### Batch 3.5
 

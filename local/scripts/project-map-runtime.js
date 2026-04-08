@@ -1,5 +1,6 @@
 (() => {
   const INITIAL_DATA = window.PROJECT_MAP_BOOTSTRAP;
+  const PAGE_MODE = window.PROJECT_MAP_PAGE_MODE || "interactive";
   const { TYPE_ORDER, CORE_DOCS, ROOT_DIRECTORIES, REPO_MARKERS } = window.PROJECT_MAP_CONSTANTS;
   const TYPE_LABELS = { doc: "Docs", directory: "Directories", skill: "Skills", mcp: "MCP", agent: "Agents", workflow: "Workflow" };
   const TYPE_STYLES = {
@@ -43,7 +44,7 @@
     lastRefreshSource: "bootstrap",
     lastRefreshState: "idle",
     lastRefreshMessage: "目前顯示的是最近一次靜態產出的 MAP。",
-    browserCanScan: typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
+    browserCanScan: PAGE_MODE === "interactive" && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
   };
 
   const summaryEl = document.getElementById("summary");
@@ -168,13 +169,28 @@
   }
 
   function computeVisibleNodes() {
-    return (DATA.nodes || []).filter((node) => {
-      if (state.type !== "all" && node.type !== state.type) return false;
-      if (!state.search) return true;
-      const haystack = [node.label, node.path, node.logical_path, node.description]
-        .filter(Boolean).join(" ").toLowerCase();
-      return haystack.includes(state.search);
-    });
+    return (DATA.nodes || []).filter((node) => nodeMatchesFilters(node));
+  }
+
+  function nodeMatchesFilters(node) {
+    if (state.type !== "all" && node.type !== state.type) return false;
+    if (!state.search) return true;
+    const haystack = [node.label, node.path, node.logical_path, node.description]
+      .filter(Boolean).join(" ").toLowerCase();
+    return haystack.includes(state.search);
+  }
+
+  function jumpToNode(nodeId, reveal = false) {
+    const target = nodeById.get(nodeId);
+    if (!target) return;
+    if (reveal && !nodeMatchesFilters(target)) {
+      state.search = "";
+      state.type = "all";
+      searchEl.value = "";
+      typeFilterEl.value = "all";
+    }
+    state.selectedId = nodeId;
+    render();
   }
 
   function relatedEdges(nodeId, allowedIds = null) {
@@ -310,7 +326,7 @@
         const directionText = mode === "outgoing" ? `${selected.label} → ${peer.label}` : `${peer.label} → ${selected.label}`;
         const visible = visibleIds.has(peer.id);
         const visibilityText = visible ? "目前可見於地圖與節點清單" : "目前被搜尋或類型篩選隱藏";
-        detailParts.push(`<div class="edge-item"><strong>${EDGE_LABELS[edge.kind] || edge.kind}</strong><div class="edge-direction">${directionText}</div><div>${peer.path}</div><div class="edge-visibility">${visibilityText}</div></div>`);
+        detailParts.push(`<button type="button" class="edge-item edge-jump" data-peer-id="${escapeHtml(peer.id)}"><strong>${EDGE_LABELS[edge.kind] || edge.kind}</strong><div class="edge-direction">${directionText}</div><div>${peer.path}</div><div class="edge-visibility">${visibilityText}；點擊可跳轉</div></button>`);
       });
       detailParts.push("</div>");
     }
@@ -322,6 +338,11 @@
       detailParts.push('<p class="empty">目前沒有關聯邊。</p>');
     }
     detailEl.innerHTML = detailParts.join("");
+    detailEl.querySelectorAll(".edge-jump").forEach((button) => {
+      button.addEventListener("click", () => {
+        jumpToNode(button.dataset.peerId, true);
+      });
+    });
   }
 
   function buildVisibleEdges(visibleIds) {
@@ -1019,7 +1040,7 @@
 
   async function maybeAutoRefreshOnLoad() {
     if (!state.browserCanScan) {
-      setRefreshState("idle", "此瀏覽器只支援閱讀靜態 MAP。");
+      setRefreshState("idle", PAGE_MODE === "share-safe" ? "分享版僅提供唯讀瀏覽，不包含頁內重掃。" : "此瀏覽器只支援閱讀靜態 MAP。");
       updateStatusCard();
       return;
     }

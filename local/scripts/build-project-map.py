@@ -372,14 +372,20 @@ def build_payload(repo_root: Path) -> dict[str, object]:
     }
 
 
-def render_html(payload: dict[str, object]) -> str:
+def render_html(payload: dict[str, object], page_mode: str = "interactive") -> str:
     repo_root = get_repo_root()
     template_path = repo_root / "local" / "scripts" / "project-map-template.html"
     runtime_path = repo_root / "local" / "scripts" / "project-map-runtime.js"
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
+    if page_mode == "share-safe":
+        header_description = "一次性生成、純靜態、可直接分享的專案 MAP 快照。此版本只提供唯讀瀏覽，不包含頁內重掃或 repo 目錄授權功能。"
+    else:
+        header_description = "一次性生成、純靜態、可直接用瀏覽器開啟的專案 MAP 頁面。若瀏覽器支援 File System Access API，頁面本身也能在不啟動 backend 的情況下讀取 repo 並重新整理內容。"
     replacements = {
         "__BOOTSTRAP_DATA__": json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"),
+        "__PAGE_MODE__": page_mode,
+        "__HEADER_DESCRIPTION__": header_description,
         "__TYPE_ORDER__": json.dumps(TYPE_ORDER, ensure_ascii=False),
         "__CORE_DOCS__": json.dumps(CORE_DOCS, ensure_ascii=False),
         "__ROOT_DIRECTORIES__": json.dumps(ROOT_DIRECTORIES, ensure_ascii=False),
@@ -391,16 +397,18 @@ def render_html(payload: dict[str, object]) -> str:
     return template
 
 
-def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, Path]:
+def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, Path, Path]:
     output_root.mkdir(parents=True, exist_ok=True)
     site_dir = output_root / "site"
     site_dir.mkdir(parents=True, exist_ok=True)
 
     json_path = output_root / "project-map.json"
     html_path = site_dir / "project-map.html"
+    share_html_path = site_dir / "project-map-share.html"
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    html_path.write_text(render_html(payload), encoding="utf-8")
-    return json_path, html_path
+    html_path.write_text(render_html(payload, page_mode="interactive"), encoding="utf-8")
+    share_html_path.write_text(render_html(payload, page_mode="share-safe"), encoding="utf-8")
+    return json_path, html_path, share_html_path
 
 
 def main() -> int:
@@ -417,7 +425,7 @@ def main() -> int:
     output_dir = Path(args.output_dir).resolve() if args.output_dir else repo_root / "ops" / "project-map"
 
     payload = build_payload(repo_root)
-    json_path, html_path = write_outputs(payload, output_dir)
+    json_path, html_path, share_html_path = write_outputs(payload, output_dir)
 
     summary = {
       "generated_at": payload["meta"]["generated_at"],
@@ -426,6 +434,7 @@ def main() -> int:
       "edge_count": len(payload["edges"]),
       "json_path": str(json_path),
       "html_path": str(html_path),
+      "share_html_path": str(share_html_path),
     }
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0
