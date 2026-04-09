@@ -364,6 +364,7 @@ def build_edges(
 
 
 def build_diagnostics(nodes: Iterable[Node], edges: Iterable[dict[str, str]], broken_references: Iterable[dict[str, str]]) -> dict[str, object]:
+    node_by_id = {node.node_id: node for node in nodes}
     non_structural_touches: dict[str, int] = defaultdict(int)
     for edge in edges:
         if edge["kind"] in STRUCTURAL_EDGE_KINDS:
@@ -378,10 +379,36 @@ def build_diagnostics(nodes: Iterable[Node], edges: Iterable[dict[str, str]], br
     ]
     broken_references_list = list(broken_references)
     broken_source_ids = sorted({item["source_id"] for item in broken_references_list})
+    broken_source_groups: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for item in broken_references_list:
+        broken_source_groups[item["source_id"]].append(item)
+
+    broken_sources: list[dict[str, object]] = []
+    for source_id in broken_source_ids:
+        source_node = node_by_id.get(source_id)
+        grouped_items = sorted(
+            broken_source_groups[source_id],
+            key=lambda item: (item["resolved_path"], item["target"]),
+        )
+        broken_sources.append({
+            "source_id": source_id,
+            "source_label": source_node.label if source_node else source_id,
+            "source_path": source_node.path if source_node else grouped_items[0]["source_path"],
+            "count": len(grouped_items),
+            "targets": [
+                {
+                    "target": item["target"],
+                    "resolved_path": item["resolved_path"],
+                }
+                for item in grouped_items
+            ],
+        })
+
     return {
         "broken_reference_count": len(broken_references_list),
         "orphan_node_count": len(orphan_node_ids),
         "broken_references": broken_references_list,
+        "broken_sources": broken_sources,
         "broken_source_ids": broken_source_ids,
         "orphan_node_ids": sorted(orphan_node_ids),
     }
@@ -432,7 +459,90 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
     return template
 
 
-def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, Path, Path]:
+def build_handoff_payload(payload: dict[str, object]) -> dict[str, object]:
+    diagnostics = payload.get("diagnostics", {})
+    counts = payload.get("counts", {})
+    broken_sources = diagnostics.get("broken_sources", [])
+    top_broken_sources = [
+        {
+            "source_label": item["source_label"],
+            "source_path": item["source_path"],
+            "count": item["count"],
+        }
+        for item in broken_sources[:8]
+    ]
+    return {
+        "generated_at": payload["meta"]["generated_at"],
+        "artifacts": {
+            "interactive_html": "site/project-map.html",
+            "share_html": "site/project-map-share.html",
+            "handoff_markdown": "site/project-map-handoff.md",
+            "handoff_json": "site/project-map-handoff.json",
+        },
+        "summary": {
+            "node_total": sum(int(value) for value in counts.values()),
+            "edge_total": len(payload.get("edges", [])),
+            "counts": counts,
+            "broken_reference_count": diagnostics.get("broken_reference_count", 0),
+            "orphan_node_count": diagnostics.get("orphan_node_count", 0),
+            "orphan_node_ids": diagnostics.get("orphan_node_ids", []),
+            "top_broken_sources": top_broken_sources,
+        },
+        "handoff_notes": [
+            "用 interactive 版做搜尋、關聯跳轉、頁內更新與診斷篩選。",
+            "用 share-safe 版做唯讀展示或交付，不含 repo 授權與頁內重掃入口。",
+            "若需要交接給下一位 agent，優先附上 handoff markdown 與 share-safe 頁面路徑。",
+        ],
+    }
+
+
+def render_handoff_markdown(payload: dict[str, object]) -> str:
+    handoff = build_handoff_payload(payload)
+    summary = handoff["summary"]
+    counts = summary["counts"]
+    lines = [
+        "# UniText Project Map Handoff",
+        "",
+        f"- Generated at: `{handoff['generated_at']}`",
+        f"- Total nodes: `{summary['node_total']}`",
+        f"- Total edges: `{summary['edge_total']}`",
+        f"- Broken references: `{summary['broken_reference_count']}`",
+        f"- Orphan resources: `{summary['orphan_node_count']}`",
+        "",
+        "## Artifact Paths",
+        "",
+        f"- Interactive page: `{handoff['artifacts']['interactive_html']}`",
+        f"- Share-safe page: `{handoff['artifacts']['share_html']}`",
+        f"- Handoff markdown: `{handoff['artifacts']['handoff_markdown']}`",
+        f"- Handoff JSON: `{handoff['artifacts']['handoff_json']}`",
+        "",
+        "## Resource Counts",
+        "",
+    ]
+    for key, value in sorted(counts.items()):
+        lines.append(f"- {key}: `{value}`")
+    lines.extend([
+        "",
+        "## Broken Reference Sources",
+        "",
+    ])
+    top_broken_sources = summary["top_broken_sources"]
+    if top_broken_sources:
+        for item in top_broken_sources:
+            lines.append(f"- `{item['source_label']}` — `{item['count']}` broken refs — `{item['source_path']}`")
+    else:
+        lines.append("- None")
+    lines.extend([
+        "",
+        "## Notes",
+        "",
+    ])
+    for note in handoff["handoff_notes"]:
+        lines.append(f"- {note}")
+    return "\n".join(lines) + "\n"
+
+
+def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, Path, Path, Path, Path]:
     output_root.mkdir(parents=True, exist_ok=True)
     site_dir = output_root / "site"
     site_dir.mkdir(parents=True, exist_ok=True)
@@ -440,10 +550,14 @@ def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, 
     json_path = output_root / "project-map.json"
     html_path = site_dir / "project-map.html"
     share_html_path = site_dir / "project-map-share.html"
+    handoff_json_path = site_dir / "project-map-handoff.json"
+    handoff_md_path = site_dir / "project-map-handoff.md"
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     html_path.write_text(render_html(payload, page_mode="interactive"), encoding="utf-8")
     share_html_path.write_text(render_html(payload, page_mode="share-safe"), encoding="utf-8")
-    return json_path, html_path, share_html_path
+    handoff_json_path.write_text(json.dumps(build_handoff_payload(payload), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    handoff_md_path.write_text(render_handoff_markdown(payload), encoding="utf-8")
+    return json_path, html_path, share_html_path, handoff_json_path, handoff_md_path
 
 
 def main() -> int:
@@ -460,7 +574,7 @@ def main() -> int:
     output_dir = Path(args.output_dir).resolve() if args.output_dir else repo_root / "ops" / "project-map"
 
     payload = build_payload(repo_root)
-    json_path, html_path, share_html_path = write_outputs(payload, output_dir)
+    json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(payload, output_dir)
 
     summary = {
       "generated_at": payload["meta"]["generated_at"],
@@ -470,6 +584,8 @@ def main() -> int:
       "json_path": str(json_path),
       "html_path": str(html_path),
       "share_html_path": str(share_html_path),
+      "handoff_json_path": str(handoff_json_path),
+      "handoff_md_path": str(handoff_md_path),
     }
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0

@@ -307,7 +307,8 @@
   - 手動 / 開頁 / 定時更新
   - browser-side repo scan
   - diagnostics 卡片與 broken/orphan 篩選
-  - 直接開啟 share-safe artifact 的 export 入口
+  - broken source drill-down
+  - share-safe artifact + handoff bundle 的 export 入口
 - share-safe 版：
   - 保留瀏覽、搜尋、類型篩選與 diagnostics
   - 移除頁內重掃與 repo 授權入口
@@ -322,6 +323,13 @@
 - `orphan_node_ids`
 
 這讓 MAP 已經從單純導覽頁，進一步變成「結構導覽 + 輕量診斷」的靜態 artifact。
+
+同時，generator 也已開始產出 handoff artifact：
+
+- `project-map-handoff.md`
+- `project-map-handoff.json`
+
+這表示 export 已不再只是「開一個分享頁」，而是能直接交接給下一位使用者或 agent 的 bundle。
 
 ## 10. 自動化流程
 
@@ -463,6 +471,13 @@
 - 補 broken source / orphan resource 篩選
 - 補 interactive 版 share-safe export 入口
 
+### Batch 5
+
+- 補 broken source → target drill-down
+- 補 handoff markdown / JSON artifact
+- 補 copyable handoff summary
+- 補 agent governance resolver（model / environment / instruction-profile）
+
 ## 12.1 Map View 視圖策略
 
 目前原型保留兩種 MAP 呈現：
@@ -501,6 +516,30 @@
 - generated state 與 canonical source 分層原則
 - 無伺服器、無長駐程序依賴的交付目標
 - 高效率、自動化、低維護成本的要求
+
+而在原型已經落地後，下一層治理能力也可以沿用同一個方法：
+
+- 用一份 template-safe 的 policy JSON 表示層級
+- 用一次性 resolver 腳本解析 effective config
+- 用 Markdown / JSON 報告做交接與審查
+
+這也是 `agent governance` 最低維護成本的實作方式。
+
+## 14.1 Agent Governance Resolver
+
+這次也補了一個配套治理工具：
+
+- 政策檔：`local/config/agent-governance-layers.json`
+- 解析器：`local/scripts/resolve-agent-governance.py`
+- 說明文件：`AGENT_GOVERNANCE_LAYERING.md`
+
+它的目的不是直接改動 runtime，而是先提供：
+
+- matched layers
+- effective config
+- provenance
+
+也就是讓 agent 可以依 `model / environment / instruction-profile` 得到不同配置層級，同時還看得出每個生效 key 是從哪一層來的。
 
 ## 15. 建議下一步
 

@@ -77,6 +77,22 @@
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+    const scratch = document.createElement("textarea");
+    scratch.value = text;
+    scratch.setAttribute("readonly", "");
+    scratch.style.position = "absolute";
+    scratch.style.left = "-9999px";
+    document.body.appendChild(scratch);
+    scratch.select();
+    const copied = document.execCommand("copy");
+    document.body.removeChild(scratch);
+    return copied;
+  }
   function setData(nextData, source) {
     DATA = cloneData(nextData);
     nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
@@ -298,15 +314,67 @@
     syncActionButtons();
   }
 
+  function getBrokenSources() {
+    return DATA.diagnostics?.broken_sources || [];
+  }
+
+  function buildHandoffSummary() {
+    const diagnostics = DATA.diagnostics || {};
+    const counts = DATA.counts || {};
+    const topBrokenSources = getBrokenSources().slice(0, 5)
+      .map((item) => `- ${item.source_label} (${item.count}) — ${item.source_path}`)
+      .join("\n");
+    return [
+      "# UniText Project Map Handoff",
+      "",
+      `- Generated at: ${state.lastUpdatedAt || DATA.meta?.generated_at || "unknown"}`,
+      `- Page mode: ${PAGE_MODE}`,
+      `- Node count: ${Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0)}`,
+      `- Edge count: ${(DATA.edges || []).length}`,
+      `- Broken references: ${diagnostics.broken_reference_count || 0}`,
+      `- Orphan resources: ${diagnostics.orphan_node_count || 0}`,
+      "",
+      "## Resource Counts",
+      "",
+      ...Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0])).map(([key, value]) => `- ${key}: ${value}`),
+      "",
+      "## Top Broken Sources",
+      "",
+      topBrokenSources || "- None",
+      "",
+      "## Share Artifacts",
+      "",
+      "- site/project-map.html",
+      "- site/project-map-share.html",
+      "- site/project-map-handoff.md",
+      "- site/project-map-handoff.json",
+    ].join("\n");
+  }
+
   function updateDiagnosticsCard() {
     const diagnostics = DATA.diagnostics || {};
     const brokenCount = diagnostics.broken_reference_count || 0;
     const orphanCount = diagnostics.orphan_node_count || 0;
+    const brokenSources = getBrokenSources();
     const activeFilterLabel = state.diagnosticsFilter === "orphan"
       ? "目前只看 orphan resources"
       : state.diagnosticsFilter === "broken-source"
         ? "目前只看 broken reference sources"
         : "目前顯示全部節點";
+    const sourceMarkup = brokenSources.length
+      ? `
+        <div class="section-title" style="margin-top:12px;">Broken Source Drill-down</div>
+        <div class="source-list">
+          ${brokenSources.slice(0, 8).map((item) => `
+            <button type="button" class="source-item diagnostics-source-jump" data-source-id="${escapeHtml(item.source_id)}">
+              <strong>${escapeHtml(item.source_label)}</strong>
+              <div class="source-meta">${escapeHtml(item.source_path)}；${item.count} 個未映射 target；點擊可跳到來源節點</div>
+            </button>
+          `).join("")}
+        </div>
+        ${brokenSources.length > 8 ? `<div class="edge-visibility">其餘 ${brokenSources.length - 8} 個 source 可於 JSON / handoff 檔查看。</div>` : ""}
+      `
+      : `<div class="edge-visibility">目前沒有 broken reference sources。</div>`;
     diagnosticsCardEl.innerHTML = `
       <span class="card-title">Diagnostics</span>
       <div><strong>Broken references</strong>：${brokenCount}</div>
@@ -317,23 +385,47 @@
         <button type="button" class="mini-action secondary" id="filter-orphans" ${orphanCount ? "" : "disabled"}>只看 orphan</button>
         <button type="button" class="mini-action" id="filter-clear-diagnostics" ${state.diagnosticsFilter === "all" ? "disabled" : ""}>清除診斷篩選</button>
       </div>
+      ${sourceMarkup}
     `;
     diagnosticsCardEl.querySelector("#filter-broken-sources")?.addEventListener("click", () => applyDiagnosticsFilter("broken-source"));
     diagnosticsCardEl.querySelector("#filter-orphans")?.addEventListener("click", () => applyDiagnosticsFilter("orphan"));
     diagnosticsCardEl.querySelector("#filter-clear-diagnostics")?.addEventListener("click", () => applyDiagnosticsFilter("all"));
+    diagnosticsCardEl.querySelectorAll(".diagnostics-source-jump").forEach((button) => {
+      button.addEventListener("click", () => {
+        jumpToNode(button.dataset.sourceId, true);
+      });
+    });
   }
 
   function updateExportCard() {
     if (!exportCardEl) return;
     const shareHref = new URL("./project-map-share.html", window.location.href).href;
+    const handoffMdHref = new URL("./project-map-handoff.md", window.location.href).href;
+    const handoffJsonHref = new URL("./project-map-handoff.json", window.location.href).href;
     exportCardEl.innerHTML = `
       <span class="card-title">Export</span>
       <div><strong>Share-safe artifact</strong>：可直接打開唯讀分享版快照。</div>
-      <div class="edge-visibility">適合做展示或交付，不包含頁內重掃與 repo 授權入口。</div>
+      <div class="edge-visibility">適合做展示或交付，不包含頁內重掃與 repo 授權入口。現在也會一併產出 handoff markdown / JSON。</div>
       <div class="card-actions">
         <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
+        <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.md</a>
+        <a class="mini-action secondary" href="${handoffJsonHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.json</a>
+        <button type="button" class="mini-action" id="copy-handoff-summary">複製 handoff 摘要</button>
       </div>
     `;
+    exportCardEl.querySelector("#copy-handoff-summary")?.addEventListener("click", async () => {
+      const button = exportCardEl.querySelector("#copy-handoff-summary");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const original = button.textContent;
+      try {
+        await copyText(buildHandoffSummary());
+        button.textContent = "已複製";
+        window.setTimeout(() => { button.textContent = original; }, 1400);
+      } catch (_error) {
+        button.textContent = "複製失敗";
+        window.setTimeout(() => { button.textContent = original; }, 1600);
+      }
+    });
   }
 
   function renderSidebar(visible) {
@@ -375,6 +467,7 @@
     const relatedAll = relatedEdges(selected.id);
     const outgoing = relatedAll.filter((edge) => edge.from === selected.id);
     const incoming = relatedAll.filter((edge) => edge.to === selected.id);
+    const brokenSource = getBrokenSources().find((item) => item.source_id === selected.id) || null;
     const detailParts = [
       `<h3>${selected.label}</h3>`,
       `<p>${selected.description || "沒有額外描述。"}</p>`,
@@ -408,6 +501,22 @@
       pushEdgeSection("Incoming", incoming, "incoming");
     } else {
       detailParts.push('<p class="empty">目前沒有關聯邊。</p>');
+    }
+    if (brokenSource) {
+      detailParts.push('<div class="section-title">Broken References</div>');
+      detailParts.push(`<p class="empty">這個來源節點目前有 ${brokenSource.count} 個連結解析到 repo 內檔案，但那些 target 尚未被納入目前的 MAP 範圍。</p>`);
+      detailParts.push('<div class="edge-list">');
+      brokenSource.targets.forEach((item) => {
+        detailParts.push(`
+          <div class="edge-item">
+            <strong>Unmapped Target</strong>
+            <div class="edge-direction">${escapeHtml(item.target)}</div>
+            <div>${escapeHtml(item.resolved_path)}</div>
+            <div class="broken-target-meta">來源檔已引用此路徑，但 generator 目前沒有把它建成節點。這通常代表它是 repo 內未納入的文件、模板，或超出現階段 canonical source set 的資源。</div>
+          </div>
+        `);
+      });
+      detailParts.push("</div>");
     }
     detailEl.innerHTML = detailParts.join("");
     detailEl.querySelectorAll(".edge-jump").forEach((button) => {
@@ -539,7 +648,7 @@
     const selected = positions.get(selectedId);
     if (!selected) return null;
     if (state.mapMode === "grid") return selected;
-    const neighborBoxes = allEdges
+    const neighborBoxes = (DATA.edges || [])
       .filter((edge) => edge.from === selectedId || edge.to === selectedId)
       .map((edge) => positions.get(edge.from === selectedId ? edge.to : edge.from))
       .filter(Boolean);
@@ -1054,6 +1163,24 @@
       .map((node) => node.id)
       .sort();
     const brokenSourceIds = [...new Set(brokenReferences.map((item) => item.source_id))].sort();
+    const nodeIndex = new Map(nodes.map((node) => [node.id, node]));
+    const brokenSources = brokenSourceIds.map((sourceId) => {
+      const sourceNode = nodeIndex.get(sourceId);
+      const targets = brokenReferences
+        .filter((item) => item.source_id === sourceId)
+        .sort((a, b) => `${a.resolved_path} ${a.target}`.localeCompare(`${b.resolved_path} ${b.target}`))
+        .map((item) => ({
+          target: item.target,
+          resolved_path: item.resolved_path,
+        }));
+      return {
+        source_id: sourceId,
+        source_label: sourceNode?.label || sourceId,
+        source_path: sourceNode?.path || brokenReferences.find((item) => item.source_id === sourceId)?.source_path || "",
+        count: targets.length,
+        targets,
+      };
+    });
     return {
       meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 },
       counts,
@@ -1061,6 +1188,7 @@
         broken_reference_count: brokenReferences.length,
         orphan_node_count: orphanNodeIds.length,
         broken_references: brokenReferences,
+        broken_sources: brokenSources,
         broken_source_ids: brokenSourceIds,
         orphan_node_ids: orphanNodeIds,
       },

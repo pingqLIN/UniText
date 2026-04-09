@@ -91,6 +91,70 @@
 - 本輪未再發現需要立即修補的互動錯誤
 - broken/orphan 與 export entry 已正式從規劃項轉成已落地能力
 
+## Round 5
+
+### 評估
+
+- 目標從 diagnostics summary 進一步推到：
+  - broken reference 的 source-target drill-down
+  - 更完整的 export / handoff 體驗
+  - 補一個可重用的 agent governance resolver
+
+### 開發
+
+- project map diagnostics 升級：
+  - `broken_sources` 進入 payload
+  - diagnostics 卡片新增 source-level jump buttons
+  - detail 區若選中 broken source，會顯示 unmapped target 明細
+- export / handoff 升級：
+  - generator 會額外產出
+    - `project-map-handoff.md`
+    - `project-map-handoff.json`
+  - export 卡片新增：
+    - `開啟 handoff.md`
+    - `開啟 handoff.json`
+    - `複製 handoff 摘要`
+- 治理工具：
+  - 新增 `local/config/agent-governance-layers.json`
+  - 新增 `local/scripts/resolve-agent-governance.py`
+  - 新增 `AGENT_GOVERNANCE_LAYERING.md`
+  - tool 可根據 `model / environment / instruction-profile` 解析 matched layers、effective config 與 provenance
+
+### 檢驗
+
+- `python -m py_compile local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py`
+- `python local/scripts/build-project-map.py`
+  - 產出包含：
+    - `project-map.html`
+    - `project-map-share.html`
+    - `project-map-handoff.md`
+    - `project-map-handoff.json`
+- `python local/scripts/resolve-agent-governance.py --model gpt-5.4 --environment codex-local-dev --instruction-profile mapping --write-report`
+  - 成功產出：
+    - `ops/agent-governance/agent-governance-resolution.json`
+    - `ops/agent-governance/agent-governance-resolution.md`
+
+### 外部審查
+
+- 真實瀏覽器驗證：
+  - diagnostics 卡片可顯示 `UniText — Index` 與 `README` 兩個 broken sources
+  - 點選 `README` source 後，detail 內可見 `BROKEN REFERENCES` 區塊與 unmapped target 清單
+  - export 卡片可見：
+    - `開啟分享版`
+    - `開啟 handoff.md`
+    - `開啟 handoff.json`
+    - `複製 handoff 摘要`
+- governance resolver 報告內容已確認包含：
+  - matched layers
+  - effective config
+  - provenance
+
+### 修正
+
+- 外部審查時發現 `renderMap()` 內 `getFocusBox()` 誤用未定義的 `allEdges`
+- 已改為直接使用 `DATA.edges`
+- 修正後 console error 清空，detail 渲染恢復正常
+
 ## 2. 回合記錄
 
 ## Round 1
@@ -216,24 +280,28 @@
 
 - 這輪開發不需要額外 server、bundler 或外部 library
 - 高訊號外部審查以 Lighthouse + 真實瀏覽器互動為主
-- 4 輪已完成的主軸：
+- 5 輪已完成的主軸：
   - `Round 1`：可讀性與 metadata
   - `Round 2`：relation 導覽效率
   - `Round 3`：share-safe artifact 落地
   - `Round 4`：diagnostics 與 export UI 入口
+  - `Round 5`：broken drill-down、handoff artifact、governance resolver
 - 若後續繼續開發，下一個優先方向會是：
-  - broken reference 明細與 source-target drill-down
-  - export workflow 的附加說明與一鍵交付體驗
+  - governance resolver 與實際 runtime / MCP config apply 流程的銜接
+  - project map 對更多 canonical docs / workflow 節點的擴充
 
 ## 4. 階段結論
 
-- 4 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
+- 5 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
 - 目前最有價值的新成果：
   - interactive 版的可讀性與可及性明顯提升
   - relation 導覽已可直接跳轉並自動 reveal hidden peer
   - generator 已具備 share-safe artifact 產出能力
   - diagnostics 已可直接顯示 broken/orphan 狀態並用篩選方式切入
   - interactive 版已提供 share-safe artifact 的直接入口
+  - broken reference 已可 drill-down 到 source-target 明細
+  - export 已從單一分享頁升級成 share page + handoff bundle
+  - agent governance 已有 simulation-first resolver 與 provenance 報告
 - 目前不建議再做的大項：
   - 重型 graph library
   - AST 級 dependency parser

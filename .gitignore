@@ -18,6 +18,7 @@ ops/review-package/
 ops/template-package/
 ops/rebuild-project/
 ops/project-map/
+ops/agent-governance/
 ops/git-bundles/
 ops/baseline.json
 ops/inventory.latest.json
