@@ -296,6 +296,33 @@
 - 高亮 references chain
 - 顯示 broken references / orphan nodes
 
+## 9.1 目前原型落地狀態
+
+截至目前，原型已不只停留在靜態結構圖，而是具備下列可直接使用的能力：
+
+- interactive 版：
+  - 搜尋
+  - 類型篩選
+  - `欄式 / 圓形` 視圖切換
+  - 手動 / 開頁 / 定時更新
+  - browser-side repo scan
+  - diagnostics 卡片與 broken/orphan 篩選
+  - 直接開啟 share-safe artifact 的 export 入口
+- share-safe 版：
+  - 保留瀏覽、搜尋、類型篩選與 diagnostics
+  - 移除頁內重掃與 repo 授權入口
+  - 適合作為唯讀交付頁面
+
+目前 generator 也已經同步產出 diagnostics data：
+
+- `broken_reference_count`
+- `orphan_node_count`
+- `broken_references`
+- `broken_source_ids`
+- `orphan_node_ids`
+
+這讓 MAP 已經從單純導覽頁，進一步變成「結構導覽 + 輕量診斷」的靜態 artifact。
+
 ## 10. 自動化流程
 
 建議標準流程如下：
@@ -429,6 +456,12 @@
 - 補 `天 / 時 / 分` 定時頻率設定
 - 補 browser-side repo scan
 - 補 `Map View` 的 `欄式 / 圓形` 切換
+
+### Batch 4
+
+- 補 diagnostics summary
+- 補 broken source / orphan resource 篩選
+- 補 interactive 版 share-safe export 入口
 
 ## 12.1 Map View 視圖策略
 

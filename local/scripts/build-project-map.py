@@ -38,6 +38,7 @@ ROOT_DIRECTORIES = [
 ]
 
 TYPE_ORDER = ["doc", "directory", "skill", "mcp", "agent", "workflow"]
+STRUCTURAL_EDGE_KINDS = {"contains"}
 
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 HEADING_PATTERN = re.compile(r"^#\s+(.+)$", re.MULTILINE)
@@ -278,8 +279,9 @@ def build_edges(
     nodes: Iterable[Node],
     path_to_node_id: dict[str, str],
     logical_to_node_id: dict[str, str],
-) -> list[dict[str, str]]:
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     edges: list[dict[str, str]] = []
+    broken_references: list[dict[str, str]] = []
     seen: set[tuple[str, str, str]] = set()
 
     def add_edge(from_id: str, to_id: str, kind: str) -> None:
@@ -334,6 +336,13 @@ def build_edges(
             target_id = path_to_node_id.get(target_path)
             if target_id:
                 add_edge(source_id, target_id, "references")
+            else:
+                broken_references.append({
+                    "source_id": source_id,
+                    "source_path": source_path,
+                    "target": target,
+                    "resolved_path": target_path,
+                })
 
     index_path = repo_root / "INDEX.md"
     if index_path.exists():
@@ -351,12 +360,37 @@ def build_edges(
             if target_id:
                 add_edge(operations_id, target_id, "maps_to")
 
-    return edges
+    return edges, broken_references
+
+
+def build_diagnostics(nodes: Iterable[Node], edges: Iterable[dict[str, str]], broken_references: Iterable[dict[str, str]]) -> dict[str, object]:
+    non_structural_touches: dict[str, int] = defaultdict(int)
+    for edge in edges:
+        if edge["kind"] in STRUCTURAL_EDGE_KINDS:
+            continue
+        non_structural_touches[edge["from"]] += 1
+        non_structural_touches[edge["to"]] += 1
+
+    orphan_node_ids = [
+        node.node_id
+        for node in nodes
+        if node.node_type != "directory" and node.node_id != "repo:root" and non_structural_touches.get(node.node_id, 0) == 0
+    ]
+    broken_references_list = list(broken_references)
+    broken_source_ids = sorted({item["source_id"] for item in broken_references_list})
+    return {
+        "broken_reference_count": len(broken_references_list),
+        "orphan_node_count": len(orphan_node_ids),
+        "broken_references": broken_references_list,
+        "broken_source_ids": broken_source_ids,
+        "orphan_node_ids": sorted(orphan_node_ids),
+    }
 
 
 def build_payload(repo_root: Path) -> dict[str, object]:
     nodes, path_to_node_id, logical_to_node_id = build_nodes(repo_root)
-    edges = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id)
+    edges, broken_references = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id)
+    diagnostics = build_diagnostics(nodes, edges, broken_references)
     counts = defaultdict(int)
     for node in nodes:
         counts[node.node_type] += 1
@@ -367,6 +401,7 @@ def build_payload(repo_root: Path) -> dict[str, object]:
             "version": 1,
         },
         "counts": dict(sorted(counts.items())),
+        "diagnostics": diagnostics,
         "nodes": [node.as_dict() for node in nodes],
         "edges": edges,
     }

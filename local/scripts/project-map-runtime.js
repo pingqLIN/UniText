@@ -23,12 +23,14 @@
   const HANDLE_DB_NAME = "unitext-project-map-db";
   const HANDLE_STORE = "handles";
   const HANDLE_KEY = "repo-root";
+  const STRUCTURAL_EDGE_KINDS = new Set(["contains"]);
 
   let DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
   let nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
   const state = {
     search: "",
     type: "all",
+    diagnosticsFilter: "all",
     mapMode: "grid",
     updateMode: "manual",
     intervalDays: 1,
@@ -62,6 +64,8 @@
   const linkRepoEl = document.getElementById("link-repo");
   const refreshNowEl = document.getElementById("refresh-now");
   const updateStatusEl = document.getElementById("update-status");
+  const diagnosticsCardEl = document.getElementById("diagnostics-card");
+  const exportCardEl = document.getElementById("export-card");
   const nodeCountLabelEl = document.getElementById("node-count-label");
   const mapModeNoteEl = document.getElementById("map-mode-note");
   const mapCaptionEl = document.getElementById("map-caption");
@@ -173,7 +177,12 @@
   }
 
   function nodeMatchesFilters(node) {
+    const diagnostics = DATA.diagnostics || {};
+    const orphanNodeIds = new Set(diagnostics.orphan_node_ids || []);
+    const brokenSourceIds = new Set(diagnostics.broken_source_ids || []);
     if (state.type !== "all" && node.type !== state.type) return false;
+    if (state.diagnosticsFilter === "orphan" && !orphanNodeIds.has(node.id)) return false;
+    if (state.diagnosticsFilter === "broken-source" && !brokenSourceIds.has(node.id)) return false;
     if (!state.search) return true;
     const haystack = [node.label, node.path, node.logical_path, node.description]
       .filter(Boolean).join(" ").toLowerCase();
@@ -186,10 +195,20 @@
     if (reveal && !nodeMatchesFilters(target)) {
       state.search = "";
       state.type = "all";
+      state.diagnosticsFilter = "all";
       searchEl.value = "";
       typeFilterEl.value = "all";
     }
     state.selectedId = nodeId;
+    render();
+  }
+
+  function applyDiagnosticsFilter(mode) {
+    state.search = "";
+    state.type = "all";
+    state.diagnosticsFilter = mode;
+    searchEl.value = "";
+    typeFilterEl.value = "all";
     render();
   }
 
@@ -208,6 +227,21 @@
       const chip = document.createElement("div");
       chip.className = "chip";
       chip.textContent = `${TYPE_LABELS[type] || type}: ${count}`;
+      summaryEl.appendChild(chip);
+    });
+    const diagnostics = DATA.diagnostics || {};
+    [
+      { label: "Broken refs", value: diagnostics.broken_reference_count || 0 },
+      { label: "Orphans", value: diagnostics.orphan_node_count || 0 },
+    ].forEach((item) => {
+      const chip = document.createElement("div");
+      chip.className = "chip";
+      chip.textContent = `${item.label}: ${item.value}`;
+      if (item.value > 0) {
+        chip.style.background = "linear-gradient(180deg, #fff8ee 0%, #ffe7c7 100%)";
+        chip.style.color = "#8a5b06";
+        chip.style.borderColor = "rgba(202, 138, 4, 0.18)";
+      }
       summaryEl.appendChild(chip);
     });
     typeFilterEl.innerHTML = '<option value="all">全部類型</option>';
@@ -262,6 +296,44 @@
       ${errorText ? `<div><strong>最近錯誤</strong>：${escapeHtml(errorText)}</div>` : ""}
     `;
     syncActionButtons();
+  }
+
+  function updateDiagnosticsCard() {
+    const diagnostics = DATA.diagnostics || {};
+    const brokenCount = diagnostics.broken_reference_count || 0;
+    const orphanCount = diagnostics.orphan_node_count || 0;
+    const activeFilterLabel = state.diagnosticsFilter === "orphan"
+      ? "目前只看 orphan resources"
+      : state.diagnosticsFilter === "broken-source"
+        ? "目前只看 broken reference sources"
+        : "目前顯示全部節點";
+    diagnosticsCardEl.innerHTML = `
+      <span class="card-title">Diagnostics</span>
+      <div><strong>Broken references</strong>：${brokenCount}</div>
+      <div><strong>Orphan resources</strong>：${orphanCount}</div>
+      <div class="edge-visibility">${activeFilterLabel}</div>
+      <div class="card-actions">
+        <button type="button" class="mini-action secondary" id="filter-broken-sources" ${brokenCount ? "" : "disabled"}>只看 broken sources</button>
+        <button type="button" class="mini-action secondary" id="filter-orphans" ${orphanCount ? "" : "disabled"}>只看 orphan</button>
+        <button type="button" class="mini-action" id="filter-clear-diagnostics" ${state.diagnosticsFilter === "all" ? "disabled" : ""}>清除診斷篩選</button>
+      </div>
+    `;
+    diagnosticsCardEl.querySelector("#filter-broken-sources")?.addEventListener("click", () => applyDiagnosticsFilter("broken-source"));
+    diagnosticsCardEl.querySelector("#filter-orphans")?.addEventListener("click", () => applyDiagnosticsFilter("orphan"));
+    diagnosticsCardEl.querySelector("#filter-clear-diagnostics")?.addEventListener("click", () => applyDiagnosticsFilter("all"));
+  }
+
+  function updateExportCard() {
+    if (!exportCardEl) return;
+    const shareHref = new URL("./project-map-share.html", window.location.href).href;
+    exportCardEl.innerHTML = `
+      <span class="card-title">Export</span>
+      <div><strong>Share-safe artifact</strong>：可直接打開唯讀分享版快照。</div>
+      <div class="edge-visibility">適合做展示或交付，不包含頁內重掃與 repo 授權入口。</div>
+      <div class="card-actions">
+        <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
+      </div>
+    `;
   }
 
   function renderSidebar(visible) {
@@ -641,6 +713,8 @@
 
   function render() {
     updateSummary();
+    updateDiagnosticsCard();
+    updateExportCard();
     const visible = computeVisibleNodes();
     const ids = new Set(visible.map((node) => node.id));
     if (!ids.has(state.selectedId)) state.selectedId = visible[0]?.id ?? null;
@@ -891,6 +965,7 @@
     }
 
     const edges = [];
+    const brokenReferences = [];
     const seen = new Set();
     const addEdge = (fromId, toId, kind) => {
       if (!fromId || !toId || fromId === toId) return;
@@ -937,6 +1012,12 @@
         if (!targetPath) continue;
         const targetId = pathToNodeId.get(targetPath);
         if (targetId) addEdge(sourceId, targetId, "references");
+        else brokenReferences.push({
+          source_id: sourceId,
+          source_path: sourcePath,
+          target: match[1],
+          resolved_path: targetPath,
+        });
       }
     }
 
@@ -962,7 +1043,30 @@
 
     const counts = {};
     nodes.forEach((node) => { counts[node.type] = (counts[node.type] || 0) + 1; });
-    return { meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 }, counts, nodes, edges };
+    const nonStructuralTouches = {};
+    edges.forEach((edge) => {
+      if (STRUCTURAL_EDGE_KINDS.has(edge.kind)) return;
+      nonStructuralTouches[edge.from] = (nonStructuralTouches[edge.from] || 0) + 1;
+      nonStructuralTouches[edge.to] = (nonStructuralTouches[edge.to] || 0) + 1;
+    });
+    const orphanNodeIds = nodes
+      .filter((node) => node.type !== "directory" && node.id !== "repo:root" && !nonStructuralTouches[node.id])
+      .map((node) => node.id)
+      .sort();
+    const brokenSourceIds = [...new Set(brokenReferences.map((item) => item.source_id))].sort();
+    return {
+      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 },
+      counts,
+      diagnostics: {
+        broken_reference_count: brokenReferences.length,
+        orphan_node_count: orphanNodeIds.length,
+        broken_references: brokenReferences,
+        broken_source_ids: brokenSourceIds,
+        orphan_node_ids: orphanNodeIds,
+      },
+      nodes,
+      edges,
+    };
   }
 
   async function connectRepoDirectory() {

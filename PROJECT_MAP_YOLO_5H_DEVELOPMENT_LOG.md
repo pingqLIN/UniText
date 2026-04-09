@@ -31,9 +31,65 @@
   - browser-side repo refresh
   - 手動 / 開頁 / 定時更新
 - 目前最有價值的缺口：
-  - 視覺對比仍有可讀性弱點
-  - relation 導覽仍偏靜態，從 detail 回跳相關節點不夠快
-  - share-safe export 仍停留在報告規劃，沒有真正落地
+- 視覺對比仍有可讀性弱點
+- relation 導覽仍偏靜態，從 detail 回跳相關節點不夠快
+- share-safe export 仍停留在報告規劃，沒有真正落地
+
+## Round 4
+
+### 評估
+
+- 聚焦先前列出的下一步：
+  - broken reference / orphan resource 顯示
+  - export workflow 的 UI 入口
+- 目標是把既有 MAP 從「可看」補到「可診斷、可分享導覽」
+
+### 開發
+
+- `build-project-map.py` 新增 diagnostics 產出：
+  - `broken_reference_count`
+  - `orphan_node_count`
+  - `broken_references`
+  - `broken_source_ids`
+  - `orphan_node_ids`
+- `project-map.html` 新增 diagnostics 卡片：
+  - 顯示 broken / orphan 計數
+  - 提供 `只看 broken sources`、`只看 orphan`、`清除診斷篩選`
+- interactive 版新增 export 卡片：
+  - 直接提供 `開啟分享版` 入口
+- browser-side repo scan 也同步補上 diagnostics 計算，避免頁內更新後資料模型降級
+
+### 檢驗
+
+- 重新產出：
+  - `python -m py_compile local/scripts/build-project-map.py`
+  - `python local/scripts/build-project-map.py`
+- 產出資料確認：
+  - `broken_reference_count = 34`
+  - `orphan_node_count = 1`
+  - `broken_source_ids = [doc:INDEX.md, doc:README.md]`
+  - `orphan_node_ids = [skill:microsoft-foundry]`
+- 瀏覽器互動驗證：
+  - 點 `只看 broken sources` 後，節點數從 `38 / 38` 變成 `2 / 38`
+  - 點 `只看 orphan` 後，節點數變成 `1 / 38`
+  - 點 `清除診斷篩選` 後，節點數回到 `38 / 38`
+  - `開啟分享版` 可直接打開 `project-map-share.html`
+
+### 外部審查
+
+- 使用真實瀏覽器互動驗證 diagnostics filter 與 share-safe entry
+- Lighthouse snapshot（share-safe）結果：
+  - Accessibility: `100`
+  - Best Practices: `100`
+  - SEO: `60`
+- 判斷：
+  - diagnostics / export UI 沒有把可及性拉壞
+  - `SEO 60` 仍主要受 `file://` 靜態快照情境影響，不是這輪功能的阻塞項
+
+### 修正
+
+- 本輪未再發現需要立即修補的互動錯誤
+- broken/orphan 與 export entry 已正式從規劃項轉成已落地能力
 
 ## 2. 回合記錄
 
@@ -160,21 +216,24 @@
 
 - 這輪開發不需要額外 server、bundler 或外部 library
 - 高訊號外部審查以 Lighthouse + 真實瀏覽器互動為主
-- 3 輪已完成的主軸：
+- 4 輪已完成的主軸：
   - `Round 1`：可讀性與 metadata
   - `Round 2`：relation 導覽效率
   - `Round 3`：share-safe artifact 落地
+  - `Round 4`：diagnostics 與 export UI 入口
 - 若後續繼續開發，下一個優先方向會是：
-  - broken reference / orphan resource 顯示
-  - export workflow 的 UI 入口
+  - broken reference 明細與 source-target drill-down
+  - export workflow 的附加說明與一鍵交付體驗
 
 ## 4. 階段結論
 
-- 3 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
+- 4 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
 - 目前最有價值的新成果：
   - interactive 版的可讀性與可及性明顯提升
   - relation 導覽已可直接跳轉並自動 reveal hidden peer
   - generator 已具備 share-safe artifact 產出能力
+  - diagnostics 已可直接顯示 broken/orphan 狀態並用篩選方式切入
+  - interactive 版已提供 share-safe artifact 的直接入口
 - 目前不建議再做的大項：
   - 重型 graph library
   - AST 級 dependency parser

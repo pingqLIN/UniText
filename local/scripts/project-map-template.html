@@ -220,6 +220,64 @@
       font-size: 13px;
       font-weight: 600;
     }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .info-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(169, 155, 127, 0.28);
+      color: #50493c;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .info-card strong {
+      color: var(--accent-deep);
+    }
+    .info-card .card-title {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    button.mini-action,
+    a.mini-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      background: linear-gradient(180deg, #ffffff 0%, #eefaf7 100%);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    button.mini-action.secondary,
+    a.mini-action.secondary {
+      border-color: rgba(202, 138, 4, 0.2);
+      background: linear-gradient(180deg, #fffef8 0%, #fff4d8 100%);
+      color: #8a5b06;
+    }
+    button.mini-action:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
     .layout {
       display: grid;
       grid-template-columns: 300px minmax(520px, 1fr) 340px;
@@ -382,6 +440,7 @@
       .layout { grid-template-columns: 1fr; }
       .sidebar, .detail { max-height: none; }
       .inline-grid { grid-template-columns: repeat(3, minmax(72px, 1fr)); }
+      .info-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -439,6 +498,14 @@
         </div>
       </div>
       <div class="status-card" id="update-status" data-share-hide></div>
+      <div class="info-grid">
+        <div class="info-card" id="diagnostics-card">
+          <span class="card-title">Diagnostics</span>
+        </div>
+        <div class="info-card" id="export-card" data-share-hide>
+          <span class="card-title">Export</span>
+        </div>
+      </div>
     </div>
   </header>
   <main class="layout">
