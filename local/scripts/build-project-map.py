@@ -42,6 +42,8 @@ STRUCTURAL_EDGE_KINDS = {"contains"}
 
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 HEADING_PATTERN = re.compile(r"^#\s+(.+)$", re.MULTILINE)
+SECTION_HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
+LIST_ITEM_PATTERN = re.compile(r"^(?:-|\d+\.)\s+(.+)$")
 
 
 @dataclass(frozen=True)
@@ -125,6 +127,64 @@ def label_for_core_doc(relative: str, text: str) -> str:
     if relative == "README.md":
         return "README"
     return extract_title(text, Path(relative).stem)
+
+
+def extract_section_rules(text: str) -> list[dict[str, object]]:
+    lines = text.replace("\r\n", "\n").split("\n")
+    sections: list[dict[str, object]] = []
+    current_heading = "Document"
+    current_items: list[str] = []
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        heading_match = SECTION_HEADING_PATTERN.match(line)
+        if heading_match:
+            if current_items:
+                sections.append({"heading": current_heading, "items": current_items[:]})
+            current_heading = heading_match.group(2).strip()
+            current_items = []
+            continue
+        item_match = LIST_ITEM_PATTERN.match(line.strip())
+        if item_match:
+            current_items.append(item_match.group(1).strip())
+    if current_items:
+        sections.append({"heading": current_heading, "items": current_items[:]})
+    return sections
+
+
+def build_governance_sources(repo_root: Path) -> dict[str, object]:
+    source_candidates = [
+        ("workspace", repo_root.parent / "AGENTS.md", 1),
+        ("repo", repo_root / "AGENTS.md", 2),
+    ]
+    sources: list[dict[str, object]] = []
+    effective_rules: list[dict[str, object]] = []
+    for scope, path, precedence in source_candidates:
+        if not path.exists():
+            continue
+        text = read_text(path)
+        sections = extract_section_rules(text)
+        sources.append({
+            "scope": scope,
+            "path": str(path),
+            "precedence": precedence,
+            "sections": sections,
+        })
+        for section in sections:
+            for index, item in enumerate(section["items"], start=1):
+                effective_rules.append({
+                    "precedence": precedence,
+                    "scope": scope,
+                    "source_path": str(path),
+                    "section": section["heading"],
+                    "rule_index": index,
+                    "rule": item,
+                })
+    effective_rules.sort(key=lambda item: (item["precedence"], item["source_path"], item["section"], item["rule_index"]))
+    return {
+        "hierarchy_note": "Runtime/system/developer/global-home instructions still sit above file-based AGENTS. The page-level governance view evaluates the file-based portion using workspace overlay first, then repo-local rules.",
+        "sources": sources,
+        "effective_file_rules": effective_rules,
+    }
 
 
 def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, str]]:
@@ -418,6 +478,7 @@ def build_payload(repo_root: Path) -> dict[str, object]:
     nodes, path_to_node_id, logical_to_node_id = build_nodes(repo_root)
     edges, broken_references = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id)
     diagnostics = build_diagnostics(nodes, edges, broken_references)
+    governance = build_governance_sources(repo_root)
     counts = defaultdict(int)
     for node in nodes:
         counts[node.node_type] += 1
@@ -425,10 +486,12 @@ def build_payload(repo_root: Path) -> dict[str, object]:
         "meta": {
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "source_root": "/",
-            "version": 1,
+            "repo_root_native": str(repo_root),
+            "version": 2,
         },
         "counts": dict(sorted(counts.items())),
         "diagnostics": diagnostics,
+        "governance": governance,
         "nodes": [node.as_dict() for node in nodes],
         "edges": edges,
     }
@@ -438,8 +501,10 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
     repo_root = get_repo_root()
     template_path = repo_root / "local" / "scripts" / "project-map-template.html"
     runtime_path = repo_root / "local" / "scripts" / "project-map-runtime.js"
+    governance_policy_path = repo_root / "local" / "config" / "agent-governance-layers.json"
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
+    governance_policy = json.loads(read_text(governance_policy_path))
     if page_mode == "share-safe":
         header_description = "一次性生成、純靜態、可直接分享的專案 MAP 快照。此版本只提供唯讀瀏覽，不包含頁內重掃或 repo 目錄授權功能。"
     else:
@@ -452,6 +517,7 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
         "__CORE_DOCS__": json.dumps(CORE_DOCS, ensure_ascii=False),
         "__ROOT_DIRECTORIES__": json.dumps(ROOT_DIRECTORIES, ensure_ascii=False),
         "__REPO_MARKERS__": json.dumps([marker.as_posix() for marker in REPO_MARKERS], ensure_ascii=False),
+        "__GOVERNANCE_POLICY__": json.dumps(governance_policy, ensure_ascii=False).replace("</", "<\\/"),
         "__RUNTIME_SOURCE__": runtime_source,
     }
     for key, value in replacements.items():

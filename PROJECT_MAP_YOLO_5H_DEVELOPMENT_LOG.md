@@ -155,6 +155,57 @@
 - 已改為直接使用 `DATA.edges`
 - 修正後 console error 清空，detail 渲染恢復正常
 
+## Round 6
+
+### 評估
+
+- 把治理工具真正搬到網頁上，而不是只停留在 CLI resolver
+- 要滿足的條件：
+  - 可在頁面上輸入模型 / 環境 / 指令配置
+  - 可聚合 `AGENTS` 規則
+  - 可評估頁面可見範圍內實際會使用的 file-based instructions
+  - 可把報告寫到指定 repo 內位置
+
+### 開發
+
+- generator 新增 governance payload：
+  - 聚合 `Q:\\AGENTS.md`
+  - 聚合 `Q:\\UniText\\AGENTS.md`
+  - 提供 `effective_file_rules`
+- `project-map.html` 新增 governance 面板：
+  - `治理模型`
+  - `工作環境`
+  - `指令配置`
+  - `輸出位置`
+  - `解析治理`
+  - `寫出治理報告`
+- runtime 新增：
+  - browser-side governance resolver
+  - 頁面內 governance 結果渲染
+  - 將治理報告寫到指定 repo 內資料夾的能力
+- policy 與 CLI resolver 也同步對齊 AGENTS aggregation
+
+### 檢驗
+
+- `python -m py_compile local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py`
+- `node --check local/scripts/project-map-runtime.js`
+- `python local/scripts/build-project-map.py`
+- `python local/scripts/resolve-agent-governance.py --model gpt-5.4 --environment codex-local-dev --instruction-profile mapping --write-report`
+
+### 外部審查
+
+- 瀏覽器頁面已確認：
+  - governance 面板存在
+  - 預設輸出位置為 `Q:\\UniText\\ops\\agent-governance`
+  - 會顯示 matched layers、effective config、AGENTS hierarchy note、AGENTS sources、effective file-based instructions
+- 以靜態頁可見範圍來說，這已經能完成「AGENTS 加總規則後，評估實際會使用的指令」
+
+### 修正
+
+- 補上 `repo_root_native` 與 governance payload 保留邏輯，避免 browser-side refresh 後治理資訊消失
+- 將 repo 目錄授權從 `read` 升級為 `readwrite`，讓頁面具備寫出治理報告的能力
+- 目前尚未全自動驗證「頁面直接寫出治理報告」這一步，因為它取決於瀏覽器的互動式目錄授權；CLI 路徑已驗證可寫出
+
 ## 2. 回合記錄
 
 ## Round 1
@@ -280,19 +331,20 @@
 
 - 這輪開發不需要額外 server、bundler 或外部 library
 - 高訊號外部審查以 Lighthouse + 真實瀏覽器互動為主
-- 5 輪已完成的主軸：
+- 6 輪已完成的主軸：
   - `Round 1`：可讀性與 metadata
   - `Round 2`：relation 導覽效率
   - `Round 3`：share-safe artifact 落地
   - `Round 4`：diagnostics 與 export UI 入口
   - `Round 5`：broken drill-down、handoff artifact、governance resolver
+  - `Round 6`：網頁治理面板、AGENTS 聚合、頁面內治理輸出
 - 若後續繼續開發，下一個優先方向會是：
-  - governance resolver 與實際 runtime / MCP config apply 流程的銜接
+  - governance resolver 與實際 runtime / MCP config apply / rollback 流程的銜接
   - project map 對更多 canonical docs / workflow 節點的擴充
 
 ## 4. 階段結論
 
-- 5 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
+- 6 輪開發已完成，且每輪都有獨立驗證與外部審查訊號
 - 目前最有價值的新成果：
   - interactive 版的可讀性與可及性明顯提升
   - relation 導覽已可直接跳轉並自動 reveal hidden peer
@@ -302,6 +354,7 @@
   - broken reference 已可 drill-down 到 source-target 明細
   - export 已從單一分享頁升級成 share page + handoff bundle
   - agent governance 已有 simulation-first resolver 與 provenance 報告
+  - governance 已正式落到網頁上，且可聚合 AGENTS 規則後做 file-based 指令評估
 - 目前不建議再做的大項：
   - 重型 graph library
   - AST 級 dependency parser

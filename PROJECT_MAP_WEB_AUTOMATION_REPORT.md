@@ -541,6 +541,27 @@
 
 也就是讓 agent 可以依 `model / environment / instruction-profile` 得到不同配置層級，同時還看得出每個生效 key 是從哪一層來的。
 
+目前這套治理能力也已經接到 `project-map.html` 互動版：
+
+- 頁面會聚合：
+  - `Q:\AGENTS.md`
+  - `Q:\UniText\AGENTS.md`
+  - `local/config/agent-governance-layers.json`
+- 頁面可直接輸入：
+  - 模型
+  - 工作環境
+  - 指令配置
+  - 輸出位置
+- 頁面會直接評估：
+  - matched layers
+  - effective config
+  - AGENTS sources
+  - effective file-based instructions
+
+若使用者授權 repo root 的讀寫權限，頁面也能直接把治理報告寫到指定 repo 內位置，例如：
+
+- `Q:\UniText\ops\agent-governance`
+
 ## 15. 建議下一步
 
 下一步不要先做完整 UI，而是先完成一個 bounded prototype：

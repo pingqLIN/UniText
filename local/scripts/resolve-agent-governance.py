@@ -3,9 +3,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+
+SECTION_HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
+LIST_ITEM_PATTERN = re.compile(r"^(?:-|\d+\.)\s+(.+)$")
 
 
 @dataclass(frozen=True)
@@ -21,6 +25,62 @@ def repo_root() -> Path:
 
 def load_policy(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def extract_section_rules(text: str) -> list[dict[str, object]]:
+    sections: list[dict[str, object]] = []
+    current_heading = "Document"
+    current_items: list[str] = []
+    for raw_line in text.replace("\r\n", "\n").split("\n"):
+        line = raw_line.rstrip()
+        heading_match = SECTION_HEADING_PATTERN.match(line)
+        if heading_match:
+            if current_items:
+                sections.append({"heading": current_heading, "items": current_items[:]})
+            current_heading = heading_match.group(2).strip()
+            current_items = []
+            continue
+        item_match = LIST_ITEM_PATTERN.match(line.strip())
+        if item_match:
+            current_items.append(item_match.group(1).strip())
+    if current_items:
+        sections.append({"heading": current_heading, "items": current_items[:]})
+    return sections
+
+
+def load_agents_governance(root: Path) -> dict[str, object]:
+    source_candidates = [
+        ("workspace", root.parent / "AGENTS.md", 1),
+        ("repo", root / "AGENTS.md", 2),
+    ]
+    sources: list[dict[str, object]] = []
+    effective_rules: list[dict[str, object]] = []
+    for scope, path, precedence in source_candidates:
+        if not path.exists():
+            continue
+        sections = extract_section_rules(path.read_text(encoding="utf-8"))
+        sources.append({
+            "scope": scope,
+            "path": str(path),
+            "precedence": precedence,
+            "sections": sections,
+        })
+        for section in sections:
+            for index, item in enumerate(section["items"], start=1):
+                effective_rules.append({
+                    "precedence": precedence,
+                    "scope": scope,
+                    "source_path": str(path),
+                    "section": section["heading"],
+                    "rule_index": index,
+                    "rule": item,
+                })
+    effective_rules.sort(key=lambda item: (item["precedence"], item["source_path"], item["section"], item["rule_index"]))
+    return {
+        "hierarchy_note": "Runtime/system/developer/global-home instructions still sit above file-based AGENTS. This resolver evaluates the file-based portion using workspace overlay first, then repo-local rules.",
+        "sources": sources,
+        "effective_file_rules": effective_rules,
+    }
 
 
 def matches(layer: dict[str, object], inputs: Inputs) -> bool:
@@ -43,7 +103,7 @@ def matches(layer: dict[str, object], inputs: Inputs) -> bool:
     return True
 
 
-def resolve(policy: dict[str, object], inputs: Inputs) -> dict[str, object]:
+def resolve(policy: dict[str, object], inputs: Inputs, agents_governance: dict[str, object]) -> dict[str, object]:
     meta = policy.get("meta", {})
     precedence = meta.get("precedence", ["base", "model", "environment", "instruction_profile"])
     layers = policy.get("layers", [])
@@ -90,6 +150,14 @@ def resolve(policy: dict[str, object], inputs: Inputs) -> dict[str, object]:
         ],
         "effective_config": effective,
         "provenance": provenance,
+        "agents_hierarchy_note": agents_governance["hierarchy_note"],
+        "agents_sources": agents_governance["sources"],
+        "effective_file_rules": agents_governance["effective_file_rules"],
+        "instruction_evaluation": [
+            "Runtime/system/developer/global-home instructions remain higher-priority and are not directly inspectable from repo files.",
+            "Within file-based scope, workspace overlay AGENTS applies before repo-local AGENTS, and repo-local rules win if there is a conflict.",
+            f"Current file-based source count: {len(agents_governance['sources'])}",
+        ],
     }
 
 
@@ -134,6 +202,27 @@ def render_markdown(resolution: dict[str, object]) -> str:
         "- Precedence is resolved as `base > model > environment > instruction_profile`, with later layers overriding earlier keys.",
         "- This tool is simulation-first: it reports intended effective configuration but does not mutate runtime settings by itself.",
     ])
+    lines.extend([
+        "",
+        "## AGENTS Sources",
+        "",
+    ])
+    for source in resolution["agents_sources"]:
+        lines.append(f"- [{source['scope']}] `{source['path']}`")
+    lines.extend([
+        "",
+        "## Effective File-Based Instructions",
+        "",
+    ])
+    for rule in resolution["effective_file_rules"]:
+        lines.append(f"- [{rule['scope']}] `{rule['section']}` — {rule['rule']}")
+    lines.extend([
+        "",
+        "## Evaluation Notes",
+        "",
+    ])
+    for note in resolution["instruction_evaluation"]:
+        lines.append(f"- {note}")
     return "\n".join(lines) + "\n"
 
 
@@ -161,6 +250,7 @@ def main() -> int:
     args = parser.parse_args()
 
     policy = load_policy(Path(args.policy).resolve())
+    agents_governance = load_agents_governance(root)
     resolution = resolve(
         policy,
         Inputs(
@@ -168,6 +258,7 @@ def main() -> int:
             environment=args.environment,
             instruction_profile=args.instruction_profile,
         ),
+        agents_governance,
     )
 
     summary: dict[str, object] = {"resolution": resolution}

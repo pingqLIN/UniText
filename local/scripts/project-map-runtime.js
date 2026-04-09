@@ -66,6 +66,13 @@
   const updateStatusEl = document.getElementById("update-status");
   const diagnosticsCardEl = document.getElementById("diagnostics-card");
   const exportCardEl = document.getElementById("export-card");
+  const governanceModelEl = document.getElementById("governance-model");
+  const governanceEnvironmentEl = document.getElementById("governance-environment");
+  const governanceProfileEl = document.getElementById("governance-profile");
+  const governanceOutputPathEl = document.getElementById("governance-output-path");
+  const governanceResolveEl = document.getElementById("governance-resolve");
+  const governanceWriteEl = document.getElementById("governance-write");
+  const governanceResultEl = document.getElementById("governance-result");
   const nodeCountLabelEl = document.getElementById("node-count-label");
   const mapModeNoteEl = document.getElementById("map-mode-note");
   const mapCaptionEl = document.getElementById("map-caption");
@@ -93,8 +100,195 @@
     document.body.removeChild(scratch);
     return copied;
   }
+
+  function normalizeWindowsPath(pathText) {
+    return String(pathText || "").trim().replaceAll("/", "\\").replace(/\\+$/, "");
+  }
+
+  function defaultGovernanceOutputPath() {
+    const repoRoot = DATA.meta?.repo_root_native || "";
+    return repoRoot ? `${normalizeWindowsPath(repoRoot)}\\ops\\agent-governance` : "Q:\\UniText\\ops\\agent-governance";
+  }
+
+  function getGovernanceSources() {
+    return DATA.governance?.sources || [];
+  }
+
+  function resolveGovernanceInPage() {
+    const policyLayers = window.AGENT_GOVERNANCE_POLICY?.layers || [];
+    const precedence = window.AGENT_GOVERNANCE_POLICY?.meta?.precedence || ["base", "model", "environment", "instruction_profile"];
+    const inputs = {
+      model: governanceModelEl?.value?.trim() || "gpt-5.4",
+      environment: governanceEnvironmentEl?.value?.trim() || "codex-local-dev",
+      instruction_profile: governanceProfileEl?.value?.trim() || "mapping",
+    };
+    const matchesLayer = (layer) => {
+      const match = layer.match || {};
+      if (Array.isArray(match.models) && !match.models.includes(inputs.model)) return false;
+      if (Array.isArray(match.environments) && !match.environments.includes(inputs.environment)) return false;
+      if (Array.isArray(match.instruction_profiles) && !match.instruction_profiles.includes(inputs.instruction_profile)) return false;
+      return true;
+    };
+    const matchedLayers = [];
+    precedence.forEach((scope) => {
+      policyLayers.forEach((layer) => {
+        if (layer.scope === scope && matchesLayer(layer)) matchedLayers.push(layer);
+      });
+    });
+    const effectiveConfig = {};
+    const provenance = {};
+    matchedLayers.forEach((layer) => {
+      Object.entries(layer.config || {}).forEach(([key, value]) => {
+        effectiveConfig[key] = value;
+        provenance[key] = { value, source_layer: layer.id, scope: layer.scope };
+      });
+    });
+    const effectiveFileRules = (DATA.governance?.effective_file_rules || []).map((item) => ({ ...item }));
+    return {
+      generated_at: new Date().toISOString(),
+      inputs,
+      policy_meta: window.AGENT_GOVERNANCE_POLICY?.meta || {},
+      matched_layers: matchedLayers.map((layer) => ({
+        id: layer.id,
+        scope: layer.scope,
+        description: layer.description,
+        config: layer.config || {},
+      })),
+      effective_config: effectiveConfig,
+      provenance,
+      agents_hierarchy_note: DATA.governance?.hierarchy_note || "",
+      agents_sources: getGovernanceSources(),
+      effective_file_rules: effectiveFileRules,
+      instruction_evaluation: [
+        "Runtime/system/developer/global-home instructions remain higher-priority and are not directly inspectable from this static page.",
+        "Within file-based scope, workspace overlay AGENTS applies before repo-local AGENTS, and repo-local rules win if there is a conflict.",
+        `Current file-based source count: ${getGovernanceSources().length}`,
+      ],
+    };
+  }
+
+  function renderGovernanceResolution(resolution, statusText = "") {
+    if (!governanceResultEl) return;
+    const layerLines = resolution.matched_layers.length
+      ? resolution.matched_layers.map((layer) => `- ${layer.id} [${layer.scope}]`).join("\n")
+      : "- None";
+    const configLines = Object.keys(resolution.effective_config).length
+      ? Object.entries(resolution.effective_config)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([key, value]) => `- ${key}: ${value} (${resolution.provenance[key].source_layer})`)
+        .join("\n")
+      : "- None";
+    const sourceLines = resolution.agents_sources.length
+      ? resolution.agents_sources.map((source) => `- [${source.scope}] ${source.path}`).join("\n")
+      : "- None";
+    const ruleLines = resolution.effective_file_rules.length
+      ? resolution.effective_file_rules.slice(0, 14).map((rule) => `- [${rule.scope}] ${rule.section}: ${rule.rule}`).join("\n")
+      : "- None";
+    governanceResultEl.textContent = [
+      statusText ? `${statusText}\n` : "",
+      "Governance Resolution",
+      `Model: ${resolution.inputs.model}`,
+      `Environment: ${resolution.inputs.environment}`,
+      `Instruction profile: ${resolution.inputs.instruction_profile}`,
+      "",
+      "Matched layers",
+      layerLines,
+      "",
+      "Effective config",
+      configLines,
+      "",
+      "AGENTS hierarchy note",
+      resolution.agents_hierarchy_note || "None",
+      "",
+      "AGENTS sources",
+      sourceLines,
+      "",
+      "Effective file-based instructions",
+      ruleLines,
+      resolution.effective_file_rules.length > 14 ? `\n... 其餘 ${resolution.effective_file_rules.length - 14} 條規則會寫入報告。` : "",
+    ].join("\n");
+  }
+
+  function governanceMarkdown(resolution) {
+    const lines = [
+      "# Agent Governance Resolution",
+      "",
+      `- Generated at: \`${resolution.generated_at}\``,
+      `- Model: \`${resolution.inputs.model}\``,
+      `- Environment: \`${resolution.inputs.environment}\``,
+      `- Instruction profile: \`${resolution.inputs.instruction_profile}\``,
+      "",
+      "## Matched Layers",
+      "",
+    ];
+    if (resolution.matched_layers.length) {
+      resolution.matched_layers.forEach((layer) => {
+        lines.push(`- \`${layer.id}\``);
+        lines.push(`  - Scope: \`${layer.scope}\``);
+        lines.push(`  - Description: ${layer.description || "No description"}`);
+      });
+    } else {
+      lines.push("- None");
+    }
+    lines.push("", "## Effective Config", "");
+    Object.entries(resolution.effective_config).sort((a, b) => a[0].localeCompare(b[0])).forEach(([key, value]) => {
+      lines.push(`- \`${key}\` = \`${value}\` (from \`${resolution.provenance[key].source_layer}\`)`);
+    });
+    lines.push("", "## AGENTS Sources", "");
+    resolution.agents_sources.forEach((source) => {
+      lines.push(`- [${source.scope}] \`${source.path}\``);
+    });
+    lines.push("", "## Effective File-Based Instructions", "");
+    resolution.effective_file_rules.forEach((rule) => {
+      lines.push(`- [${rule.scope}] \`${rule.section}\` — ${rule.rule}`);
+    });
+    lines.push("", "## Evaluation Notes", "");
+    resolution.instruction_evaluation.forEach((note) => lines.push(`- ${note}`));
+    return `${lines.join("\n")}\n`;
+  }
+
+  function governanceJson(resolution) {
+    return `${JSON.stringify(resolution, null, 2)}\n`;
+  }
+
+  function splitRelativeSegments(pathText) {
+    return normalizeWindowsPath(pathText).split("\\").filter(Boolean);
+  }
+
+  function repoRelativeSegmentsFromNativePath(outputPath) {
+    const repoRoot = normalizeWindowsPath(DATA.meta?.repo_root_native || "");
+    const target = normalizeWindowsPath(outputPath);
+    if (!repoRoot || !target) return null;
+    const repoRootLower = repoRoot.toLowerCase();
+    const targetLower = target.toLowerCase();
+    if (targetLower === repoRootLower) return [];
+    if (!targetLower.startsWith(`${repoRootLower}\\`)) return null;
+    return splitRelativeSegments(target.slice(repoRoot.length + 1));
+  }
+
+  async function ensureDirectoryFromSegments(rootHandle, segments) {
+    let current = rootHandle;
+    for (const segment of segments) {
+      current = await current.getDirectoryHandle(segment, { create: true });
+    }
+    return current;
+  }
+
+  async function writeTextFile(directoryHandle, filename, text) {
+    const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(text);
+    await writable.close();
+  }
   function setData(nextData, source) {
     DATA = cloneData(nextData);
+    if (!DATA.meta) DATA.meta = {};
+    if (!DATA.meta.repo_root_native && INITIAL_DATA?.meta?.repo_root_native) {
+      DATA.meta.repo_root_native = INITIAL_DATA.meta.repo_root_native;
+    }
+    if (!DATA.governance && INITIAL_DATA?.governance) {
+      DATA.governance = cloneData(INITIAL_DATA.governance);
+    }
     nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
     if (!nodeById.has(state.selectedId)) {
       state.selectedId = nodeById.has("doc:INDEX.md") ? "doc:INDEX.md" : DATA.nodes?.[0]?.id ?? null;
@@ -426,6 +620,31 @@
         window.setTimeout(() => { button.textContent = original; }, 1600);
       }
     });
+  }
+
+  async function resolveGovernanceAction() {
+    const resolution = resolveGovernanceInPage();
+    renderGovernanceResolution(resolution, "已重新解析治理配置。");
+    return resolution;
+  }
+
+  async function writeGovernanceReports() {
+    const resolution = await resolveGovernanceAction();
+    const handle = await ensureRepoHandle(true);
+    if (!handle) {
+      renderGovernanceResolution(resolution, "尚未連結 repo root，無法寫出治理報告。");
+      return;
+    }
+    const outputPath = governanceOutputPathEl?.value?.trim() || defaultGovernanceOutputPath();
+    const relativeSegments = repoRelativeSegmentsFromNativePath(outputPath);
+    if (!relativeSegments) {
+      renderGovernanceResolution(resolution, `輸出位置必須位於目前 repo 之內：${DATA.meta?.repo_root_native || "unknown repo root"}`);
+      return;
+    }
+    const outputDirHandle = await ensureDirectoryFromSegments(handle, relativeSegments);
+    await writeTextFile(outputDirHandle, "agent-governance-resolution.md", governanceMarkdown(resolution));
+    await writeTextFile(outputDirHandle, "agent-governance-resolution.json", governanceJson(resolution));
+    renderGovernanceResolution(resolution, `已寫出治理報告到 ${outputPath}`);
   }
 
   function renderSidebar(visible) {
@@ -909,8 +1128,8 @@
     return handle;
   }
 
-  async function hasReadPermission(handle, request = false) {
-    const options = { mode: "read" };
+  async function hasHandlePermission(handle, mode = "read", request = false) {
+    const options = { mode };
     if ((await handle.queryPermission(options)) === "granted") return true;
     if (request && (await handle.requestPermission(options)) === "granted") return true;
     return false;
@@ -1203,8 +1422,8 @@
       updateStatusCard("目前瀏覽器不支援 File System Access API，請改用 Python 重新生成。");
       return;
     }
-    const handle = await window.showDirectoryPicker({ mode: "read" });
-    if (!(await hasReadPermission(handle, true))) throw new Error("沒有取得讀取權限。");
+    const handle = await window.showDirectoryPicker({ mode: "readwrite" });
+    if (!(await hasHandlePermission(handle, "readwrite", true))) throw new Error("沒有取得讀寫權限。");
     await saveRepoHandle(handle);
     state.repoHandle = handle;
     state.repoHandleName = handle.name;
@@ -1214,12 +1433,12 @@
 
   async function ensureRepoHandle(requestInteractive = false) {
     if (state.repoHandle) {
-      const allowed = await hasReadPermission(state.repoHandle, requestInteractive);
+      const allowed = await hasHandlePermission(state.repoHandle, "readwrite", requestInteractive);
       if (allowed) return state.repoHandle;
     }
     if (!state.browserCanScan) return null;
     const stored = await loadRepoHandle();
-    if (stored && (await hasReadPermission(stored, requestInteractive))) {
+    if (stored && (await hasHandlePermission(stored, "readwrite", requestInteractive))) {
       state.repoHandle = stored;
       state.repoHandleName = stored.name;
       return stored;
@@ -1297,6 +1516,7 @@
   function setupControls() {
     loadSettings();
     applySettingsToControls();
+    if (governanceOutputPathEl) governanceOutputPathEl.value = defaultGovernanceOutputPath();
     searchEl.addEventListener("input", () => { state.search = searchEl.value.trim().toLowerCase(); render(); });
     typeFilterEl.addEventListener("change", () => { state.type = typeFilterEl.value; render(); });
     mapModeEl.addEventListener("change", () => { state.mapMode = mapModeEl.value; saveSettings(); render(); });
@@ -1307,9 +1527,12 @@
       catch (error) { updateStatusCard(error instanceof Error ? error.message : String(error)); }
     });
     refreshNowEl.addEventListener("click", () => { refreshFromRepo("manual-button", true); });
+    governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
+    governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
   }
 
   setupControls();
   render();
+  renderGovernanceResolution(resolveGovernanceInPage(), "已載入預設治理解析。");
   maybeAutoRefreshOnLoad();
 })();

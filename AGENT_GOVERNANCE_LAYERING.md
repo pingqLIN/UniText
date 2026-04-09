@@ -38,6 +38,43 @@
 
 ## 4. 使用方式
 
+### A. 在網頁上解析與輸出
+
+`project-map.html` 現在已內建治理面板，會直接使用：
+
+- `Q:\AGENTS.md`
+- `Q:\UniText\AGENTS.md`
+- `local/config/agent-governance-layers.json`
+
+頁面內可輸入：
+
+- 治理模型
+- 工作環境
+- 指令配置
+- 輸出位置
+
+然後進行兩種操作：
+
+- `解析治理`
+  - 直接在頁面上顯示 matched layers、effective config、AGENTS sources 與 effective file-based instructions
+- `寫出治理報告`
+  - 若瀏覽器已授權 repo root 的讀寫權限，會把
+    - `agent-governance-resolution.md`
+    - `agent-governance-resolution.json`
+    寫到指定輸出位置
+
+預設輸出位置是：
+
+- `Q:\UniText\ops\agent-governance`
+
+目前的安全限制是：
+
+- 頁面只接受位於目前 repo 之內的輸出位置
+- 若尚未授權 repo root，頁面會先要求連結專案目錄
+- 單純輸入文字路徑不會繞過瀏覽器的 File System Access 權限模型
+
+### B. 在 CLI 上解析與輸出
+
 最基本的解析：
 
 ```powershell

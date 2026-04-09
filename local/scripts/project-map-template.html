@@ -225,6 +225,32 @@
       grid-template-columns: repeat(2, minmax(280px, 1fr));
       gap: 12px;
     }
+    .governance-panel {
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(169, 155, 127, 0.28);
+    }
+    .governance-panel .control-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .governance-result {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f9f6ee;
+      border: 1px solid #e4dbc7;
+      color: #4f493d;
+      line-height: 1.65;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .governance-result strong {
+      color: var(--accent-deep);
+    }
     .info-card {
       padding: 12px 14px;
       border-radius: 14px;
@@ -481,6 +507,7 @@
       .sidebar, .detail { max-height: none; }
       .inline-grid { grid-template-columns: repeat(3, minmax(72px, 1fr)); }
       .info-grid { grid-template-columns: 1fr; }
+      .governance-panel .control-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -546,6 +573,31 @@
           <span class="card-title">Export</span>
         </div>
       </div>
+      <section class="governance-panel" data-share-hide>
+        <div class="control-grid">
+          <div class="control-group">
+            <label for="governance-model">治理模型</label>
+            <input id="governance-model" type="text" value="gpt-5.4" />
+          </div>
+          <div class="control-group">
+            <label for="governance-environment">工作環境</label>
+            <input id="governance-environment" type="text" value="codex-local-dev" />
+          </div>
+          <div class="control-group">
+            <label for="governance-profile">指令配置</label>
+            <input id="governance-profile" type="text" value="mapping" />
+          </div>
+          <div class="control-group">
+            <label for="governance-output-path">輸出位置</label>
+            <input id="governance-output-path" type="text" />
+          </div>
+        </div>
+        <div class="card-actions">
+          <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
+          <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
+        </div>
+        <div class="governance-result" id="governance-result">治理解析結果會顯示在這裡。</div>
+      </section>
     </div>
   </header>
   <main class="layout">
@@ -566,6 +618,7 @@
   <script>
     window.PROJECT_MAP_BOOTSTRAP = __BOOTSTRAP_DATA__;
     window.PROJECT_MAP_PAGE_MODE = "__PAGE_MODE__";
+    window.AGENT_GOVERNANCE_POLICY = __GOVERNANCE_POLICY__;
     window.PROJECT_MAP_CONSTANTS = {
       TYPE_ORDER: __TYPE_ORDER__,
       CORE_DOCS: __CORE_DOCS__,
