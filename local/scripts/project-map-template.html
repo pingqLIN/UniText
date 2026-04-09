@@ -8,180 +8,427 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f4f0e8;
-      --panel: rgba(255, 252, 246, 0.94);
+      --bg: #f5f1e8;
+      --bg-deep: #ebe3d5;
+      --panel: rgba(255, 252, 246, 0.92);
       --panel-strong: #fffdf8;
-      --ink: #1f1c16;
-      --muted: #4f493d;
-      --line: #d7cfbf;
-      --accent: #0f766e;
-      --accent-soft: #d7f3ed;
-      --accent-deep: #0b5a54;
-      --shadow: 0 14px 36px rgba(34, 28, 19, 0.08);
+      --panel-muted: rgba(252, 247, 238, 0.88);
+      --ink: #2b241d;
+      --ink-soft: #5a5146;
+      --ink-faint: #7b7063;
+      --line: #ded3c2;
+      --line-strong: #b9a88e;
+      --accent: #2d7f78;
+      --accent-strong: #205e59;
+      --accent-soft: #d7eee8;
+      --warning: #b9771e;
+      --danger: #af5438;
+      --shadow-soft: 0 12px 30px rgba(49, 40, 25, 0.06);
+      --shadow-strong: 0 24px 64px rgba(46, 38, 24, 0.08);
+      --display-font: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Noto Serif TC", serif;
+      --body-font: "Aptos", "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
+      --text-body: 1rem;
+      --text-small: 0.875rem;
+      --text-label: 0.75rem;
+      --text-title: clamp(2.45rem, 4vw, 4.25rem);
+      --text-panel: 1.125rem;
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --content-width: 1680px;
     }
+
     * { box-sizing: border-box; }
+
+    html {
+      font-size: 16px;
+      background: var(--bg);
+    }
+
     body {
       margin: 0;
-      font-family: "Segoe UI", "Noto Sans TC", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 28%),
-        radial-gradient(circle at top right, rgba(202, 138, 4, 0.08), transparent 22%),
-        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
+      font-family: var(--body-font);
+      font-size: var(--text-body);
+      line-height: 1.55;
       color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(20, 108, 101, 0.085), transparent 24%),
+        radial-gradient(circle at top right, rgba(184, 128, 34, 0.09), transparent 22%),
+        linear-gradient(180deg, #fcfbf8 0%, var(--bg) 42%, var(--bg-deep) 100%);
     }
+
     .page-mode-share-safe [data-share-hide] {
       display: none !important;
     }
-    header {
-      padding: 20px 24px 16px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(255, 252, 246, 0.92);
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    a:focus-visible,
+    .node-button:focus-visible,
+    .source-item:focus-visible,
+    .edge-item:focus-visible {
+      outline: 3px solid rgba(45, 127, 120, 0.32);
+      outline-offset: 2px;
+    }
+
+    .page-shell {
+      max-width: calc(var(--content-width) + 48px);
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .masthead {
       position: sticky;
       top: 0;
-      backdrop-filter: blur(10px);
-      z-index: 2;
+      z-index: 5;
+      margin-bottom: 18px;
+      padding: clamp(22px, 3vw, 34px);
+      border: 1px solid rgba(155, 143, 117, 0.26);
+      border-radius: 36px;
+      background:
+        linear-gradient(180deg, rgba(255, 252, 245, 0.94) 0%, rgba(255, 249, 241, 0.9) 100%);
+      box-shadow: var(--shadow-strong);
+      backdrop-filter: blur(18px);
     }
-    header h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: -0.02em; }
-    header p { margin: 0; color: var(--muted); max-width: 980px; line-height: 1.6; }
+
+    .masthead-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.75fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+    }
+
+    .masthead h1 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: var(--text-title);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+      max-width: 10ch;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      max-width: 66ch;
+      color: var(--ink-soft);
+      font-size: 1.03rem;
+      line-height: 1.75;
+      text-wrap: pretty;
+    }
+
+    .masthead-aside {
+      display: grid;
+      gap: 14px;
+      padding: 18px 18px 16px;
+      border: 1px solid rgba(140, 128, 104, 0.22);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(249, 245, 236, 0.86) 100%);
+    }
+
+    .aside-kicker {
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .aside-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .aside-copy {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: var(--text-small);
+      line-height: 1.65;
+    }
+
     .summary {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 14px;
+      margin-top: 18px;
     }
+
     .chip {
-      padding: 6px 10px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 12px;
       border-radius: 999px;
-      background: linear-gradient(180deg, #effaf7 0%, var(--accent-soft) 100%);
-      color: var(--accent-deep);
-      font-size: 13px;
-      border: 1px solid rgba(15, 118, 110, 0.15);
+      border: 1px solid rgba(103, 130, 120, 0.18);
+      background: linear-gradient(180deg, rgba(245, 252, 249, 0.95) 0%, rgba(229, 246, 240, 0.94) 100%);
+      color: var(--accent-strong);
+      font-size: 0.84rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
     }
+
     .legend {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 12px;
     }
+
     .legend span {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(170, 160, 138, 0.35);
+      padding: 7px 11px;
+      border: 1px solid rgba(160, 146, 118, 0.22);
       border-radius: 999px;
+      background: rgba(255, 255, 255, 0.56);
+      color: var(--ink-soft);
+      font-size: 0.78rem;
     }
+
     .legend i {
       width: 10px;
       height: 10px;
-      border-radius: 50%;
+      border-radius: 999px;
       display: inline-block;
     }
-    .toolbar {
+
+    .control-deck {
       display: grid;
-      gap: 12px;
-      margin-top: 16px;
+      gap: 16px;
+      margin-top: 26px;
     }
+
+    .control-band {
+      display: grid;
+      gap: 14px;
+      padding: 16px 18px 18px;
+      border-radius: 24px;
+      border: 1px solid rgba(155, 143, 117, 0.2);
+      background: var(--panel-muted);
+    }
+
+    .control-band.primary {
+      background:
+        linear-gradient(180deg, rgba(252, 253, 250, 0.96) 0%, rgba(243, 247, 243, 0.92) 100%);
+    }
+
+    .control-band.secondary {
+      background:
+        linear-gradient(180deg, rgba(255, 250, 240, 0.92) 0%, rgba(250, 244, 230, 0.88) 100%);
+    }
+
+    .band-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .band-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: var(--text-panel);
+      line-height: 1.1;
+    }
+
+    .band-copy {
+      margin: 4px 0 0;
+      color: var(--ink-soft);
+      font-size: var(--text-small);
+      line-height: 1.55;
+      max-width: 72ch;
+    }
+
+    .band-note {
+      color: var(--ink-faint);
+      font-size: var(--text-small);
+      font-weight: 600;
+    }
+
     .toolbar-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       align-items: end;
     }
+
     .control-group {
       display: grid;
-      gap: 6px;
+      gap: 7px;
       min-width: 180px;
+      flex: 1 1 180px;
     }
+
+    .control-group.wide {
+      flex-basis: 320px;
+      min-width: 260px;
+    }
+
     .control-group label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      color: var(--ink-faint);
     }
+
     .control-group input,
     .control-group select {
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: var(--panel-strong);
       min-width: 0;
+      min-height: 46px;
+      padding: 11px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 252, 247, 0.96);
+      color: var(--ink);
+      transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
     }
+
+    .control-group input:hover,
+    .control-group select:hover {
+      border-color: var(--line-strong);
+    }
+
     .inline-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(68px, 88px));
+      grid-template-columns: repeat(3, minmax(74px, 96px));
       gap: 8px;
       align-items: end;
     }
-    .button-row {
+
+    .button-row,
+    .card-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
-    button.action {
-      padding: 10px 14px;
+
+    button.action,
+    button.mini-action,
+    a.mini-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 9px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(15, 118, 110, 0.18);
-      background: linear-gradient(180deg, #ffffff 0%, #eefaf7 100%);
-      color: var(--accent-deep);
-      font-weight: 700;
+      border: 1px solid rgba(19, 110, 103, 0.18);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(234, 248, 243, 0.95) 100%);
+      color: var(--accent-strong);
+      font-size: 0.88rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      text-decoration: none;
       cursor: pointer;
-      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.07);
+      box-shadow: 0 8px 20px rgba(23, 101, 94, 0.08);
+      transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
-    button.action.secondary {
-      border-color: rgba(202, 138, 4, 0.2);
-      background: linear-gradient(180deg, #fffef8 0%, #fff4d8 100%);
-      color: #8a5b06;
+
+    button.action.secondary,
+    button.mini-action.secondary,
+    a.mini-action.secondary {
+      border-color: rgba(182, 132, 53, 0.22);
+      background: linear-gradient(180deg, rgba(255, 254, 248, 0.98) 0%, rgba(255, 243, 214, 0.95) 100%);
+      color: #875a09;
+      box-shadow: 0 8px 20px rgba(160, 113, 27, 0.08);
     }
-    button.action:disabled {
-      cursor: wait;
-      opacity: 0.7;
+
+    button.action:hover,
+    button.mini-action:hover,
+    a.mini-action:hover {
+      transform: translateY(-1px);
+      border-color: rgba(19, 110, 103, 0.34);
+      box-shadow: 0 12px 24px rgba(23, 101, 94, 0.1);
     }
+
+    button.action:disabled,
+    button.mini-action:disabled {
+      cursor: not-allowed;
+      opacity: 0.62;
+      transform: none;
+      box-shadow: none;
+    }
+
     button.action[data-state="success"] {
-      border-color: rgba(15, 118, 110, 0.28);
-      background: linear-gradient(180deg, #fcfffd 0%, #dff7ef 100%);
+      border-color: rgba(19, 110, 103, 0.28);
     }
+
     button.action[data-state="error"] {
-      border-color: rgba(181, 74, 42, 0.26);
-      background: linear-gradient(180deg, #fff9f7 0%, #ffe6de 100%);
-      color: #8c3d21;
+      border-color: rgba(173, 68, 38, 0.34);
+      color: #8b3a20;
     }
+
     button.action[data-state="progress"] {
-      border-color: rgba(202, 138, 4, 0.3);
-      background: linear-gradient(180deg, #fffef9 0%, #fff0c9 100%);
-      color: #8a5b06;
+      border-color: rgba(177, 126, 42, 0.34);
+      color: #89590c;
     }
+
+    .status-card,
+    .info-card,
+    .governance-result,
+    .meta-row,
+    .edge-item,
+    .source-item {
+      border-radius: var(--radius-sm);
+    }
+
     .status-card {
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 14px 16px;
+      border: 1px solid rgba(160, 146, 118, 0.24);
       background: rgba(255, 255, 255, 0.62);
-      border: 1px solid rgba(169, 155, 127, 0.28);
-      color: #50493c;
-      line-height: 1.6;
-      font-size: 13px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      font-size: var(--text-small);
       transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
-    .status-card strong { color: var(--accent-deep); }
+
+    .status-card strong,
+    .info-card strong,
+    .governance-result strong,
+    .source-item strong,
+    .edge-item strong {
+      color: var(--ink);
+    }
+
     .status-card.success {
-      border-color: rgba(15, 118, 110, 0.28);
-      background: linear-gradient(180deg, rgba(243, 255, 250, 0.95) 0%, rgba(231, 250, 243, 0.92) 100%);
-      box-shadow: 0 12px 24px rgba(15, 118, 110, 0.08);
+      border-color: rgba(19, 110, 103, 0.28);
+      background: linear-gradient(180deg, rgba(244, 255, 251, 0.98) 0%, rgba(232, 249, 241, 0.95) 100%);
+      box-shadow: 0 12px 24px rgba(19, 110, 103, 0.08);
     }
+
     .status-card.progress {
-      border-color: rgba(202, 138, 4, 0.3);
-      background: linear-gradient(180deg, rgba(255, 250, 239, 0.95) 0%, rgba(255, 244, 216, 0.96) 100%);
-      box-shadow: 0 12px 24px rgba(202, 138, 4, 0.08);
+      border-color: rgba(177, 126, 42, 0.28);
+      background: linear-gradient(180deg, rgba(255, 250, 238, 0.98) 0%, rgba(255, 242, 208, 0.96) 100%);
+      box-shadow: 0 12px 24px rgba(177, 126, 42, 0.08);
     }
+
     .status-card.error {
-      border-color: rgba(181, 74, 42, 0.28);
-      background: linear-gradient(180deg, rgba(255, 246, 242, 0.95) 0%, rgba(255, 233, 224, 0.94) 100%);
-      box-shadow: 0 12px 24px rgba(181, 74, 42, 0.08);
+      border-color: rgba(173, 68, 38, 0.3);
+      background: linear-gradient(180deg, rgba(255, 247, 243, 0.98) 0%, rgba(255, 232, 223, 0.96) 100%);
+      box-shadow: 0 12px 24px rgba(173, 68, 38, 0.08);
     }
-    .status-card.error strong { color: #8c3d21; }
+
     .status-row {
       display: flex;
       align-items: center;
@@ -189,432 +436,590 @@
       flex-wrap: wrap;
       margin-bottom: 8px;
     }
+
     .status-pill {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 76px;
+      min-width: 82px;
       padding: 4px 10px;
       border-radius: 999px;
-      background: rgba(107, 100, 87, 0.12);
-      color: #4e473a;
-      font-size: 11px;
+      background: rgba(96, 88, 75, 0.12);
+      color: var(--ink-soft);
+      font-size: 0.68rem;
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
-    .status-card.success .status-pill {
-      background: rgba(15, 118, 110, 0.16);
-      color: #0b5a54;
-    }
-    .status-card.progress .status-pill {
-      background: rgba(202, 138, 4, 0.18);
-      color: #8a5b06;
-    }
-    .status-card.error .status-pill {
-      background: rgba(181, 74, 42, 0.16);
-      color: #8c3d21;
-    }
+
     .status-inline-note {
-      color: #4f493d;
-      font-size: 13px;
-      font-weight: 600;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 700;
     }
-    .info-grid {
+
+    .status-card.success .status-pill {
+      background: rgba(19, 110, 103, 0.14);
+      color: var(--accent-strong);
+    }
+
+    .status-card.progress .status-pill {
+      background: rgba(177, 126, 42, 0.16);
+      color: #875a09;
+    }
+
+    .status-card.error .status-pill {
+      background: rgba(173, 68, 38, 0.14);
+      color: #8b3a20;
+    }
+
+    .operations-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(280px, 1fr));
-      gap: 12px;
+      grid-template-columns: minmax(320px, 0.95fr) minmax(280px, 0.8fr);
+      gap: 14px;
     }
+
+    .info-card {
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(160, 146, 118, 0.22);
+      background: rgba(255, 255, 255, 0.68);
+      color: var(--ink-soft);
+      line-height: 1.65;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-title {
+      display: inline-flex;
+      margin-bottom: 10px;
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
     .governance-panel {
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(169, 155, 127, 0.28);
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(19, 110, 103, 0.18);
+      background:
+        linear-gradient(180deg, rgba(240, 250, 246, 0.9) 0%, rgba(248, 245, 236, 0.92) 100%);
+      box-shadow: var(--shadow-soft);
     }
-    .governance-panel .control-grid {
+
+    .governance-head {
+      display: grid;
+      gap: 6px;
+      max-width: 84ch;
+    }
+
+    .governance-head h2 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.55rem;
+      line-height: 1.05;
+    }
+
+    .governance-head p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: var(--text-small);
+      line-height: 1.65;
+    }
+
+    .control-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(180px, 1fr));
       gap: 12px;
     }
+
     .governance-result {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: #f9f6ee;
-      border: 1px solid #e4dbc7;
-      color: #4f493d;
-      line-height: 1.65;
-      font-size: 13px;
+      padding: 16px 18px;
+      min-height: 240px;
+      border: 1px solid rgba(128, 114, 88, 0.22);
+      background:
+        linear-gradient(180deg, rgba(255, 253, 246, 0.98) 0%, rgba(245, 241, 230, 0.98) 100%);
+      color: #40392f;
+      font-family: "Consolas", "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
-    .governance-result strong {
-      color: var(--accent-deep);
-    }
-    .info-card {
-      padding: 12px 14px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.62);
-      border: 1px solid rgba(169, 155, 127, 0.28);
-      color: #50493c;
-      line-height: 1.6;
-      font-size: 13px;
-    }
-    .info-card strong {
-      color: var(--accent-deep);
-    }
-    .info-card .card-title {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .source-list {
-      display: grid;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .source-item {
-      width: 100%;
-      text-align: left;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid #e4dbc7;
-      background: #f9f6ef;
-      color: inherit;
-      cursor: pointer;
-      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
-    }
-    .source-item:hover,
-    .source-item:focus-visible {
-      background: #fffaf1;
-      border-color: rgba(15, 118, 110, 0.3);
-      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
-      transform: translateY(-1px);
-      outline: none;
-    }
-    .source-item strong {
-      display: block;
-      color: var(--accent-deep);
-      margin-bottom: 4px;
-    }
-    .source-item .source-meta {
-      color: #5c5448;
-      font-size: 11px;
-      line-height: 1.45;
-    }
-    button.mini-action,
-    a.mini-action {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 34px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(15, 118, 110, 0.18);
-      background: linear-gradient(180deg, #ffffff 0%, #eefaf7 100%);
-      color: var(--accent-deep);
-      font-size: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    button.mini-action.secondary,
-    a.mini-action.secondary {
-      border-color: rgba(202, 138, 4, 0.2);
-      background: linear-gradient(180deg, #fffef8 0%, #fff4d8 100%);
-      color: #8a5b06;
-    }
-    button.mini-action:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+
     .layout {
       display: grid;
-      grid-template-columns: 300px minmax(520px, 1fr) 340px;
-      gap: 16px;
-      padding: 16px;
-      min-height: calc(100vh - 260px);
+      grid-template-columns: 320px minmax(640px, 1fr) 360px;
+      gap: 18px;
+      align-items: start;
     }
+
     .panel {
+      min-height: 480px;
+      border: 1px solid rgba(155, 143, 117, 0.22);
+      border-radius: 30px;
       background: var(--panel);
-      border: 1px solid rgba(155, 145, 120, 0.25);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-soft);
       overflow: hidden;
-      min-height: 400px;
     }
+
     .panel-head {
       display: flex;
-      align-items: center;
+      align-items: end;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--line);
+      padding: 18px 20px 16px;
+      border-bottom: 1px solid rgba(155, 143, 117, 0.18);
+      background: linear-gradient(180deg, rgba(255, 252, 246, 0.98) 0%, rgba(250, 247, 239, 0.92) 100%);
     }
-    .panel-head h2 { margin: 0; font-size: 15px; }
-    .panel-head .mini-note { color: var(--muted); font-size: 12px; }
+
+    .panel-head h2 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.35rem;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .mini-note {
+      color: var(--ink-faint);
+      font-size: var(--text-small);
+      font-weight: 600;
+      text-align: right;
+      max-width: 24ch;
+    }
+
     .sidebar {
-      padding: 8px 8px 18px;
+      padding: 10px 10px 20px;
       overflow: auto;
-      max-height: calc(100vh - 330px);
+      max-height: calc(100vh - 344px);
     }
+
     .group-title {
-      margin: 14px 8px 6px;
-      font-size: 12px;
+      margin: 18px 10px 8px;
+      font-size: var(--text-label);
+      font-weight: 800;
       text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
     }
+
     .node-button {
       width: 100%;
       text-align: left;
       border: 0;
+      margin-bottom: 6px;
+      padding: 12px 13px;
+      border-radius: 16px;
       background: transparent;
-      border-radius: 14px;
-      padding: 10px 12px;
-      cursor: pointer;
       color: inherit;
-      transition: background 120ms ease, transform 120ms ease;
+      cursor: pointer;
+      transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
     }
+
     .node-button:hover,
     .node-button.active {
-      background: #f2eee2;
+      background: rgba(240, 235, 223, 0.88);
       transform: translateX(2px);
+      box-shadow: inset 0 0 0 1px rgba(155, 143, 117, 0.16);
     }
+
     .node-head {
       display: flex;
-      align-items: center;
+      align-items: start;
       gap: 8px;
       justify-content: space-between;
     }
-    .node-head strong { font-size: 14px; line-height: 1.35; }
+
+    .node-head strong {
+      font-size: 0.99rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
     .node-type {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 58px;
-      padding: 4px 8px;
+      min-width: 62px;
+      padding: 4px 9px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #453d2f;
-      background: #efe7d4;
+      background: rgba(230, 223, 207, 0.95);
+      color: var(--ink-soft);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .node-description {
-      display: block;
-      color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.45;
-      font-size: 12px;
-    }
+
+    .node-description,
     .node-path {
       display: block;
-      color: #5f5649;
       margin-top: 6px;
-      line-height: 1.35;
-      font-size: 11px;
+      color: var(--ink-soft);
+      line-height: 1.48;
     }
+
+    .node-description {
+      font-size: 0.83rem;
+    }
+
+    .node-path {
+      color: var(--ink-faint);
+      font-size: 0.74rem;
+      overflow-wrap: anywhere;
+    }
+
     .map-wrap {
+      position: relative;
       overflow: auto;
       scroll-behavior: smooth;
       background:
-        radial-gradient(circle at 20% 20%, rgba(15, 118, 110, 0.06), transparent 24%),
-        radial-gradient(circle at 80% 15%, rgba(202, 138, 4, 0.05), transparent 20%),
-        linear-gradient(180deg, #fffdf8 0%, #f9f7f1 100%);
+        radial-gradient(circle at 16% 16%, rgba(19, 110, 103, 0.05), transparent 22%),
+        radial-gradient(circle at 85% 12%, rgba(184, 128, 34, 0.05), transparent 18%),
+        linear-gradient(180deg, rgba(254, 253, 249, 0.98) 0%, rgba(247, 243, 234, 0.98) 100%);
     }
+
     svg {
-      min-height: 900px;
       display: block;
+      min-height: 940px;
     }
+
+    .map-caption {
+      padding: 0 20px 16px;
+      color: var(--ink-faint);
+      font-size: var(--text-small);
+      line-height: 1.55;
+      max-width: 64ch;
+    }
+
     .detail {
-      padding: 16px;
+      padding: 20px;
       overflow: auto;
-      max-height: calc(100vh - 330px);
+      max-height: calc(100vh - 344px);
     }
-    .detail h3 { margin: 0 0 10px; font-size: 22px; }
-    .detail p { line-height: 1.7; color: #50493c; }
-    .detail .meta { display: grid; gap: 8px; margin-top: 16px; }
+
+    .detail h3 {
+      margin: 0 0 10px;
+      font-family: var(--display-font);
+      font-size: 1.8rem;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .detail p {
+      margin: 0;
+      max-width: 42ch;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+
+    .detail .meta {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
     .meta-row {
-      padding: 10px 12px;
-      background: #f9f6ee;
-      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(249, 245, 236, 0.95);
     }
+
     .meta-row strong {
       display: block;
-      font-size: 12px;
-      text-transform: uppercase;
-      color: var(--muted);
       margin-bottom: 4px;
-    }
-    .section-title {
-      margin: 22px 0 10px;
-      font-size: 13px;
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
+      color: var(--ink-faint);
     }
-    .edge-list { display: grid; gap: 8px; }
-    .edge-item {
+
+    .section-title {
+      margin: 24px 0 10px;
+      font-size: var(--text-label);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+    }
+
+    .edge-list,
+    .source-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .edge-item,
+    .source-item {
       width: 100%;
       text-align: left;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #f9f6ef;
-      border: 1px solid #e4dbc7;
-      font-size: 14px;
-    }
-    button.edge-item {
-      cursor: pointer;
+      padding: 12px 14px;
+      border: 1px solid rgba(155, 143, 117, 0.2);
+      background: rgba(250, 246, 237, 0.96);
       color: inherit;
-      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
     }
+
+    button.edge-item,
+    .source-item {
+      cursor: pointer;
+      transition: transform 130ms ease, border-color 130ms ease, background 130ms ease, box-shadow 130ms ease;
+    }
+
     button.edge-item:hover,
-    button.edge-item:focus-visible {
-      background: #fffaf1;
-      border-color: rgba(15, 118, 110, 0.3);
-      box-shadow: 0 8px 18px rgba(15, 118, 110, 0.08);
+    .source-item:hover,
+    button.edge-item:focus-visible,
+    .source-item:focus-visible {
+      background: rgba(255, 251, 241, 0.98);
+      border-color: rgba(19, 110, 103, 0.26);
+      box-shadow: 0 10px 22px rgba(19, 110, 103, 0.08);
       transform: translateY(-1px);
-      outline: none;
     }
+
+    .source-item strong,
     .edge-item strong {
-      color: var(--accent-deep);
+      display: block;
+      margin-bottom: 4px;
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.08em;
+      color: var(--accent-strong);
     }
-    .edge-item .broken-target-meta {
-      margin-top: 6px;
-      color: #5c5448;
-      font-size: 11px;
-      line-height: 1.55;
+
+    .source-meta,
+    .edge-direction,
+    .edge-visibility,
+    .broken-target-meta,
+    .empty {
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      line-height: 1.58;
     }
-    .edge-direction { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
-    .edge-visibility { margin-top: 6px; font-size: 11px; color: #5c5448; }
-    .empty { color: var(--muted); line-height: 1.6; }
-    .map-caption { padding: 0 16px 14px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .empty {
+      max-width: 44ch;
+    }
+
+    @media (max-width: 1480px) {
+      .layout {
+        grid-template-columns: 300px minmax(0, 1fr);
+      }
+
+      .layout > :last-child {
+        grid-column: 1 / -1;
+      }
+    }
+
     @media (max-width: 1320px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar, .detail { max-height: none; }
-      .inline-grid { grid-template-columns: repeat(3, minmax(72px, 1fr)); }
-      .info-grid { grid-template-columns: 1fr; }
-      .governance-panel .control-grid { grid-template-columns: 1fr; }
+      .masthead-grid,
+      .operations-grid,
+      .control-grid,
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar,
+      .detail {
+        max-height: none;
+      }
+
+      .mini-note {
+        text-align: left;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page-shell {
+        padding: 14px;
+      }
+
+      .masthead {
+        padding: 18px;
+        border-radius: 26px;
+      }
+
+      .control-band,
+      .panel {
+        border-radius: 22px;
+      }
+
+      .inline-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .button-row,
+      .card-actions {
+        width: 100%;
+      }
+
+      button.action,
+      button.mini-action,
+      a.mini-action {
+        flex: 1 1 180px;
+      }
     }
   </style>
 </head>
 <body class="page-mode-__PAGE_MODE__">
-  <header>
-    <h1>UniText Project Map</h1>
-    <p>__HEADER_DESCRIPTION__</p>
-    <div class="summary" id="summary"></div>
-    <div class="legend">
-      <span><i style="background:#ffe9b8"></i>Docs</span>
-      <span><i style="background:#d6efe9"></i>Directories</span>
-      <span><i style="background:#dbe8ff"></i>Skills</span>
-      <span><i style="background:#f5d9ff"></i>MCP</span>
-      <span><i style="background:#ffd8cb"></i>Agents</span>
-      <span><i style="background:#d8f0ce"></i>Workflow</span>
-    </div>
-    <div class="toolbar">
-      <div class="toolbar-row">
-        <div class="control-group" style="min-width:260px;">
-          <label for="search">搜尋</label>
-          <input id="search" type="search" placeholder="搜尋節點名稱、描述、路徑" />
-        </div>
-        <div class="control-group">
-          <label for="type-filter">類型篩選</label>
-          <select id="type-filter"><option value="all">全部類型</option></select>
-        </div>
-        <div class="control-group">
-          <label for="map-mode">Map View</label>
-          <select id="map-mode">
-            <option value="grid">欄式</option>
-            <option value="radial">圓形</option>
-          </select>
-        </div>
+  <div class="page-shell">
+    <header class="masthead">
+      <div class="masthead-grid">
+        <section>
+          <p class="eyebrow">UniText / Governance Instrument Panel</p>
+          <h1>Project Map</h1>
+          <p class="lede">__HEADER_DESCRIPTION__</p>
+          <div class="summary" id="summary"></div>
+        </section>
+        <aside class="masthead-aside">
+          <span class="aside-kicker">Operator Focus</span>
+          <h2 class="aside-title">Scan the registry, isolate drift, then hand off with confidence.</h2>
+          <p class="aside-copy">這個頁面主要服務維護者與治理操作者。先看整體資源結構，再下鑽 diagnostics 與 governance layering，最後輸出 share-safe / handoff artifacts。</p>
+          <div class="legend">
+            <span><i style="background:#f2d79d"></i>Docs</span>
+            <span><i style="background:#d7ece3"></i>Directories</span>
+            <span><i style="background:#dce5f5"></i>Skills</span>
+            <span><i style="background:#e8deef"></i>MCP</span>
+            <span><i style="background:#f2ddd4"></i>Agents</span>
+            <span><i style="background:#dde8d3"></i>Workflow</span>
+          </div>
+        </aside>
       </div>
-      <div class="toolbar-row" data-share-hide>
-        <div class="control-group">
-          <label for="update-mode">更新模式</label>
-          <select id="update-mode">
-            <option value="manual">手動更新</option>
-            <option value="on-open">開啟網頁時自動更新</option>
-            <option value="interval">定時更新</option>
-          </select>
-        </div>
-        <div class="control-group">
-          <label>定時頻率</label>
-          <div class="inline-grid">
-            <input id="interval-days" type="number" min="0" step="1" value="1" placeholder="天" />
-            <input id="interval-hours" type="number" min="0" step="1" value="0" placeholder="時" />
-            <input id="interval-minutes" type="number" min="0" step="1" value="0" placeholder="分" />
+
+      <div class="control-deck">
+        <section class="control-band primary">
+          <div class="band-head">
+            <div>
+              <h2 class="band-title">Primary Scan Controls</h2>
+              <p class="band-copy">先鎖定你要看的資源範圍，再切換 map 視角。這一排保留給「看懂目前狀態」所需的最短操作路徑。</p>
+            </div>
+            <div class="band-note">Browse first, resolve second.</div>
           </div>
+          <div class="toolbar-row">
+            <div class="control-group wide">
+              <label for="search">搜尋</label>
+              <input id="search" type="search" placeholder="搜尋節點名稱、描述、路徑" />
+            </div>
+            <div class="control-group">
+              <label for="type-filter">類型篩選</label>
+              <select id="type-filter"><option value="all">全部類型</option></select>
+            </div>
+            <div class="control-group">
+              <label for="map-mode">Map View</label>
+              <select id="map-mode">
+                <option value="grid">欄式</option>
+                <option value="radial">圓形</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="control-band secondary" data-share-hide>
+          <div class="band-head">
+            <div>
+              <h2 class="band-title">Maintenance Controls</h2>
+              <p class="band-copy">這一排只放 repo 連結、重掃與更新策略。平常維護用得到，但不應該壓過主要巡覽工作。</p>
+            </div>
+            <div class="band-note">Local scanning only.</div>
+          </div>
+          <div class="toolbar-row">
+            <div class="control-group">
+              <label for="update-mode">更新模式</label>
+              <select id="update-mode">
+                <option value="manual">手動更新</option>
+                <option value="on-open">開啟網頁時自動更新</option>
+                <option value="interval">定時更新</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label>定時頻率</label>
+              <div class="inline-grid">
+                <input id="interval-days" type="number" min="0" step="1" value="1" placeholder="天" />
+                <input id="interval-hours" type="number" min="0" step="1" value="0" placeholder="時" />
+                <input id="interval-minutes" type="number" min="0" step="1" value="0" placeholder="分" />
+              </div>
+            </div>
+            <div class="button-row">
+              <button class="action secondary" id="link-repo">連結專案目錄</button>
+              <button class="action" id="refresh-now">立即更新</button>
+            </div>
+          </div>
+          <div class="status-card" id="update-status"></div>
+        </section>
+
+        <div class="operations-grid">
+          <article class="info-card" id="diagnostics-card">
+            <span class="card-title">Diagnostics</span>
+          </article>
+          <article class="info-card" id="export-card" data-share-hide>
+            <span class="card-title">Export</span>
+          </article>
         </div>
-        <div class="button-row">
-          <button class="action secondary" id="link-repo">連結專案目錄</button>
-          <button class="action" id="refresh-now">立即更新</button>
-        </div>
+
+        <section class="governance-panel" data-share-hide>
+          <div class="governance-head">
+            <span class="card-title">Resolver Workspace</span>
+            <h2>Governance Layering</h2>
+            <p>在不改動任何 runtime 設定的前提下，直接檢查 `model / environment / instruction profile` 的疊代結果，並把解析報告寫回 repo 內的指定位置。</p>
+          </div>
+          <div class="control-grid">
+            <div class="control-group">
+              <label for="governance-model">治理模型</label>
+              <input id="governance-model" type="text" value="gpt-5.4" />
+            </div>
+            <div class="control-group">
+              <label for="governance-environment">工作環境</label>
+              <input id="governance-environment" type="text" value="codex-local-dev" />
+            </div>
+            <div class="control-group">
+              <label for="governance-profile">指令配置</label>
+              <input id="governance-profile" type="text" value="mapping" />
+            </div>
+            <div class="control-group">
+              <label for="governance-output-path">輸出位置</label>
+              <input id="governance-output-path" type="text" />
+            </div>
+          </div>
+          <div class="card-actions">
+            <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
+            <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
+          </div>
+          <div class="governance-result" id="governance-result">治理解析結果會顯示在這裡。</div>
+        </section>
       </div>
-      <div class="status-card" id="update-status" data-share-hide></div>
-      <div class="info-grid">
-        <div class="info-card" id="diagnostics-card">
-          <span class="card-title">Diagnostics</span>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Nodes</h2>
+          <div class="mini-note" id="node-count-label"></div>
         </div>
-        <div class="info-card" id="export-card" data-share-hide>
-          <span class="card-title">Export</span>
-        </div>
-      </div>
-      <section class="governance-panel" data-share-hide>
-        <div class="control-grid">
-          <div class="control-group">
-            <label for="governance-model">治理模型</label>
-            <input id="governance-model" type="text" value="gpt-5.4" />
-          </div>
-          <div class="control-group">
-            <label for="governance-environment">工作環境</label>
-            <input id="governance-environment" type="text" value="codex-local-dev" />
-          </div>
-          <div class="control-group">
-            <label for="governance-profile">指令配置</label>
-            <input id="governance-profile" type="text" value="mapping" />
-          </div>
-          <div class="control-group">
-            <label for="governance-output-path">輸出位置</label>
-            <input id="governance-output-path" type="text" />
-          </div>
-        </div>
-        <div class="card-actions">
-          <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
-          <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
-        </div>
-        <div class="governance-result" id="governance-result">治理解析結果會顯示在這裡。</div>
+        <div class="sidebar" id="sidebar"></div>
       </section>
-    </div>
-  </header>
-  <main class="layout">
-    <section class="panel">
-      <div class="panel-head"><h2>Nodes</h2><div class="mini-note" id="node-count-label"></div></div>
-      <div class="sidebar" id="sidebar"></div>
-    </section>
-    <section class="panel map-wrap" id="map-wrap">
-      <div class="panel-head"><h2>Map View</h2><div class="mini-note" id="map-mode-note"></div></div>
-      <div class="map-caption" id="map-caption"></div>
-      <svg id="map" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
-    </section>
-    <section class="panel">
-      <div class="panel-head"><h2>Details</h2><div class="mini-note" id="detail-note"></div></div>
-      <div class="detail" id="detail"></div>
-    </section>
-  </main>
+
+      <section class="panel map-wrap" id="map-wrap">
+        <div class="panel-head">
+          <h2>Map View</h2>
+          <div class="mini-note" id="map-mode-note"></div>
+        </div>
+        <div class="map-caption" id="map-caption"></div>
+        <svg id="map" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Details</h2>
+          <div class="mini-note" id="detail-note"></div>
+        </div>
+        <div class="detail" id="detail"></div>
+      </section>
+    </main>
+  </div>
+
   <script>
     window.PROJECT_MAP_BOOTSTRAP = __BOOTSTRAP_DATA__;
     window.PROJECT_MAP_PAGE_MODE = "__PAGE_MODE__";

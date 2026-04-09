@@ -4,12 +4,12 @@
   const { TYPE_ORDER, CORE_DOCS, ROOT_DIRECTORIES, REPO_MARKERS } = window.PROJECT_MAP_CONSTANTS;
   const TYPE_LABELS = { doc: "Docs", directory: "Directories", skill: "Skills", mcp: "MCP", agent: "Agents", workflow: "Workflow" };
   const TYPE_STYLES = {
-    doc: { fill: "#fff1c7", stroke: "#d29d21", badge: "#f4e1a2" },
-    directory: { fill: "#dff4ee", stroke: "#3b8f81", badge: "#cfe8e1" },
-    skill: { fill: "#e1ebff", stroke: "#5679c5", badge: "#d6e2fb" },
-    mcp: { fill: "#f0dcff", stroke: "#9254c7", badge: "#e7cef9" },
-    agent: { fill: "#ffdcca", stroke: "#d06c45", badge: "#f7cfbf" },
-    workflow: { fill: "#e0f1d7", stroke: "#5b9b51", badge: "#d3e8ca" },
+    doc: { fill: "#f6e7bc", stroke: "#b7882a", badge: "#ead8a7" },
+    directory: { fill: "#deece4", stroke: "#5e8775", badge: "#cfe0d8" },
+    skill: { fill: "#dfe6f2", stroke: "#667da4", badge: "#d0d9e8" },
+    mcp: { fill: "#e8e0ec", stroke: "#7f6a8e", badge: "#ddd0e5" },
+    agent: { fill: "#efddd2", stroke: "#ab6b51", badge: "#e6cfbf" },
+    workflow: { fill: "#dfe7d7", stroke: "#6f8760", badge: "#d3ddc9" },
   };
   const EDGE_LABELS = { contains: "Contains", references: "References", catalog_entry: "Catalog", maps_to: "Maps To" };
   const EDGE_STYLES = {
@@ -573,6 +573,7 @@
       <span class="card-title">Diagnostics</span>
       <div><strong>Broken references</strong>：${brokenCount}</div>
       <div><strong>Orphan resources</strong>：${orphanCount}</div>
+      <div class="edge-visibility">先看這兩個數字，就能快速判斷目前 registry 連結是否有 drift。</div>
       <div class="edge-visibility">${activeFilterLabel}</div>
       <div class="card-actions">
         <button type="button" class="mini-action secondary" id="filter-broken-sources" ${brokenCount ? "" : "disabled"}>只看 broken sources</button>
@@ -599,7 +600,7 @@
     exportCardEl.innerHTML = `
       <span class="card-title">Export</span>
       <div><strong>Share-safe artifact</strong>：可直接打開唯讀分享版快照。</div>
-      <div class="edge-visibility">適合做展示或交付，不包含頁內重掃與 repo 授權入口。現在也會一併產出 handoff markdown / JSON。</div>
+      <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的 share-safe 頁面與 handoff 檔，而不是把操作者介面直接丟給下一位。</div>
       <div class="card-actions">
         <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
         <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.md</a>
@@ -987,35 +988,36 @@
       rect.setAttribute("width", String(box.width));
       rect.setAttribute("height", String(box.height));
       rect.setAttribute("rx", active ? "18" : "14");
-      rect.setAttribute("fill", active ? "#fffdf7" : typeStyle.fill);
-      rect.setAttribute("stroke", active ? "#0f766e" : typeStyle.stroke);
-      rect.setAttribute("stroke-width", active ? "2.2" : "1");
+      rect.setAttribute("fill", active ? "#fcfbf5" : typeStyle.fill);
+      rect.setAttribute("stroke", active ? "#176b66" : typeStyle.stroke);
+      rect.setAttribute("stroke-width", active ? "2.1" : "1.1");
       group.appendChild(rect);
-
-      const accent = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      accent.setAttribute("x", String(box.x));
-      accent.setAttribute("y", String(box.y));
-      accent.setAttribute("width", "6");
-      accent.setAttribute("height", String(box.height));
-      accent.setAttribute("rx", active ? "18" : "14");
-      accent.setAttribute("fill", active ? "#0f766e" : typeStyle.stroke);
-      group.appendChild(accent);
 
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label.setAttribute("x", String(box.x + 16));
-      label.setAttribute("y", String(box.y + (active ? 25 : 22)));
-      label.setAttribute("fill", "#1f1f1f");
-      label.setAttribute("font-size", active ? "14" : "13");
+      label.setAttribute("y", String(box.y + 23));
+      label.setAttribute("fill", "#201c16");
+      label.setAttribute("font-size", active ? "14.4" : "13.2");
       label.setAttribute("font-weight", active ? "700" : "600");
       label.textContent = node.label.length > 27 ? `${node.label.slice(0, 26)}…` : node.label;
       group.appendChild(label);
 
+      const typeTag = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      typeTag.setAttribute("x", String(box.x + box.width - 14));
+      typeTag.setAttribute("y", String(box.y + 23));
+      typeTag.setAttribute("fill", active ? "#176b66" : typeStyle.stroke);
+      typeTag.setAttribute("font-size", "10.4");
+      typeTag.setAttribute("font-weight", "700");
+      typeTag.setAttribute("text-anchor", "end");
+      typeTag.textContent = (TYPE_LABELS[node.type] || node.type).toUpperCase();
+      group.appendChild(typeTag);
+
       const sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
       sub.setAttribute("x", String(box.x + 16));
-      sub.setAttribute("y", String(box.y + (active ? 45 : 40)));
-      sub.setAttribute("fill", "#6f6a5a");
-      sub.setAttribute("font-size", active ? "11" : "10.5");
-      sub.textContent = `${TYPE_LABELS[node.type] || node.type} · ${node.status || "active"}`;
+      sub.setAttribute("y", String(box.y + 42));
+      sub.setAttribute("fill", "#6b6256");
+      sub.setAttribute("font-size", active ? "11.2" : "10.8");
+      sub.textContent = node.status || "active";
       group.appendChild(sub);
 
       group.addEventListener("click", () => {
