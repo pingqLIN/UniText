@@ -1,0 +1,8 @@
+{
+  "skills": {
+    "microsoft-foundry": {
+      "status": "stray",
+      "reason": "Mistaken item. Present in the workspace, but excluded from the official UniText registry and release-facing catalog surfaces."
+    }
+  }
+}
