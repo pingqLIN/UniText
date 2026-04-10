@@ -27,6 +27,14 @@
   - 驗證 source 與常見 skills targets 是否存在、是否為連結、是否可解析
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
+- `report-i18n-wave.py`
+  - 分析目前 `i18n/` dirty worktree，區分純行尾變更、實質翻譯改動與新檔案波次
+- `report-release-hygiene.py`
+  - 分類目前 dirty worktree，區分 release scope、已知例外與真正 blocker
+- `collect-release-evidence.py`
+  - 彙整 bootstrap、security tests、i18n wave、release hygiene、MCP smoke 與 Copilot session 的本地 evidence bundle
+- `verify-copilot-session.py`
+  - 以非互動方式執行 Copilot CLI 驗證，確認 session payload 與 project MCP wiring 是否正常
 - `batch-adopt-skills.ps1`
   - 將候選 skills 批次遷入 `registry/skills/`
 - `generate-index-entries.ps1`
