@@ -41,6 +41,15 @@ def load_with_server_module():
     return module
 
 
+def load_bootstrap_module():
+    script = REPO_ROOT / "local" / "scripts" / "bootstrap.py"
+    spec = importlib.util.spec_from_file_location("bootstrap", script)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    return module
+
+
 class SecurityHardeningTests(unittest.TestCase):
     def test_with_server_rejects_shell_string_by_default(self):
         script = REPO_ROOT / "registry" / "skills" / "webapp-testing" / "scripts" / "with_server.py"
@@ -91,6 +100,23 @@ class SecurityHardeningTests(unittest.TestCase):
         module = load_with_server_module()
         with self.assertRaisesRegex(ValueError, "Legacy shell mode has been disabled"):
             module.parse_server_spec('{"cmd":["python","server.py"]}', allow_shell=True)
+
+    def test_bootstrap_home_dir_falls_back_to_windows_username(self):
+        module = load_bootstrap_module()
+        original_home = module.Path.home
+        original_environ = os.environ.copy()
+        try:
+            module.Path.home = classmethod(lambda cls: (_ for _ in ()).throw(RuntimeError("no home")))
+            for key in ("HOME", "USERPROFILE", "HOMEDRIVE", "HOMEPATH"):
+                os.environ.pop(key, None)
+            os.environ["USERNAME"] = "miles"
+            home_dir = module.get_home_dir()
+        finally:
+            module.Path.home = original_home
+            os.environ.clear()
+            os.environ.update(original_environ)
+
+        self.assertEqual(home_dir, Path("C:/Users/miles"))
 
     def test_quick_validate_rejects_duplicate_frontmatter_keys(self):
         script = REPO_ROOT / "registry" / "skills" / "skill-creator" / "scripts" / "quick_validate.py"

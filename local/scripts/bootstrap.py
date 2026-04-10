@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import getpass
 import json
 import os
 import re
@@ -31,16 +32,45 @@ def get_home_dir() -> Path:
     try:
         return Path.home()
     except RuntimeError:
-        fallback = os.environ.get("USERPROFILE")
-        if fallback:
-            return Path(fallback)
+        candidates: list[Path] = []
+
+        for variable in ("HOME", "USERPROFILE"):
+            fallback = os.environ.get(variable)
+            if fallback:
+                candidates.append(Path(fallback))
 
         home_drive = os.environ.get("HOMEDRIVE")
         home_path = os.environ.get("HOMEPATH")
         if home_drive and home_path:
-            return Path(f"{home_drive}{home_path}")
+            candidates.append(Path(f"{home_drive}{home_path}"))
 
-        raise RuntimeError("Could not determine home directory from Path.home(), USERPROFILE, or HOMEDRIVE/HOMEPATH.")
+        if os.name == "nt":
+            username = os.environ.get("USERNAME")
+            if username:
+                candidates.append(Path("C:/Users") / username)
+            try:
+                candidates.append(Path("C:/Users") / getpass.getuser())
+            except Exception:
+                pass
+
+        unique_candidates: list[Path] = []
+        seen: set[str] = set()
+        for candidate in candidates:
+            key = str(candidate)
+            if key in seen:
+                continue
+            seen.add(key)
+            unique_candidates.append(candidate)
+
+        for candidate in unique_candidates:
+            if candidate.exists():
+                return candidate
+        if unique_candidates:
+            return unique_candidates[0]
+
+        raise RuntimeError(
+            "Could not determine home directory from Path.home(), HOME, USERPROFILE, HOMEDRIVE/HOMEPATH, or Windows username fallbacks."
+        )
 
 
 def safe_name(path: Path) -> str:
@@ -311,6 +341,7 @@ def main() -> int:
     run_dir = repo / "ops" / "history" / f"bootstrap_{stamp}"
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "generation_state": "dry_run" if args.dry_run else "apply",
         "repo_root": str(repo),
         "script_repo_root": str(root),
         "external_repo_root": repo != root,
