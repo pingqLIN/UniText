@@ -2,6 +2,7 @@
 
 > 狀態：Active
 > 用途：定義目前外部審查主集，只保留 `8 + 4` 的精選 skills，而不是全量候選池。
+> 註：截至 `2026-04-10`，authoring tree 的 `registry/skills/` 共有 `44` 個 skill 目錄；本文件只描述 review shortlist，不描述完整 inventory。
 
 ## Selection Rule
 

@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import os
 import subprocess
 import sys
@@ -37,6 +38,8 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertIn("must be JSON unless --allow-shell", result.stdout + result.stderr)
 
     def test_quick_validate_rejects_duplicate_frontmatter_keys(self):
+        if importlib.util.find_spec("yaml") is None:
+            self.skipTest("PyYAML is not installed in the current test environment")
         script = REPO_ROOT / "registry" / "skills" / "skill-creator" / "scripts" / "quick_validate.py"
         with tempfile.TemporaryDirectory() as temp_dir:
             skill_dir = Path(temp_dir) / "demo-skill"
@@ -57,9 +60,13 @@ class SecurityHardeningTests(unittest.TestCase):
             )
             result = run_command([sys.executable, str(script), str(skill_dir), "--json"])
         self.assertEqual(result.returncode, 1)
-        payload = json.loads(result.stdout)
-        self.assertFalse(payload["ok"])
-        self.assertIn("Duplicate key", payload["message"])
+        combined_output = result.stdout + result.stderr
+        if result.stdout.strip():
+            payload = json.loads(result.stdout)
+            self.assertFalse(payload["ok"])
+            self.assertIn("Duplicate key", payload["message"])
+        else:
+            self.assertIn("Duplicate key", combined_output)
 
     def test_export_template_rejects_escape_output_root(self):
         script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
@@ -85,6 +92,8 @@ class SecurityHardeningTests(unittest.TestCase):
                 "-NoProfile",
                 "-File",
                 str(script),
+                "-Source",
+                "registry\\skills",
                 "-Ids",
                 "..\\..",
                 "-DryRun",

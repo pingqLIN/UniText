@@ -66,6 +66,8 @@
 
 目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
+截至 `2026-04-10`，目前 authoring tree 內的 `registry/skills/` 共有 `44` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+
 ### Review Package
 
 若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
@@ -111,7 +113,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
-### Skills
+### Review Shortlist Skills
 
 | `id` | Tier | `canonical_location` | `status` |
 |---|---|---|---|
@@ -128,9 +130,9 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
-### Workspace-Specific Skills
+### Additional Shared Skills
 
-以下 skills 已存在於 shared registry，但不屬於目前外部審查主集的 `8 + 4` shortlist。
+以下 skills 已存在於 shared registry，但不屬於目前外部審查主集的 `8 + 4` shortlist。它們是目前可見 inventory 的一部分，但不是這份 review-facing catalog excerpt 的全部。
 
 | `id` | Tier | `canonical_location` | `status` |
 |---|---|---|---|

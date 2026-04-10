@@ -3,6 +3,7 @@
 > 報告日期：2026-03-24
 > 報告性質：專案現況盤點 / Status Report
 > 盤點範圍：目前 workspace 內可見文件、`registry/`、`local/`、`ops/` 產物，以及本輪驗證結果
+> 註：本文件描述的是 `2026-03-24` 當時的基線快照；後續 skill inventory、project map、governance 與 cross-CLI 能力已持續擴張。
 
 ## 一、執行摘要
 
@@ -44,7 +45,7 @@
 四類 shared resources 均已有可審查內容：
 
 - `skills`
-  - 已收斂為 `8 + 4` 審查主集
+  - 當時已收斂為 `8 + 4` 審查主集
 - `agents`
   - 已有 `registry-curator`
 - `mcp`
@@ -98,7 +99,7 @@
 
 目前可量化確認的狀態：
 
-- adopted skills = `12`
+- adopted skills = `12`（此數字對應當時的 review shortlist baseline，不代表後續完整 inventory）
 - invalid skills = `0`
 - agent seed = `true`
 - mcp seed = `true`
