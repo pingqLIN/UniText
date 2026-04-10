@@ -19,7 +19,10 @@
 - [ ] template package 不包含 `ops/history/`
 - [ ] template package 不包含 review-only docs
 - [ ] template package 不包含 machine-specific absolute paths
+- [ ] template package 不包含 live Cloudflare baseline refs、真實 hostnames、真實 IDs、或 runtime 路徑
 - [ ] tracked `.mcp.json` 為 relative-path seed，而非作者本機絕對路徑
+- [ ] template package 含 `.gitattributes`，且 line-ending policy 不依賴作者機器的 Git 設定
+- [ ] 若需要 line-ending cleanup，已先用 preview / scoped renormalize 工具確認 blast radius，而不是直接全 repo 套用
 
 ## 3. Examples
 
@@ -37,13 +40,15 @@
 ## 4. Validation
 
 - [ ] `health-check.ps1` 可通過
+- [ ] `verify-workspace-boundaries.ps1` 可通過
+- [ ] `get-publishability-report.ps1` 的結果不會在 dirty worktree 上誤判可推
 - [ ] `export-template-package.ps1 -DryRun` 可列出 package 內容
 - [ ] `export-template-package.ps1` 可成功產出 package
 - [ ] `verify-template-package.ps1` 可通過
 - [ ] `bootstrap.py --dry-run` 可在乾淨環境預覽初始化內容
 - [ ] `verify-bootstrap.py` 可驗證 first-run wiring
 - [ ] `.claude/settings.json` 指向 UniText MCP 工具而非錯誤服務
-- [ ] 未宣稱 Copilot 已完成驗證，除非真的有 adapter 與實測證據
+- [ ] 未宣稱 Copilot 已完成跨平台驗證，除非真的有對應平台的 bootstrap / verify 實測證據
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
 

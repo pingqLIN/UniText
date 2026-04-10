@@ -21,7 +21,9 @@ if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBa
 }
 $package = Join-Path $outputBase $folder
 $items = @(
+  [pscustomobject]@{ kind = "file"; source = ".gitattributes"; target = ".gitattributes" },
   [pscustomobject]@{ kind = "file"; source = ".gitignore"; target = ".gitignore" },
+  [pscustomobject]@{ kind = "file"; source = ".github\\pull_request_template.md"; target = ".github\\pull_request_template.md" },
   [pscustomobject]@{ kind = "file"; source = ".mcp.json"; target = ".mcp.json" },
   [pscustomobject]@{ kind = "file"; source = "README.md"; target = "README.md" },
   [pscustomobject]@{ kind = "file"; source = "INDEX.md"; target = "INDEX.md" },
@@ -29,7 +31,11 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "RESOURCE_SPEC.md"; target = "RESOURCE_SPEC.md" },
   [pscustomobject]@{ kind = "file"; source = "OPERATIONS.md"; target = "OPERATIONS.md" },
   [pscustomobject]@{ kind = "file"; source = "PROJECT_MODES.md"; target = "PROJECT_MODES.md" },
+  [pscustomobject]@{ kind = "file"; source = "WORKSPACE_SENSITIVE_METADATA_RULES.json"; target = "WORKSPACE_SENSITIVE_METADATA_RULES.json" },
+  [pscustomobject]@{ kind = "file"; source = "WORKSPACE_SENSITIVE_METADATA_RULES.md"; target = "WORKSPACE_SENSITIVE_METADATA_RULES.md" },
+  [pscustomobject]@{ kind = "file"; source = "DOCUMENT_PLACEMENT_POLICY.md"; target = "DOCUMENT_PLACEMENT_POLICY.md" },
   [pscustomobject]@{ kind = "file"; source = "SECRET_HANDLING_GUIDELINES.md"; target = "SECRET_HANDLING_GUIDELINES.md" },
+  [pscustomobject]@{ kind = "file"; source = "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md"; target = "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md" },
   [pscustomobject]@{ kind = "file"; source = "MILESTONES.md"; target = "MILESTONES.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_PACKAGE.md"; target = "TEMPLATE_RELEASE_PACKAGE.md" },
   [pscustomobject]@{ kind = "file"; source = "TEMPLATE_RELEASE_CHECKLIST.md"; target = "TEMPLATE_RELEASE_CHECKLIST.md" },
@@ -39,7 +45,16 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\bootstrap.py"; target = "local\\scripts\\bootstrap.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-bootstrap.py"; target = "local\\scripts\\verify-bootstrap.py" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\create-git-bundle.py"; target = "local\\scripts\\create-git-bundle.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\preview-renormalize.py"; target = "local\\scripts\\preview-renormalize.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\run-renormalize.ps1"; target = "local\\scripts\\run-renormalize.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\run-renormalize.py"; target = "local\\scripts\\run-renormalize.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\preview-renormalize.ps1"; target = "local\\scripts\\preview-renormalize.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\sync-skills.ps1"; target = "local\\scripts\\sync-skills.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\lib\\renormalize_core.py"; target = "local\\scripts\\lib\\renormalize_core.py" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1"; target = "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1"; target = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-workspace-boundaries.ps1"; target = "local\\scripts\\verify-workspace-boundaries.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\get-publishability-report.ps1"; target = "local\\scripts\\get-publishability-report.ps1" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\skills\\example-skill"; target = "registry\\skills\\example-skill" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\agents\\example-agent"; target = "registry\\agents\\example-agent" },
   [pscustomobject]@{ kind = "dir"; source = "registry\\mcp\\claude-project-mcp-seed"; target = "registry\\mcp\\claude-project-mcp-seed" },
@@ -56,11 +71,11 @@ if ($missing.Count -gt 0) {
 }
 
 if ($DryRun) {
-  [pscustomobject]@{
-    package_path = $package
-    output_root = $outputBase
-    item_count = $items.Count
-    items = $items
+[pscustomobject]@{
+  package_path = "."
+  output_root = $outputBase
+  item_count = $items.Count
+  items = $items
     excluded = @(
       "backup/",
       "recovered_*/",
@@ -69,7 +84,8 @@ if ($DryRun) {
       "ops/review-package/",
       "local/docs/authoring/",
       "review-only docs",
-      "machine-local runtime state"
+      "machine-local runtime state",
+      "live workspace-specific Cloudflare baseline refs"
     )
   }
   return
@@ -101,7 +117,8 @@ foreach ($item in $items) {
 $manifest = [ordered]@{
   generated_at = (Get-Date).ToString("s")
   source_root = "."
-  package_path = $package
+  package_path = "."
+  package_name = $folder
   phase_target = "template-release-cleanup"
   release_channel = "candidate"
   release_version = "$((Get-Date).ToString('yyyy.MM.dd'))-template-candidate"
@@ -114,7 +131,8 @@ $manifest = [ordered]@{
     "ops/review-package/",
     "local/docs/authoring/",
     "review-only docs",
-    "machine-local runtime state"
+    "machine-local runtime state",
+    "live workspace-specific Cloudflare baseline refs"
   )
   items = $items
 }

@@ -8,11 +8,13 @@ Hier liegen die **lokalen Betriebsskripte**.
 ## Aktuelle Skripte
 
 - `bootstrap.py`
-  - plattformübergreifende Initialisierung von Skills-Delivery, Codex native config und projektlokaler `.mcp.json`
+  - initialisiert plattformübergreifend Skills-Delivery, Codex native-config, Copilot MCP config und die projektlokale `.mcp.json`
 - `verify-bootstrap.py`
-  - plattformübergreifende Prüfung, ob das First-Run-Ergebnis mit dem aktuellen Repo übereinstimmt
+  - prüft plattformübergreifend, ob das First-Run-Ergebnis zum aktuellen Repo passt, und akzeptiert sowohl die template-safe `.mcp.json`-Seed-Datei als auch lokal bootstrapped wiring
 - `create-git-bundle.py`
   - erstellt ein portables `git bundle`-Backup und reduziert das Single-Point-of-Failure-Risiko eines reinen lokalen Worktrees
+- `git-startup.ps1`
+  - löst für eine neue Session den canonical base branch auf, verlangt einen sauberen Worktree, führt ein explizites Fast-Forward-Update aus und erstellt einen neuen Feature-Branch
 - `sync-skills.ps1`
   - synchronisiert `registry/skills/` auf die lokalen Skills-Ziele
 - `scan-skills.ps1`
@@ -33,6 +35,24 @@ Hier liegen die **lokalen Betriebsskripte**.
   - exportiert template-safe Docs, generic examples und das Starter-Layout nach `ops/template-package/`
 - `verify-template-package.ps1`
   - prüft, ob das exportierte Template Package die nötige Starter-Struktur enthält und keine review-only- oder local-only-Inhalte mitbringt
+- `verify-workspace-boundaries.ps1`
+  - prüft, ob die tracked shared surfaces im aktuellen Authoring-Repo live workspace metadata, authoring-only docs oder operations state enthalten
+- `get-publishability-report.ps1`
+  - fasst local-only-, ops- und shared-surface-Änderungen der aktuellen Branch mit dem Ergebnis der Boundary-Prüfung zu einem lokalen Bericht für Push-Suitability zusammen
+- `lib/workspace-sensitive-metadata.ps1`
+  - lädt die gemeinsame `WORKSPACE_SENSITIVE_METADATA_RULES.json`, damit Boundary-, Template- und Publishability-Prüfungen dieselben Regeln nutzen
+- `validate-workspace-sensitive-metadata-rules.ps1`
+  - validiert Struktur, kompilierbare Regexe und eingebaute Fälle der gemeinsamen `WORKSPACE_SENSITIVE_METADATA_RULES.json`
+- `preview-renormalize.ps1`
+  - führt nur einen Dry-Run aus und zeigt vorab, wie viele tracked files `git add --renormalize .` berühren würde, damit der Blast Radius eines Line-Ending-Cleanups zuerst sichtbar wird
+- `run-renormalize.ps1`
+  - führt kontrolliertes Renormalisieren nach `repo / root / registry / i18n / local / template`-Scope aus; standardmäßig bleibt es beim Dry-Run, nur mit `-Apply` werden Änderungen gestaged, und ein `MaxFiles`-Guard schützt vor zu großen Batches
+- `audit-i18n-drift.py`
+  - liest `i18n/manifest.json`, listet pro Locale fehlende, veraltete oder von Git noch nicht verfolgte Übersetzungen auf und unterstützt `json / markdown`, Filter nach `locale / source-doc` sowie die Ausgabe eines Arbeitsberichts
+- `export-rebuild-project.ps1`
+  - exportiert das aktuelle Repo als fresh-project baseline, die neu benannt und neu initialisiert werden kann, nach `ops/rebuild-project/`
+- `verify-rebuild-project.ps1`
+  - bestätigt zusätzlich zur Template-Package-Prüfung, dass Rebuild-Guide und Fresh-Project-Einstieg vorhanden sind
 
 ## Governance-Hinweis
 

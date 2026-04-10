@@ -55,3 +55,15 @@
 1. 先確認允許發布的範圍
 2. 再確認允許發布的目的地
 3. 最後才執行 push / upload / posting
+
+若要在「使用者是否允許發布」之外，再先做一次本地結構檢查，可執行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-publishability-report.ps1
+```
+
+這份報告只回答：
+
+- 目前 branch 是否混入 local-only / ops state / boundary violations
+
+它不會取代使用者授權，也不會覆蓋 no-publish rule。

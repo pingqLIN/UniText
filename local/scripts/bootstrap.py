@@ -6,6 +6,7 @@ import json
 import re
 import shutil
 import sys
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 
@@ -16,6 +17,8 @@ REPO_MARKERS = [
     Path("README.md"),
     Path("INDEX.md"),
 ]
+
+UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 360
 
 
 def get_repo_root() -> Path:
@@ -102,6 +105,7 @@ def render_codex_mcp_block(server: Path, root: Path) -> str:
     return "\n".join(
         [
             "[mcp_servers.unitext_registry]",
+            f"startup_timeout_sec = {UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC}",
             f"command = {toml_string(sys.executable)}",
             f"args = [{args}]",
             "",
@@ -131,6 +135,36 @@ def render_project_mcp(server: Path, root: Path) -> dict[str, object]:
     }
 
 
+def render_copilot_mcp_server(server: Path, root: Path) -> dict[str, object]:
+    return {
+        "type": "local",
+        "command": sys.executable,
+        "args": [str(server), "--root", str(root)],
+        "env": {},
+        "tools": ["*"],
+    }
+
+
+def parse_json_object(text: str) -> dict[str, object]:
+    if not text.strip():
+        return {}
+    body = json.loads(text)
+    if not isinstance(body, dict):
+        raise RuntimeError("JSON content must contain a top-level object.")
+    return body
+
+
+def upsert_copilot_mcp_config(text: str, server: Path, root: Path) -> dict[str, object]:
+    body = parse_json_object(text)
+    servers = body.get("mcpServers", {})
+    if not isinstance(servers, dict):
+        raise RuntimeError("~/.copilot/mcp-config.json must contain an object at mcpServers.")
+    updated = deepcopy(body)
+    updated.setdefault("mcpServers", {})
+    updated["mcpServers"]["unitext-registry"] = render_copilot_mcp_server(server, root)
+    return updated
+
+
 def validate_repo_surface(repo: Path) -> None:
     missing = [str(marker) for marker in REPO_MARKERS if not (repo / marker).exists()]
     if missing:
@@ -158,6 +192,7 @@ def main() -> int:
     parser.add_argument("--mode", choices=["auto", "symlink", "mirror"], default="auto")
     parser.add_argument("--skip-skills", action="store_true")
     parser.add_argument("--skip-codex", action="store_true")
+    parser.add_argument("--skip-copilot", action="store_true")
     parser.add_argument("--skip-project-mcp", action="store_true")
     args = parser.parse_args()
 
@@ -170,6 +205,7 @@ def main() -> int:
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
     codex_config = Path.home() / ".codex" / "config.toml"
+    copilot_mcp_config = Path.home() / ".copilot" / "mcp-config.json"
     skills_targets = [
         Path.home() / ".claude" / "skills",
         Path.home() / ".gemini" / "skills",
@@ -187,6 +223,7 @@ def main() -> int:
         "mode": args.mode,
         "skills": [],
         "codex": {},
+        "copilot": {},
         "project_mcp": {},
     }
 
@@ -220,6 +257,23 @@ def main() -> int:
             if codex_config.exists():
                 backup_path(codex_config, run_dir / "codex" / "config.toml")
             codex_config.write_text(updated, encoding="utf-8")
+
+    if not args.skip_copilot:
+        original = copilot_mcp_config.read_text(encoding="utf-8") if copilot_mcp_config.exists() else ""
+        original_body = parse_json_object(original) if original else {}
+        updated_body = upsert_copilot_mcp_config(original, server, repo)
+        updated = json.dumps(updated_body, indent=2)
+        changed = updated_body != original_body
+        summary["copilot"] = {
+            "path": str(copilot_mcp_config),
+            "changed": changed,
+            "mcp_server": "unitext-registry",
+        }
+        if changed and not args.dry_run:
+            copilot_mcp_config.parent.mkdir(parents=True, exist_ok=True)
+            if copilot_mcp_config.exists():
+                backup_path(copilot_mcp_config, run_dir / "copilot" / "mcp-config.json")
+            copilot_mcp_config.write_text(updated + "\n", encoding="utf-8")
 
     if not args.skip_project_mcp:
         body = render_project_mcp(server, repo)

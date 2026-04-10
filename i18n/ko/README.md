@@ -8,6 +8,14 @@
 
 ---
 
+## UniText가 실제로 하는 일
+
+UniText는 prompts, skills, MCP 템플릿을 모아 두는 폴더가 아닙니다. shared AI resources 의 canonical definition 을 하나로 유지하면서 machine-local wiring, project-local activation, operations history 를 분리해서 다루기 위한 governed 방식입니다. 목표는 각 CLI 가 같은 능력의 복사본을 따로 들고 점점 drift 해 가는 상태를 멈추는 것입니다.
+
+그래서 이 저장소는 `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, publishability checks 를 한 시스템 안에 함께 둡니다. UniText가 실제로 하려는 일은 shared AI tooling 을 서로 다른 CLI, 서로 다른 머신, 서로 다른 프로젝트 생애주기 사이에서도 portable, reviewable, repeatable 하게 만드는 것입니다.
+
+---
+
 ## Why This Exists
 
 여러 AI CLI 도구를 함께 쓰면 리소스가 금방 흩어집니다.

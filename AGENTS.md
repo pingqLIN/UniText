@@ -26,3 +26,13 @@ This policy applies even when:
 - the content appears ready for publication
 
 Private repository does not equal automatic permission to publish.
+
+## Git Startup
+
+For a new development session in this repository, prefer:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\git-startup.ps1
+```
+
+This helper resolves the canonical base branch from `origin/HEAD` first, then falls back to local `main` or `master` only when needed. It also enforces a clean working tree, fetches `origin --prune`, fast-forwards explicitly against the resolved base branch, and refuses to reuse an existing feature branch name.

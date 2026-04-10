@@ -29,6 +29,7 @@ rebuild package 不應保留：
 - local-only history
 - backup / recovered / `.bak_*`
 - 機器專屬絕對路徑
+- live workspace-specific Cloudflare baseline references with real IDs、hostnames、redirect URIs、or runtime paths
 
 ## 3. Rebuild Command
 

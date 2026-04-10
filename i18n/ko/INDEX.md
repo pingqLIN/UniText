@@ -1,9 +1,9 @@
 # UniText — Index
 
-> 상태: Template Base
-> 역할: 모든 human / AI의 첫 읽기 지점으로, discovery에 사용합니다.
+> 상태: `Template Base`
+> 역할: 모든 human / AI 가 가장 먼저 읽는 문서이자 discovery 진입점.
 
-`UniText`는 순수 텍스트를 공유 인터페이스로 삼아, 다양한 CLI 간의 일관된 호환성과 AI-first discovery를 강조합니다.
+`UniText` 는 순수 텍스트를 공유 인터페이스로 사용하며, cross-CLI 통합 호환성과 AI-first discovery 를 강조합니다.
 
 ## 1. Core Docs
 
@@ -14,28 +14,28 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `MILESTONES.md`
-7. `EXTERNAL_REVIEW_PACKAGE.md`
-8. `EXTERNAL_REVIEW_COVER_NOTE.md`
-9. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-10. `TEMPLATE_RELEASE_PACKAGE.md`
-11. `TEMPLATE_RELEASE_CHECKLIST.md`
-12. `SECRET_HANDLING_GUIDELINES.md`
-13. `NO_PUBLISH_POLICY.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
 14. `SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
-현재 registry는 다음 shared resource types를 다룹니다.
+현재 registry 는 다음 shared resource types 를 다룹니다:
 
 | Type | Logical root | Purpose |
 |---|---|---|
-| `skills` | `/registry/skills` | 여러 CLI가 함께 쓸 수 있는 skill 정의 |
+| `skills` | `/registry/skills` | 여러 CLI 가 함께 쓸 수 있는 skill 정의 |
 | `mcp` | `/registry/mcp` | canonical MCP definitions |
 | `agents` | `/registry/agents` | 공용 agent 지침과 persona 정의 |
-| `workflow` | `/registry/workflow` | 공용 flow, runbook, planning guidance |
+| `workflow` | `/registry/workflow` | 공용 흐름, runbook, planning guidance |
 
-다음은 shared resource type이 아닙니다.
+다음 항목은 shared resource type 이 아닙니다:
 
 | Area | Logical root | Role |
 |---|---|---|
@@ -43,50 +43,63 @@
 
 ## 3. Starter Catalog Shape
 
-최소 catalog entry는 다음을 포함해야 합니다.
+최소 catalog entry 에는 적어도 다음이 있어야 합니다:
 
 - `id`
 - `type`
 - `canonical_location`
 - `status`
 
-추가로 권장되는 항목:
+추가 권장 항목:
 
 - `source_of_truth`
 - `supported_clis`
 - `delivery_guidance`
 
-필드 규칙 전체는 `RESOURCE_SPEC.md`를 보세요.
+전체 필드 규칙은 `RESOURCE_SPEC.md` 를 참고하세요.
 
 ## 4. Current Catalog Entries
 
 ### Review Shortlist
 
-현재 외부 리뷰 주력 집합은 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md)의 `8 + 4` 핵심 skills이며, 전체 후보군이 아닙니다.
+현재 외부 review 주 집합은 전체 후보군이 아니라 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 의 `8 + 4` 선별 skills 를 기준으로 합니다.
 
 ### Review Package
 
-외부 리뷰용 자료를 정리하려면 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md)를 시작점으로 삼고, `local/scripts/export-review-package.ps1`로 재생성 가능한 review package를 만드세요.
+외부 reviewer 용 자료를 준비하려면 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 를 진입점으로 사용하고, `local/scripts/export-review-package.ps1` 로 재생성 가능한 review package 를 만드세요.
 
-리뷰어에게 바로 보여줄 가장 짧은 입구는 다음입니다.
+reviewer 에게 가장 짧은 진입점을 바로 주고 싶다면 먼저 다음을 보세요:
 
 - [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
 - [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 
-깨끗한 starter package로 정리하려면 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md)를 보고 `local/scripts/export-template-package.ps1`를 사용하세요.
+깨끗한 starter package 를 만들려면 [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) 를 읽고 `local/scripts/export-template-package.ps1` 를 사용하세요.
 
-내보낸 starter package를 검증하려면 `local/scripts/verify-template-package.ps1`를 사용하세요.
+export 된 starter package 를 검증하려면 `local/scripts/verify-template-package.ps1` 를 사용하세요.
 
-새 머신에서 첫 번째 initialize → verify를 완료하려면 우선 다음을 사용합니다.
+authoring repo 의 tracked shared surfaces 에 live workspace metadata 가 섞이지 않았는지 먼저 확인하려면 `local/scripts/verify-workspace-boundaries.ps1` 를 사용하세요.
+
+향후 push suitability 논의 전에 로컬 보고서를 만들려면 `local/scripts/get-publishability-report.ps1` 를 사용하세요.
+
+shared metadata 탐지 규칙을 조정하거나 규칙 사례를 이해하려면 먼저 [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md) 를 읽고, 그 다음 `local/scripts/validate-workspace-sensitive-metadata-rules.ps1` 를 사용하세요.
+
+현재 repo 를 바로 새로운 starter project 로 재구성하려면 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) 를 읽고 다음을 사용하세요:
+
+- `local/scripts/export-rebuild-project.ps1`
+- `local/scripts/verify-rebuild-project.ps1`
+
+새 머신에서 첫 initialize → verify 를 완료하려면 다음을 우선 사용하세요:
 
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
 ### Related Concept Notes
 
-`UniText`와 `skill-0`의 협업 방식을 평가하려면 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)를 보세요.
+`Copilot CLI` 의 현재 repo-level bootstrap baseline, 제약, 이후 cross-platform 검증 방향을 이해하려면 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) 를 보세요.
+
+`UniText` 가 `skill-0` 와 어떻게 협력할 수 있는지 평가하려면 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) 를 보세요.
 
 ### Skills
 
@@ -105,6 +118,21 @@
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
 
+### Workspace-Specific Skills
+
+다음 skills 는 shared registry 에 존재하지만 현재 외부 review 의 `8 + 4` shortlist 에는 포함되지 않습니다.
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+
 ### Workflow
 
 | Field | Value |
@@ -115,7 +143,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/workflow/claude-plans` |
 | `supported_clis` | `claude` |
-| `delivery_guidance` | CLI 능력에 따라 workflow adapter 또는 project-local plan mapping을 사용합니다. |
+| `delivery_guidance` | Use workflow adapter or project-local plan mapping depending on CLI capability. |
 
 ### MCP
 
@@ -126,8 +154,8 @@
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap이 project `.mcp.json`과 Codex native-config를 써서 bundled read-only MCP server를 가리키도록 합니다. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap writes a project `.mcp.json`, a Codex native-config entry, and a Copilot `~/.copilot/mcp-config.json` entry pointing to the bundled read-only MCP server. |
 
 ### Agents
 
@@ -139,7 +167,7 @@
 | `status` | `active` |
 | `source_of_truth` | `/registry/agents/registry-curator/AGENT.md` |
 | `supported_clis` | `claude, codex, gemini` |
-| `delivery_guidance` | review와 adoption 작업에 공용 persona로 사용할 수 있으며, 실제 wiring은 CLI 능력에 따라 다릅니다. |
+| `delivery_guidance` | Use as a shared agent persona for review and adoption tasks; actual wiring depends on CLI capability. |
 
 ## 5. Example Catalog Entries
 
@@ -153,7 +181,7 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/skills/example-skill/SKILL.md` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | skills adapter를 사용합니다. 실제 해석 방식은 CLI 능력과 로컬 환경에 따라 달라집니다. |
+| `delivery_guidance` | Use the skills adapter; resolved mode depends on CLI capabilities and local environment. |
 
 ### Example: MCP Definition
 
@@ -165,34 +193,35 @@
 | `status` | `draft` |
 | `source_of_truth` | `/registry/mcp/example-mcp/definition` |
 | `supported_clis` | `undocumented` |
-| `delivery_guidance` | MCP adapter로 등록하며, 최종 delivery mode는 CLI 능력과 로컬 환경에 따라 달라집니다. |
+| `delivery_guidance` | Register through the MCP adapter; the final delivery mode depends on CLI capabilities and local environment. |
 
 ## 6. Discovery Rules
 
-`INDEX.md`가 답하는 것은 다음입니다.
+`INDEX.md` 가 답하는 것은:
 
-- 여기에는 어떤 리소스가 있는가
-- 각 리소스의 논리적 위치는 어디인가
-- 어떤 규격 또는 운영 문서를 먼저 봐야 하는가
+- 여기 어떤 resource 가 있는가
+- 각 resource 의 논리 위치는 어디인가
+- 어떤 규격서나 운영 문서를 봐야 하는가
 
-`INDEX.md`가 직접 답하지 않는 것은 다음입니다.
+`INDEX.md` 가 직접 답하지 않는 것은:
 
 - 특정 플랫폼의 절대 경로
 - 최종적으로 해석된 delivery mode
-- 특정 author workspace의 로컬 설정
+- 특정 author workspace 의 로컬 설정
+- local authoring plans, review notes, live workspace baselines 를 어디에 두는가; 이 부분은 `DOCUMENT_PLACEMENT_POLICY.md` 를 참고하세요
 
 ## 7. How To Use This Baseline
 
 ### For Humans
 
-1. 먼저 `VISION.md`를 읽습니다.
-2. `INDEX.md`로 starter catalog를 만듭니다.
-3. `RESOURCE_SPEC.md`로 리소스 필드를 정의합니다.
-4. `OPERATIONS.md`로 플랫폼과 CLI 연결 방식을 정의합니다.
+1. 먼저 `VISION.md` 를 읽기
+2. `INDEX.md` 로 자신의 starter catalog 만들기
+3. `RESOURCE_SPEC.md` 로 resource 필드 정의하기
+4. `OPERATIONS.md` 로 플랫폼 / CLI 연결 방식 정의하기
 
 ### For AI Agents
 
-1. 먼저 `INDEX.md`를 discovery entry로 봅니다.
-2. schema가 필요하면 `RESOURCE_SPEC.md`를 봅니다.
-3. delivery 또는 mutation이 필요하면 `OPERATIONS.md`를 봅니다.
-4. 어떤 단일 배포 경로도 규격의 진실로 취급하지 않습니다.
+1. `INDEX.md` 를 discovery 진입점으로 사용하기
+2. schema 가 필요하면 `RESOURCE_SPEC.md` 읽기
+3. delivery / mutation 이 필요하면 `OPERATIONS.md` 읽기
+4. 단일 배포 환경의 경로를 규격 진실로 취급하지 않기

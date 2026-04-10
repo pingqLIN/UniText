@@ -14,13 +14,17 @@
 3. `RESOURCE_SPEC.md`
 4. `OPERATIONS.md`
 5. `PROJECT_MODES.md`
-6. `TEMPLATE_RELEASE_PACKAGE.md`
-7. `TEMPLATE_RELEASE_CHECKLIST.md`
-8. `REBUILD_AS_NEW_PROJECT.md`
-9. `SECRET_HANDLING_GUIDELINES.md`
-10. `NO_PUBLISH_POLICY.md`
-11. `COPILOT_CLI_ADAPTER_NOTE.md`
-12. `SKILL0_COLLABORATION_VISION.md`
+6. `DOCUMENT_PLACEMENT_POLICY.md`
+7. `WORKSPACE_SENSITIVE_METADATA_RULES.md`
+8. `TEMPLATE_RELEASE_PACKAGE.md`
+9. `TEMPLATE_RELEASE_CHECKLIST.md`
+10. `REBUILD_AS_NEW_PROJECT.md`
+11. `SECRET_HANDLING_GUIDELINES.md`
+12. `NO_PUBLISH_POLICY.md`
+13. `COPILOT_CLI_ADAPTER_NOTE.md`
+14. `CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
+15. `SKILL0_COLLABORATION_VISION.md`
+16. `PROJECT_MAP_WEB_AUTOMATION_REPORT.md`
 
 ## 2. Resource Catalog
 
@@ -77,6 +81,14 @@
 
 若要驗證匯出的 starter package，請使用 `local/scripts/verify-template-package.ps1`。
 
+starter package 目前也保留 `.github/pull_request_template.md`，作為最小 GitHub review baseline。
+
+若要先驗證 authoring repo 的 tracked shared surfaces 沒有混入 live workspace metadata，請使用 `local/scripts/verify-workspace-boundaries.ps1`。
+
+若要在未來討論 push suitability 前先做本地報告，請使用 `local/scripts/get-publishability-report.ps1`。
+
+若要調整 shared metadata 偵測規則或理解規則案例，請先看 [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md)，再使用 `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`。
+
 若要直接把目前 repo 重建成一份新的 starter project，請看 [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md)，並使用：
 
 - `local/scripts/export-rebuild-project.ps1`
@@ -89,9 +101,15 @@
 
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 為何已列入 starter template 目標、但目前仍屬 `adapter pending`，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+
+若要規劃如何逐步把目前偏 `PowerShell-first` 的治理腳本改寫成更通用的跨平台工具鏈，請看 [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
+
+若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [PROJECT_MAP_WEB_AUTOMATION_REPORT.md](PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
+
+目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
 ### Skills
 
@@ -109,6 +127,21 @@
 | `web-artifacts-builder` | Expansion 4 | `/registry/skills/web-artifacts-builder` | `active` |
 | `internal-comms` | Expansion 4 | `/registry/skills/internal-comms` | `active` |
 | `theme-factory` | Expansion 4 | `/registry/skills/theme-factory` | `active` |
+
+### Workspace-Specific Skills
+
+以下 skills 已存在於 shared registry，但不屬於目前外部審查主集的 `8 + 4` shortlist。
+
+| `id` | Tier | `canonical_location` | `status` |
+|---|---|---|---|
+| `cloudflare` | Workspace | `/registry/skills/cloudflare` | `active` |
+| `wrangler` | Workspace | `/registry/skills/wrangler` | `active` |
+| `building-mcp-server-on-cloudflare` | Workspace | `/registry/skills/building-mcp-server-on-cloudflare` | `active` |
+| `cloudflare-governance` | Workspace | `/registry/skills/cloudflare-governance` | `active` |
+| `cloudflare-access-mcp` | Workspace | `/registry/skills/cloudflare-access-mcp` | `active` |
+| `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
+| `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
+| `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
 
 ### Workflow
 
@@ -131,8 +164,8 @@
 | `canonical_location` | `/registry/mcp/claude-project-mcp-seed` |
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
-| `supported_clis` | `claude, codex` |
-| `delivery_guidance` | Bootstrap writes a project `.mcp.json` plus Codex native-config entry pointing to the bundled read-only MCP server. |
+| `supported_clis` | `claude, codex, copilot` |
+| `delivery_guidance` | Bootstrap writes a project `.mcp.json`, a Codex native-config entry, and a Copilot `~/.copilot/mcp-config.json` entry pointing to the bundled read-only MCP server. |
 
 ### Agents
 
@@ -185,6 +218,7 @@
 - 某個平台的絕對路徑
 - 最終已解析完成的 delivery mode
 - 某個作者工作區的本機配置
+- local authoring plans、review notes、或 live workspace baselines 應放哪裡；這部分請看 `DOCUMENT_PLACEMENT_POLICY.md`
 
 ## 7. How To Use This Baseline
 

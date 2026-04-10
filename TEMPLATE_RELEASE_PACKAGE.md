@@ -33,12 +33,16 @@
   - `RESOURCE_SPEC.md`
   - `OPERATIONS.md`
   - `PROJECT_MODES.md`
+  - `WORKSPACE_SENSITIVE_METADATA_RULES.json`
+  - `WORKSPACE_SENSITIVE_METADATA_RULES.md`
   - `SECRET_HANDLING_GUIDELINES.md`
   - `MILESTONES.md`
   - `TEMPLATE_RELEASE_PACKAGE.md`
   - `TEMPLATE_RELEASE_CHECKLIST.md`
 - template-safe root config
+  - `.gitattributes`
   - `.gitignore`
+  - `.github/pull_request_template.md`
   - `.mcp.json`
   - `.claude/settings.json`
 - generic examples
@@ -54,10 +58,23 @@
   - `local/scripts/bootstrap.py`
   - `local/scripts/verify-bootstrap.py`
   - `local/scripts/create-git-bundle.py`
+  - `local/scripts/preview-renormalize.py`
+  - `local/scripts/preview-renormalize.ps1`
+  - `local/scripts/run-renormalize.ps1`
+  - `local/scripts/run-renormalize.py`
+  - `local/scripts/lib/renormalize_core.py`
   - `local/scripts/sync-skills.ps1`
+  - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
+  - `local/scripts/lib/workspace-sensitive-metadata.ps1`
+  - `local/scripts/verify-workspace-boundaries.ps1`
+  - `local/scripts/get-publishability-report.ps1`
 - release metadata
-  - `manifest.json`
-  - `release.json`
+- `manifest.json`
+- `release.json`
+
+starter template 也應保留 repo-level line-ending policy，避免不同機器上的 `core.autocrlf` 在首次修改 shared docs 或 scripts 時產生不必要的 CRLF 噪音。
+若要做 line-ending cleanup，應優先使用 `preview-renormalize.py` 或 `preview-renormalize.ps1` 看 blast radius，再用 `run-renormalize.py` 或 `run-renormalize.ps1 -Scope ...` 做受控批次，而不是直接對整個 repo 無差別套用。
+starter template 也應保留最小 GitHub collaboration baseline，至少包含 `.github/pull_request_template.md`，讓 review 與驗證欄位有一致格式，而不是每次重新手寫。
 
 ## 3. Exclude
 
@@ -71,6 +88,7 @@ template package 不應包含：
 - `ops/template-package/`
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
+- workspace-specific Cloudflare baseline references with live IDs、hostnames、redirect URIs、or runtime paths
 - authoring notes、review archives 與其他 local-only 補充材料
 - review-specific docs
   - `EXTERNAL_REVIEW_PACKAGE.md`
@@ -104,6 +122,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
 ```
 
+若要在匯出前先檢查 authoring repo 的 tracked shared surfaces：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-workspace-boundaries.ps1
+```
+
 若要直接輸出成「全新的 starter project」而不是一般 template package：
 
 ```powershell
@@ -132,7 +156,7 @@ python local/scripts/create-git-bundle.py
 - 一條可重複的 cross-platform `bootstrap -> verify` 路徑
 - 一份可由 Claude 直接讀取的 `.claude/settings.json`
 - 一份可由 project-local MCP 使用的 `.mcp.json` seed
-- 一個可供 Copilot CLI 未來 adapter 對接的 shared baseline
+- 一個可供 Copilot CLI 透過 bootstrap 註冊 MCP wiring 的 shared baseline
 
 它不代表：
 
@@ -141,6 +165,8 @@ python local/scripts/create-git-bundle.py
 - 所有 review / audit 證據
 - 已完成的本機 delivery wiring
 - 任意機器都已經完成的 interpreter pinning
+- live workspace-specific infrastructure references；若需要保留結構，只能改成 sanitized placeholder docs
+- authoring repo branch 本身已可安全推送；push suitability 仍需另做 repo-side boundary review
 
 ## 6. Current Interpretation
 

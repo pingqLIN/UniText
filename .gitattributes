@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+*.pdf binary
+*.gz binary
+*.zip binary
+*.db binary
+*.wasm binary
+*.node binary
+*.dll binary
+*.exe binary
+*.pdb binary

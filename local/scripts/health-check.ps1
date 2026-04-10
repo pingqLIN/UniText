@@ -1,6 +1,9 @@
 $ErrorActionPreference = "Stop"
+$root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $skillsRoot = "registry\\skills"
 $required = @(
+  ".gitattributes",
+  ".github\\pull_request_template.md",
   ".mcp.json",
   ".claude\\settings.json",
   "README.md",
@@ -9,8 +12,12 @@ $required = @(
   "RESOURCE_SPEC.md",
   "OPERATIONS.md",
   "PROJECT_MODES.md",
+  "WORKSPACE_SENSITIVE_METADATA_RULES.json",
+  "WORKSPACE_SENSITIVE_METADATA_RULES.md",
+  "DOCUMENT_PLACEMENT_POLICY.md",
   "SECRET_HANDLING_GUIDELINES.md",
   "MILESTONES.md",
+  "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
   "EXTERNAL_REVIEW_PACKAGE.md",
   "EXTERNAL_REVIEW_COVER_NOTE.md",
   "EXTERNAL_REVIEW_HIGHLIGHTS.md",
@@ -20,6 +27,10 @@ $required = @(
   "local\\scripts\\bootstrap.py",
   "local\\scripts\\verify-bootstrap.py",
   "local\\scripts\\create-git-bundle.py",
+  "local\\scripts\\preview-renormalize.py",
+  "local\\scripts\\preview-renormalize.ps1",
+  "local\\scripts\\run-renormalize.ps1",
+  "local\\scripts\\run-renormalize.py",
   "local\\scripts\\scan-skills.ps1",
   "local\\scripts\\verify-delivery.ps1",
   "local\\scripts\\batch-adopt-skills.ps1",
@@ -27,7 +38,12 @@ $required = @(
   "local\\scripts\\rollback-skills.ps1",
   "local\\scripts\\export-review-package.ps1",
   "local\\scripts\\export-template-package.ps1",
+  "local\\scripts\\lib\\renormalize_core.py",
+  "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
+  "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
   "local\\scripts\\verify-template-package.ps1",
+  "local\\scripts\\verify-workspace-boundaries.ps1",
+  "local\\scripts\\get-publishability-report.ps1",
   "local\\docs\\ADOPTION_CHECKLIST.md",
   "local\\docs\\CLI_COMPAT_MATRIX.md",
   "registry\\agents\\registry-curator\\AGENT.md",
@@ -43,22 +59,27 @@ $required = @(
   "template\\examples\\local\\scripts\\sync-skills.template.ps1"
 )
 
-$missing = $required | Where-Object { -not (Test-Path $_) }
-$skills = if (Test-Path $skillsRoot) { Get-ChildItem $skillsRoot -Directory } else { @() }
+$missing = $required | Where-Object { -not (Test-Path (Join-Path $root $_)) }
+$trackedSkillFiles = @((& git -C $root ls-files "$skillsRoot/*/SKILL.md") | Where-Object { $_ })
+$skills = @($trackedSkillFiles | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
 $invalid = @()
+$rulesScript = Join-Path $root "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1"
 
 foreach ($skill in $skills) {
-  $path = Join-Path $skill.FullName "SKILL.md"
+  $path = Join-Path $root (Join-Path $skill "SKILL.md")
   if (-not (Test-Path $path)) {
-    $invalid += $skill.Name
+    $invalid += (Split-Path $skill -Leaf)
     continue
   }
 
   $body = Get-Content $path -Raw
   if (-not $body.StartsWith("---")) {
-    $invalid += $skill.Name
+    $invalid += (Split-Path $skill -Leaf)
   }
 }
+
+$rulesCheck = & $rulesScript
+$rulesOk = [bool]$rulesCheck.ok
 
 [pscustomobject]@{
   missing_files = $missing
@@ -67,5 +88,7 @@ foreach ($skill in $skills) {
   agent_seed = Test-Path "registry\\agents\\registry-curator\\AGENT.md"
   mcp_seed = Test-Path "registry\\mcp\\claude-project-mcp-seed\\definition.json"
   workflow_seed = Test-Path "registry\\workflow\\claude-plans\\WORKFLOW.md"
-  ok = ($missing.Count -eq 0) -and ($invalid.Count -eq 0) -and ($skills.Count -ge 1)
+  boundary_rules_ok = $rulesOk
+  boundary_rule_errors = @($rulesCheck.errors)
+  ok = ($missing.Count -eq 0) -and ($invalid.Count -eq 0) -and ($skills.Count -ge 1) -and $rulesOk
 }

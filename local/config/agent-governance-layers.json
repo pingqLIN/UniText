@@ -1,0 +1,199 @@
+{
+  "meta": {
+    "version": 1,
+    "description": "Layered governance policy for resolving effective agent configuration from model, work environment, and instruction profile.",
+    "precedence": [
+      "base",
+      "model",
+      "environment",
+      "instruction_profile"
+    ]
+  },
+  "layers": [
+    {
+      "id": "base/default",
+      "scope": "base",
+      "description": "Shared baseline for all agents in this workspace.",
+      "match": {},
+      "config": {
+        "reasoning_effort": "medium",
+        "planning_style": "plan-then-execute",
+        "checkpoint_mode": "phase-complete",
+        "refresh_strategy": "manual",
+        "diagnostics_depth": "summary",
+        "export_mode": "share-page+handoff",
+        "browser_scan": "allowed",
+        "handoff_detail": "standard",
+        "instruction_stack": "platform > global AGENTS > workspace > repo > user",
+        "change_policy": "local-commit-only"
+      }
+    },
+    {
+      "id": "model/gpt-5.4",
+      "scope": "model",
+      "description": "Frontier model profile with deeper review expectations.",
+      "match": {
+        "models": [
+          "gpt-5.4"
+        ]
+      },
+      "config": {
+        "reasoning_effort": "high",
+        "review_depth": "deep",
+        "parallelism": "bounded"
+      }
+    },
+    {
+      "id": "model/gpt-5.4-mini",
+      "scope": "model",
+      "description": "Smaller frontier profile with lighter default cost envelope.",
+      "match": {
+        "models": [
+          "gpt-5.4-mini"
+        ]
+      },
+      "config": {
+        "reasoning_effort": "medium",
+        "review_depth": "targeted",
+        "parallelism": "single-sidecar"
+      }
+    },
+    {
+      "id": "model/gpt-5.3-codex",
+      "scope": "model",
+      "description": "Codex-optimized profile for implementation-heavy work.",
+      "match": {
+        "models": [
+          "gpt-5.3-codex"
+        ]
+      },
+      "config": {
+        "reasoning_effort": "medium",
+        "planning_style": "dispatch-first",
+        "review_depth": "targeted"
+      }
+    },
+    {
+      "id": "environment/codex-local-dev",
+      "scope": "environment",
+      "description": "Interactive local development with full browser-side tooling.",
+      "match": {
+        "environments": [
+          "codex-local-dev"
+        ]
+      },
+      "config": {
+        "browser_scan": "enabled",
+        "refresh_strategy": "manual",
+        "diagnostics_depth": "detailed",
+        "export_mode": "share-page+handoff"
+      }
+    },
+    {
+      "id": "environment/browser-share-safe",
+      "scope": "environment",
+      "description": "Read-only share artifact environment.",
+      "match": {
+        "environments": [
+          "browser-share-safe"
+        ]
+      },
+      "config": {
+        "browser_scan": "disabled",
+        "refresh_strategy": "generator-only",
+        "diagnostics_depth": "summary",
+        "export_mode": "share-page-only"
+      }
+    },
+    {
+      "id": "environment/yolo-unattended",
+      "scope": "environment",
+      "description": "Long-running unattended execution with stronger checkpoint discipline.",
+      "match": {
+        "environments": [
+          "yolo-unattended"
+        ]
+      },
+      "config": {
+        "planning_style": "dispatch-first",
+        "checkpoint_mode": "blockers-only",
+        "handoff_detail": "stage-report"
+      }
+    },
+    {
+      "id": "environment/ci-verify",
+      "scope": "environment",
+      "description": "Verification-only environment with no browser-side mutation path.",
+      "match": {
+        "environments": [
+          "ci-verify"
+        ]
+      },
+      "config": {
+        "browser_scan": "disabled",
+        "refresh_strategy": "generator-only",
+        "export_mode": "handoff-json"
+      }
+    },
+    {
+      "id": "instruction/mapping",
+      "scope": "instruction_profile",
+      "description": "Optimize for project-map diagnostics and navigation work.",
+      "match": {
+        "instruction_profiles": [
+          "mapping"
+        ]
+      },
+      "config": {
+        "map_view": "radial",
+        "diagnostics_depth": "detailed",
+        "export_mode": "share-page+handoff"
+      }
+    },
+    {
+      "id": "instruction/handoff",
+      "scope": "instruction_profile",
+      "description": "Bias toward explicit export and transition artifacts.",
+      "match": {
+        "instruction_profiles": [
+          "handoff"
+        ]
+      },
+      "config": {
+        "map_view": "grid",
+        "handoff_detail": "extended",
+        "export_mode": "share-page+handoff"
+      }
+    },
+    {
+      "id": "instruction/governance-review",
+      "scope": "instruction_profile",
+      "description": "Bias toward auditability and policy review over speed.",
+      "match": {
+        "instruction_profiles": [
+          "governance-review"
+        ]
+      },
+      "config": {
+        "planning_style": "plan-first",
+        "review_depth": "deep",
+        "diagnostics_depth": "detailed",
+        "checkpoint_mode": "pre-execution"
+      }
+    },
+    {
+      "id": "instruction/yolo",
+      "scope": "instruction_profile",
+      "description": "Bias toward continuous execution with minimal pauses.",
+      "match": {
+        "instruction_profiles": [
+          "yolo"
+        ]
+      },
+      "config": {
+        "planning_style": "dispatch-first",
+        "checkpoint_mode": "blockers-only"
+      }
+    }
+  ]
+}

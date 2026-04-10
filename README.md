@@ -8,6 +8,14 @@
 
 ---
 
+## What UniText Is Actually For
+
+UniText is not just a folder of prompts, skills, or MCP stubs. It is a governed way to keep one canonical definition of shared AI resources while separating machine-local wiring, project-local activation, and operational history. The point is to stop every CLI from growing its own drifting copy of the same capability.
+
+That is why this repository includes `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, and publishability checks in one place. UniText is trying to make shared AI tooling portable, reviewable, and repeatable across different CLIs, different machines, and different stages of a project lifecycle.
+
+---
+
 ## Why This Exists
 
 If you use more than one AI CLI tool, your resources end up scattered:
@@ -128,7 +136,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, and upgrades the project `.mcp.json` to the active machine interpreter and repo root. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot CLI is part of the target baseline, but its adapter wiring is still tracked as a follow-up item rather than a verified first-run path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and next-step definition.
+`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, upgrades the project `.mcp.json` to the active machine interpreter and repo root, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -139,7 +147,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
 | **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
-| **Copilot CLI** | target baseline, adapter pending | intended to consume the shared MCP / skill baseline once a stable Copilot adapter path is defined |
+| **Copilot CLI** | global MCP config + repo instructions | `~/.copilot/mcp-config.json` for MCP wiring; repo instructions come from `AGENTS.md` / related files |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
 
@@ -157,6 +165,11 @@ The GitHub-hosted starter template is intended to support:
 - `macOS`
 - `Linux`
 
+Current validation status is narrower than that target baseline:
+
+- `Windows / PC` is the only platform with complete end-to-end authoring-host evidence today
+- `macOS` and `Linux` remain design targets, but not yet fully revalidated across the full bootstrap, delivery, and governance flow
+
 The tracked `.mcp.json` is a relative-path seed for fresh clones. The supported first-run path is still:
 
 ```bash
@@ -165,6 +178,13 @@ python local/scripts/verify-bootstrap.py
 ```
 
 That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
+
+The repo baseline also ships a minimal GitHub review scaffold through `.github/pull_request_template.md`, so human review, validation notes, and follow-up risks have a stable shape instead of being improvised per branch.
+
+`verify-bootstrap.py` accepts either:
+
+- the tracked template-safe `.mcp.json` seed
+- or the locally bootstrapped `.mcp.json` that points at the current machine interpreter and repo root
 
 ---
 
@@ -191,8 +211,11 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [RESOURCE_SPEC.md](RESOURCE_SPEC.md) | Metadata contract for all shared resources |
 | [OPERATIONS.md](OPERATIONS.md) | Delivery modes, triggers, and safety rules |
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Authoring repo vs. project template distinction |
+| [WORKSPACE_SENSITIVE_METADATA_RULES.md](WORKSPACE_SENSITIVE_METADATA_RULES.md) | Schema, maintenance rules, and validation flow for workspace-sensitive metadata detection |
+| [DOCUMENT_PLACEMENT_POLICY.md](DOCUMENT_PLACEMENT_POLICY.md) | Placement matrix for shared, local, authoring, and operations documents |
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Secret storage, redaction, and password/API key handling boundaries |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
+| [BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md](BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md) | Reusable template for documenting boundary drift incidents and permanent controls |
 | [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` essential skills set for the current review wave |
 | [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
 | [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
@@ -201,10 +224,13 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
 | [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
+| [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
 | [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
-Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+
+The authoring repo is not automatically publish-safe just because template or rebuild exports validate cleanly. Use `local/scripts/verify-workspace-boundaries.ps1` when you need a repo-side boundary check for tracked shared surfaces.
 
 ---
 
@@ -212,7 +238,7 @@ Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS
 
 ### As a starter template
 
-Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini, and treat Copilot CLI as a target adapter to wire once its local config path is defined for your environment. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
+Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `bootstrap -> verify` flow as the baseline for Claude / Codex / Gemini. If `Copilot CLI` is installed, the same bootstrap flow also registers `unitext-registry` into `~/.copilot/mcp-config.json` while leaving repo instructions to `AGENTS.md` / related files. Populate `registry/` with your own skills and MCP definitions, then run the local bootstrap flow for your machine.
 
 ### As a reference implementation
 
@@ -225,6 +251,7 @@ Read the core docs to understand the architecture. Adapt the patterns — regist
 - **Registry first** — define before you deliver
 - **Discovery before automation** — know what exists before syncing it
 - **Platform-agnostic contracts** — logical paths in specs, absolute paths only in local overlay
+- **Repo-level line ending policy** — keep text normalization in tracked `.gitattributes`, not in author-specific Git settings
 - **Minimum viable metadata** — `id`, `type`, `canonical_location`, `status` is enough to start
 - **Safe mutation** — dry-run + backup + explicit trigger, always
 - **AI as consumer** — models read and act on the registry; they don't own the delivery guarantee

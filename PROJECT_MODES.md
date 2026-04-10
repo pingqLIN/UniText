@@ -71,6 +71,13 @@
 3. 移除本機 path / account / machine-specific values
 4. 將 reference implementation 改寫為抽象 examples
 
+即使 template / rebuild export 已通過，也不代表目前 authoring repo 分支自動適合 push。
+
+若要先檢查 tracked shared surfaces，請使用：
+
+- `local/scripts/verify-workspace-boundaries.ps1`
+- `DOCUMENT_PLACEMENT_POLICY.md`
+
 ## 4. Rebuild Rule
 
 當需求不是「發布 template」，而是「把 UniText 重整成全新的專案」時：
