@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
+import textwrap
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -18,11 +20,27 @@ REPO_MARKERS = [
     Path("INDEX.md"),
 ]
 
-UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 360
+UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 60.0
 
 
 def get_repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+def get_home_dir() -> Path:
+    try:
+        return Path.home()
+    except RuntimeError:
+        fallback = os.environ.get("USERPROFILE")
+        if fallback:
+            return Path(fallback)
+
+        home_drive = os.environ.get("HOMEDRIVE")
+        home_path = os.environ.get("HOMEPATH")
+        if home_drive and home_path:
+            return Path(f"{home_drive}{home_path}")
+
+        raise RuntimeError("Could not determine home directory from Path.home(), USERPROFILE, or HOMEDRIVE/HOMEPATH.")
 
 
 def safe_name(path: Path) -> str:
@@ -100,8 +118,84 @@ def toml_string(value: str) -> str:
     return f'"{escaped}"'
 
 
-def render_codex_mcp_block(server: Path, root: Path) -> str:
-    args = ", ".join(toml_string(item) for item in [str(server), "--root", str(root)])
+def render_codex_wrapper() -> str:
+    return textwrap.dedent(
+        """\
+        #!/usr/bin/env python3
+        from __future__ import annotations
+
+        import argparse
+        import importlib.util
+        import sys
+        import time
+        import traceback
+        from pathlib import Path
+
+
+        def append_log(log_path: Path, message: str) -> None:
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+            with log_path.open("a", encoding="utf-8") as handle:
+                handle.write(f"[{timestamp}] {message}\\n")
+
+
+        def load_module(target: Path):
+            spec = importlib.util.spec_from_file_location("unitext_registry_server", target)
+            if spec is None or spec.loader is None:
+                raise RuntimeError(f"unable to load module from {target}")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+
+
+        def main() -> int:
+            parser = argparse.ArgumentParser(add_help=False)
+            parser.add_argument("--target", required=True)
+            parser.add_argument("--log", required=True)
+            args, passthrough = parser.parse_known_args()
+
+            log_path = Path(args.log)
+            target = Path(args.target)
+            start = time.perf_counter()
+
+            append_log(log_path, f"wrapper start argv={sys.argv!r}")
+            append_log(log_path, f"cwd={Path.cwd()} target={target}")
+
+            try:
+                module = load_module(target)
+                import_ms = round((time.perf_counter() - start) * 1000, 2)
+                append_log(log_path, f"target imported in {import_ms} ms")
+
+                sys.argv = [str(target), *passthrough]
+                append_log(log_path, f"delegating with argv={sys.argv!r}")
+
+                run_start = time.perf_counter()
+                exit_code = int(module.main())
+                run_ms = round((time.perf_counter() - run_start) * 1000, 2)
+                append_log(log_path, f"target main exited code={exit_code} run_ms={run_ms}")
+                return exit_code
+            except SystemExit as exc:
+                code = exc.code if isinstance(exc.code, int) else 0
+                total_ms = round((time.perf_counter() - start) * 1000, 2)
+                append_log(log_path, f"SystemExit code={code} total_ms={total_ms}")
+                raise
+            except Exception:
+                total_ms = round((time.perf_counter() - start) * 1000, 2)
+                append_log(log_path, f"exception after {total_ms} ms:\\n{traceback.format_exc()}")
+                raise
+
+
+        if __name__ == "__main__":
+            raise SystemExit(main())
+        """
+    )
+
+
+def render_codex_mcp_block(server: Path, root: Path, wrapper_path: Path, log_path: Path) -> str:
+    args = ", ".join(
+        toml_string(item)
+        for item in [str(wrapper_path), "--target", str(server), "--log", str(log_path), "--root", str(root)]
+    )
     return "\n".join(
         [
             "[mcp_servers.unitext_registry]",
@@ -113,8 +207,8 @@ def render_codex_mcp_block(server: Path, root: Path) -> str:
     )
 
 
-def upsert_codex_mcp_block(text: str, server: Path, root: Path) -> str:
-    block = render_codex_mcp_block(server, root)
+def upsert_codex_mcp_block(text: str, server: Path, root: Path, wrapper_path: Path, log_path: Path) -> str:
+    block = render_codex_mcp_block(server, root, wrapper_path, log_path)
     pattern = r"(?ms)^\[mcp_servers\.unitext_registry\]\n.*?(?=^\[|\Z)"
     if re.search(pattern, text):
         return re.sub(pattern, lambda _: block, text)
@@ -200,16 +294,17 @@ def main() -> int:
         raise SystemExit("non-dry-run bootstrap requires --force")
 
     repo = Path(args.repo_root).resolve()
+    home_dir = get_home_dir()
     validate_repo_root(repo, root, args.allow_external_repo_root)
     source = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
-    codex_config = Path.home() / ".codex" / "config.toml"
-    copilot_mcp_config = Path.home() / ".copilot" / "mcp-config.json"
+    codex_config = home_dir / ".codex" / "config.toml"
+    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
     skills_targets = [
-        Path.home() / ".claude" / "skills",
-        Path.home() / ".gemini" / "skills",
-        Path.home() / ".agents" / "skills",
+        home_dir / ".claude" / "skills",
+        home_dir / ".gemini" / "skills",
+        home_dir / ".agents" / "skills",
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -242,20 +337,30 @@ def main() -> int:
             summary["skills"].append(set_skills_target(source, target, mode, args.dry_run))
 
     if not args.skip_codex:
+        wrapper_path = codex_config.parent / "diagnostics" / "unitext_registry_wrapper.py"
+        log_path = codex_config.parent / "diagnostics" / "unitext_registry_startup.log"
+        wrapper = render_codex_wrapper()
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
+        wrapper_original = wrapper_path.read_text(encoding="utf-8") if wrapper_path.exists() else ""
         updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(source))}")
-        updated = upsert_codex_mcp_block(updated, server, repo)
-        changed = updated != original
+        updated = upsert_codex_mcp_block(updated, server, repo, wrapper_path, log_path)
+        changed = updated != original or wrapper != wrapper_original
         summary["codex"] = {
             "path": str(codex_config),
             "changed": changed,
             "skills_path": str(source),
             "mcp_server": "unitext_registry",
+            "wrapper_path": str(wrapper_path),
+            "log_path": str(log_path),
         }
         if changed and not args.dry_run:
             codex_config.parent.mkdir(parents=True, exist_ok=True)
             if codex_config.exists():
                 backup_path(codex_config, run_dir / "codex" / "config.toml")
+            wrapper_path.parent.mkdir(parents=True, exist_ok=True)
+            if wrapper_path.exists():
+                backup_path(wrapper_path, run_dir / "codex" / "unitext_registry_wrapper.py")
+            wrapper_path.write_text(wrapper, encoding="utf-8")
             codex_config.write_text(updated, encoding="utf-8")
 
     if not args.skip_copilot:
