@@ -20,6 +20,7 @@ ops/rebuild-project/
 ops/project-map/
 ops/agent-governance/
 ops/git-bundles/
+ops/reports/
 ops/baseline.json
 ops/inventory.latest.json
 registry/dist/*.skill
