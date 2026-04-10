@@ -13,8 +13,8 @@ Usage:
       --server '{"cmd":["npm","run","dev"],"cwd":"frontend"}' --port 5173 \
       -- python test.py
 
-    # Legacy shell mode (explicit opt-in only)
-    python scripts/with_server.py --allow-shell --server "cd backend && python server.py" --port 3000 -- python test.py
+    # Legacy shell mode is disabled. Pass JSON server specs only.
+    python scripts/with_server.py --server '{"cmd":["python","server.py"]}' --port 3000 -- python test.py
 """
 
 import argparse
@@ -30,12 +30,13 @@ def parse_server_spec(spec, allow_shell):
     try:
         value = json.loads(spec)
     except json.JSONDecodeError:
-        if not allow_shell:
-            raise ValueError(
-                "Server spec must be JSON unless --allow-shell is provided. "
-                "Example: --server '{\"cmd\":[\"npm\",\"run\",\"dev\"],\"cwd\":\"frontend\"}'"
-            )
-        return {'cmd': spec, 'shell': True, 'cwd': None}
+        raise ValueError(
+            "Server spec must be JSON. "
+            "Example: --server '{\"cmd\":[\"npm\",\"run\",\"dev\"],\"cwd\":\"frontend\"}'"
+        )
+
+    if allow_shell:
+        raise ValueError("Legacy shell mode has been disabled; use a JSON server spec with cmd array instead")
 
     if not isinstance(value, dict):
         raise ValueError("Server spec JSON must be an object")
@@ -47,7 +48,7 @@ def parse_server_spec(spec, allow_shell):
     if cwd is not None and (not isinstance(cwd, str) or not cwd.strip()):
         raise ValueError("Server spec cwd must be a non-empty string when provided")
 
-    return {'cmd': cmd, 'shell': False, 'cwd': cwd}
+    return {'cmd': cmd, 'cwd': cwd}
 
 
 def resolve_cwd(value):
@@ -78,7 +79,11 @@ def main():
     parser.add_argument('--server', action='append', dest='servers', required=True, help='Server command (can be repeated)')
     parser.add_argument('--port', action='append', dest='ports', type=int, required=True, help='Port for each server (must match --server count)')
     parser.add_argument('--timeout', type=int, default=30, help='Timeout in seconds per server (default: 30)')
-    parser.add_argument('--allow-shell', action='store_true', help='Allow legacy shell server commands')
+    parser.add_argument(
+        '--allow-shell',
+        action='store_true',
+        help='Legacy compatibility flag; shell execution is disabled for safety',
+    )
     parser.add_argument('command', nargs=argparse.REMAINDER, help='Command to run after server(s) ready')
 
     args = parser.parse_args()
@@ -115,7 +120,6 @@ def main():
             print(f"Starting server {i+1}/{len(servers)}: {server['cmd']}")
             process = subprocess.Popen(
                 server['cmd'],
-                shell=server['shell'],
                 cwd=server['cwd'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
