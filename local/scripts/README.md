@@ -39,6 +39,8 @@
   - 將候選 skills 批次遷入 `registry/skills/`
 - `generate-index-entries.ps1`
   - 由 `registry/skills/` 生成 INDEX 所需的 catalog 區塊
+- `sync-index-skill-summary.ps1`
+  - 同步 `INDEX.md` 的 skills 摘要行（截至日期與 `registry/skills/` 目錄數量）
 - `rollback-skills.ps1`
   - 從 `ops/history/adopt_*` 的 backup 回復指定 skill
 - `export-review-package.ps1`
