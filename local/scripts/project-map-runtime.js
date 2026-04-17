@@ -1,6 +1,13 @@
 (() => {
   const INITIAL_DATA = window.PROJECT_MAP_BOOTSTRAP;
   const PAGE_MODE = window.PROJECT_MAP_PAGE_MODE || "interactive";
+  const PAGE_CAPABILITIES = INITIAL_DATA?.capabilities || {
+    browser_scan: PAGE_MODE === "interactive",
+    governance_resolver: PAGE_MODE === "interactive",
+    native_repo_paths: PAGE_MODE === "interactive",
+  };
+  const GOVERNANCE_ENABLED = Boolean(PAGE_CAPABILITIES.governance_resolver);
+  const NATIVE_REPO_PATHS_ENABLED = Boolean(PAGE_CAPABILITIES.native_repo_paths);
   const { TYPE_ORDER, CORE_DOCS, ROOT_DIRECTORIES, REPO_MARKERS } = window.PROJECT_MAP_CONSTANTS;
   const TYPE_LABELS = { doc: "Docs", directory: "Directories", skill: "Skills", mcp: "MCP", agent: "Agents", workflow: "Workflow" };
   const TYPE_STYLES = {
@@ -46,7 +53,7 @@
     lastRefreshSource: "bootstrap",
     lastRefreshState: "idle",
     lastRefreshMessage: "目前顯示的是最近一次靜態產出的 MAP。",
-    browserCanScan: PAGE_MODE === "interactive" && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
+    browserCanScan: Boolean(PAGE_CAPABILITIES.browser_scan) && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
   };
 
   const summaryEl = document.getElementById("summary");
@@ -107,14 +114,37 @@
 
   function defaultGovernanceOutputPath() {
     const repoRoot = DATA.meta?.repo_root_native || "";
-    return repoRoot ? `${normalizeWindowsPath(repoRoot)}\\ops\\agent-governance` : "Q:\\UniText\\ops\\agent-governance";
+    if (!NATIVE_REPO_PATHS_ENABLED || !repoRoot) return "";
+    return `${normalizeWindowsPath(repoRoot)}\\ops\\agent-governance`;
   }
 
   function getGovernanceSources() {
     return DATA.governance?.sources || [];
   }
 
+  function governanceUnavailableResolution() {
+    return {
+      generated_at: new Date().toISOString(),
+      inputs: {
+        model: "unavailable",
+        environment: PAGE_MODE === "share-safe" ? "browser-share-safe" : "unavailable",
+        instruction_profile: "unavailable",
+      },
+      policy_meta: {},
+      matched_layers: [],
+      effective_config: {},
+      provenance: {},
+      agents_hierarchy_note: "Governance resolver is disabled for this page profile.",
+      agents_sources: [],
+      effective_file_rules: [],
+      instruction_evaluation: [
+        "This artifact intentionally excludes governance sources, effective file rules, and local operator-only controls.",
+      ],
+    };
+  }
+
   function resolveGovernanceInPage() {
+    if (!GOVERNANCE_ENABLED) return governanceUnavailableResolution();
     const policyLayers = window.AGENT_GOVERNANCE_POLICY?.layers || [];
     const precedence = window.AGENT_GOVERNANCE_POLICY?.meta?.precedence || ["base", "model", "environment", "instruction_profile"];
     const inputs = {
@@ -283,10 +313,10 @@
   function setData(nextData, source) {
     DATA = cloneData(nextData);
     if (!DATA.meta) DATA.meta = {};
-    if (!DATA.meta.repo_root_native && INITIAL_DATA?.meta?.repo_root_native) {
+    if (NATIVE_REPO_PATHS_ENABLED && !DATA.meta.repo_root_native && INITIAL_DATA?.meta?.repo_root_native) {
       DATA.meta.repo_root_native = INITIAL_DATA.meta.repo_root_native;
     }
-    if (!DATA.governance && INITIAL_DATA?.governance) {
+    if (GOVERNANCE_ENABLED && !DATA.governance && INITIAL_DATA?.governance) {
       DATA.governance = cloneData(INITIAL_DATA.governance);
     }
     nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
@@ -515,6 +545,7 @@
   function buildHandoffSummary() {
     const diagnostics = DATA.diagnostics || {};
     const counts = DATA.counts || {};
+    const exportArtifactsStale = state.lastRefreshSource !== "bootstrap";
     const topBrokenSources = getBrokenSources().slice(0, 5)
       .map((item) => `- ${item.source_label} (${item.count}) — ${item.source_path}`)
       .join("\n");
@@ -527,6 +558,7 @@
       `- Edge count: ${(DATA.edges || []).length}`,
       `- Broken references: ${diagnostics.broken_reference_count || 0}`,
       `- Orphan resources: ${diagnostics.orphan_node_count || 0}`,
+      `- Static artifacts: ${exportArtifactsStale ? `stale after browser refresh (${state.lastRefreshSource})` : "aligned with the current page bootstrap"}`,
       "",
       "## Resource Counts",
       "",
@@ -594,17 +626,36 @@
 
   function updateExportCard() {
     if (!exportCardEl) return;
+    const exportArtifactsStale = state.lastRefreshSource !== "bootstrap";
     const shareHref = new URL("./project-map-share.html", window.location.href).href;
     const handoffMdHref = new URL("./project-map-handoff.md", window.location.href).href;
     const handoffJsonHref = new URL("./project-map-handoff.json", window.location.href).href;
+    const staleWarningMarkup = exportArtifactsStale
+      ? `
+        <div class="status-card progress">
+          <div class="status-row">
+            <span class="status-pill">stale</span>
+            <span class="status-inline-note">目前畫面資料來自頁內重掃，靜態 share/handoff 檔尚未同步更新。</span>
+          </div>
+          <div><strong>目前來源</strong>：${escapeHtml(state.lastRefreshSource)}</div>
+          <div><strong>建議動作</strong>：重新執行 <code>python local/scripts/build-project-map.py</code> 後，再交付 share-safe / handoff artifacts。</div>
+        </div>
+      `
+      : "";
+    const staticLinkMarkup = exportArtifactsStale
+      ? ""
+      : `
+        <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
+        <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.md</a>
+        <a class="mini-action secondary" href="${handoffJsonHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.json</a>
+      `;
     exportCardEl.innerHTML = `
       <span class="card-title">Export</span>
       <div><strong>Share-safe artifact</strong>：可直接打開唯讀分享版快照。</div>
       <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的 share-safe 頁面與 handoff 檔，而不是把操作者介面直接丟給下一位。</div>
+      ${staleWarningMarkup}
       <div class="card-actions">
-        <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
-        <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.md</a>
-        <a class="mini-action secondary" href="${handoffJsonHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.json</a>
+        ${staticLinkMarkup}
         <button type="button" class="mini-action" id="copy-handoff-summary">複製 handoff 摘要</button>
       </div>
     `;
@@ -631,6 +682,10 @@
 
   async function writeGovernanceReports() {
     const resolution = await resolveGovernanceAction();
+    if (!GOVERNANCE_ENABLED || !NATIVE_REPO_PATHS_ENABLED) {
+      renderGovernanceResolution(resolution, "此頁面設定為唯讀 surface，不提供治理報告輸出。");
+      return;
+    }
     const handle = await ensureRepoHandle(true);
     if (!handle) {
       renderGovernanceResolution(resolution, "尚未連結 repo root，無法寫出治理報告。");
@@ -1168,7 +1223,7 @@
     const dirHandle = await getDirectoryHandle(rootHandle, relativePath);
     const names = [];
     for await (const [name, handle] of dirHandle.entries()) {
-      if (handle.kind === "directory") names.push(name);
+      if (handle.kind === "directory" && !name.startsWith(".")) names.push(name);
     }
     return names.sort((a, b) => a.localeCompare(b));
   }
@@ -1403,7 +1458,7 @@
       };
     });
     return {
-      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 },
+      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 3, page_mode: "interactive" },
       counts,
       diagnostics: {
         broken_reference_count: brokenReferences.length,
@@ -1518,7 +1573,7 @@
   function setupControls() {
     loadSettings();
     applySettingsToControls();
-    if (governanceOutputPathEl) governanceOutputPathEl.value = defaultGovernanceOutputPath();
+    if (governanceOutputPathEl && GOVERNANCE_ENABLED) governanceOutputPathEl.value = defaultGovernanceOutputPath();
     searchEl.addEventListener("input", () => { state.search = searchEl.value.trim().toLowerCase(); render(); });
     typeFilterEl.addEventListener("change", () => { state.type = typeFilterEl.value; render(); });
     mapModeEl.addEventListener("change", () => { state.mapMode = mapModeEl.value; saveSettings(); render(); });
@@ -1529,12 +1584,16 @@
       catch (error) { updateStatusCard(error instanceof Error ? error.message : String(error)); }
     });
     refreshNowEl.addEventListener("click", () => { refreshFromRepo("manual-button", true); });
-    governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
-    governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
+    if (GOVERNANCE_ENABLED) {
+      governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
+      governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
+    }
   }
 
   setupControls();
   render();
-  renderGovernanceResolution(resolveGovernanceInPage(), "已載入預設治理解析。");
+  if (GOVERNANCE_ENABLED) {
+    renderGovernanceResolution(resolveGovernanceInPage(), "已載入預設治理解析。");
+  }
   maybeAutoRefreshOnLoad();
 })();

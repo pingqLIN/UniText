@@ -98,6 +98,10 @@ def node_id_for(kind: str, key: str) -> str:
     return f"{kind}:{key}"
 
 
+def is_public_registry_dir(path: Path) -> bool:
+    return path.is_dir() and not path.name.startswith(".")
+
+
 def parse_frontmatter(text: str) -> dict[str, str]:
     if not text.startswith("---\n"):
         return {}
@@ -243,7 +247,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
 
     skills_root = repo_root / "registry" / "skills"
-    for skill_dir in sorted(path for path in skills_root.iterdir() if path.is_dir()):
+    for skill_dir in sorted(path for path in skills_root.iterdir() if is_public_registry_dir(path)):
         skill_file = skill_dir / "SKILL.md"
         if not skill_file.exists():
             continue
@@ -264,7 +268,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
 
     mcp_root = repo_root / "registry" / "mcp"
-    for mcp_dir in sorted(path for path in mcp_root.iterdir() if path.is_dir()):
+    for mcp_dir in sorted(path for path in mcp_root.iterdir() if is_public_registry_dir(path)):
         definition_file = mcp_dir / "definition.json"
         if not definition_file.exists():
             continue
@@ -292,7 +296,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
 
     agents_root = repo_root / "registry" / "agents"
-    for agent_dir in sorted(path for path in agents_root.iterdir() if path.is_dir()):
+    for agent_dir in sorted(path for path in agents_root.iterdir() if is_public_registry_dir(path)):
         agent_file = agent_dir / "AGENT.md"
         if not agent_file.exists():
             continue
@@ -311,7 +315,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
 
     workflow_root = repo_root / "registry" / "workflow"
-    for workflow_dir in sorted(path for path in workflow_root.iterdir() if path.is_dir()):
+    for workflow_dir in sorted(path for path in workflow_root.iterdir() if is_public_registry_dir(path)):
         workflow_file = workflow_dir / "WORKFLOW.md"
         if not workflow_file.exists():
             workflow_file = workflow_dir / "README.md"
@@ -487,7 +491,7 @@ def build_payload(repo_root: Path) -> dict[str, object]:
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "source_root": "/",
             "repo_root_native": str(repo_root),
-            "version": 2,
+            "version": 3,
         },
         "counts": dict(sorted(counts.items())),
         "diagnostics": diagnostics,
@@ -497,6 +501,55 @@ def build_payload(repo_root: Path) -> dict[str, object]:
     }
 
 
+def build_page_capabilities(page_mode: str) -> dict[str, bool]:
+    interactive = page_mode == "interactive"
+    return {
+        "browser_scan": interactive,
+        "governance_resolver": interactive,
+        "native_repo_paths": interactive,
+    }
+
+
+def build_page_payload(payload: dict[str, object], page_mode: str) -> dict[str, object]:
+    page_payload = json.loads(json.dumps(payload))
+    page_payload["capabilities"] = build_page_capabilities(page_mode)
+    page_payload.setdefault("meta", {})
+    page_payload["meta"]["page_mode"] = page_mode
+    if page_mode == "share-safe":
+        page_payload["meta"].pop("repo_root_native", None)
+        page_payload.pop("governance", None)
+    return page_payload
+
+
+def build_page_copy(page_mode: str) -> dict[str, str]:
+    if page_mode == "share-safe":
+        return {
+            "header_description": "一次性生成、純靜態、可直接分享的專案 MAP 快照。此版本只保留唯讀巡覽與診斷摘要，移除本機 repo 路徑、治理來源與頁內重掃能力。",
+            "eyebrow": "UniText / Project Snapshot",
+            "aside_kicker": "Read-Only Surface",
+            "aside_title": "Browse the project map without exposing local operator context.",
+            "aside_copy": "這個版本只保留節點、關聯與 diagnostics 摘要，移除 repo 本機路徑、治理來源、resolver，以及頁內目錄授權與重掃能力。",
+        }
+    return {
+        "header_description": "一次性生成、純靜態、可直接用瀏覽器開啟的專案 MAP 頁面。若瀏覽器支援 File System Access API，頁面本身也能在不啟動 backend 的情況下讀取 repo 並重新整理內容。",
+        "eyebrow": "UniText / Governance Instrument Panel",
+        "aside_kicker": "Operator Focus",
+        "aside_title": "Scan the registry, isolate drift, then hand off with confidence.",
+        "aside_copy": "這個頁面主要服務維護者與治理操作者。先看整體資源結構，再下鑽 diagnostics 與 governance layering，最後輸出 share-safe / handoff artifacts。",
+    }
+
+
+def strip_share_safe_blocks(html: str) -> str:
+    operator_only_patterns = [
+        re.compile(r"\s*<section class=\"control-band secondary\" data-share-hide>.*?</section>\s*", re.DOTALL),
+        re.compile(r"\s*<article class=\"info-card\" id=\"export-card\" data-share-hide>\s*<span class=\"card-title\">Export</span>\s*</article>\s*", re.DOTALL),
+        re.compile(r"\s*<section class=\"governance-panel\" data-share-hide>.*?</section>\s*", re.DOTALL),
+    ]
+    for pattern in operator_only_patterns:
+        html = pattern.sub("\n", html)
+    return html
+
+
 def render_html(payload: dict[str, object], page_mode: str = "interactive") -> str:
     repo_root = get_repo_root()
     template_path = repo_root / "local" / "scripts" / "project-map-template.html"
@@ -504,15 +557,17 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
     governance_policy_path = repo_root / "local" / "config" / "agent-governance-layers.json"
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
-    governance_policy = json.loads(read_text(governance_policy_path))
-    if page_mode == "share-safe":
-        header_description = "一次性生成、純靜態、可直接分享的專案 MAP 快照。此版本只提供唯讀瀏覽，不包含頁內重掃或 repo 目錄授權功能。"
-    else:
-        header_description = "一次性生成、純靜態、可直接用瀏覽器開啟的專案 MAP 頁面。若瀏覽器支援 File System Access API，頁面本身也能在不啟動 backend 的情況下讀取 repo 並重新整理內容。"
+    governance_policy = json.loads(read_text(governance_policy_path)) if page_mode == "interactive" else None
+    page_payload = build_page_payload(payload, page_mode)
+    page_copy = build_page_copy(page_mode)
     replacements = {
-        "__BOOTSTRAP_DATA__": json.dumps(payload, ensure_ascii=False).replace("</", "<\\/"),
+        "__BOOTSTRAP_DATA__": json.dumps(page_payload, ensure_ascii=False).replace("</", "<\\/"),
         "__PAGE_MODE__": page_mode,
-        "__HEADER_DESCRIPTION__": header_description,
+        "__HEADER_DESCRIPTION__": page_copy["header_description"],
+        "__PAGE_EYEBROW__": page_copy["eyebrow"],
+        "__ASIDE_KICKER__": page_copy["aside_kicker"],
+        "__ASIDE_TITLE__": page_copy["aside_title"],
+        "__ASIDE_COPY__": page_copy["aside_copy"],
         "__TYPE_ORDER__": json.dumps(TYPE_ORDER, ensure_ascii=False),
         "__CORE_DOCS__": json.dumps(CORE_DOCS, ensure_ascii=False),
         "__ROOT_DIRECTORIES__": json.dumps(ROOT_DIRECTORIES, ensure_ascii=False),
@@ -522,6 +577,8 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
     }
     for key, value in replacements.items():
         template = template.replace(key, value)
+    if page_mode == "share-safe":
+        template = strip_share_safe_blocks(template)
     return template
 
 
@@ -545,6 +602,16 @@ def build_handoff_payload(payload: dict[str, object]) -> dict[str, object]:
             "handoff_markdown": "site/project-map-handoff.md",
             "handoff_json": "site/project-map-handoff.json",
         },
+        "surface_contract": {
+            "interactive": {
+                "intended_audience": "operators and maintainers",
+                **build_page_capabilities("interactive"),
+            },
+            "share_safe": {
+                "intended_audience": "read-only reviewers and handoff recipients",
+                **build_page_capabilities("share-safe"),
+            },
+        },
         "summary": {
             "node_total": sum(int(value) for value in counts.values()),
             "edge_total": len(payload.get("edges", [])),
@@ -556,7 +623,7 @@ def build_handoff_payload(payload: dict[str, object]) -> dict[str, object]:
         },
         "handoff_notes": [
             "用 interactive 版做搜尋、關聯跳轉、頁內更新與診斷篩選。",
-            "用 share-safe 版做唯讀展示或交付，不含 repo 授權與頁內重掃入口。",
+            "用 share-safe 版做唯讀展示或交付，移除 native repo path、governance sources，以及頁內重掃/治理輸出能力。",
             "若需要交接給下一位 agent，優先附上 handoff markdown 與 share-safe 頁面路徑。",
         ],
     }
@@ -581,6 +648,11 @@ def render_handoff_markdown(payload: dict[str, object]) -> str:
         f"- Share-safe page: `{handoff['artifacts']['share_html']}`",
         f"- Handoff markdown: `{handoff['artifacts']['handoff_markdown']}`",
         f"- Handoff JSON: `{handoff['artifacts']['handoff_json']}`",
+        "",
+        "## Surface Contract",
+        "",
+        f"- Interactive: browser scan = `{handoff['surface_contract']['interactive']['browser_scan']}`, governance resolver = `{handoff['surface_contract']['interactive']['governance_resolver']}`, native repo paths = `{handoff['surface_contract']['interactive']['native_repo_paths']}`",
+        f"- Share-safe: browser scan = `{handoff['surface_contract']['share_safe']['browser_scan']}`, governance resolver = `{handoff['surface_contract']['share_safe']['governance_resolver']}`, native repo paths = `{handoff['surface_contract']['share_safe']['native_repo_paths']}`",
         "",
         "## Resource Counts",
         "",
