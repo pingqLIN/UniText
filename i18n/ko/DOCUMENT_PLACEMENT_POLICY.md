@@ -31,6 +31,12 @@ UniText 는 동시에 다음과 같다.
 - 문서가 단일 작성자 workspace 의 현재 상태를 설명하면 local layer 에 둔다
 - 문서가 작업 이력, export 결과, audit evidence, generated state 를 설명하면 operations layer 에 둔다
 
+어떤 “작업 창”이나 어떤 authoring 머신에서 이 문서를 작성했는지는 주된 판단 기준이 아니다.
+
+- UniText authoring workspace 안에서 작성했다고 해서 자동으로 `local/docs/authoring/` 인 것은 아니다
+- tracked 라고 해서 자동으로 “공개 가능” 또는 “push 가능”을 의미하지도 않는다
+- 먼저 이 문서가 누구를 위한 것인지, 어떤 진실 레이어를 설명하는지부터 확인한 다음 위치를 결정한다
+
 ## 3. Placement Matrix
 
 | Content type | Canonical location | Tracked | Share-safe | Notes |
@@ -84,14 +90,39 @@ template / rebuild export 가 안전하다는 것은 export 산출물의 경계�
 3. 이 문서는 앞으로 template / rebuild / shared registry 에서 안전하게 참조되어야 하는가
    - 예: root docs, `registry/`, 또는 shared workflow layer 를 우선 검토
 
-## 8. Common Misplacements
+## 8. Decision Ladder
+
+더 안정적으로 판단해야 한다면 다음 순서를 따른다.
+
+1. 이것이 generated state, audit evidence, drift report, 또는 export output 인가
+   - 예: `ops/` 에 둔다
+2. 이것이 단일 authoring workspace, 단일 머신, 또는 현재의 live wiring 을 설명하는가
+   - 예: `local/docs/` 에 둔다
+3. 단일 workspace 를 설명한다면, 이것이 draft, review note, 또는 authoring workboard 인가
+   - 예: `local/docs/authoring/` 에 둔다
+4. 미래의 shared readers 가 반복 참조할 canonical truth 이며 template-safe 해야 하는가
+   - 예: tracked shared layer 에 둔다
+5. tracked shared layer 라면 어느 유형에 더 가까운가
+   - repo-wide policy / spec: root docs 에 둔다
+   - sanitized reference: `registry/.../references/` 에 둔다
+   - shared workflow / runbook: `registry/workflow/` 에 둔다
+6. shared 버전과 live 버전이 모두 필요하다면
+   - sanitized/live pair 를 만들고, 두 경계를 하나의 파일에 섞지 않는다
+
+그래도 확신이 없으면 다음을 사용한다.
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document-placement-recommendation.ps1 -Topic "cloudflare workflow" -CanonicalSharedTruth -SharedForm registry-reference
+```
+
+## 9. Common Misplacements
 
 - live Cloudflare baseline 을 `registry/.../references/` 에 두는 것
 - strategy / review plan 을 root 에 두는 것
 - export output 또는 audit evidence 를 canonical reference 로 취급하는 것
 - machine-specific path 를 shared governance docs 에 직접 쓰는 것
 
-## 9. Review Gate
+## 10. Review Gate
 
 새 governance / reference 문서를 추가하기 전에 최소한 다음을 확인해야 한다.
 
@@ -99,7 +130,7 @@ template / rebuild export 가 안전하다는 것은 export 산출물의 경계�
 - push 되더라도 `NO_PUBLISH_POLICY.md` 와 template-safe 기대를 계속 만족하는가
 - 하나의 파일에 둘 다 넣는 대신 sanitized/live pair 가 필요한 것은 아닌가
 
-## 10. Related Docs
+## 11. Related Docs
 
 - `README.md`
 - `INDEX.md`

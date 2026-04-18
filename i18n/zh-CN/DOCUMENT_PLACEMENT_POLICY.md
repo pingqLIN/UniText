@@ -31,6 +31,12 @@ UniText 同时是：
 - 如果文档描述的是单一作者工作区的当前状态，就放 local layer
 - 如果文档描述的是操作历史、输出结果、audit evidence 或 generated state，就放 operations layer
 
+作者是在哪个“工作窗口”或哪台 authoring 机器里编写这份文档，不是主判准。
+
+- 在 UniText authoring workspace 内编写，不自动等于 `local/docs/authoring/`
+- 被 tracked，也不自动等于“可公开”或“可 push”
+- 先问文档要服务谁、要描述哪一层真相，再决定放置位置
+
 ## 3. Placement Matrix
 
 | Content type | Canonical location | Tracked | Share-safe | Notes |
@@ -84,14 +90,39 @@ template / rebuild 导出安全，只代表导出产物的边界较干净，不�
 3. 这份文档是不是希望未来 template / rebuild / shared registry 都能安全引用
    - 是：优先放 root docs、`registry/`，或 shared workflow layer
 
-## 8. Common Misplacements
+## 8. Decision Ladder
+
+需要更稳定的判断时，按这个顺序：
+
+1. 这是不是 generated state、audit evidence、drift report，或 export output
+   - 是：放 `ops/`
+2. 这是不是在描述单一 authoring workspace、单一机器，或当前 live wiring
+   - 是：放 `local/docs/`
+3. 如果它描述单一 workspace，它是不是 draft、review note，或 authoring workboard
+   - 是：放 `local/docs/authoring/`
+4. 这是不是给未来 shared readers 重复引用的 canonical truth，而且应该 template-safe
+   - 是：放 tracked shared layer
+5. 如果是 tracked shared layer，它更像哪一种
+   - repo-wide policy / spec：放 root docs
+   - sanitized reference：放 `registry/.../references/`
+   - shared workflow / runbook：放 `registry/workflow/`
+6. 如果 shared 与 live 两种版本都需要存在
+   - 建立 sanitized/live pair，不要把两种边界混在同一份文件里
+
+若仍不确定，先用：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document-placement-recommendation.ps1 -Topic "cloudflare workflow" -CanonicalSharedTruth -SharedForm registry-reference
+```
+
+## 9. Common Misplacements
 
 - 把 live Cloudflare baseline 放到 `registry/.../references/`
 - 把 strategy / review plan 放到 root
 - 把 export output 或 audit evidence 当成 canonical reference
 - 把 machine-specific path 直接写进 shared governance docs
 
-## 9. Review Gate
+## 10. Review Gate
 
 在新增任何 governance / reference 类文档前，至少先确认：
 
@@ -99,7 +130,7 @@ template / rebuild 导出安全，只代表导出产物的边界较干净，不�
 - 它如果被 push，是否仍符合 `NO_PUBLISH_POLICY.md` 与 template-safe 预期
 - 它是否需要一个 sanitized/live pair，而不是单档同时承载两者
 
-## 10. Related Docs
+## 11. Related Docs
 
 - `README.md`
 - `INDEX.md`

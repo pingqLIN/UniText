@@ -64,6 +64,8 @@
 
 現在の外部 review 主集は、全候補ではなく [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) にある `8 + 4` の選抜 skills に基づきます。
 
+`2026-04-18` 時点で、authoring tree 内の `registry/skills/` には `48` 個の skill ディレクトリがあります。下の表は review-facing catalog excerpt であり、完全な inventory dump ではありません。
+
 ### Review Package
 
 外部 reviewer 向けの資料をまとめる場合は、[EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) を入口にし、`local/scripts/export-review-package.ps1` を使って再生成可能な review package を作ってください。
@@ -132,6 +134,7 @@ shared metadata の検出ルールを調整したり、ルール事例を理解�
 | `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
 | `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
 | `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+| `cloudflare-zerotrust-device` | Workspace | `/registry/skills/cloudflare-zerotrust-device` | `active` |
 
 ### Workflow
 

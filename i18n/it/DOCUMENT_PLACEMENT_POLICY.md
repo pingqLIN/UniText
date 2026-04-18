@@ -31,6 +31,12 @@ Quando si decide dove collocare un documento, conta prima la natura del contenut
 - se descrive lo stato attuale di un singolo authoring workspace, va nel local layer
 - se descrive cronologia operativa, risultati di export, audit evidence o generated state, va nel operations layer
 
+Il fatto che un documento sia stato scritto in una certa “finestra di lavoro” o su una specifica macchina di authoring non è il criterio principale.
+
+- Essere stato scritto dentro il UniText authoring workspace non significa automaticamente `local/docs/authoring/`
+- Essere tracked non significa automaticamente nemmeno “pubblicabile” o “adatto al push”
+- Prima chiediti a chi serve il documento e quale livello di verità descrive, poi decidi la collocazione
+
 ## 3. Placement Matrix
 
 | Content type | Canonical location | Tracked | Share-safe | Notes |
@@ -84,14 +90,39 @@ Se non sei sicuro di dove collocare un documento, poni prima queste tre domande:
 3. questo documento deve poter essere referenziato in modo sicuro da template / rebuild / shared registry?
    - sì: privilegia root docs, `registry/` oppure il shared workflow layer
 
-## 8. Common Misplacements
+## 8. Decision Ladder
+
+Se serve un criterio più stabile, segui quest’ordine:
+
+1. È generated state, audit evidence, un drift report o un export output?
+   - sì: va in `ops/`
+2. Descrive un singolo authoring workspace, una singola macchina o il live wiring attuale?
+   - sì: va in `local/docs/`
+3. Se descrive un singolo workspace, è un draft, una review note o un authoring workboard?
+   - sì: va in `local/docs/authoring/`
+4. È canonical truth da riutilizzare per futuri shared readers e deve anche essere template-safe?
+   - sì: va nel tracked shared layer
+5. Se appartiene al tracked shared layer, a quale tipo assomiglia di più?
+   - repo-wide policy / spec: va nei root docs
+   - sanitized reference: va in `registry/.../references/`
+   - shared workflow / runbook: va in `registry/workflow/`
+6. Se devono coesistere una versione shared e una live
+   - crea una sanitized/live pair; non mescolare i due confini nello stesso file
+
+Se hai ancora dubbi, usa:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document-placement-recommendation.ps1 -Topic "cloudflare workflow" -CanonicalSharedTruth -SharedForm registry-reference
+```
+
+## 9. Common Misplacements
 
 - mettere una live Cloudflare baseline in `registry/.../references/`
 - mettere uno strategy / review plan nella root
 - trattare un export output o una audit evidence come canonical reference
 - scrivere machine-specific path direttamente nelle shared governance docs
 
-## 9. Review Gate
+## 10. Review Gate
 
 Prima di aggiungere qualsiasi documento di governance / reference, bisogna almeno verificare:
 
@@ -99,7 +130,7 @@ Prima di aggiungere qualsiasi documento di governance / reference, bisogna almen
 - che, se pushato, resti conforme a `NO_PUBLISH_POLICY.md` e alle aspettative template-safe
 - che non serva invece una coppia sanitized/live invece di un singolo file che prova a contenere entrambe
 
-## 10. Related Docs
+## 11. Related Docs
 
 - `README.md`
 - `INDEX.md`

@@ -64,6 +64,8 @@ Le regole complete sui campi si trovano in `RESOURCE_SPEC.md`.
 
 L’attuale base per la review esterna segue il set `8 + 4` definito in [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md), non l’intero pool di candidati.
 
+Alla data `2026-04-18`, `registry/skills/` nell’authoring tree contiene `48` directory di skill. La tabella seguente è un review-facing catalog excerpt, non un inventory dump completo.
+
 ### Review Package
 
 Per preparare materiale per reviewer esterni, usa [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) come punto di ingresso e `local/scripts/export-review-package.ps1` per produrre un review package ripetibile.
@@ -132,6 +134,7 @@ Le seguenti skill esistono già nel shared registry, ma non fanno parte dell’a
 | `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
 | `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
 | `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+| `cloudflare-zerotrust-device` | Workspace | `/registry/skills/cloudflare-zerotrust-device` | `active` |
 
 ### Workflow
 

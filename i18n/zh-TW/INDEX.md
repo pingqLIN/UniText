@@ -64,6 +64,8 @@
 
 目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
+截至 `2026-04-18`，目前 authoring tree 內的 `registry/skills/` 共有 `48` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+
 ### Review Package
 
 若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
@@ -132,6 +134,7 @@
 | `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
 | `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
 | `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+| `cloudflare-zerotrust-device` | Workspace | `/registry/skills/cloudflare-zerotrust-device` | `active` |
 
 ### Workflow
 
