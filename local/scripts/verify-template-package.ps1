@@ -56,7 +56,8 @@ $required = @(
   "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
   "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
-  "local\\scripts\\get-publishability-report.ps1"
+  "local\\scripts\\get-publishability-report.ps1",
+  "local\\scripts\\get-document-placement-recommendation.ps1"
 )
 
 $forbidden = @(

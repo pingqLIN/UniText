@@ -55,6 +55,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1"; target = "local\\scripts\\lib\\workspace-sensitive-metadata.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\verify-workspace-boundaries.ps1"; target = "local\\scripts\\verify-workspace-boundaries.ps1" },
   [pscustomobject]@{ kind = "file"; source = "local\\scripts\\get-publishability-report.ps1"; target = "local\\scripts\\get-publishability-report.ps1" },
+  [pscustomobject]@{ kind = "file"; source = "local\\scripts\\get-document-placement-recommendation.ps1"; target = "local\\scripts\\get-document-placement-recommendation.ps1" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\skills\\example-skill"; target = "registry\\skills\\example-skill" },
   [pscustomobject]@{ kind = "dir"; source = "template\\examples\\agents\\example-agent"; target = "registry\\agents\\example-agent" },
   [pscustomobject]@{ kind = "dir"; source = "registry\\mcp\\claude-project-mcp-seed"; target = "registry\\mcp\\claude-project-mcp-seed" },

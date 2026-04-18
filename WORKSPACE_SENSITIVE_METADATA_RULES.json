@@ -39,6 +39,7 @@
     "local/scripts/validate-workspace-sensitive-metadata-rules.ps1",
     "local/scripts/verify-workspace-boundaries.ps1",
     "local/scripts/get-publishability-report.ps1",
+    "local/scripts/get-document-placement-recommendation.ps1",
     "local/scripts/lib/renormalize_core.py",
     "local/scripts/lib/workspace-sensitive-metadata.ps1",
     "WORKSPACE_SENSITIVE_METADATA_RULES.json",

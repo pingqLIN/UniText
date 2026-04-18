@@ -44,6 +44,7 @@ $required = @(
   "local\\scripts\\verify-template-package.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
   "local\\scripts\\get-publishability-report.ps1",
+  "local\\scripts\\get-document-placement-recommendation.ps1",
   "local\\docs\\ADOPTION_CHECKLIST.md",
   "local\\docs\\CLI_COMPAT_MATRIX.md",
   "registry\\agents\\registry-curator\\AGENT.md",
