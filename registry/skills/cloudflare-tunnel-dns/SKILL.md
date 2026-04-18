@@ -35,6 +35,7 @@ description: Use when the request is specifically about Cloudflare Tunnel invent
 
 - [workspace baseline](../cloudflare-governance/references/current-baseline.md)
 - [scripts/check-tunnel-runtime-alignment.ps1](scripts/check-tunnel-runtime-alignment.ps1)
+- [scripts/plan-staging-public-host-activation.ps1](scripts/plan-staging-public-host-activation.ps1)
 
 ## Escalate
 
