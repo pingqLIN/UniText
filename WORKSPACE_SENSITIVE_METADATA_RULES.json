@@ -71,7 +71,7 @@
     },
     {
       "label": "live workspace hostname",
-      "regex": "(?i)\\b(?:zone hostname|ingress|hostnames?|domain)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
+      "regex": "(?i)\\b(?:zone hostname|ingress hostname|ingress hostnames|access app domain|public health host|workspace domain|tunnel hostname|hostname mapping)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
       "skip_script_pattern_lines": true
     },
     {
@@ -100,6 +100,21 @@
       "label": "flag live hostname in governance text",
       "sample": "Zone hostname: colorgeek.co",
       "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "flag ingress hostname binding",
+      "sample": "Ingress hostname: app.colorgeek.co",
+      "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "allow generic hostname example in docs",
+      "sample": "For example, report https://myapp.azurewebsites.net, never myapp.azurewebsites.net.",
+      "expected_labels": []
+    },
+    {
+      "label": "allow domain controller text with docs link",
+      "sample": "\"Trust relationship between workstation and domain failed\" | Reset machine account or rejoin domain | https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/windows/troubleshoot-rdp-connection",
+      "expected_labels": []
     },
     {
       "label": "flag machine-specific path",

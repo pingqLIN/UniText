@@ -1,9 +1,9 @@
 param(
-    [string]$AuthoringRoot = "Q:\Projects\tb2-claude-subagent-workflow",
-    [string]$ProdConfigPath = "Q:\Services\tb2-prod\ops\cloudflared.tb2.yml",
-    [string]$StagingConfigPath = "Q:\Services\tb2-staging\ops\cloudflared.tb2.yml",
-    [string]$ProdReleaseInfoPath = "Q:\Services\tb2-prod\release-info.json",
-    [string]$ReleaseTargetsPath = "Q:\Projects\tb2-claude-subagent-workflow\ops\release-targets.json",
+    [string]$AuthoringRoot = ".",
+    [string]$ProdConfigPath,
+    [string]$StagingConfigPath,
+    [string]$ProdReleaseInfoPath,
+    [string]$ReleaseTargetsPath = "ops\release-targets.json",
     [string]$InventoryJsonPath,
     [string]$MarkdownOutputPath,
     [string]$JsonOutputPath
@@ -11,10 +11,31 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Resolve-OptionalPath {
+    param(
+        [string]$Path,
+        [string]$BasePath
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Path)) {
+        return $null
+    }
+
+    if ([IO.Path]::IsPathRooted($Path)) {
+        return $Path
+    }
+
+    if ([string]::IsNullOrWhiteSpace($BasePath)) {
+        return $Path
+    }
+
+    return (Join-Path $BasePath $Path)
+}
+
 function Read-TextFile {
     param([string]$Path)
 
-    if (-not (Test-Path -LiteralPath $Path)) {
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path)) {
         return $null
     }
 
@@ -109,21 +130,28 @@ function Get-InventoryMapping {
     }
 }
 
-$authoringProd = Parse-CloudflaredConfig -Path (Resolve-StageCloudflaredSourceFile -RootDir $AuthoringRoot -StageName "prod")
-$authoringStaging = Parse-CloudflaredConfig -Path (Resolve-StageCloudflaredSourceFile -RootDir $AuthoringRoot -StageName "staging")
-$prod = Parse-CloudflaredConfig -Path $ProdConfigPath
-$staging = Parse-CloudflaredConfig -Path $StagingConfigPath
-$prodReleaseInfo = if (Test-Path -LiteralPath $ProdReleaseInfoPath) {
-    Get-Content -LiteralPath $ProdReleaseInfoPath -Raw | ConvertFrom-Json -Depth 8
+$resolvedAuthoringRoot = Resolve-OptionalPath -Path $AuthoringRoot -BasePath (Get-Location).Path
+$resolvedProdConfigPath = Resolve-OptionalPath -Path $ProdConfigPath -BasePath $resolvedAuthoringRoot
+$resolvedStagingConfigPath = Resolve-OptionalPath -Path $StagingConfigPath -BasePath $resolvedAuthoringRoot
+$resolvedProdReleaseInfoPath = Resolve-OptionalPath -Path $ProdReleaseInfoPath -BasePath $resolvedAuthoringRoot
+$resolvedReleaseTargetsPath = Resolve-OptionalPath -Path $ReleaseTargetsPath -BasePath $resolvedAuthoringRoot
+$resolvedInventoryJsonPath = Resolve-OptionalPath -Path $InventoryJsonPath -BasePath (Get-Location).Path
+
+$authoringProd = Parse-CloudflaredConfig -Path (Resolve-StageCloudflaredSourceFile -RootDir $resolvedAuthoringRoot -StageName "prod")
+$authoringStaging = Parse-CloudflaredConfig -Path (Resolve-StageCloudflaredSourceFile -RootDir $resolvedAuthoringRoot -StageName "staging")
+$prod = Parse-CloudflaredConfig -Path $resolvedProdConfigPath
+$staging = Parse-CloudflaredConfig -Path $resolvedStagingConfigPath
+$prodReleaseInfo = if ($resolvedProdReleaseInfoPath -and (Test-Path -LiteralPath $resolvedProdReleaseInfoPath)) {
+    Get-Content -LiteralPath $resolvedProdReleaseInfoPath -Raw | ConvertFrom-Json -Depth 8
 } else {
     $null
 }
-$releaseTargets = if (Test-Path -LiteralPath $ReleaseTargetsPath) {
-    Get-Content -LiteralPath $ReleaseTargetsPath -Raw | ConvertFrom-Json -Depth 8
+$releaseTargets = if ($resolvedReleaseTargetsPath -and (Test-Path -LiteralPath $resolvedReleaseTargetsPath)) {
+    Get-Content -LiteralPath $resolvedReleaseTargetsPath -Raw | ConvertFrom-Json -Depth 8
 } else {
     $null
 }
-$inventory = Get-InventoryMapping -InventoryJsonPath $InventoryJsonPath
+$inventory = Get-InventoryMapping -InventoryJsonPath $resolvedInventoryJsonPath
 
 $authoringProdIngressSignature = @(Normalize-IngressSignature -Ingress $authoringProd.ingress)
 $authoringStagingIngressSignature = @(Normalize-IngressSignature -Ingress $authoringStaging.ingress)

@@ -1,6 +1,7 @@
 param(
   [string]$Topic = "document",
   [string]$CandidatePath,
+  [switch]$InferFromCandidatePath,
   [switch]$CanonicalSharedTruth,
   [switch]$DescribesSingleWorkspace,
   [switch]$GeneratedState,
@@ -47,8 +48,8 @@ function New-Recommendation {
   param(
     [string]$Classification,
     [string]$RecommendedLocation,
-    [bool]$Tracked,
-    [bool]$ShareSafe,
+    [object]$Tracked,
+    [object]$ShareSafe,
     [string]$Rationale,
     [string[]]$Notes
   )
@@ -56,7 +57,7 @@ function New-Recommendation {
   $normalizedCandidate = Normalize-RepoPath -Path $CandidatePath
   $matchesCandidate = $null
 
-  if ($normalizedCandidate) {
+  if ($Classification -ne "manual-review" -and $normalizedCandidate -and -not [string]::IsNullOrWhiteSpace($RecommendedLocation)) {
     $prefix = Normalize-RepoPath -Path $RecommendedLocation
     $matchesCandidate = $normalizedCandidate.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)
   }
@@ -76,13 +77,119 @@ function New-Recommendation {
   }
 }
 
-$classificationCount = @(
+function Get-InferredRecommendation {
+  param([string]$NormalizedCandidate)
+
+  if ($NormalizedCandidate -match '^ops/') {
+    return (New-Recommendation `
+      -Classification "generated-state" `
+      -RecommendedLocation "ops/" `
+      -Tracked $false `
+      -ShareSafe $false `
+      -Rationale "Paths under ops/ are treated as generated state, audit evidence, or export artifacts rather than canonical source." `
+      -Notes @(
+        "Classify by document role and audience, not by the window where the file was edited.",
+        "If this file is intended to become shared canonical truth, move it out of ops/ and rewrite it as a sanitized shared document."
+      ))
+  }
+
+  if ($NormalizedCandidate -match '^local/docs/authoring/') {
+    return (New-Recommendation `
+      -Classification "authoring-draft" `
+      -RecommendedLocation "local/docs/authoring/" `
+      -Tracked $false `
+      -ShareSafe $false `
+      -Rationale "Paths under local/docs/authoring/ are ignored authoring drafts, review notes, or workboards." `
+      -Notes @(
+        "These files should remain local-only.",
+        "Do not promote them to tracked shared docs without rewriting them as sanitized canonical content."
+      ))
+  }
+
+  if ($NormalizedCandidate -match '^local/docs/.+_LIVE\.md$' -or $NormalizedCandidate -match '^local/docs/.+_WORKSPACE_BASELINE\.md$') {
+    return (New-Recommendation `
+      -Classification "single-workspace-live" `
+      -RecommendedLocation "local/docs/" `
+      -Tracked $false `
+      -ShareSafe $false `
+      -Rationale "LIVE and WORKSPACE_BASELINE documents describe one workspace or machine-local state and should stay local-only." `
+      -Notes @(
+        "Use *_LIVE.md for active operational checklists.",
+        "Use *_WORKSPACE_BASELINE.md for baseline snapshots."
+      ))
+  }
+
+  if ($NormalizedCandidate -match '^registry/.+/references/') {
+    return (New-Recommendation `
+      -Classification "shared-canonical" `
+      -RecommendedLocation "registry/.../references/" `
+      -Tracked $true `
+      -ShareSafe $true `
+      -Rationale "Sanitized shared references belong under registry references and should remain template-safe." `
+      -Notes @(
+        "Keep structure and guidance; redact live workspace values.",
+        "If a live pair is needed, keep it under local/docs/."
+      ))
+  }
+
+  if ($NormalizedCandidate -match '^registry/workflow/') {
+    return (New-Recommendation `
+      -Classification "shared-canonical" `
+      -RecommendedLocation "registry/workflow/" `
+      -Tracked $true `
+      -ShareSafe $true `
+      -Rationale "Shared workflow and runbook material belongs in the tracked workflow layer." `
+      -Notes @(
+        "Workflow docs should stay reusable across machines and projects.",
+        "Do not embed machine-local values."
+      ))
+  }
+
+  if ($NormalizedCandidate -match '^[^/]+\.md$') {
+    return (New-Recommendation `
+      -Classification "shared-canonical" `
+      -RecommendedLocation $NormalizedCandidate `
+      -Tracked $true `
+      -ShareSafe $true `
+      -Rationale "Root markdown docs are treated as repo-wide canonical policy, spec, or guidance unless evidence says otherwise." `
+      -Notes @(
+        "Tracked shared placement still does not imply publish permission.",
+        "If the content is actually a live workspace note, move it into local/docs/ or local/docs/authoring/."
+      ))
+  }
+
+  return (New-Recommendation `
+    -Classification "manual-review" `
+    -RecommendedLocation "manual-review" `
+    -Tracked $null `
+    -ShareSafe $null `
+    -Rationale "Path alone is not enough to classify this file. Review the document role and audience before deciding placement." `
+    -Notes @(
+      "This usually means the file is not one of the high-confidence document-placement patterns.",
+      "Use explicit switches with this helper when you need a recommendation from intent rather than existing path."
+    ))
+}
+
+$classificationSwitches = @(
   [bool]$CanonicalSharedTruth
   [bool]$DescribesSingleWorkspace
   [bool]$GeneratedState
 ) | Where-Object { $_ } | Measure-Object | Select-Object -ExpandProperty Count
 
-if ($classificationCount -ne 1) {
+if ($InferFromCandidatePath) {
+  if (-not $CandidatePath) {
+    throw "-InferFromCandidatePath requires -CandidatePath."
+  }
+
+  if ($classificationSwitches -gt 0 -or $DraftOrReviewNote) {
+    throw "Do not combine -InferFromCandidatePath with explicit classification switches."
+  }
+
+  $normalizedCandidate = Normalize-RepoPath -Path $CandidatePath
+  return (Get-InferredRecommendation -NormalizedCandidate $normalizedCandidate)
+}
+
+if ($classificationSwitches -ne 1) {
   throw "Choose exactly one primary classification: -CanonicalSharedTruth, -DescribesSingleWorkspace, or -GeneratedState."
 }
 

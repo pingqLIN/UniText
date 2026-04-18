@@ -53,6 +53,7 @@
   - 驗證目前 authoring repo 的 tracked shared surfaces 是否混入 live workspace metadata、authoring-only docs、或 operations state
 - `get-publishability-report.ps1`
   - 彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
+  - 對 changed markdown docs 補上 document placement observation，幫助判斷它目前落點是否符合 policy
 - `get-document-placement-recommendation.ps1`
   - 依文件角色輸出建議落點，區分 tracked shared layer、`local/docs/`、`local/docs/authoring/`、與 `ops/`
 - `lib/workspace-sensitive-metadata.ps1`
