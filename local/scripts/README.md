@@ -27,6 +27,7 @@
   - 驗證 source 與常見 skills targets 是否存在、是否為連結、是否可解析
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
+  - 額外輸出 non-blocking `i18n drift` telemetry，讓 backlog 可見但不直接把 health gate 打成失敗
 - `report-i18n-wave.py`
   - 分析目前 `i18n/` dirty worktree，區分純行尾變更、實質翻譯改動與新檔案波次
 - `report-release-hygiene.py`
