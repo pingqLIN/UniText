@@ -1,6 +1,7 @@
 backup/
 recovered_*/
 .bak_*/
+.idea/
 .playwright-mcp/
 .tmp_unitext_protocol.log
 **/__pycache__/
