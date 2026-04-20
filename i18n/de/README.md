@@ -182,10 +182,10 @@ Formaler Adoption-Flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → V
 | [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Kurzfassung des Reviews für schnellen Einstieg |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Scope, Ausschlüsse und Exportfluss für die Template-Bereinigung |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-Release-Checkliste für ein Starter Package |
-| [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Konzeptnotiz dazu, wie UniText mit skill-0 als Decomposition- und Primitive-Extraction-Projekt zusammenarbeiten kann |
+| [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Konzeptnotiz dazu, wie UniText mit skill-0 als Decomposition- und Primitive-Extraction-Projekt zusammenarbeiten kann |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Lokale Publishing-Grenze für Agents und Mitarbeitende |
 
-Lesereihenfolge: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `SKILL0_COLLABORATION_VISION.md`
+Lesereihenfolge: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ---
 
@@ -236,4 +236,3 @@ MIT
 ---
 
 *Für Menschen, die mehr als ein AI-Tool nutzen und eine einzige Source of Truth wollen.*
-

@@ -182,10 +182,10 @@ UniText 採用 **no silent changes** 政策：
 | [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | 供快速掌握的精簡審查摘要 |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | template release cleanup 的範圍、排除項與匯出流程 |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | starter package 發布前的清理檢查清單 |
-| [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | 說明 UniText 與 skill-0 如何分工：一個做治理與分發，一個做拆解與原子化提煉 |
+| [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | 說明 UniText 與 skill-0 如何分工：一個做治理與分發，一個做拆解與原子化提煉 |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | 給 agents 與協作者的 local-first 發布邊界 |
 
-閱讀順序：`EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `SKILL0_COLLABORATION_VISION.md`
+閱讀順序：`EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ---
 
@@ -236,4 +236,3 @@ MIT
 ---
 
 *給使用超過一個 AI 工具、並希望有單一真相來源的人。*
-

@@ -24,7 +24,7 @@
 
 - Git repository가 초기화됨
 - `.gitignore`가 local-only 및 대형 역사 산출물을 제외함
-- `README.md`, `INDEX.md`, `PROJECT_STATUS_REPORT_2026-03-23.md` 세 문서의 상태가 일치함
+- `README.md`, `INDEX.md`, `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` 세 문서의 상태가 일치함
 - `EXTERNAL_REVIEW_PACKAGE.md`가 리뷰 범위, 읽기 순서, 제외 항목을 정의함
 - `EXTERNAL_REVIEW_COVER_NOTE.md`와 `EXTERNAL_REVIEW_HIGHLIGHTS.md`가 reviewer-facing entry docs로 사용 가능함
 - `SECRET_HANDLING_GUIDELINES.md`가 governance boundary를 만들고 핵심 읽기 순서에 포함됨

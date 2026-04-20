@@ -143,7 +143,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
+`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -232,9 +232,9 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Template release cleanup scope, exclusions, and export flow |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
-| [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
-| [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
-| [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
+| [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
+| [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
 Reading order for humans: `README.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`

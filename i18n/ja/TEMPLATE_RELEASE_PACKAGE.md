@@ -71,7 +71,7 @@ template package に含めるべきではないものは次の通りです。
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
   - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Export Command
 
@@ -144,4 +144,3 @@ export された template package が表すのは次の通りです。
 それよりも次のように呼ぶのは適切ではありません。
 
 **authoring workspace snapshot**
-

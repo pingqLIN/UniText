@@ -45,7 +45,7 @@ Todos los agentes en este repo deben seguir:
 Hasta ahora, los siguientes tipos de contenido deben tratarse con especial cautela:
 
 - social post drafts
-- `SKILL0_COLLABORATION_VISION.md`
+- `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 - cualquier otra discusión estratégica relacionada con `skill-0` o con revisiones externas
 
 ## 6. Interpretación Operativa
@@ -55,4 +55,3 @@ Si en el futuro hace falta publicar algo, conviene dividir el proceso en tres pa
 1. Confirmar el alcance exacto permitido
 2. Confirmar el destino permitido
 3. Sólo entonces ejecutar `push` / upload / posting
-

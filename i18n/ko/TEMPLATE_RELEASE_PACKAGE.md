@@ -71,7 +71,7 @@ template package에는 다음이 포함되면 안 됩니다.
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
   - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Export Command
 
@@ -144,4 +144,3 @@ export된 template package는 다음을 의미합니다.
 입니다.
 
 **authoring workspace snapshot**는 아닙니다.
-

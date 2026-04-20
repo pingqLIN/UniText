@@ -24,7 +24,7 @@
 
 - Git-Repository ist initialisiert
 - `.gitignore` schließt local-only und große historische Artefakte aus
-- `README.md`, `INDEX.md` und `PROJECT_STATUS_REPORT_2026-03-23.md` sind konsistent
+- `README.md`, `INDEX.md` und `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` sind konsistent
 - `EXTERNAL_REVIEW_PACKAGE.md` definiert Review-Umfang, Lesereihenfolge und Ausschlüsse
 - `EXTERNAL_REVIEW_COVER_NOTE.md` und `EXTERNAL_REVIEW_HIGHLIGHTS.md` sind als reviewer-facing entry docs nutzbar
 - `SECRET_HANDLING_GUIDELINES.md` definiert die Governance-Grenzen und ist in die Kernlesereihenfolge aufgenommen

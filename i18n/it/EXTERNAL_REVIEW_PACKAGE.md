@@ -25,7 +25,7 @@ L’obiettivo di questo documento è raccogliere questi elementi in un review pa
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 Per vedere esempi di risorse reali, guarda poi:
@@ -51,7 +51,7 @@ Il review package dovrebbe includere:
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - file minimi di governance
@@ -143,5 +143,3 @@ La posizione più corretta, oggi, è:
 e non:
 
 **fully generalized release template**
-
-

@@ -21,8 +21,8 @@
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -97,9 +97,9 @@
 
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md)。
 
-若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
+若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md)。
 
 ### Skills
 

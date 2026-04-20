@@ -44,7 +44,7 @@
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. 建议审查焦点
 
@@ -67,4 +67,3 @@
 - 未纳入 shortlist 的候选资源
 
 这样做的目的，是让审查聚焦在 **canonical baseline**，而不是作者工作区的历史噪音。
-

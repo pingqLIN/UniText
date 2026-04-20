@@ -45,7 +45,7 @@
 截至目前，以下类型内容应特别保守处理：
 
 - social post drafts
-- `SKILL0_COLLABORATION_VISION.md`
+- `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 - 其他与 `skill-0` 或外部审查相关的策略讨论
 
 ## 6. 操作解读
@@ -55,4 +55,3 @@
 1. 先确认允许发布的范围
 2. 再确认允许发布的目的地
 3. 最后才执行 push / upload / posting
-

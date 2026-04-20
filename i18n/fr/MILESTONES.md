@@ -24,7 +24,7 @@
 
 - le dépôt Git est initialisé
 - `.gitignore` exclut les artefacts locaux et les gros historiques
-- `README.md`, `INDEX.md`, `PROJECT_STATUS_REPORT_2026-03-23.md` sont alignés
+- `README.md`, `INDEX.md`, `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` sont alignés
 - `EXTERNAL_REVIEW_PACKAGE.md` définit le périmètre, l’ordre de lecture et les éléments exclus
 - `EXTERNAL_REVIEW_COVER_NOTE.md` et `EXTERNAL_REVIEW_HIGHLIGHTS.md` sont prêts comme documents d’entrée pour les relecteurs
 - `SECRET_HANDLING_GUIDELINES.md` est en place et intégré à l’ordre de lecture principal
@@ -50,4 +50,3 @@
 - `mcp` dispose d’au moins une base réellement exécutable
 - la couverture des shared resources continue de s’étendre à `skills`, `mcp`, `agents`, `workflow`
 - au moins 2 CLI ont validé la delivery de manière réelle
-

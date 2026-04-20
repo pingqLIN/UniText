@@ -44,7 +44,7 @@
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. 審査の焦点
 
@@ -67,4 +67,3 @@
 - shortlist に含まれない candidate resources
 
 これは、審査の焦点を **canonical baseline** に絞り、作者 workspace の履歴ノイズを避けるためです。
-

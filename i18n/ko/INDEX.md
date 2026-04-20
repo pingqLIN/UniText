@@ -21,8 +21,8 @@
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -97,9 +97,9 @@ shared metadata 탐지 규칙을 조정하거나 규칙 사례를 이해하려�
 
 ### Related Concept Notes
 
-`Copilot CLI` 의 현재 repo-level bootstrap baseline, 제약, 이후 cross-platform 검증 방향을 이해하려면 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) 를 보세요.
+`Copilot CLI` 의 현재 repo-level bootstrap baseline, 제약, 이후 cross-platform 검증 방향을 이해하려면 [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) 를 보세요.
 
-`UniText` 가 `skill-0` 와 어떻게 협력할 수 있는지 평가하려면 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) 를 보세요.
+`UniText` 가 `skill-0` 와 어떻게 협력할 수 있는지 평가하려면 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) 를 보세요.
 
 ### Skills
 

@@ -27,7 +27,7 @@ Externe Reviewer sollten in dieser Reihenfolge lesen:
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 Wenn echte Ressourcenbeispiele betrachtet werden sollen, geht es weiter mit:
@@ -53,7 +53,7 @@ Das Review Package sollte aktuell folgende Inhalte enthalten:
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - minimale Governance-Dateien
@@ -145,4 +145,3 @@ Damit ist die passendste Einordnung derzeit:
 und nicht:
 
 **fully generalized release template**
-

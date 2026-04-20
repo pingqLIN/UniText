@@ -166,7 +166,7 @@ Recommended order:
 3. `runtime-reset architecture record`
    - `docs/architecture/.del/agent-runtime-reset/**`
    - `MILESTONES.md`
-   - `PROJECT_STATUS_REPORT_2026-03-23.md`
+   - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 4. `post-cutover follow-up planning`
    - `docs/architecture/legacy-ingestion-modernization-plan.md`
    - any future full acceptance-run evidence summary intended to be tracked

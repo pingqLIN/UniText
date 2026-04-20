@@ -44,7 +44,7 @@
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Recommended Review Focus
 
@@ -67,4 +67,3 @@
 - shortlist에 포함되지 않은 후보 리소스
 
 이렇게 하는 목적은 리뷰를 **canonical baseline**에 집중시키고, 작성자 작업공간의 역사적 노이즈를 배제하기 위함입니다.
-

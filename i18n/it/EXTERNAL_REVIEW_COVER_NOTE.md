@@ -44,7 +44,7 @@ Ma non ha ancora completato:
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Focus della review
 
@@ -67,5 +67,3 @@ Questo review package esclude volutamente:
 - le risorse candidate non incluse nella shortlist
 
 L’obiettivo è concentrare la review sul **canonical baseline**, non sul rumore storico del workspace dell’autore.
-
-

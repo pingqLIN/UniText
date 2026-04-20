@@ -19,4 +19,4 @@
 - `delivery path verified` 代表已由驗證腳本確認 machine-local skills target 對齊 runtime source，並不等於完成端到端互動驗證。
 - `bootstrap baseline verified` 代表目前 authoring host 已有 repo-level bootstrap + verify 證據，但不自動等於所有平台都完成驗證。
 - 截至目前，只有 `Windows / PC` 完成較完整的 authoring-host 驗證；`macOS` 與 `Linux` 仍屬目標平台，而非已完整驗證平台。
-- `Copilot CLI` 的目前定位、限制與後續 adapter 路線，另見 [../../COPILOT_CLI_ADAPTER_NOTE.md](../../COPILOT_CLI_ADAPTER_NOTE.md)。
+- `Copilot CLI` 的目前定位、限制與後續 adapter 路線，另見 [../../docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](../../docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md)。

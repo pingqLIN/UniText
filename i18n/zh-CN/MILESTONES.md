@@ -24,7 +24,7 @@
 
 - Git repository 已初始化
 - `.gitignore` 已排除 local-only 与大型历史产物
-- `README.md`、`INDEX.md`、`PROJECT_STATUS_REPORT_2026-03-23.md` 三者状态一致
+- `README.md`、`INDEX.md`、`docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` 三者状态一致
 - `EXTERNAL_REVIEW_PACKAGE.md` 已定义审查范围、阅读顺序与排除项目
 - `EXTERNAL_REVIEW_COVER_NOTE.md` 与 `EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作为 reviewer-facing entry docs
 - `SECRET_HANDLING_GUIDELINES.md` 已建立治理边界，并纳入核心阅读顺序

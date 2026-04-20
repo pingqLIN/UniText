@@ -21,8 +21,8 @@ Ordre de lecture recommandé :
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Catalogue des ressources
 
@@ -97,9 +97,9 @@ Pour terminer un premier cycle `initialize → verify` sur une nouvelle machine,
 
 ### Notes conceptuelles associées
 
-Pour comprendre la repo-level bootstrap baseline actuelle de `Copilot CLI`, ses limites et la direction de validation cross-platform à venir, consultez [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md).
+Pour comprendre la repo-level bootstrap baseline actuelle de `Copilot CLI`, ses limites et la direction de validation cross-platform à venir, consultez [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md).
 
-Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md).
+Pour évaluer la façon dont `UniText` peut collaborer avec `skill-0`, consultez [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md).
 
 ### Skills
 

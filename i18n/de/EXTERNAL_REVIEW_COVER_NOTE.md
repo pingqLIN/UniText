@@ -44,7 +44,7 @@ Es ist aber noch nicht fertig für:
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Empfohlene Review-Schwerpunkte
 
@@ -67,4 +67,3 @@ Dieses Review Package schließt bewusst aus:
 - nicht in die Shortlist aufgenommene Ressourcen
 
 Damit soll die Review-Analyse auf die **kanonische Baseline** fokussieren und nicht auf historischen Lärm des Author-Workspaces.
-

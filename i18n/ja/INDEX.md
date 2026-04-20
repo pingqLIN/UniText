@@ -21,8 +21,8 @@
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ## 2. Resource Catalog
 
@@ -97,9 +97,9 @@ shared metadata の検出ルールを調整したり、ルール事例を理解�
 
 ### Related Concept Notes
 
-`Copilot CLI` の現在の repo-level bootstrap baseline、制約、今後の cross-platform 検証方針を理解したい場合は、[COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) を見てください。
+`Copilot CLI` の現在の repo-level bootstrap baseline、制約、今後の cross-platform 検証方針を理解したい場合は、[docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) を見てください。
 
-`UniText` と `skill-0` の協力方法を評価したい場合は、[SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) を見てください。
+`UniText` と `skill-0` の協力方法を評価したい場合は、[docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) を見てください。
 
 ### Skills
 

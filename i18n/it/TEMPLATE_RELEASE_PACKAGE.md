@@ -71,7 +71,7 @@ Il template package non dovrebbe includere:
   - `EXTERNAL_REVIEW_PACKAGE.md`
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
   - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Comando di export
 
@@ -144,5 +144,3 @@ La lettura più corretta oggi è:
 e non:
 
 **authoring workspace snapshot**
-
-

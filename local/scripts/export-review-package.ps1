@@ -47,7 +47,7 @@ $items = @(
   [pscustomobject]@{ kind = "file"; path = "SECRET_HANDLING_GUIDELINES.md" },
   [pscustomobject]@{ kind = "file"; path = "PROJECT_MODES.md" },
   [pscustomobject]@{ kind = "file"; path = "MILESTONES.md" },
-  [pscustomobject]@{ kind = "file"; path = "PROJECT_STATUS_REPORT_2026-03-23.md" },
+  [pscustomobject]@{ kind = "file"; path = "docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md" },
   [pscustomobject]@{ kind = "file"; path = "ESSENTIAL_SKILLS_SHORTLIST.md" },
   [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_PACKAGE.md" },
   [pscustomobject]@{ kind = "file"; path = "local\\docs\\ADOPTION_CHECKLIST.md" },

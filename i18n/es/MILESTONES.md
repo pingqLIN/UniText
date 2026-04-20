@@ -24,7 +24,7 @@
 
 - el Git repository ya está inicializado
 - `.gitignore` excluye artefactos históricos grandes y material local-only
-- `README.md`, `INDEX.md` y `PROJECT_STATUS_REPORT_2026-03-23.md` están alineados
+- `README.md`, `INDEX.md` y `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` están alineados
 - `EXTERNAL_REVIEW_PACKAGE.md` define el alcance de revisión, el orden de lectura y los elementos excluidos
 - `EXTERNAL_REVIEW_COVER_NOTE.md` y `EXTERNAL_REVIEW_HIGHLIGHTS.md` pueden usarse como entry docs para revisores
 - `SECRET_HANDLING_GUIDELINES.md` ya define el límite de gobernanza y está en el orden de lectura central

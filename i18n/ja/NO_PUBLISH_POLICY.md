@@ -45,7 +45,7 @@
 現時点では、以下の種類の内容は特に慎重に扱うべきです。
 
 - social post drafts
-- `SKILL0_COLLABORATION_VISION.md`
+- `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 - `skill-0` または外部審査に関するその他の戦略的議論
 
 ## 6. Operational Interpretation
@@ -55,4 +55,3 @@
 1. まず公開を許可する範囲を確認する
 2. 次に公開先を確認する
 3. 最後に push / upload / posting を実行する
-

@@ -24,7 +24,7 @@
 
 - il repository Git è inizializzato
 - `.gitignore` esclude i contenuti locali e i grossi artifact storici
-- `README.md`, `INDEX.md` e `PROJECT_STATUS_REPORT_2026-03-23.md` sono allineati
+- `README.md`, `INDEX.md` e `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` sono allineati
 - `EXTERNAL_REVIEW_PACKAGE.md` definisce ambito, ordine di lettura e contenuti esclusi
 - `EXTERNAL_REVIEW_COVER_NOTE.md` e `EXTERNAL_REVIEW_HIGHLIGHTS.md` sono disponibili come entry docs per reviewer
 - `SECRET_HANDLING_GUIDELINES.md` definisce i confini di governance ed è incluso nell’ordine di lettura
@@ -50,4 +50,3 @@
 - `mcp` ha almeno un baseline realmente eseguibile
 - la copertura delle canonical resources continua a espandersi su `skills`, `mcp`, `agents` e `workflow`
 - almeno 2 CLI superano realmente la delivery verification
-

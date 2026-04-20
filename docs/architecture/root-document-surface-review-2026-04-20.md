@@ -93,17 +93,22 @@ These either act as startup/discovery surfaces, formal policy, or active release
 
 ## 4. Second-wave consolidation candidates
 
-The following files are likely move candidates, but were intentionally not moved in this first pass because they have broader linkage across exports, i18n, or review flows:
+This wave moved the following files out of repo root:
+
+- [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](../adapters/COPILOT_CLI_ADAPTER_NOTE.md)
+- [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](../plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)
+- [docs/concepts/SKILL0_COLLABORATION_VISION.md](../concepts/SKILL0_COLLABORATION_VISION.md)
+- [docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md](../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md)
+
+These moved now because their roles are clearer as adapter notes, plans, concept drafts, and historical status snapshots than as near-term root startup docs.
+
+The following files remain likely move candidates, but are intentionally still in repo root because they continue to anchor release/export or external-review flows:
 
 - `EXTERNAL_REVIEW_COVER_NOTE.md`
 - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
 - `EXTERNAL_REVIEW_PACKAGE.md`
 - `ESSENTIAL_SKILLS_SHORTLIST.md`
 - `MILESTONES.md`
-- `PROJECT_STATUS_REPORT_2026-03-23.md`
-- `COPILOT_CLI_ADAPTER_NOTE.md`
-- `CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
-- `SKILL0_COLLABORATION_VISION.md`
 - `BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md`
 
 Recommended future destinations:

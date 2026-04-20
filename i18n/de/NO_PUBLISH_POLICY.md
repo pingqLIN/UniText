@@ -45,7 +45,7 @@ Alle Agents in diesem Repo müssen Folgendes einhalten:
 Bis auf Weiteres sollten die folgenden Inhaltstypen besonders vorsichtig behandelt werden:
 
 - social post drafts
-- `SKILL0_COLLABORATION_VISION.md`
+- `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 - weitere strategische Diskussionen rund um `skill-0` oder externe Reviews
 
 ## 6. Operative Auslegung
@@ -55,4 +55,3 @@ Falls künftig veröffentlicht werden soll, empfiehlt sich die Aufteilung in dre
 1. Erst den Umfang der erlaubten Veröffentlichung bestätigen
 2. Dann das Zielsystem oder die Plattform bestätigen
 3. Erst danach `push` / `upload` / `posting` ausführen
-
