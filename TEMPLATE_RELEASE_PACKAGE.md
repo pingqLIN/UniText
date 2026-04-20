@@ -91,9 +91,9 @@ template package 不應包含：
 - workspace-specific Cloudflare baseline references with live IDs、hostnames、redirect URIs、or runtime paths
 - authoring notes、review archives 與其他 local-only 補充材料
 - review-specific docs
-  - `EXTERNAL_REVIEW_PACKAGE.md`
-  - `EXTERNAL_REVIEW_COVER_NOTE.md`
-  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+  - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
   - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Export Command

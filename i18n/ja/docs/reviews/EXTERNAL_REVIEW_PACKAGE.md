@@ -27,7 +27,7 @@
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 実際の resource sample を見る場合は、次を確認します。
@@ -53,7 +53,7 @@
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - 最小治理文書

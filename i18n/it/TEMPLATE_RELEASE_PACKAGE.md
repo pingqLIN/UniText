@@ -68,9 +68,9 @@ Il template package non dovrebbe includere:
 - `local/docs/PATH_MAP.md`
 - path assoluti della macchina, account personali e home directory
 - documenti specifici della review
-  - `EXTERNAL_REVIEW_PACKAGE.md`
-  - `EXTERNAL_REVIEW_COVER_NOTE.md`
-  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+  - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
   - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Comando di export

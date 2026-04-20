@@ -62,16 +62,16 @@ Las reglas completas de campos están en `RESOURCE_SPEC.md`.
 
 ### Review Shortlist
 
-La base actual de revisión externa sigue el conjunto `8 + 4` definido en [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md), y no el conjunto completo de candidatos.
+La base actual de revisión externa sigue el conjunto `8 + 4` definido en [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md), y no el conjunto completo de candidatos.
 
 ### Review Package
 
-Si quieres preparar material para revisores externos, usa [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) como punto de entrada y `local/scripts/export-review-package.ps1` para producir un review package reproducible.
+Si quieres preparar material para revisores externos, usa [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) como punto de entrada y `local/scripts/export-review-package.ps1` para producir un review package reproducible.
 
 Si quieres dar a los revisores la entrada más corta posible, empieza por:
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 

@@ -68,9 +68,9 @@ Le template package ne doit pas inclure :
 - `local/docs/PATH_MAP.md`
 - les comptes utilisateurs réels, le home directory et les chemins absolus
 - les documents spécifiques à la revue
-  - `EXTERNAL_REVIEW_PACKAGE.md`
-  - `EXTERNAL_REVIEW_COVER_NOTE.md`
-  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+  - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
   - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Commande d’export

@@ -176,16 +176,16 @@ Flujo formal de adopción: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER �
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Diferencia entre repo de authoring y template del proyecto |
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Límites para almacenar secretos, redacción y manejo de passwords/API keys |
 | [MILESTONES.md](MILESTONES.md) | Objetivos de fase cuantificados y checkpoints de readiness para revisión externa |
-| [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Conjunto curado de skills esenciales `8 + 4` para la ola de revisión actual |
-| [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Alcance para revisores, orden de lectura y flujo de exportación repetible |
-| [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Nota de envío para revisores externos |
-| [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Resumen corto para orientación rápida |
+| [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) | Conjunto curado de skills esenciales `8 + 4` para la ola de revisión actual |
+| [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) | Alcance para revisores, orden de lectura y flujo de exportación repetible |
+| [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md) | Nota de envío para revisores externos |
+| [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md) | Resumen corto para orientación rápida |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Alcance de cleanup para release, exclusiones y flujo de exportación |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Checklist previo al release para un starter package |
 | [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Nota conceptual sobre cómo UniText puede colaborar con skill-0 como proyecto de descomposición y extracción de primitivas |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Límite local-first de publicación para agentes y colaboradores |
 
-Orden de lectura: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+Orden de lectura: `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` → `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ---
 

@@ -68,9 +68,9 @@ template package에는 다음이 포함되면 안 됩니다.
 - `local/docs/PATH_MAP.md`
 - 실제 사용자 계정, home directory, 절대 경로
 - review-specific docs
-  - `EXTERNAL_REVIEW_PACKAGE.md`
-  - `EXTERNAL_REVIEW_COVER_NOTE.md`
-  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
+  - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
   - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Export Command

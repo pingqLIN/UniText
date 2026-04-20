@@ -1,22 +1,22 @@
 # UniText — External Review Package
 
-> 状态：Active Baseline  
-> 用途：定义外部审查要看什么、不要看什么，以及如何重复产出 review package。
+> 狀態：Active Baseline  
+> 用途：定義外部審查要看什麼、不要看什麼，以及如何重複產出 review package。
 
 ## 1. Purpose
 
-`UniText` 已经进入可供外部审查的 baseline 阶段，但审查重点应集中在：
+`UniText` 已經進入可供外部審查的 baseline 階段，但審查重點應集中在：
 
-- 核心架构是否合理
+- 核心架構是否合理
 - canonical registry 是否已落地
-- operations safety model 是否可执行
-- 精选 shared resources 是否足以代表专案方向
+- operations safety model 是否可執行
+- 精選 shared resources 是否足以代表專案方向
 
-本文件的目的，是把这些内容收敛成一个可重复整理的审查包，而不是把整个作者工作区原封不动交出去。
+本文件的目的，是把這些內容收斂成一個可重複整理的審查包，而不是把整個作者工作區原封不動交出去。
 
 ## 2. Recommended Reading Order
 
-建议外部审查者依以下顺序阅读：
+建議外部審查者依以下順序閱讀：
 
 1. `EXTERNAL_REVIEW_COVER_NOTE.md`
 2. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
@@ -27,20 +27,20 @@
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
-若要看实际资源样本，再往下看：
+若要看實際資源樣本，再往下看：
 
-- `registry/skills/` 的 `8 + 4` 精选主集
+- `registry/skills/` 的 `8 + 4` 精選主集
 - `registry/agents/registry-curator/`
 - `registry/mcp/claude-project-mcp-seed/`
 - `registry/workflow/claude-plans/`
-- `local/scripts/` 中的最小治理脚本与 cross-platform first-run 脚本
+- `local/scripts/` 中的最小治理腳本與 cross-platform first-run 腳本
 
 ## 3. Review Scope
 
-目前 review package 应包含以下内容：
+目前 review package 應包含以下內容：
 
 - 核心文件
   - `EXTERNAL_REVIEW_COVER_NOTE.md`
@@ -53,14 +53,14 @@
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - 最小治理文件
   - `local/docs/ADOPTION_CHECKLIST.md`
   - `local/docs/CLI_COMPAT_MATRIX.md`
   - `local/scripts/README.md`
-- 最小治理脚本
+- 最小治理腳本
   - `bootstrap.py`
   - `verify-bootstrap.py`
   - `create-git-bundle.py`
@@ -72,7 +72,7 @@
   - `generate-index-entries.ps1`
   - `rollback-skills.ps1`
   - `export-review-package.ps1`
-- 精选 shared resources
+- 精選 shared resources
   - `registry/skills/` 的 `8 + 4` 主集
   - `registry/agents/registry-curator/`
   - `registry/mcp/claude-project-mcp-seed/`
@@ -80,33 +80,33 @@
 
 ## 4. Out Of Scope
 
-以下内容不应作为外部审查主体：
+以下內容不應作為外部審查主體：
 
 - `backup/`
 - `recovered_*`
 - `.bak_*`
 - `ops/history/`
-- 本机特定 path mapping 与个人环境残留
-- 未纳入 shortlist 的候选 skills
-- 未追踪或实验中的内容
+- 本機特定 path mapping 與個人環境殘留
+- 未納入 shortlist 的候選 skills
+- 未追蹤或實驗中的內容
 
-authoring notes and review archives 属于作者工作参考资料，不是 canonical review source。
+authoring notes and review archives 屬於作者工作參考資料，不是 canonical review source。
 
 ## 5. Export Command
 
-在 repo root 执行：
+在 repo root 執行：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-review-package.ps1
 ```
 
-预设输出到：
+預設輸出到：
 
 ```text
 ops/review-package/review_YYYYMMDD_HHMMSS/
 ```
 
-若只想先检查内容，不写入档案：
+若只想先檢查內容，不寫入檔案：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-review-package.ps1 -DryRun
@@ -114,13 +114,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-revie
 
 ## 6. Validation
 
-建议在 export 前至少先跑一次：
+建議在 export 前至少先跑一次：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\health-check.ps1
 ```
 
-若要确认 canonical skills delivery 对齐：
+若要確認 canonical skills delivery 對齊：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-delivery.ps1
@@ -128,17 +128,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-deliv
 
 ## 7. Current Interpretation
 
-截至 2026-03-24，`UniText` 已具备：
+截至 2026-03-24，`UniText` 已具備：
 
-- reviewer-facing cover note 与 highlights summary
-- 外部审查可读的核心文件
-- `8 + 4` 精选 skills 主集
-- agent / workflow seed 与可实跑的 MCP baseline
-- 可重复产出 review package 的整理流程
+- reviewer-facing cover note 與 highlights summary
+- 外部審查可讀的核心文件
+- `8 + 4` 精選 skills 主集
+- agent / workflow seed 與可實跑的 MCP baseline
+- 可重複產出 review package 的整理流程
 - cross-platform `bootstrap -> verify`
-- 可携 `git bundle` 备份流程
+- 可攜 `git bundle` 備份流程
 
-因此目前最适合的定位是：
+因此目前最適合的定位是：
 
 **external-review-ready baseline**
 

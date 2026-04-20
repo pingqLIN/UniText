@@ -44,7 +44,7 @@ Mais il n’a pas encore finalisé :
 5. `OPERATIONS.md`
 6. `MILESTONES.md`
 7. `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-8. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+8. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Focales de revue recommandées
 

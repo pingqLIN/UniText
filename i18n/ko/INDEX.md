@@ -62,16 +62,16 @@
 
 ### Review Shortlist
 
-현재 외부 review 주 집합은 전체 후보군이 아니라 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 의 `8 + 4` 선별 skills 를 기준으로 합니다.
+현재 외부 review 주 집합은 전체 후보군이 아니라 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 의 `8 + 4` 선별 skills 를 기준으로 합니다.
 
 ### Review Package
 
-외부 reviewer 용 자료를 준비하려면 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 를 진입점으로 사용하고, `local/scripts/export-review-package.ps1` 로 재생성 가능한 review package 를 만드세요.
+외부 reviewer 용 자료를 준비하려면 [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) 를 진입점으로 사용하고, `local/scripts/export-review-package.ps1` 로 재생성 가능한 review package 를 만드세요.
 
 reviewer 에게 가장 짧은 진입점을 바로 주고 싶다면 먼저 다음을 보세요:
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 

@@ -25,8 +25,8 @@
 - Git repository 已初始化
 - `.gitignore` 已排除 local-only 與大型歷史產物
 - `README.md`、`INDEX.md`、`docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` 三者狀態一致
-- `EXTERNAL_REVIEW_PACKAGE.md` 已定義審查範圍、閱讀順序與排除項目
-- `EXTERNAL_REVIEW_COVER_NOTE.md` 與 `EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
+- `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` 已定義審查範圍、閱讀順序與排除項目
+- `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` 與 `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
 - `SECRET_HANDLING_GUIDELINES.md` 已建立治理邊界，並納入核心閱讀順序
 - `local/scripts/export-review-package.ps1` 可重複產出 review package
 - 已提供跨平台 `bootstrap -> verify` first-run 路徑

@@ -25,8 +25,8 @@
 - le dépôt Git est initialisé
 - `.gitignore` exclut les artefacts locaux et les gros historiques
 - `README.md`, `INDEX.md`, `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` sont alignés
-- `EXTERNAL_REVIEW_PACKAGE.md` définit le périmètre, l’ordre de lecture et les éléments exclus
-- `EXTERNAL_REVIEW_COVER_NOTE.md` et `EXTERNAL_REVIEW_HIGHLIGHTS.md` sont prêts comme documents d’entrée pour les relecteurs
+- `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` définit le périmètre, l’ordre de lecture et les éléments exclus
+- `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` et `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` sont prêts comme documents d’entrée pour les relecteurs
 - `SECRET_HANDLING_GUIDELINES.md` est en place et intégré à l’ordre de lecture principal
 - `local/scripts/export-review-package.ps1` peut produire un review package de manière reproductible
 - un chemin `bootstrap -> verify` multiplateforme pour le premier lancement est disponible

@@ -176,16 +176,16 @@ Flusso formale di adozione: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER �
 | [PROJECT_MODES.md](PROJECT_MODES.md) | Distinzione tra repository di authoring e template di progetto |
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Regole di archiviazione, redaction e gestione di password/API key |
 | [MILESTONES.md](MILESTONES.md) | Obiettivi quantitativi delle fasi e checkpoint di readiness per la review esterna |
-| [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Set curato `8 + 4` di skill essenziali per l’ondata di review corrente |
-| [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Ambito per i reviewer, ordine di lettura e flusso ripetibile di export del package |
-| [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Nota di invio per i reviewer esterni |
-| [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Riassunto breve per orientarsi rapidamente |
+| [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) | Set curato `8 + 4` di skill essenziali per l’ondata di review corrente |
+| [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) | Ambito per i reviewer, ordine di lettura e flusso ripetibile di export del package |
+| [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md) | Nota di invio per i reviewer esterni |
+| [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md) | Riassunto breve per orientarsi rapidamente |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Ambito, esclusioni e flusso di export per il cleanup del rilascio template |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Checklist di pre-release per uno starter package |
 | [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Nota concettuale su come UniText può collaborare con skill-0 come progetto di decomposizione ed estrazione di primitive |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Confine di pubblicazione local-first per agent e collaboratori |
 
-Ordine di lettura: `EXTERNAL_REVIEW_COVER_NOTE.md` → `EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+Ordine di lettura: `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` → `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 
 ---
 

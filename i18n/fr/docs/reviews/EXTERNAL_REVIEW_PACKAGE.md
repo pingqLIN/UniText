@@ -27,7 +27,7 @@ Les relecteurs externes devraient lire dans cet ordre :
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 Pour voir les vrais échantillons de ressources, continuez ensuite avec :
@@ -53,7 +53,7 @@ Le review package doit actuellement inclure :
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - les fichiers de gouvernance minimaux

@@ -62,16 +62,16 @@ Die vollständigen Feldregeln stehen in `RESOURCE_SPEC.md`.
 
 ### Review Shortlist
 
-Die aktuelle externe Review-Basis folgt dem `8 + 4`-Set aus [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) und nicht dem vollständigen Kandidatenpool.
+Die aktuelle externe Review-Basis folgt dem `8 + 4`-Set aus [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) und nicht dem vollständigen Kandidatenpool.
 
 ### Review Package
 
-Wenn du Material für externe Reviewer aufbereiten willst, nutze [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) als Einstieg und `local/scripts/export-review-package.ps1`, um ein wiederholbar erzeugbares Review Package zu erstellen.
+Wenn du Material für externe Reviewer aufbereiten willst, nutze [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) als Einstieg und `local/scripts/export-review-package.ps1`, um ein wiederholbar erzeugbares Review Package zu erstellen.
 
 Wenn du den kürzesten Einstieg direkt an Reviewer geben willst, lies zuerst:
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 

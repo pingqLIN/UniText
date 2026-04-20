@@ -25,8 +25,8 @@
 - il repository Git è inizializzato
 - `.gitignore` esclude i contenuti locali e i grossi artifact storici
 - `README.md`, `INDEX.md` e `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` sono allineati
-- `EXTERNAL_REVIEW_PACKAGE.md` definisce ambito, ordine di lettura e contenuti esclusi
-- `EXTERNAL_REVIEW_COVER_NOTE.md` e `EXTERNAL_REVIEW_HIGHLIGHTS.md` sono disponibili come entry docs per reviewer
+- `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` definisce ambito, ordine di lettura e contenuti esclusi
+- `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` e `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` sono disponibili come entry docs per reviewer
 - `SECRET_HANDLING_GUIDELINES.md` definisce i confini di governance ed è incluso nell’ordine di lettura
 - `local/scripts/export-review-package.ps1` può produrre il review package in modo ripetibile
 - è disponibile un percorso cross-platform `bootstrap -> verify`

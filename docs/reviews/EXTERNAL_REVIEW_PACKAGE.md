@@ -3,7 +3,7 @@
 > 狀態：Active Baseline  
 > 用途：定義外部審查要看什麼、不要看什麼，以及如何重複產出 review package。
 
-> Authoritative machine-readable contract: [docs/reviews/external-review-bundle.contract.json](docs/reviews/external-review-bundle.contract.json)
+> Authoritative machine-readable contract: [external-review-bundle.contract.json](external-review-bundle.contract.json)
 
 ## 1. Purpose
 
@@ -29,10 +29,10 @@
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
-實際 export 與後續自動化應以 `docs/reviews/external-review-bundle.contract.json` 為唯一 machine-readable source，再由本文件補充人類可讀的範圍解釋。
+實際 export 與後續自動化應以 `external-review-bundle.contract.json` 為唯一 machine-readable source，再由本文件補充人類可讀的範圍解釋。
 
 若要看實際資源樣本，再往下看：
 
@@ -44,7 +44,7 @@
 
 ## 3. Review Scope
 
-目前 review package 的 canonical membership 由 `docs/reviews/external-review-bundle.contract.json` 定義；本節只保留人類可讀的分類摘要。
+目前 review package 的 canonical membership 由 `external-review-bundle.contract.json` 定義；本節只保留人類可讀的分類摘要。
 
 目前 review package 應包含以下內容：
 
@@ -59,7 +59,7 @@
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - 最小治理文件
@@ -106,7 +106,7 @@
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-review-package.ps1
 ```
 
-`export-review-package.ps1` 會直接讀取 `docs/reviews/external-review-bundle.contract.json`，因此若要調整 package 成員或 reading order，應先改 contract，再跑 export。
+`export-review-package.ps1` 會直接讀取 `external-review-bundle.contract.json`，因此若要調整 package 成員或 reading order，應先改 contract，再跑 export。
 
 預設輸出到：
 

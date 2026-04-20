@@ -56,7 +56,7 @@
 - `README.md`
 - `INDEX.md`
 - `PROJECT_STATUS_REPORT_2026-03-23.md`
-- `ESSENTIAL_SKILLS_SHORTLIST.md`
+- `docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md`
 
 本輪主要修正點是：
 

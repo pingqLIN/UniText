@@ -62,16 +62,16 @@
 
 ### Review Shortlist
 
-現在の外部 review 主集は、全候補ではなく [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) にある `8 + 4` の選抜 skills に基づきます。
+現在の外部 review 主集は、全候補ではなく [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) にある `8 + 4` の選抜 skills に基づきます。
 
 ### Review Package
 
-外部 reviewer 向けの資料をまとめる場合は、[EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) を入口にし、`local/scripts/export-review-package.ps1` を使って再生成可能な review package を作ってください。
+外部 reviewer 向けの資料をまとめる場合は、[docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) を入口にし、`local/scripts/export-review-package.ps1` を使って再生成可能な review package を作ってください。
 
 reviewer への最短入口をそのまま渡したい場合は、まず次を見てください：
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 

@@ -62,16 +62,16 @@ Les règles complètes sur les champs se trouvent dans `RESOURCE_SPEC.md`.
 
 ### Review Shortlist
 
-La base de revue externe suit maintenant l’ensemble sélectionné de `8 + 4` skills défini dans [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md), et non plus l’ensemble complet des candidats.
+La base de revue externe suit maintenant l’ensemble sélectionné de `8 + 4` skills défini dans [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md), et non plus l’ensemble complet des candidats.
 
 ### Review Package
 
-Pour préparer un dossier destiné à des relecteurs externes, utilisez [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) comme point d’entrée, puis `local/scripts/export-review-package.ps1` pour produire un review package reproductible.
+Pour préparer un dossier destiné à des relecteurs externes, utilisez [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) comme point d’entrée, puis `local/scripts/export-review-package.ps1` pour produire un review package reproductible.
 
 Pour l’entrée la plus courte destinée aux relecteurs, commencez par :
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 

@@ -27,7 +27,7 @@
 7. `OPERATIONS.md`
 8. `SECRET_HANDLING_GUIDELINES.md`
 9. `MILESTONES.md`
-10. `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+10. `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 11. `ESSENTIAL_SKILLS_SHORTLIST.md`
 
 실제 리소스 샘플을 보려면 다음도 확인합니다.
@@ -53,7 +53,7 @@
   - `SECRET_HANDLING_GUIDELINES.md`
   - `PROJECT_MODES.md`
   - `MILESTONES.md`
-  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
   - `ESSENTIAL_SKILLS_SHORTLIST.md`
   - `EXTERNAL_REVIEW_PACKAGE.md`
 - 최소 governance 문서

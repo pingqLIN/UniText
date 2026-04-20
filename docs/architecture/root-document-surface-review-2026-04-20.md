@@ -104,10 +104,10 @@ These moved now because their roles are clearer as adapter notes, plans, concept
 
 The following files remain likely move candidates, but are intentionally still in repo root because they continue to anchor release/export or external-review flows:
 
-- `EXTERNAL_REVIEW_COVER_NOTE.md`
-- `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-- `EXTERNAL_REVIEW_PACKAGE.md`
-- `ESSENTIAL_SKILLS_SHORTLIST.md`
+- `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+- `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
+- `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+- `docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md`
 - `MILESTONES.md`
 - `BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md`
 

@@ -25,8 +25,8 @@
 - Git repository が初期化済みである
 - `.gitignore` が local-only と大きな履歴産物を除外している
 - `README.md`、`INDEX.md`、`docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` の 3 つの状態が一致している
-- `EXTERNAL_REVIEW_PACKAGE.md` が審査範囲、読書順、除外項目を定義している
-- `EXTERNAL_REVIEW_COVER_NOTE.md` と `EXTERNAL_REVIEW_HIGHLIGHTS.md` が reviewer-facing entry docs として使える
+- `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` が審査範囲、読書順、除外項目を定義している
+- `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` と `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` が reviewer-facing entry docs として使える
 - `SECRET_HANDLING_GUIDELINES.md` が治理境界を定義し、コア読書順に含まれている
 - `local/scripts/export-review-package.ps1` で review package を繰り返し生成できる
 - cross-platform の `bootstrap -> verify` first-run path が提供されている
