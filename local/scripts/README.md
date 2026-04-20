@@ -15,7 +15,7 @@
 - `build-runtime-layer.py`
   - 由 `registry/` 生成 tracked `runtime/` read model，提供 consumer agents 的低噪音入口與 runtime projections
 - `register-codex-skills.py`
-  - 從舊的 Codex skills tree 比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
+  - 以 `--source` 指定舊的 Codex skills tree，比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
 - `preview-renormalize.py`
