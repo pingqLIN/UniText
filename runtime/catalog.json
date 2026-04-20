@@ -1,0 +1,969 @@
+{
+  "meta": {
+    "generated_by": "local/scripts/build-runtime-layer.py",
+    "description": "Tracked runtime read model for consumer agents.",
+    "source_of_truth_root": "registry/"
+  },
+  "entries": [
+    {
+      "id": "registry-curator",
+      "type": "agent",
+      "runtime_path": "runtime/agents/registry-curator/AGENT.md",
+      "source_of_truth": "registry/agents/registry-curator/AGENT.md",
+      "entrypoint": "runtime/agents/registry-curator/AGENT.md",
+      "intent_tags": [
+        "registry-curator",
+        "shared",
+        "agent",
+        "persona",
+        "for",
+        "reviewing",
+        "adopting",
+        "and"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "ai-first-readiness-review",
+      "type": "skill",
+      "runtime_path": "runtime/skills/ai-first-readiness-review/SKILL.md",
+      "source_of_truth": "registry/skills/ai-first-readiness-review/SKILL.md",
+      "entrypoint": "runtime/skills/ai-first-readiness-review/SKILL.md",
+      "intent_tags": [
+        "ai-first-readiness-review",
+        "review",
+        "existing",
+        "projects",
+        "workflows",
+        "runbooks",
+        "and",
+        "operational"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "appinsights-instrumentation",
+      "type": "skill",
+      "runtime_path": "runtime/skills/appinsights-instrumentation/SKILL.md",
+      "source_of_truth": "registry/skills/appinsights-instrumentation/SKILL.md",
+      "entrypoint": "runtime/skills/appinsights-instrumentation/SKILL.md",
+      "intent_tags": [
+        "appinsights-instrumentation",
+        "guidance",
+        "for",
+        "instrumenting",
+        "webapps",
+        "with",
+        "azure",
+        "application"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-ai",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-ai/SKILL.md",
+      "source_of_truth": "registry/skills/azure-ai/SKILL.md",
+      "entrypoint": "runtime/skills/azure-ai/SKILL.md",
+      "intent_tags": [
+        "azure-ai",
+        "use",
+        "for",
+        "azure",
+        "ai",
+        "search",
+        "speech",
+        "openai"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-aigateway",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-aigateway/SKILL.md",
+      "source_of_truth": "registry/skills/azure-aigateway/SKILL.md",
+      "entrypoint": "runtime/skills/azure-aigateway/SKILL.md",
+      "intent_tags": [
+        "azure-aigateway",
+        "configure",
+        "azure",
+        "api",
+        "management",
+        "as",
+        "an",
+        "ai"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-cloud-migrate",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-cloud-migrate/SKILL.md",
+      "source_of_truth": "registry/skills/azure-cloud-migrate/SKILL.md",
+      "entrypoint": "runtime/skills/azure-cloud-migrate/SKILL.md",
+      "intent_tags": [
+        "azure-cloud-migrate",
+        "assess",
+        "and",
+        "migrate",
+        "cross-cloud",
+        "workloads",
+        "to",
+        "azure"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-compliance",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-compliance/SKILL.md",
+      "source_of_truth": "registry/skills/azure-compliance/SKILL.md",
+      "entrypoint": "runtime/skills/azure-compliance/SKILL.md",
+      "intent_tags": [
+        "azure-compliance",
+        "run",
+        "azure",
+        "compliance",
+        "and",
+        "security",
+        "audits",
+        "with"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-compute",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-compute/SKILL.md",
+      "source_of_truth": "registry/skills/azure-compute/SKILL.md",
+      "entrypoint": "runtime/skills/azure-compute/SKILL.md",
+      "intent_tags": [
+        "azure-compute",
+        "azure",
+        "vm",
+        "and",
+        "vmss",
+        "router",
+        "for",
+        "recommendations"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-cost",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-cost/SKILL.md",
+      "source_of_truth": "registry/skills/azure-cost/SKILL.md",
+      "entrypoint": "runtime/skills/azure-cost/SKILL.md",
+      "intent_tags": [
+        "azure-cost",
+        "unified",
+        "azure",
+        "cost",
+        "management",
+        "query",
+        "historical",
+        "costs"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-deploy",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-deploy/SKILL.md",
+      "source_of_truth": "registry/skills/azure-deploy/SKILL.md",
+      "entrypoint": "runtime/skills/azure-deploy/SKILL.md",
+      "intent_tags": [
+        "azure-deploy",
+        "execute",
+        "azure",
+        "deployments",
+        "for",
+        "already-prepared",
+        "applications",
+        "that"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-diagnostics",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-diagnostics/SKILL.md",
+      "source_of_truth": "registry/skills/azure-diagnostics/SKILL.md",
+      "entrypoint": "runtime/skills/azure-diagnostics/SKILL.md",
+      "intent_tags": [
+        "azure-diagnostics",
+        "debug",
+        "azure",
+        "production",
+        "issues",
+        "on",
+        "using",
+        "applens"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-enterprise-infra-planner",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-enterprise-infra-planner/SKILL.md",
+      "source_of_truth": "registry/skills/azure-enterprise-infra-planner/SKILL.md",
+      "entrypoint": "runtime/skills/azure-enterprise-infra-planner/SKILL.md",
+      "intent_tags": [
+        "azure-enterprise-infra-planner",
+        "architect",
+        "and",
+        "provision",
+        "enterprise",
+        "azure",
+        "infrastructure",
+        "from"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-hosted-copilot-sdk",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-hosted-copilot-sdk/SKILL.md",
+      "source_of_truth": "registry/skills/azure-hosted-copilot-sdk/SKILL.md",
+      "entrypoint": "runtime/skills/azure-hosted-copilot-sdk/SKILL.md",
+      "intent_tags": [
+        "azure-hosted-copilot-sdk",
+        "build",
+        "deploy",
+        "modify",
+        "github",
+        "copilot",
+        "sdk",
+        "apps"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-kubernetes",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-kubernetes/SKILL.md",
+      "source_of_truth": "registry/skills/azure-kubernetes/SKILL.md",
+      "entrypoint": "runtime/skills/azure-kubernetes/SKILL.md",
+      "intent_tags": [
+        "azure-kubernetes",
+        "plan",
+        "create",
+        "and",
+        "configure",
+        "production-ready",
+        "azure",
+        "kubernetes"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-kusto",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-kusto/SKILL.md",
+      "source_of_truth": "registry/skills/azure-kusto/SKILL.md",
+      "entrypoint": "runtime/skills/azure-kusto/SKILL.md",
+      "intent_tags": [
+        "azure-kusto",
+        "query",
+        "and",
+        "analyze",
+        "data",
+        "in",
+        "azure",
+        "explorer"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-messaging",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-messaging/SKILL.md",
+      "source_of_truth": "registry/skills/azure-messaging/SKILL.md",
+      "entrypoint": "runtime/skills/azure-messaging/SKILL.md",
+      "intent_tags": [
+        "azure-messaging",
+        "troubleshoot",
+        "and",
+        "resolve",
+        "issues",
+        "with",
+        "azure",
+        "messaging"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-prepare",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-prepare/SKILL.md",
+      "source_of_truth": "registry/skills/azure-prepare/SKILL.md",
+      "entrypoint": "runtime/skills/azure-prepare/SKILL.md",
+      "intent_tags": [
+        "azure-prepare",
+        "prepare",
+        "azure",
+        "apps",
+        "for",
+        "deployment",
+        "infra",
+        "bicep"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-quotas",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-quotas/SKILL.md",
+      "source_of_truth": "registry/skills/azure-quotas/SKILL.md",
+      "entrypoint": "runtime/skills/azure-quotas/SKILL.md",
+      "intent_tags": [
+        "azure-quotas",
+        "check",
+        "manage",
+        "azure",
+        "quotas",
+        "and",
+        "usage",
+        "across"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-rbac",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-rbac/SKILL.md",
+      "source_of_truth": "registry/skills/azure-rbac/SKILL.md",
+      "entrypoint": "runtime/skills/azure-rbac/SKILL.md",
+      "intent_tags": [
+        "azure-rbac",
+        "helps",
+        "users",
+        "find",
+        "the",
+        "right",
+        "azure",
+        "rbac"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-resource-lookup",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-resource-lookup/SKILL.md",
+      "source_of_truth": "registry/skills/azure-resource-lookup/SKILL.md",
+      "entrypoint": "runtime/skills/azure-resource-lookup/SKILL.md",
+      "intent_tags": [
+        "azure-resource-lookup",
+        "list",
+        "find",
+        "and",
+        "show",
+        "azure",
+        "resources",
+        "across"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-resource-visualizer",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-resource-visualizer/SKILL.md",
+      "source_of_truth": "registry/skills/azure-resource-visualizer/SKILL.md",
+      "entrypoint": "runtime/skills/azure-resource-visualizer/SKILL.md",
+      "intent_tags": [
+        "azure-resource-visualizer",
+        "analyze",
+        "azure",
+        "resource",
+        "groups",
+        "and",
+        "generate",
+        "detailed"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-storage",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-storage/SKILL.md",
+      "source_of_truth": "registry/skills/azure-storage/SKILL.md",
+      "entrypoint": "runtime/skills/azure-storage/SKILL.md",
+      "intent_tags": [
+        "azure-storage",
+        "azure",
+        "storage",
+        "services",
+        "including",
+        "blob",
+        "file",
+        "shares"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-upgrade",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-upgrade/SKILL.md",
+      "source_of_truth": "registry/skills/azure-upgrade/SKILL.md",
+      "entrypoint": "runtime/skills/azure-upgrade/SKILL.md",
+      "intent_tags": [
+        "azure-upgrade",
+        "assess",
+        "and",
+        "upgrade",
+        "azure",
+        "workloads",
+        "between",
+        "plans"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "azure-validate",
+      "type": "skill",
+      "runtime_path": "runtime/skills/azure-validate/SKILL.md",
+      "source_of_truth": "registry/skills/azure-validate/SKILL.md",
+      "entrypoint": "runtime/skills/azure-validate/SKILL.md",
+      "intent_tags": [
+        "azure-validate",
+        "pre-deployment",
+        "validation",
+        "for",
+        "azure",
+        "readiness",
+        "run",
+        "deep"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "building-mcp-server-on-cloudflare",
+      "type": "skill",
+      "runtime_path": "runtime/skills/building-mcp-server-on-cloudflare/SKILL.md",
+      "source_of_truth": "registry/skills/building-mcp-server-on-cloudflare/SKILL.md",
+      "entrypoint": "runtime/skills/building-mcp-server-on-cloudflare/SKILL.md",
+      "intent_tags": [
+        "building-mcp-server-on-cloudflare",
+        "use",
+        "when",
+        "building",
+        "or",
+        "deploying",
+        "remote",
+        "mcp"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare/SKILL.md",
+      "intent_tags": [
+        "cloudflare",
+        "use",
+        "when",
+        "building",
+        "or",
+        "reviewing",
+        "platform",
+        "projects"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-access-mcp",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-access-mcp/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-access-mcp/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare-access-mcp/SKILL.md",
+      "intent_tags": [
+        "cloudflare-access-mcp",
+        "use",
+        "when",
+        "auditing",
+        "or",
+        "changing",
+        "cloudflare",
+        "access"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-edge-security",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-edge-security/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-edge-security/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare-edge-security/SKILL.md",
+      "intent_tags": [
+        "cloudflare-edge-security",
+        "use",
+        "when",
+        "auditing",
+        "or",
+        "changing",
+        "cloudflare",
+        "zone"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-governance",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-governance/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-governance/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare-governance/SKILL.md",
+      "intent_tags": [
+        "cloudflare-governance",
+        "use",
+        "when",
+        "deciding",
+        "which",
+        "cloudflare",
+        "governance",
+        "skill"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-runtime-sync",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-runtime-sync/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-runtime-sync/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare-runtime-sync/SKILL.md",
+      "intent_tags": [
+        "cloudflare-runtime-sync",
+        "use",
+        "when",
+        "checking",
+        "or",
+        "changing",
+        "the",
+        "local"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-tunnel-dns",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-tunnel-dns/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-tunnel-dns/SKILL.md",
+      "entrypoint": "runtime/skills/cloudflare-tunnel-dns/SKILL.md",
+      "intent_tags": [
+        "cloudflare-tunnel-dns",
+        "use",
+        "when",
+        "auditing",
+        "or",
+        "changing",
+        "cloudflare",
+        "tunnel"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "conversation-memo",
+      "type": "skill",
+      "runtime_path": "runtime/skills/conversation-memo/SKILL.md",
+      "source_of_truth": "registry/skills/conversation-memo/SKILL.md",
+      "entrypoint": "runtime/skills/conversation-memo/SKILL.md",
+      "intent_tags": [
+        "conversation-memo",
+        "archive",
+        "complete",
+        "agent",
+        "conversations",
+        "and",
+        "derive",
+        "structured"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "doc-coauthoring",
+      "type": "skill",
+      "runtime_path": "runtime/skills/doc-coauthoring/SKILL.md",
+      "source_of_truth": "registry/skills/doc-coauthoring/SKILL.md",
+      "entrypoint": "runtime/skills/doc-coauthoring/SKILL.md",
+      "intent_tags": [
+        "doc-coauthoring",
+        "guide",
+        "users",
+        "through",
+        "structured",
+        "workflow",
+        "for",
+        "co-authoring"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "docx",
+      "type": "skill",
+      "runtime_path": "runtime/skills/docx/SKILL.md",
+      "source_of_truth": "registry/skills/docx/SKILL.md",
+      "entrypoint": "runtime/skills/docx/SKILL.md",
+      "intent_tags": [
+        "docx",
+        "comprehensive",
+        "document",
+        "creation",
+        "editing",
+        "and",
+        "analysis",
+        "with"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "entra-app-registration",
+      "type": "skill",
+      "runtime_path": "runtime/skills/entra-app-registration/SKILL.md",
+      "source_of_truth": "registry/skills/entra-app-registration/SKILL.md",
+      "entrypoint": "runtime/skills/entra-app-registration/SKILL.md",
+      "intent_tags": [
+        "entra-app-registration",
+        "guides",
+        "microsoft",
+        "entra",
+        "id",
+        "app",
+        "registration",
+        "oauth"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "frontend-design",
+      "type": "skill",
+      "runtime_path": "runtime/skills/frontend-design/SKILL.md",
+      "source_of_truth": "registry/skills/frontend-design/SKILL.md",
+      "entrypoint": "runtime/skills/frontend-design/SKILL.md",
+      "intent_tags": [
+        "frontend-design",
+        "create",
+        "distinctive",
+        "production-grade",
+        "frontend",
+        "interfaces",
+        "with",
+        "high"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "internal-comms",
+      "type": "skill",
+      "runtime_path": "runtime/skills/internal-comms/SKILL.md",
+      "source_of_truth": "registry/skills/internal-comms/SKILL.md",
+      "entrypoint": "runtime/skills/internal-comms/SKILL.md",
+      "intent_tags": [
+        "internal-comms",
+        "set",
+        "of",
+        "resources",
+        "to",
+        "help",
+        "me",
+        "write"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "mcp-builder",
+      "type": "skill",
+      "runtime_path": "runtime/skills/mcp-builder/SKILL.md",
+      "source_of_truth": "registry/skills/mcp-builder/SKILL.md",
+      "entrypoint": "runtime/skills/mcp-builder/SKILL.md",
+      "intent_tags": [
+        "mcp-builder",
+        "guide",
+        "for",
+        "creating",
+        "high-quality",
+        "mcp",
+        "model",
+        "context"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "obsidian-index-adapter",
+      "type": "skill",
+      "runtime_path": "runtime/skills/obsidian-index-adapter/SKILL.md",
+      "source_of_truth": "registry/skills/obsidian-index-adapter/SKILL.md",
+      "entrypoint": "runtime/skills/obsidian-index-adapter/SKILL.md",
+      "intent_tags": [
+        "obsidian-index-adapter",
+        "create",
+        "guarded",
+        "obsidian",
+        "index",
+        "notes",
+        "from",
+        "completed"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "pdf",
+      "type": "skill",
+      "runtime_path": "runtime/skills/pdf/SKILL.md",
+      "source_of_truth": "registry/skills/pdf/SKILL.md",
+      "entrypoint": "runtime/skills/pdf/SKILL.md",
+      "intent_tags": [
+        "pdf",
+        "comprehensive",
+        "manipulation",
+        "toolkit",
+        "for",
+        "extracting",
+        "text",
+        "and"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "pptx",
+      "type": "skill",
+      "runtime_path": "runtime/skills/pptx/SKILL.md",
+      "source_of_truth": "registry/skills/pptx/SKILL.md",
+      "entrypoint": "runtime/skills/pptx/SKILL.md",
+      "intent_tags": [
+        "pptx",
+        "presentation",
+        "creation",
+        "editing",
+        "and",
+        "analysis",
+        "when",
+        "claude"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "skill-creator",
+      "type": "skill",
+      "runtime_path": "runtime/skills/skill-creator/SKILL.md",
+      "source_of_truth": "registry/skills/skill-creator/SKILL.md",
+      "entrypoint": "runtime/skills/skill-creator/SKILL.md",
+      "intent_tags": [
+        "skill-creator",
+        "guide",
+        "for",
+        "creating",
+        "effective",
+        "skills",
+        "this",
+        "skill"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "theme-factory",
+      "type": "skill",
+      "runtime_path": "runtime/skills/theme-factory/SKILL.md",
+      "source_of_truth": "registry/skills/theme-factory/SKILL.md",
+      "entrypoint": "runtime/skills/theme-factory/SKILL.md",
+      "intent_tags": [
+        "theme-factory",
+        "toolkit",
+        "for",
+        "styling",
+        "artifacts",
+        "with",
+        "theme",
+        "these"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "web-artifacts-builder",
+      "type": "skill",
+      "runtime_path": "runtime/skills/web-artifacts-builder/SKILL.md",
+      "source_of_truth": "registry/skills/web-artifacts-builder/SKILL.md",
+      "entrypoint": "runtime/skills/web-artifacts-builder/SKILL.md",
+      "intent_tags": [
+        "web-artifacts-builder",
+        "suite",
+        "of",
+        "tools",
+        "for",
+        "creating",
+        "elaborate",
+        "multi-component"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "webapp-testing",
+      "type": "skill",
+      "runtime_path": "runtime/skills/webapp-testing/SKILL.md",
+      "source_of_truth": "registry/skills/webapp-testing/SKILL.md",
+      "entrypoint": "runtime/skills/webapp-testing/SKILL.md",
+      "intent_tags": [
+        "webapp-testing",
+        "toolkit",
+        "for",
+        "interacting",
+        "with",
+        "and",
+        "testing",
+        "local"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "wrangler",
+      "type": "skill",
+      "runtime_path": "runtime/skills/wrangler/SKILL.md",
+      "source_of_truth": "registry/skills/wrangler/SKILL.md",
+      "entrypoint": "runtime/skills/wrangler/SKILL.md",
+      "intent_tags": [
+        "wrangler",
+        "use",
+        "when",
+        "deploying",
+        "developing",
+        "or",
+        "managing",
+        "cloudflare"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "xlsx",
+      "type": "skill",
+      "runtime_path": "runtime/skills/xlsx/SKILL.md",
+      "source_of_truth": "registry/skills/xlsx/SKILL.md",
+      "entrypoint": "runtime/skills/xlsx/SKILL.md",
+      "intent_tags": [
+        "xlsx",
+        "comprehensive",
+        "spreadsheet",
+        "creation",
+        "editing",
+        "and",
+        "analysis",
+        "with"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "claude-plans",
+      "type": "workflow",
+      "runtime_path": "runtime/workflow/claude-plans/WORKFLOW.md",
+      "source_of_truth": "registry/workflow/claude-plans/WORKFLOW.md",
+      "entrypoint": "runtime/workflow/claude-plans/WORKFLOW.md",
+      "intent_tags": [
+        "name",
+        "claude-plans",
+        "description",
+        "canonical",
+        "planning",
+        "workflow",
+        "seed",
+        "for"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    }
+  ]
+}

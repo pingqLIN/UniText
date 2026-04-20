@@ -5,6 +5,8 @@
 
 所有 delivery 與 mutation 都應以 `UniText` 的純文本 registry / spec 契約為 source of truth。
 
+Consumer agent 的預設讀取面是 `runtime/`，不是 `registry/`。`registry/` 仍然是 canonical authoring source；`runtime/` 是 tracked runtime read model；`local/` 才是 machine-local wiring。
+
 若操作涉及 password、API key、token、credential 等 sensitive material，請同時遵守 `SECRET_HANDLING_GUIDELINES.md`。
 
 ## 1. Scope
@@ -127,6 +129,7 @@ delivery 只能由明確 trigger 啟動：
 | Logical area | Meaning | Physical mapping examples |
 |---|---|---|
 | `/registry/skills` | canonical skill sources | shared directory、repo subdir、mounted path |
+| `/runtime` | tracked runtime read model | repo `runtime/` directory、generated projections、runtime catalog |
 | `/registry/mcp` | canonical MCP definitions | config folder、generated manifest root |
 | `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
 | `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |

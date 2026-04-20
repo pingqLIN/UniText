@@ -20,6 +20,7 @@
 - [ ] template package 不包含 review-only docs
 - [ ] template package 不包含 machine-specific absolute paths
 - [ ] template package 不包含 live Cloudflare baseline refs、真實 hostnames、真實 IDs、或 runtime 路徑
+- [ ] shared env baseline 不包含 `localhost`、本機 callback URL、作者機器路徑、debug override、或其他 local-only environment habit
 - [ ] tracked `.mcp.json` 為 relative-path seed，而非作者本機絕對路徑
 - [ ] template package 含 `.gitattributes`，且 line-ending policy 不依賴作者機器的 Git 設定
 - [ ] 若需要 line-ending cleanup，已先用 preview / scoped renormalize 工具確認 blast radius，而不是直接全 repo 套用
