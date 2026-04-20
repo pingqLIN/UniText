@@ -1,0 +1,79 @@
+{
+  "bundle_id": "external-review",
+  "phase_target": "external-review-ready",
+  "contract_version": 1,
+  "reading_order": [
+    "EXTERNAL_REVIEW_COVER_NOTE.md",
+    "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+    "README.md",
+    "INDEX.md",
+    "VISION.md",
+    "RESOURCE_SPEC.md",
+    "OPERATIONS.md",
+    "SECRET_HANDLING_GUIDELINES.md",
+    "MILESTONES.md",
+    "docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md",
+    "ESSENTIAL_SKILLS_SHORTLIST.md"
+  ],
+  "files": [
+    "EXTERNAL_REVIEW_COVER_NOTE.md",
+    "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+    "README.md",
+    "INDEX.md",
+    "VISION.md",
+    "RESOURCE_SPEC.md",
+    "OPERATIONS.md",
+    "SECRET_HANDLING_GUIDELINES.md",
+    "PROJECT_MODES.md",
+    "MILESTONES.md",
+    "docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md",
+    "ESSENTIAL_SKILLS_SHORTLIST.md",
+    "EXTERNAL_REVIEW_PACKAGE.md",
+    "local/docs/ADOPTION_CHECKLIST.md",
+    "local/docs/CLI_COMPAT_MATRIX.md",
+    "local/scripts/README.md",
+    "local/scripts/bootstrap.py",
+    "local/scripts/verify-bootstrap.py",
+    "local/scripts/create-git-bundle.py",
+    "local/scripts/scan-skills.ps1",
+    "local/scripts/sync-skills.ps1",
+    "local/scripts/verify-delivery.ps1",
+    "local/scripts/health-check.ps1",
+    "local/scripts/batch-adopt-skills.ps1",
+    "local/scripts/generate-index-entries.ps1",
+    "local/scripts/rollback-skills.ps1",
+    "local/scripts/export-review-package.ps1",
+    "local/scripts/lib/path-safety.ps1"
+  ],
+  "directories": [
+    "registry/agents/registry-curator",
+    "registry/mcp/claude-project-mcp-seed",
+    "registry/workflow/claude-plans"
+  ],
+  "skills": {
+    "core": [
+      "pdf",
+      "docx",
+      "xlsx",
+      "pptx",
+      "mcp-builder",
+      "skill-creator",
+      "webapp-testing",
+      "doc-coauthoring"
+    ],
+    "expansion": [
+      "frontend-design",
+      "web-artifacts-builder",
+      "internal-comms",
+      "theme-factory"
+    ]
+  },
+  "excluded": [
+    "backup/",
+    "recovered_*/",
+    ".bak_*/",
+    "ops/history/",
+    "local/docs/authoring/",
+    "untracked experiments"
+  ]
+}

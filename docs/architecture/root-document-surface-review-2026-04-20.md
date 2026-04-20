@@ -150,10 +150,6 @@ The repo is now easier to interpret in layers:
 
 ## 6. Recommended next step
 
-Do a second consolidation wave only after:
-
-- export/review scripts are updated for moved files
-- i18n references are intentionally migrated
-- the repo-root target set is explicitly capped
+A follow-up maintenance batch should first centralize the external-review bundle into one machine-readable contract and rewire `export-review-package.ps1` to consume it. After that lands, the remaining review/export root docs can be evaluated as a third consolidation wave with a much smaller update surface.
 
 Until then, keep root cleanup incremental rather than trying to move every secondary file in one pass.
