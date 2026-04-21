@@ -30,13 +30,19 @@ function Get-WorkspaceSensitiveMetadataRules {
 
 function Test-WorkspaceSensitiveMetadataRules {
   param(
-    [object]$Rules
+    [object]$Rules,
+    [string]$RootPath,
+    [switch]$RequireScopeExists
   )
 
   $errors = [System.Collections.Generic.List[string]]::new()
 
   if (@($Rules.shared_surface_scope).Count -eq 0) {
     $errors.Add("shared_surface_scope must not be empty.")
+  }
+
+  if ($RequireScopeExists -and [string]::IsNullOrWhiteSpace($RootPath)) {
+    $errors.Add("RootPath is required when RequireScopeExists is enabled.")
   }
 
   $pathLabels = @($Rules.path_rules | ForEach-Object { $_.label })
@@ -78,6 +84,14 @@ function Test-WorkspaceSensitiveMetadataRules {
 
     if (@(Compare-Object -ReferenceObject $expectedSorted -DifferenceObject $actual).Count -gt 0) {
       $errors.Add("self_test_case '$($case.label)' mismatch. expected=[$($expectedSorted -join ', ')] actual=[$($actual -join ', ')]")
+    }
+  }
+
+  if ($RequireScopeExists -and -not [string]::IsNullOrWhiteSpace($RootPath)) {
+    foreach ($entry in @($Rules.shared_surface_scope)) {
+      if (-not (Test-Path (Join-Path $RootPath $entry))) {
+        $errors.Add("shared_surface_scope entry is missing from root: $entry")
+      }
     }
   }
 

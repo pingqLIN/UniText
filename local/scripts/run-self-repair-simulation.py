@@ -11,7 +11,6 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CONTRACT_RELATIVE_PATH = Path("docs/architecture/scenarios")
 
 
 def parse_args() -> argparse.Namespace:
@@ -134,6 +133,82 @@ def mutate_review_bundle_contract(repo_root: Path) -> None:
     contract["reading_order"] = rewrite([str(item) for item in contract.get("reading_order", [])])
     contract["files"] = rewrite([str(item) for item in contract.get("files", [])])
     contract_path.write_text(json.dumps(contract, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def build_workspace_sensitive_fixture(target_root: Path) -> None:
+    fixture_paths = {
+        "AGENTS.md",
+        "WORKSPACE_SENSITIVE_METADATA_RULES.json",
+        "WORKSPACE_SENSITIVE_METADATA_RULES.md",
+        "README.md",
+        "INDEX.md",
+        "VISION.md",
+        "RESOURCE_SPEC.md",
+        "OPERATIONS.md",
+        "PROJECT_MODES.md",
+        "SECRET_HANDLING_GUIDELINES.md",
+        "TEMPLATE_RELEASE_PACKAGE.md",
+        "TEMPLATE_RELEASE_CHECKLIST.md",
+        "REBUILD_AS_NEW_PROJECT.md",
+        "MILESTONES.md",
+        "NO_PUBLISH_POLICY.md",
+        "DOCUMENT_PLACEMENT_POLICY.md",
+        "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
+        ".github/pull_request_template.md",
+        ".mcp.json",
+        ".claude/settings.json",
+        "docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md",
+        "docs/concepts/SKILL0_COLLABORATION_VISION.md",
+        "docs/reviews/external-review-bundle.contract.json",
+        "docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md",
+        "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md",
+        "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md",
+        "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md",
+        "local/scripts/bootstrap.py",
+        "local/scripts/git-startup.ps1",
+        "local/scripts/health-check.ps1",
+        "local/scripts/export-template-package.ps1",
+        "local/scripts/preview-renormalize.ps1",
+        "local/scripts/preview-renormalize.py",
+        "local/scripts/run-renormalize.ps1",
+        "local/scripts/run-renormalize.py",
+        "local/scripts/verify-template-package.ps1",
+        "local/scripts/export-rebuild-project.ps1",
+        "local/scripts/verify-rebuild-project.ps1",
+        "local/scripts/validate-workspace-sensitive-metadata-rules.ps1",
+        "local/scripts/verify-workspace-boundaries.ps1",
+        "local/scripts/get-publishability-report.ps1",
+        "local/scripts/lib/renormalize_core.py",
+        "local/scripts/lib/workspace-sensitive-metadata.ps1",
+        "local/scripts/repair-workspace-sensitive-rules.py",
+        "registry/README.md",
+    }
+
+    for relative_path in sorted(fixture_paths):
+        copy_path(REPO_ROOT, target_root, relative_path)
+
+    for relative_dir in (".github", "registry"):
+        (target_root / relative_dir).mkdir(parents=True, exist_ok=True)
+
+
+def mutate_workspace_sensitive_rules(repo_root: Path) -> None:
+    rules_path = repo_root / "WORKSPACE_SENSITIVE_METADATA_RULES.json"
+    rules = json.loads(rules_path.read_text(encoding="utf-8"))
+
+    legacy_map = {
+        "docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md": "COPILOT_CLI_ADAPTER_NOTE.md",
+        "docs/concepts/SKILL0_COLLABORATION_VISION.md": "SKILL0_COLLABORATION_VISION.md",
+        "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md": "EXTERNAL_REVIEW_PACKAGE.md",
+        "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md": "EXTERNAL_REVIEW_COVER_NOTE.md",
+        "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md": "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+        "docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md": "ESSENTIAL_SKILLS_SHORTLIST.md",
+    }
+
+    rules["shared_surface_scope"] = [
+        legacy_map.get(str(item), str(item))
+        for item in rules.get("shared_surface_scope", [])
+    ]
+    rules_path.write_text(json.dumps(rules, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def run_runtime_target_drift() -> dict[str, object]:
@@ -294,12 +369,92 @@ def run_review_bundle_contract_drift() -> dict[str, object]:
         }
 
 
+def run_workspace_sensitive_boundary_drift() -> dict[str, object]:
+    scenario_path = REPO_ROOT / "docs" / "architecture" / "scenarios" / "workspace-sensitive-boundary-drift.json"
+    scenario = json.loads(scenario_path.read_text(encoding="utf-8"))
+
+    with tempfile.TemporaryDirectory(prefix="unitext-sim-boundary-") as repo_dir_name:
+        fixture_root = Path(repo_dir_name)
+        build_workspace_sensitive_fixture(fixture_root)
+        mutate_workspace_sensitive_rules(fixture_root)
+
+        validate_script = fixture_root / "local" / "scripts" / "validate-workspace-sensitive-metadata-rules.ps1"
+        validate_before_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{validate_script}' | ConvertTo-Json -Depth 8",
+        ]
+        before_code, before_stdout, before_stderr = run_command(validate_before_command)
+        before_report = json.loads(before_stdout) if before_stdout.strip() else {}
+
+        repair_command = [
+            "python",
+            str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-rules.py"),
+            "--repo-root",
+            str(fixture_root),
+            "--write",
+        ]
+        repair_code, repair_stdout, repair_stderr = run_command(repair_command)
+        repair_report = json.loads(repair_stdout) if repair_stdout.strip() else {}
+
+        validate_after_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{validate_script}' | ConvertTo-Json -Depth 8",
+        ]
+        after_code, after_stdout, after_stderr = run_command(validate_after_command)
+        after_report = json.loads(after_stdout) if after_stdout.strip() else {}
+
+        recovered = (
+            before_report.get("ok") is False
+            and repair_code == 0
+            and after_report.get("ok") is True
+        )
+        classification = "recovered" if recovered else "blocked-with-escalation"
+
+        return {
+            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "scenario": scenario["id"],
+            "scenario_config": str(scenario_path),
+            "repo_root": str(REPO_ROOT),
+            "simulated_repo": str(fixture_root),
+            "classification": classification,
+            "recovered": recovered,
+            "before": {
+                "validate_exit_code": before_code,
+                "validate_ok": before_report.get("ok"),
+                "stdout": before_report,
+                "stderr": before_stderr.strip(),
+            },
+            "repair": {
+                "repair_exit_code": repair_code,
+                "repair_ok": repair_code == 0,
+                "stdout": repair_report,
+                "stderr": repair_stderr.strip(),
+            },
+            "after": {
+                "validate_exit_code": after_code,
+                "validate_ok": after_report.get("ok"),
+                "stdout": after_report,
+                "stderr": after_stderr.strip(),
+            },
+        }
+
+
 def main() -> int:
     args = parse_args()
     if args.scenario == "runtime-target-drift":
         report = run_runtime_target_drift()
     elif args.scenario == "review-bundle-contract-drift":
         report = run_review_bundle_contract_drift()
+    elif args.scenario == "workspace-sensitive-boundary-drift":
+        report = run_workspace_sensitive_boundary_drift()
     else:
         raise SystemExit(f"unsupported scenario: {args.scenario}")
     output = json.dumps(report, indent=2) if args.format == "json" else render_markdown(report)

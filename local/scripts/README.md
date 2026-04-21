@@ -66,7 +66,7 @@
 - `lib/workspace-sensitive-metadata.ps1`
   - 載入 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json`，讓 boundary / template / publishability 驗證共用同一套規則
 - `validate-workspace-sensitive-metadata-rules.ps1`
-  - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性與自帶案例是否通過
+    - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性、自帶案例，以及 repo-side `shared_surface_scope` 參照是否仍有效
 - `preview-renormalize.ps1`
   - Windows PowerShell wrapper；呼叫 `preview-renormalize.py` 並回傳 PowerShell object
 - `run-renormalize.ps1`
@@ -75,11 +75,14 @@
   - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
   - active gate 由 `required_source_docs` 決定，其餘 mirrored docs 以 optional coverage 顯示，不直接阻斷 release/health gate
 - `run-self-repair-simulation.py`
-  - 執行 bounded self-repair 情境模擬；目前支援 `runtime-target-drift` 與 `review-bundle-contract-drift`
-  - 使用 temporary home fixture 與 override flags，避免為了模擬直接改動真實本機 wiring
+    - 執行 bounded self-repair 情境模擬；目前支援 `runtime-target-drift`、`review-bundle-contract-drift`、`workspace-sensitive-boundary-drift`
+    - 使用 temporary home fixture 與 override flags，避免為了模擬直接改動真實本機 wiring
 - `repair-external-review-bundle-contract.py`
-  - 只做 external-review bundle contract 的 guided repair：正規化已知 legacy review 路徑，並確保 `reading_order` 項目仍包含在 `files`
-  - 不負責新增或刪除 package 成員；若修正後仍缺檔，應升級為 human review
+    - 只做 external-review bundle contract 的 guided repair：正規化已知 legacy review 路徑，並確保 `reading_order` 項目仍包含在 `files`
+    - 不負責新增或刪除 package 成員；若修正後仍缺檔，應升級為 human review
+- `repair-workspace-sensitive-rules.py`
+    - 只做 workspace-sensitive boundary rules 的 guided repair：正規化 `shared_surface_scope` 中已知 moved docs 的 legacy 路徑
+    - 不修改 regex、self-test 或 shared surface 的政策範圍；若修正後仍有缺路徑，應升級為 human review
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

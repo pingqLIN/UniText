@@ -39,6 +39,8 @@
 - 若某個 placeholder 應視為安全範例，必須補一個 `expected_labels = []` 的 self-test case
 - 若某條 regex 只是在 script 內作為規則字串出現，應明確設定 `skip_script_pattern_lines`
 - 不要把 authoring-only 或 operations-only 路徑塞進 `shared_surface_scope` 來解決誤報；應先檢查文件放置是否錯層
+- repo-side validation 現在會額外檢查 `shared_surface_scope` 內的路徑是否仍存在；若文件已搬家，應先修正規則引用，而不是繞過驗證
+- starter template 驗證不會把 review-only docs 視為必備，因此 `shared_surface_scope` 的存在性檢查只在 repo-side validate / boundary verify 啟用
 
 ## 4. Required Validation
 

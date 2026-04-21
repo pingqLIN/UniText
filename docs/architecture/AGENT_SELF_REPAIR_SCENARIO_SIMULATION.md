@@ -134,12 +134,15 @@ Reason:
 - `layer`: `boundary`
 - `class`: `A2`
 - 現況：已有 `WORKSPACE_SENSITIVE_METADATA_RULES.*` 與 validation script
+- executable scenario: `docs/architecture/scenarios/workspace-sensitive-boundary-drift.json`
+- runner: `local/scripts/run-self-repair-simulation.py --scenario workspace-sensitive-boundary-drift`
 - 判定：**可偵測，且可局部修復**
 
 Reason:
 
 - 規則與 self-test 已存在
 - 但若 drift 牽涉 canonical docs 的內容取捨，需保守處理
+- 目前可自動修復的範圍只限於 `shared_surface_scope` 中已知 moved docs 的 reference drift；不自動修改 regex、self-test 或內容策略
 
 ### 5.5 I18n drift
 
