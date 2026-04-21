@@ -22,11 +22,13 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def run_command(command: list[str]) -> tuple[int, str, str]:
+def run_command(command: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
     completed = subprocess.run(
         command,
-        cwd=REPO_ROOT,
+        cwd=str(cwd or REPO_ROOT),
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         check=False,
     )
@@ -181,7 +183,21 @@ def build_workspace_sensitive_fixture(target_root: Path) -> None:
         "local/scripts/lib/renormalize_core.py",
         "local/scripts/lib/workspace-sensitive-metadata.ps1",
         "local/scripts/repair-workspace-sensitive-rules.py",
+        "local/scripts/repair-workspace-sensitive-content-patterns.py",
         "registry/README.md",
+        "registry/skills/conversation-memo/SKILL.md",
+        "registry/skills/conversation-memo/references/memo-lifecycle.md",
+        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/credential-auth-errors.md",
+        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/vm-agent-not-responding.md",
+        "registry/skills/azure-deploy/references/recipes/azcli/verify.md",
+        "registry/skills/azure-deploy/references/recipes/azd/verify.md",
+        "registry/skills/azure-deploy/references/recipes/bicep/verify.md",
+        "registry/skills/azure-deploy/references/recipes/cicd/verify.md",
+        "registry/skills/azure-deploy/references/recipes/terraform/verify.md",
+        "registry/skills/azure-diagnostics/SKILL.md",
+        "registry/skills/azure-diagnostics/aks-troubleshooting/aks-troubleshooting.md",
+        "registry/skills/azure-diagnostics/aks-troubleshooting/networking.md",
+        "registry/skills/azure-diagnostics/references/container-apps/README.md",
     }
 
     for relative_path in sorted(fixture_paths):
@@ -189,6 +205,13 @@ def build_workspace_sensitive_fixture(target_root: Path) -> None:
 
     for relative_dir in (".github", "registry"):
         (target_root / relative_dir).mkdir(parents=True, exist_ok=True)
+
+
+def initialize_git_fixture(target_root: Path) -> None:
+    run_command(["git", "init", "-q"], cwd=target_root)
+    run_command(["git", "config", "user.name", "Simulation Bot"], cwd=target_root)
+    run_command(["git", "config", "user.email", "simulation@example.com"], cwd=target_root)
+    run_command(["git", "add", "-A"], cwd=target_root)
 
 
 def mutate_workspace_sensitive_rules(repo_root: Path) -> None:
@@ -208,6 +231,22 @@ def mutate_workspace_sensitive_rules(repo_root: Path) -> None:
         legacy_map.get(str(item), str(item))
         for item in rules.get("shared_surface_scope", [])
     ]
+    rules_path.write_text(json.dumps(rules, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def mutate_workspace_sensitive_content_patterns(repo_root: Path) -> None:
+    rules_path = repo_root / "WORKSPACE_SENSITIVE_METADATA_RULES.json"
+    rules = json.loads(rules_path.read_text(encoding="utf-8"))
+
+    for pattern in rules.get("content_patterns", []):
+        if pattern.get("label") != "live workspace hostname":
+            continue
+        pattern["regex"] = (
+            r"(?i)\b(?:zone hostname|ingress|hostnames?|domain)\b[^\r\n]*\b"
+            r"(?!workspace\.example\.com\b)(?!example\.com\b)(?:[a-z0-9-]+\.)+[a-z]{2,}\b"
+        )
+        pattern["skip_script_pattern_lines"] = True
+
     rules_path.write_text(json.dumps(rules, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
@@ -447,6 +486,119 @@ def run_workspace_sensitive_boundary_drift() -> dict[str, object]:
         }
 
 
+def run_workspace_sensitive_content_pattern_drift() -> dict[str, object]:
+    scenario_path = REPO_ROOT / "docs" / "architecture" / "scenarios" / "workspace-sensitive-content-pattern-drift.json"
+    scenario = json.loads(scenario_path.read_text(encoding="utf-8"))
+
+    with tempfile.TemporaryDirectory(prefix="unitext-sim-content-pattern-") as repo_dir_name:
+        fixture_root = Path(repo_dir_name)
+        build_workspace_sensitive_fixture(fixture_root)
+        initialize_git_fixture(fixture_root)
+        mutate_workspace_sensitive_content_patterns(fixture_root)
+
+        validate_script = fixture_root / "local" / "scripts" / "validate-workspace-sensitive-metadata-rules.ps1"
+        verify_script = fixture_root / "local" / "scripts" / "verify-workspace-boundaries.ps1"
+
+        validate_before_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{validate_script}' | ConvertTo-Json -Depth 10",
+        ]
+        before_validate_code, before_validate_stdout, before_validate_stderr = run_command(validate_before_command)
+        before_validate_report = json.loads(before_validate_stdout) if before_validate_stdout.strip() else {}
+
+        verify_before_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{verify_script}' | ConvertTo-Json -Depth 10",
+        ]
+        before_verify_code, before_verify_stdout, before_verify_stderr = run_command(verify_before_command)
+        before_verify_report = json.loads(before_verify_stdout) if before_verify_stdout.strip() else {}
+
+        repair_command = [
+            "python",
+            str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-content-patterns.py"),
+            "--repo-root",
+            str(fixture_root),
+            "--write",
+        ]
+        repair_code, repair_stdout, repair_stderr = run_command(repair_command)
+        repair_report = json.loads(repair_stdout) if repair_stdout.strip() else {}
+
+        validate_after_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{validate_script}' | ConvertTo-Json -Depth 10",
+        ]
+        after_validate_code, after_validate_stdout, after_validate_stderr = run_command(validate_after_command)
+        after_validate_report = json.loads(after_validate_stdout) if after_validate_stdout.strip() else {}
+
+        verify_after_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{verify_script}' | ConvertTo-Json -Depth 10",
+        ]
+        after_verify_code, after_verify_stdout, after_verify_stderr = run_command(verify_after_command)
+        after_verify_report = json.loads(after_verify_stdout) if after_verify_stdout.strip() else {}
+
+        recovered = (
+            before_validate_report.get("ok") is False
+            and before_verify_report.get("ok") is False
+            and repair_code == 0
+            and after_validate_report.get("ok") is True
+            and after_verify_report.get("ok") is True
+        )
+        classification = "recovered" if recovered else "blocked-with-escalation"
+
+        return {
+            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "scenario": scenario["id"],
+            "scenario_config": str(scenario_path),
+            "repo_root": str(REPO_ROOT),
+            "simulated_repo": str(fixture_root),
+            "classification": classification,
+            "recovered": recovered,
+            "before": {
+                "validate_exit_code": before_validate_code,
+                "validate_ok": before_validate_report.get("ok"),
+                "validate_stdout": before_validate_report,
+                "validate_stderr": before_validate_stderr.strip(),
+                "verify_exit_code": before_verify_code,
+                "verify_ok": before_verify_report.get("ok"),
+                "verify_stdout": before_verify_report,
+                "verify_stderr": before_verify_stderr.strip(),
+            },
+            "repair": {
+                "repair_exit_code": repair_code,
+                "repair_ok": repair_code == 0,
+                "stdout": repair_report,
+                "stderr": repair_stderr.strip(),
+            },
+            "after": {
+                "validate_exit_code": after_validate_code,
+                "validate_ok": after_validate_report.get("ok"),
+                "validate_stdout": after_validate_report,
+                "validate_stderr": after_validate_stderr.strip(),
+                "verify_exit_code": after_verify_code,
+                "verify_ok": after_verify_report.get("ok"),
+                "verify_stdout": after_verify_report,
+                "verify_stderr": after_verify_stderr.strip(),
+            },
+        }
+
+
 def main() -> int:
     args = parse_args()
     if args.scenario == "runtime-target-drift":
@@ -455,6 +607,8 @@ def main() -> int:
         report = run_review_bundle_contract_drift()
     elif args.scenario == "workspace-sensitive-boundary-drift":
         report = run_workspace_sensitive_boundary_drift()
+    elif args.scenario == "workspace-sensitive-content-pattern-drift":
+        report = run_workspace_sensitive_content_pattern_drift()
     else:
         raise SystemExit(f"unsupported scenario: {args.scenario}")
     output = json.dumps(report, indent=2) if args.format == "json" else render_markdown(report)

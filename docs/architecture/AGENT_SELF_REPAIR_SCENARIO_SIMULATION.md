@@ -144,7 +144,22 @@ Reason:
 - 但若 drift 牽涉 canonical docs 的內容取捨，需保守處理
 - 目前可自動修復的範圍只限於 `shared_surface_scope` 中已知 moved docs 的 reference drift；不自動修改 regex、self-test 或內容策略
 
-### 5.5 I18n drift
+### 5.5 Workspace-sensitive content pattern drift
+
+- `layer`: `boundary`
+- `class`: `A2`
+- 現況：`live workspace hostname` 這類 heuristic pattern 可能因 regex 過寬，對 public reference docs 產生誤報
+- executable scenario: `docs/architecture/scenarios/workspace-sensitive-content-pattern-drift.json`
+- runner: `local/scripts/run-self-repair-simulation.py --scenario workspace-sensitive-content-pattern-drift`
+- 判定：**可做 guided repair**
+
+Reason:
+
+- failure signal 可同時從 self-test 與 boundary verify 取得
+- repair path 可以限制在「restore canonical content pattern + restore canonical self-tests」
+- 若 canonical restore 後仍有 violation，代表可能是真實 live metadata 或更大政策問題，應直接升級
+
+### 5.6 I18n drift
 
 - `layer`: `i18n`
 - `class`: `A1` for `zh-TW`, `A0` for archived locales
@@ -156,7 +171,7 @@ Reason:
 - archived locales 不再是 release gate，也不應觸發自動修復
 - `zh-TW` 則可透過 manifest 與 drift audit 持續維護
 
-### 5.6 Canonical source disagreement
+### 5.7 Canonical source disagreement
 
 - `layer`: `registry` / `core-docs`
 - `class`: `A3`
@@ -204,7 +219,8 @@ Reason:
 1. `runtime-target-drift`
 2. `review-bundle-contract-drift`
 3. `workspace-sensitive-boundary-drift`
-4. `active-zh-TW-i18n-drift`
+4. `workspace-sensitive-content-pattern-drift`
+5. `active-zh-TW-i18n-drift`
 
 暫時不要先演練：
 

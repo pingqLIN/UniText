@@ -37,7 +37,8 @@ Before summarizing, preserve the full discussion transcript.
 
 Default raw archive root:
 
-- `C:\Users\miles\.agents\.little_talks`
+- `%USERPROFILE%\.agents\.little_talks` (Windows)
+- `$HOME/.agents/.little_talks` (POSIX-style reference)
 
 Unless the user explicitly names a better location, keep using that root for complete raw discussion storage.
 
