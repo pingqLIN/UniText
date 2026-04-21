@@ -11,6 +11,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+CONTRACT_RELATIVE_PATH = Path("docs/architecture/scenarios")
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,6 +78,62 @@ def write_output(text: str, output: str | None) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(text, encoding="utf-8")
     print(output_path)
+
+
+def load_external_review_contract(repo_root: Path) -> dict[str, object]:
+    contract_path = repo_root / "docs" / "reviews" / "external-review-bundle.contract.json"
+    return json.loads(contract_path.read_text(encoding="utf-8"))
+
+
+def copy_path(source_root: Path, target_root: Path, relative_path: str) -> None:
+    source = source_root / relative_path
+    target = target_root / relative_path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if source.is_dir():
+        shutil.copytree(source, target, dirs_exist_ok=True)
+        return
+    shutil.copy2(source, target)
+
+
+def build_external_review_fixture(target_root: Path) -> None:
+    contract = load_external_review_contract(REPO_ROOT)
+
+    fixture_paths = {
+        "docs/reviews/external-review-bundle.contract.json",
+        "local/scripts/export-review-package.ps1",
+        "local/scripts/lib/path-safety.ps1",
+        "local/scripts/repair-external-review-bundle-contract.py",
+    }
+    fixture_paths.update(str(item) for item in contract.get("files", []))
+    fixture_paths.update(str(item) for item in contract.get("directories", []))
+
+    skills = contract.get("skills", {})
+    if isinstance(skills, dict):
+        for name in [str(item) for item in skills.get("core", []) + skills.get("expansion", [])]:
+            fixture_paths.add(f"registry/skills/{name}")
+
+    for relative_path in sorted(fixture_paths):
+        copy_path(REPO_ROOT, target_root, relative_path)
+
+
+def mutate_review_bundle_contract(repo_root: Path) -> None:
+    contract_path = repo_root / "docs" / "reviews" / "external-review-bundle.contract.json"
+    contract = json.loads(contract_path.read_text(encoding="utf-8"))
+
+    legacy_map = {
+        "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md": "EXTERNAL_REVIEW_COVER_NOTE.md",
+        "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md": "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+        "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md": "EXTERNAL_REVIEW_PACKAGE.md",
+        "docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md": "ESSENTIAL_SKILLS_SHORTLIST.md",
+        "docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md": "../reports/status/PROJECT_STATUS_REPORT_2026-03-23.md",
+    }
+
+    def rewrite(entries: list[str]) -> list[str]:
+        return [legacy_map.get(item, item) for item in entries]
+
+    contract["reading_order"] = rewrite([str(item) for item in contract.get("reading_order", [])])
+    contract["files"] = rewrite([str(item) for item in contract.get("files", [])])
+    contract_path.write_text(json.dumps(contract, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def run_runtime_target_drift() -> dict[str, object]:
@@ -164,12 +221,87 @@ def run_runtime_target_drift() -> dict[str, object]:
         }
 
 
+def run_review_bundle_contract_drift() -> dict[str, object]:
+    scenario_path = REPO_ROOT / "docs" / "architecture" / "scenarios" / "review-bundle-contract-drift.json"
+    scenario = json.loads(scenario_path.read_text(encoding="utf-8"))
+
+    with tempfile.TemporaryDirectory(prefix="unitext-sim-repo-") as repo_dir_name:
+        fixture_root = Path(repo_dir_name)
+        build_external_review_fixture(fixture_root)
+        mutate_review_bundle_contract(fixture_root)
+
+        export_script = fixture_root / "local" / "scripts" / "export-review-package.ps1"
+        export_before_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{export_script}' -DryRun | ConvertTo-Json -Depth 8",
+        ]
+        before_code, before_stdout, before_stderr = run_command(export_before_command)
+
+        repair_command = [
+            "python",
+            str(fixture_root / "local" / "scripts" / "repair-external-review-bundle-contract.py"),
+            "--repo-root",
+            str(fixture_root),
+            "--write",
+        ]
+        repair_code, repair_stdout, repair_stderr = run_command(repair_command)
+        repair_report = json.loads(repair_stdout) if repair_stdout.strip() else {}
+
+        export_after_command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            f"& '{export_script}' -DryRun | ConvertTo-Json -Depth 8",
+        ]
+        after_code, after_stdout, after_stderr = run_command(export_after_command)
+        after_report = json.loads(after_stdout) if after_stdout.strip() else {}
+
+        recovered = before_code != 0 and repair_code == 0 and after_code == 0
+        classification = "recovered" if recovered else "blocked-with-escalation"
+
+        return {
+            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "scenario": scenario["id"],
+            "scenario_config": str(scenario_path),
+            "repo_root": str(REPO_ROOT),
+            "simulated_repo": str(fixture_root),
+            "classification": classification,
+            "recovered": recovered,
+            "before": {
+                "export_exit_code": before_code,
+                "export_ok": before_code == 0,
+                "stdout": before_stdout.strip(),
+                "stderr": before_stderr.strip(),
+            },
+            "repair": {
+                "repair_exit_code": repair_code,
+                "repair_ok": repair_code == 0,
+                "stdout": repair_report,
+                "stderr": repair_stderr.strip(),
+            },
+            "after": {
+                "export_exit_code": after_code,
+                "export_ok": after_code == 0,
+                "stdout": after_report,
+                "stderr": after_stderr.strip(),
+            },
+        }
+
+
 def main() -> int:
     args = parse_args()
-    if args.scenario != "runtime-target-drift":
+    if args.scenario == "runtime-target-drift":
+        report = run_runtime_target_drift()
+    elif args.scenario == "review-bundle-contract-drift":
+        report = run_review_bundle_contract_drift()
+    else:
         raise SystemExit(f"unsupported scenario: {args.scenario}")
-
-    report = run_runtime_target_drift()
     output = json.dumps(report, indent=2) if args.format == "json" else render_markdown(report)
     write_output(output, args.output)
 

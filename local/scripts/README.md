@@ -75,8 +75,11 @@
   - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
   - active gate 由 `required_source_docs` 決定，其餘 mirrored docs 以 optional coverage 顯示，不直接阻斷 release/health gate
 - `run-self-repair-simulation.py`
-  - 執行 bounded self-repair 情境模擬；v1 先支援 `runtime-target-drift`
+  - 執行 bounded self-repair 情境模擬；目前支援 `runtime-target-drift` 與 `review-bundle-contract-drift`
   - 使用 temporary home fixture 與 override flags，避免為了模擬直接改動真實本機 wiring
+- `repair-external-review-bundle-contract.py`
+  - 只做 external-review bundle contract 的 guided repair：正規化已知 legacy review 路徑，並確保 `reading_order` 項目仍包含在 `files`
+  - 不負責新增或刪除 package 成員；若修正後仍缺檔，應升級為 human review
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

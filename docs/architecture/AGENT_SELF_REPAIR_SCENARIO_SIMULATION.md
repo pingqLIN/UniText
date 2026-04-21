@@ -119,12 +119,15 @@ Reason:
 - `layer`: `review-bundle`
 - `class`: `A2`
 - 現況：已有 `external-review-bundle.contract.json` 與 `export-review-package.ps1`
+- executable scenario: `docs/architecture/scenarios/review-bundle-contract-drift.json`
+- runner: `local/scripts/run-self-repair-simulation.py --scenario review-bundle-contract-drift`
 - 判定：**可做 guided repair**
 
 Reason:
 
 - 只要 contract 與引用一致，就能 dry-run 驗證
 - 但若要改 package 成員，仍是文檔決策，不是純技術修復
+- 目前可自動修復的範圍只限於 legacy 路徑正規化與 `reading_order -> files` 對齊，不包含擴大或縮減審查範圍
 
 ### 5.4 Workspace-sensitive metadata drift
 
