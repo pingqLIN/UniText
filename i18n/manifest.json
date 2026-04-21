@@ -1,8 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "default_locale": "en",
   "locales": [
-    "zh-TW",
+    "zh-TW"
+  ],
+  "archived_locales": [
     "zh-CN",
     "ja",
     "de",
@@ -11,6 +13,7 @@
     "ko",
     "it"
   ],
+  "archive_root": "i18n/.clean/archived-locales",
   "source_docs": [
     "AGENTS.md",
     "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
@@ -38,6 +41,14 @@
     "local/scripts/README.md",
     "local/docs/ADOPTION_CHECKLIST.md",
     "local/docs/CLI_COMPAT_MATRIX.md"
+  ],
+  "required_source_docs": [
+    "README.md",
+    "INDEX.md",
+    "OPERATIONS.md",
+    "DOCUMENT_PLACEMENT_POLICY.md",
+    "WORKSPACE_SENSITIVE_METADATA_RULES.md",
+    "NO_PUBLISH_POLICY.md"
   ],
   "excluded": [
     "local/docs/JOURNAL.md",

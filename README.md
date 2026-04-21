@@ -1,4 +1,4 @@
-[English](README.md) | [繁體中文](i18n/zh-TW/README.md) | [简体中文](i18n/zh-CN/README.md) | [日本語](i18n/ja/README.md) | [Deutsch](i18n/de/README.md) | [Français](i18n/fr/README.md) | [Español](i18n/es/README.md) | [한국어](i18n/ko/README.md) | [Italiano](i18n/it/README.md)
+[English](README.md) | [繁體中文](i18n/zh-TW/README.md)
 
 # UniText
 
@@ -13,6 +13,12 @@
 UniText is not just a folder of prompts, skills, or MCP stubs. It is a governed way to keep one canonical definition of shared AI resources while separating machine-local wiring, project-local activation, and operational history. The point is to stop every CLI from growing its own drifting copy of the same capability.
 
 That is why this repository includes `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, and publishability checks in one place. UniText is trying to make shared AI tooling portable, reviewable, and repeatable across different CLIs, different machines, and different stages of a project lifecycle.
+
+Current documentation maintenance is intentionally narrow:
+
+- `English` in repo root is the canonical source
+- `繁體中文 (zh-TW)` is the only actively maintained translated surface
+- older locale waves are kept as archived snapshots under `i18n/.clean/archived-locales/` rather than active release gates
 
 ---
 
@@ -236,6 +242,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
 | [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
 | [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md) | Scenario-driven rules for deciding when agents may auto-repair drift, when they must stay bounded, and when human escalation is required |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
 Reading order for humans: `README.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`

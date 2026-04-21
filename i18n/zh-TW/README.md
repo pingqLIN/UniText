@@ -1,10 +1,12 @@
-[English](../../README.md) | [繁體中文](README.md) | [简体中文](../zh-CN/README.md) | [日本語](../ja/README.md) | [Deutsch](../de/README.md) | [Français](../fr/README.md) | [Español](../es/README.md) | [한국어](../ko/README.md) | [Italiano](../it/README.md)
+[English](../../README.md) | [繁體中文](README.md)
 
 # UniText
 
 > **一個以純文本為核心、以 registry 為先的多 AI CLI 共享資源中樞。**
 >
 > 將 Claude Code、Codex、Gemini CLI 等工具的資源定義統一到同一套文字契約中。
+
+目前英文 root 文件是 canonical source，`zh-TW` 是唯一主動維護的翻譯 surface。過往的 `zh-CN`、`ja`、`de`、`fr`、`es`、`ko`、`it` waves 已歸檔到 `i18n/.clean/archived-locales/`，不再作為 release 或 drift gate 的 active target。
 
 ---
 
@@ -183,6 +185,7 @@ UniText 採用 **no silent changes** 政策：
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | template release cleanup 的範圍、排除項與匯出流程 |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | starter package 發布前的清理檢查清單 |
 | [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | 說明 UniText 與 skill-0 如何分工：一個做治理與分發，一個做拆解與原子化提煉 |
+| [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md) | 用情境模擬判斷未來執行障礙是否可由系統 agent 自我修復，以及應停在哪個治理層級 |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | 給 agents 與協作者的 local-first 發布邊界 |
 
 閱讀順序：`docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` → `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md` → `MILESTONES.md` → `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `docs/concepts/SKILL0_COLLABORATION_VISION.md`

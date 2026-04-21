@@ -26,6 +26,7 @@
 13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
 14. `docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
 15. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+16. `docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md`
 
 ## 2. Resource Catalog
 
@@ -111,6 +112,8 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 若要規劃如何逐步把目前偏 `PowerShell-first` 的治理腳本改寫成更通用的跨平台工具鏈，請看 [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md)。
+
+若要以情境模擬方式檢查 system agent 在未來碰到 drift、repair、bootstrap 障礙時能否自我修復，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。
 
 若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
 

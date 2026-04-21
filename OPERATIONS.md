@@ -134,3 +134,19 @@ delivery 只能由明確 trigger 啟動：
 | `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
 | `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |
 | `/operations` | inventories、backups、drift logs | ops folder、state store、audit directory |
+
+## 9. Self-Repair Simulation
+
+若要評估未來執行過程產生障礙時，system agent 是否有能力自我修復，不要直接憑直覺判斷；請先套用一個固定的 scenario simulation。
+
+最小判斷順序：
+
+1. `detectable`
+2. `bounded`
+3. `reversible`
+4. `verifiable`
+5. `escalatable`
+
+只有當前四項都成立時，agent 才能嘗試 autonomous self-repair。若缺少任何一項，應降級成 guided repair 或 human gate。
+
+完整規則、repair classes、scenario config template 與目前 `UniText` 的評估，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。

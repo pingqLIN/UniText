@@ -49,19 +49,23 @@ def render_markdown(summary: dict[str, object]) -> str:
         "",
         f"- manifest: `{summary['manifest_path']}`",
         f"- default locale: `{summary['default_locale']}`",
-        f"- locale count: `{summary['locale_count']}`",
+        f"- active locale count: `{summary['locale_count']}`",
+        f"- archived locale count: `{summary['archived_locale_count']}`",
         f"- source doc count: `{summary['source_doc_count']}`",
+        f"- required source doc count: `{summary['required_source_doc_count']}`",
+        f"- required issues found: `{summary['required_issues_found']}`",
+        f"- optional issues found: `{summary['optional_issues_found']}`",
         f"- issues found: `{summary['issues_found']}`",
         "",
         "## By Locale",
         "",
-        "| locale | missing | stale | untracked | source missing |",
-        "|---|---:|---:|---:|---:|",
+        "| locale | required missing | required stale | required untracked | optional missing | optional stale | optional untracked | source missing |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
 
     for locale, counts in summary["by_locale"].items():
         lines.append(
-            f"| `{locale}` | {counts['missing']} | {counts['stale']} | {counts['untracked']} | {counts['source_missing']} |"
+            f"| `{locale}` | {counts['required_missing']} | {counts['required_stale']} | {counts['required_untracked']} | {counts['optional_missing']} | {counts['optional_stale']} | {counts['optional_untracked']} | {counts['source_missing']} |"
         )
 
     lines.extend(
@@ -69,14 +73,14 @@ def render_markdown(summary: dict[str, object]) -> str:
             "",
             "## By Source Doc",
             "",
-            "| source doc | missing | stale | untracked | source missing |",
-            "|---|---:|---:|---:|---:|",
+            "| source doc | required | missing | stale | untracked | source missing |",
+            "|---|---|---:|---:|---:|---:|",
         ]
     )
 
     for source_doc, counts in summary["by_source_doc"].items():
         lines.append(
-            f"| `{source_doc}` | {counts['missing']} | {counts['stale']} | {counts['untracked']} | {counts['source_missing']} |"
+            f"| `{source_doc}` | {str(counts['required']).lower()} | {counts['missing']} | {counts['stale']} | {counts['untracked']} | {counts['source_missing']} |"
         )
 
     sample_issues = summary["sample_issues"]
@@ -115,7 +119,9 @@ def main() -> int:
     manifest_path = repo / "i18n" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest_locales = list(manifest["locales"])
+    archived_locales = list(manifest.get("archived_locales", []))
     manifest_source_docs = list(manifest["source_docs"])
+    required_source_docs = set(manifest.get("required_source_docs", manifest_source_docs))
     locales = args.locales or manifest_locales
     source_docs = args.source_docs or manifest_source_docs
     unknown_locales = sorted(set(locales) - set(manifest_locales))
@@ -126,6 +132,8 @@ def main() -> int:
         raise SystemExit(f"Unknown source docs: {', '.join(unknown_source_docs)}")
 
     issues: list[dict[str, object]] = []
+    required_issues = 0
+    optional_issues = 0
     locale_counts: dict[str, Counter[str]] = {locale: Counter() for locale in locales}
     source_counts: dict[str, Counter[str]] = {source_doc: Counter() for source_doc in source_docs}
 
@@ -133,6 +141,7 @@ def main() -> int:
         source_path = repo / source_doc
         source_exists = source_path.exists()
         source_sha, source_timestamp = run_git(repo, source_doc) if source_exists else (None, None)
+        is_required = source_doc in required_source_docs
 
         for locale in locales:
             translated_doc = Path("i18n") / locale / source_doc
@@ -146,6 +155,7 @@ def main() -> int:
                         "source_doc": source_doc,
                         "translated_doc": str(translated_doc).replace("\\", "/"),
                         "status": "source-missing",
+                        "required": is_required,
                     }
                 )
                 continue
@@ -160,8 +170,15 @@ def main() -> int:
                         "translated_doc": str(translated_doc).replace("\\", "/"),
                         "status": "missing",
                         "source_sha": source_sha,
+                        "required": is_required,
                     }
                 )
+                if is_required:
+                    locale_counts[locale]["required_missing"] += 1
+                    required_issues += 1
+                else:
+                    locale_counts[locale]["optional_missing"] += 1
+                    optional_issues += 1
                 continue
 
             translated_sha, translated_timestamp = run_git(repo, str(translated_doc).replace("\\", "/"))
@@ -174,6 +191,12 @@ def main() -> int:
             locale_counts[locale][status] += 1
             source_counts[source_doc][status] += 1
             if status != "up-to-date":
+                if is_required:
+                    locale_counts[locale][f"required_{status}"] += 1
+                    required_issues += 1
+                else:
+                    locale_counts[locale][f"optional_{status}"] += 1
+                    optional_issues += 1
                 issues.append(
                     {
                         "locale": locale,
@@ -182,6 +205,7 @@ def main() -> int:
                         "status": status,
                         "source_sha": source_sha,
                         "translated_sha": translated_sha,
+                        "required": is_required,
                     }
                 )
 
@@ -189,21 +213,34 @@ def main() -> int:
         "manifest_path": str(manifest_path),
         "default_locale": manifest["default_locale"],
         "locale_count": len(locales),
+        "archived_locale_count": len(archived_locales),
         "source_doc_count": len(source_docs),
+        "required_source_doc_count": len([doc for doc in source_docs if doc in required_source_docs]),
         "selected_locales": locales,
+        "archived_locales": archived_locales,
         "selected_source_docs": source_docs,
+        "required_source_docs": [doc for doc in source_docs if doc in required_source_docs],
+        "required_issues_found": required_issues,
+        "optional_issues_found": optional_issues,
         "issues_found": len(issues),
         "by_locale": {
             locale: {
                 "missing": locale_counts[locale]["missing"],
                 "stale": locale_counts[locale]["stale"],
                 "untracked": locale_counts[locale]["untracked"],
+                "required_missing": locale_counts[locale]["required_missing"],
+                "required_stale": locale_counts[locale]["required_stale"],
+                "required_untracked": locale_counts[locale]["required_untracked"],
+                "optional_missing": locale_counts[locale]["optional_missing"],
+                "optional_stale": locale_counts[locale]["optional_stale"],
+                "optional_untracked": locale_counts[locale]["optional_untracked"],
                 "source_missing": locale_counts[locale]["source_missing"],
             }
             for locale in locales
         },
         "by_source_doc": {
             source_doc: {
+                "required": source_doc in required_source_docs,
                 "missing": source_counts[source_doc]["missing"],
                 "stale": source_counts[source_doc]["stale"],
                 "untracked": source_counts[source_doc]["untracked"],
@@ -212,7 +249,7 @@ def main() -> int:
             for source_doc in source_docs
         },
         "sample_issues": issues[: args.sample_size],
-        "ok": len(issues) == 0,
+        "ok": required_issues == 0,
     }
     output = json.dumps(summary, indent=2) if args.format == "json" else render_markdown(summary)
     write_output(output, args.output)

@@ -23,6 +23,7 @@
 12. `NO_PUBLISH_POLICY.md`
 13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
 14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+15. `docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md`
 
 ## 2. Resource Catalog
 
@@ -95,11 +96,15 @@
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
+目前 active i18n baseline 僅維護英文 root 文件與 `zh-TW` mirrored surface；其餘 locale waves 已移到 `i18n/.clean/archived-locales/`，不再納入 release 或 drift gate。
+
 ### Related Concept Notes
 
 若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md)。
 
 若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md)。
+
+若要用情境模擬檢查未來 runtime drift、review package drift、boundary drift 或 active locale drift 是否可由系統 agent 自我修復，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。
 
 ### Skills
 
