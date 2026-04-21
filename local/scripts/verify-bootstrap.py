@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import getpass
 import json
 import os
@@ -93,6 +94,15 @@ def read_json(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Verify UniText bootstrap state for local CLI runtimes.")
+    parser.add_argument("--home-dir")
+    parser.add_argument("--skip-codex", action="store_true")
+    parser.add_argument("--skip-copilot", action="store_true")
+    parser.add_argument("--skip-project-mcp", action="store_true")
+    return parser.parse_args()
+
+
 def codex_target_contains_runtime_baseline(target: Path, runtime_skills: Path) -> tuple[bool, str, list[str], str | None]:
     exists = target.exists() or target.is_symlink()
     if not exists:
@@ -133,8 +143,9 @@ def project_mcp_matches_template_seed(server_config: dict[str, object]) -> bool:
 
 
 def main() -> int:
+    args = parse_args()
     repo = get_repo_root()
-    home_dir = get_home_dir()
+    home_dir = Path(args.home_dir).resolve() if args.home_dir else get_home_dir()
     runtime_skills = repo / "runtime" / "skills"
     registry_skills = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
@@ -242,18 +253,25 @@ def main() -> int:
         },
         "project_mcp": project_mcp_report,
     }
-    report["ok"] = (
-        all(item["matches_expected"] for item in target_report)
-        and report["codex"]["skills_path_matches"]
+    codex_ok = True if args.skip_codex else (
+        report["codex"]["skills_path_matches"]
         and not report["codex"]["skills_path_points_to_registry"]
         and report["codex"]["startup_timeout_matches"]
         and report["codex"]["mcp_command_matches"]
         and report["codex"]["mcp_args_match"]
         and report["codex"]["runtime_target_exists"]
         and report["codex"]["runtime_target_contains_runtime_baseline"]
-        and (not report["copilot"]["cli_present"] or report["copilot"]["mcp_server_matches"])
+    )
+    copilot_ok = True if args.skip_copilot else (
+        not report["copilot"]["cli_present"] or report["copilot"]["mcp_server_matches"]
+    )
+    project_mcp_ok = True if args.skip_project_mcp else report["project_mcp"]["matches_expected"]
+    report["ok"] = (
+        all(item["matches_expected"] for item in target_report)
+        and codex_ok
+        and copilot_ok
         and report["claude_project"]["registry_permissions_match"]
-        and report["project_mcp"]["matches_expected"]
+        and project_mcp_ok
     )
     print(json.dumps(report, indent=2))
     return 0 if report["ok"] else 1

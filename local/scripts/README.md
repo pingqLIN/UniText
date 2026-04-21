@@ -12,6 +12,7 @@
 - `verify-bootstrap.py`
   - 跨平台檢查 first-run 結果是否與目前 repo 的 runtime surface 對齊，並接受 template-safe `.mcp.json` seed 或 legacy bootstrapped 的本機 wiring
   - Codex 目標若已 materialize 成 machine-local bundle，也接受「包含完整 runtime baseline + 額外 local skills」的模式
+  - 支援 `--home-dir`、`--skip-codex`、`--skip-copilot`、`--skip-project-mcp`，可用於 bounded self-repair simulation
 - `build-runtime-layer.py`
   - 由 `registry/` 生成 tracked `runtime/` read model，提供 consumer agents 的低噪音入口與 runtime projections
 - `register-codex-skills.py`
@@ -72,6 +73,10 @@
   - Windows PowerShell wrapper；呼叫 `run-renormalize.py`，保留既有 `Scope / Apply / Force` 入口
 - `audit-i18n-drift.py`
   - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
+  - active gate 由 `required_source_docs` 決定，其餘 mirrored docs 以 optional coverage 顯示，不直接阻斷 release/health gate
+- `run-self-repair-simulation.py`
+  - 執行 bounded self-repair 情境模擬；v1 先支援 `runtime-target-drift`
+  - 使用 temporary home fixture 與 override flags，避免為了模擬直接改動真實本機 wiring
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

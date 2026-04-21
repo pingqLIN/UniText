@@ -76,7 +76,10 @@ def get_home_dir() -> Path:
 
 
 def safe_name(path: Path) -> str:
-    return path.name or path.parent.name or "target"
+    parts = [part for part in (path.parent.name, path.name) if part]
+    if parts:
+        return "-".join(parts)
+    return "target"
 
 
 def write_json(path: Path, body: object) -> None:
@@ -395,9 +398,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Bootstrap UniText delivery for local CLI runtimes.")
     parser.add_argument("--repo-root", default=str(root))
     parser.add_argument("--allow-external-repo-root", action="store_true")
+    parser.add_argument("--home-dir")
+    parser.add_argument("--history-root")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--mode", choices=["auto", "symlink", "mirror"], default="auto")
+    parser.add_argument("--skip-runtime-build", action="store_true")
     parser.add_argument("--skip-skills", action="store_true")
     parser.add_argument("--skip-codex", action="store_true")
     parser.add_argument("--skip-copilot", action="store_true")
@@ -408,7 +414,7 @@ def main() -> int:
         raise SystemExit("non-dry-run bootstrap requires --force")
 
     repo = Path(args.repo_root).resolve()
-    home_dir = get_home_dir()
+    home_dir = Path(args.home_dir).resolve() if args.home_dir else get_home_dir()
     validate_repo_root(repo, root, args.allow_external_repo_root)
     runtime_root = repo / "runtime"
     runtime_skills = runtime_root / "skills"
@@ -424,13 +430,15 @@ def main() -> int:
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = repo / "ops" / "history" / f"bootstrap_{stamp}"
+    history_root = Path(args.history_root).resolve() if args.history_root else repo / "ops" / "history"
+    run_dir = history_root / f"bootstrap_{stamp}"
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "generation_state": "dry_run" if args.dry_run else "apply",
         "repo_root": str(repo),
         "script_repo_root": str(root),
         "external_repo_root": repo != root,
+        "home_dir": str(home_dir),
         "dry_run": args.dry_run,
         "mode": args.mode,
         "runtime": {},
@@ -441,7 +449,14 @@ def main() -> int:
         "project_mcp": {},
     }
 
-    summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
+    if args.skip_runtime_build:
+        summary["runtime"] = {
+            "action": "skipped",
+            "reason": "--skip-runtime-build",
+            "target": str(runtime_root),
+        }
+    else:
+        summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
     if not runtime_skills.exists():
         raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
     if not server.exists():

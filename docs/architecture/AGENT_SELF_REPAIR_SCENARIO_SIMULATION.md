@@ -91,6 +91,8 @@ escalate_when:
 - `layer`: `local-wiring`
 - `class`: `A1`
 - 現況：已有 `bootstrap.py` 與 `verify-bootstrap.py`
+- executable scenario: `docs/architecture/scenarios/runtime-target-drift.json`
+- runner: `local/scripts/run-self-repair-simulation.py --scenario runtime-target-drift`
 - 判定：**可以自我修復**
 
 Reason:
@@ -175,6 +177,8 @@ Reason:
      - `recovered`
      - `blocked-with-escalation`
      - `unsafe-to-autorepair`
+
+第一個可執行 baseline 應優先採用「temporary fixture + bounded override」方式，避免為了模擬而改壞真實 home target。`runtime-target-drift` 現在就是用 `--home-dir`、`--history-root`、`--skip-runtime-build` 等 bounded overrides 在臨時目錄中演練。
 
 ## 7. Design Rules For New Scenarios
 
