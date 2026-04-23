@@ -17,8 +17,8 @@
 - `registry/` 是 canonical authoring source，不是預設 consumer runtime。
 - `runtime/` 是 tracked runtime read model，提供低噪音入口與 runtime projection。
 - `bootstrap.py` 會先重建 `runtime/`，再把各 CLI 的本機 target 指到 `runtime/skills`。
-- Codex 只應讀自己的本機 `skills_path` target，不應直接指向 `registry/skills`。
-- 深入 discovery 仍可透過 `unitext-registry` MCP 回讀 canonical source。
+- Codex 只應讀自己的本機 `skills_path` target，不應直接指向 `registry/skills`，也不應由 bootstrap 自動寫入全域 `unitext_registry`。
+- 若需要回讀 canonical source，優先走 repo/project-local MCP surface，而不是依賴 Codex 全域註冊。
 
 ## Human Docs
 

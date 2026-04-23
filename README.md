@@ -149,7 +149,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
+`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, removes legacy global Codex `unitext_registry` wiring when present, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -159,7 +159,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 |-----|--------------|-------|
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + project-local MCP | `skills_path` points at the local runtime target under `~/.codex/skills`; MCP stays in `~/.codex/config.toml` |
+| **Codex** | native-config + project-local MCP | `skills_path` points at the local runtime target under `~/.codex/skills`; canonical MCP stays repo-local in `.mcp.json`, not auto-registered into global `~/.codex/config.toml` |
 | **Copilot CLI** | global MCP config + repo instructions | `~/.copilot/mcp-config.json` for MCP wiring; repo instructions come from `AGENTS.md` / related files |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
