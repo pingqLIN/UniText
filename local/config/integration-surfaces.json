@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "description": "Declared integration surfaces for runtime delivery, local wiring, and verification.",
+  "surfaces": [
+    {
+      "id": "runtime-read-model",
+      "kind": "runtime-read-model",
+      "cli_id": "runtime",
+      "resource_types": [
+        "skill",
+        "agent",
+        "workflow"
+      ],
+      "path_scope": "repo",
+      "path_template": "runtime",
+      "delivery_modes": [
+        "pointer"
+      ],
+      "preferred_delivery_resolution": "pointer",
+      "instruction_surface": "runtime-first",
+      "discovery_surface": "runtime/catalog.json",
+      "runtime_projection_rules": {
+        "projection": "tracked-runtime-read-model"
+      },
+      "verify_probe": "runtime-catalog-presence",
+      "capabilities": {
+        "runtime_entrypoint": true,
+        "repo_instructions": false,
+        "global_mcp": false,
+        "project_mcp": false,
+        "skills_path": false
+      }
+    },
+    {
+      "id": "claude-skills",
+      "kind": "skills-target",
+      "cli_id": "claude",
+      "resource_types": [
+        "skill"
+      ],
+      "path_scope": "home",
+      "path_template": ".claude/skills",
+      "delivery_modes": [
+        "symlink",
+        "mirror"
+      ],
+      "preferred_delivery_resolution": "symlink",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "mirrored-skills",
+      "runtime_projection_rules": {
+        "projection": "runtime/skills"
+      },
+      "verify_probe": "symlink-or-runtime-bundle-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": true,
+        "global_mcp": false,
+        "project_mcp": false,
+        "skills_path": true
+      }
+    },
+    {
+      "id": "gemini-skills",
+      "kind": "skills-target",
+      "cli_id": "gemini",
+      "resource_types": [
+        "skill"
+      ],
+      "path_scope": "home",
+      "path_template": ".gemini/skills",
+      "delivery_modes": [
+        "symlink",
+        "mirror"
+      ],
+      "preferred_delivery_resolution": "symlink",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "mirrored-skills",
+      "runtime_projection_rules": {
+        "projection": "runtime/skills"
+      },
+      "verify_probe": "symlink-or-runtime-bundle-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": false,
+        "global_mcp": false,
+        "project_mcp": false,
+        "skills_path": true
+      }
+    },
+    {
+      "id": "agents-skills",
+      "kind": "skills-target",
+      "cli_id": "agents",
+      "resource_types": [
+        "skill"
+      ],
+      "path_scope": "home",
+      "path_template": ".agents/skills",
+      "delivery_modes": [
+        "symlink",
+        "mirror"
+      ],
+      "preferred_delivery_resolution": "symlink",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "mirrored-skills",
+      "runtime_projection_rules": {
+        "projection": "runtime/skills"
+      },
+      "verify_probe": "symlink-or-runtime-bundle-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": false,
+        "global_mcp": false,
+        "project_mcp": false,
+        "skills_path": true
+      }
+    },
+    {
+      "id": "codex-skills",
+      "kind": "skills-target",
+      "cli_id": "codex",
+      "resource_types": [
+        "skill"
+      ],
+      "path_scope": "home",
+      "path_template": ".codex/skills",
+      "delivery_modes": [
+        "symlink",
+        "mirror"
+      ],
+      "preferred_delivery_resolution": "symlink",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "local-runtime-bundle",
+      "runtime_projection_rules": {
+        "projection": "runtime/skills",
+        "preserve_local_extras": true
+      },
+      "verify_probe": "runtime-bundle-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": false,
+        "global_mcp": true,
+        "project_mcp": false,
+        "skills_path": true
+      },
+      "preserve_local_extras": true
+    },
+    {
+      "id": "codex-native-config",
+      "kind": "config-target",
+      "cli_id": "codex",
+      "resource_types": [
+        "skill",
+        "mcp"
+      ],
+      "path_scope": "home",
+      "path_template": ".codex/config.toml",
+      "delivery_modes": [
+        "native-config"
+      ],
+      "preferred_delivery_resolution": "native-config",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "native-config",
+      "runtime_projection_rules": {
+        "projection": "runtime/skills"
+      },
+      "verify_probe": "toml-config-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": false,
+        "global_mcp": true,
+        "project_mcp": false,
+        "skills_path": true
+      }
+    },
+    {
+      "id": "copilot-global-mcp",
+      "kind": "config-target",
+      "cli_id": "copilot",
+      "resource_types": [
+        "mcp"
+      ],
+      "path_scope": "home",
+      "path_template": ".copilot/mcp-config.json",
+      "delivery_modes": [
+        "native-config"
+      ],
+      "preferred_delivery_resolution": "native-config",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "native-config",
+      "runtime_projection_rules": {
+        "projection": "registry/mcp/claude-project-mcp-seed"
+      },
+      "verify_probe": "json-config-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": true,
+        "global_mcp": true,
+        "project_mcp": false,
+        "skills_path": false
+      }
+    },
+    {
+      "id": "project-mcp-seed",
+      "kind": "project-config-target",
+      "cli_id": "repo",
+      "resource_types": [
+        "mcp"
+      ],
+      "path_scope": "repo",
+      "path_template": ".mcp.json",
+      "delivery_modes": [
+        "template-seed"
+      ],
+      "preferred_delivery_resolution": "template-seed",
+      "instruction_surface": "repo-files",
+      "discovery_surface": "project-mcp-seed",
+      "runtime_projection_rules": {
+        "projection": "registry/mcp/claude-project-mcp-seed"
+      },
+      "verify_probe": "project-mcp-seed-match",
+      "capabilities": {
+        "runtime_entrypoint": false,
+        "repo_instructions": true,
+        "global_mcp": false,
+        "project_mcp": true,
+        "skills_path": false
+      }
+    }
+  ]
+}

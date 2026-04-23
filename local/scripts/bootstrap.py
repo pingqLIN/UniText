@@ -15,6 +15,12 @@ from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.integration_surfaces import find_surface, load_integration_surfaces, surfaces_by_kind
+
 
 REPO_MARKERS = [
     Path("registry") / "skills",
@@ -419,14 +425,26 @@ def main() -> int:
     runtime_root = repo / "runtime"
     runtime_skills = runtime_root / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
-    project_mcp = repo / ".mcp.json"
-    codex_config = home_dir / ".codex" / "config.toml"
-    codex_skills_target = home_dir / ".codex" / "skills"
-    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
+    manifest_path, integration_surfaces = load_integration_surfaces(repo)
+    project_mcp_surface = find_surface(integration_surfaces, "project-mcp-seed")
+    codex_config_surface = find_surface(integration_surfaces, "codex-native-config")
+    codex_skills_surface = find_surface(integration_surfaces, "codex-skills")
+    copilot_surface = find_surface(integration_surfaces, "copilot-global-mcp")
+    project_mcp = project_mcp_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_config = codex_config_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_skills_target = codex_skills_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    copilot_mcp_config = copilot_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    skills_target_surfaces = [
+        surface
+        for surface in surfaces_by_kind(integration_surfaces, "skills-target")
+        if surface.surface_id != codex_skills_surface.surface_id
+    ]
     skills_targets = [
-        home_dir / ".claude" / "skills",
-        home_dir / ".gemini" / "skills",
-        home_dir / ".agents" / "skills",
+        {
+            "surface_id": surface.surface_id,
+            "path": surface.resolve_path(repo_root=repo, home_dir=home_dir),
+        }
+        for surface in skills_target_surfaces
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -439,6 +457,7 @@ def main() -> int:
         "script_repo_root": str(root),
         "external_repo_root": repo != root,
         "home_dir": str(home_dir),
+        "integration_surfaces_manifest": str(manifest_path),
         "dry_run": args.dry_run,
         "mode": args.mode,
         "runtime": {},
@@ -466,10 +485,13 @@ def main() -> int:
         run_dir.mkdir(parents=True, exist_ok=False)
 
     if not args.skip_skills:
-        for target in skills_targets:
+        for target_info in skills_targets:
+            target = target_info["path"]
             if not args.dry_run and (target.exists() or target.is_symlink()):
                 backup_path(target, run_dir / "skills" / safe_name(target))
-            summary["skills"].append(set_skills_target(runtime_skills, target, mode, args.dry_run))
+            result = set_skills_target(runtime_skills, target, mode, args.dry_run)
+            result["surface_id"] = target_info["surface_id"]
+            summary["skills"].append(result)
 
     if not args.skip_codex:
         wrapper_path = codex_config.parent / "diagnostics" / "unitext_registry_wrapper.py"
@@ -482,7 +504,7 @@ def main() -> int:
             codex_skills_target,
             mode,
             args.dry_run,
-            preserve_local_extras=True,
+            preserve_local_extras=codex_skills_surface.preserve_local_extras,
         )
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
         wrapper_original = wrapper_path.read_text(encoding="utf-8") if wrapper_path.exists() else ""
@@ -491,6 +513,7 @@ def main() -> int:
         changed = updated != original or wrapper != wrapper_original
         summary["codex"] = {
             "path": str(codex_config),
+            "surface_id": codex_config_surface.surface_id,
             "changed": changed,
             "skills_path": str(codex_skills_target),
             "skills_target": codex_skills_result,
@@ -516,6 +539,7 @@ def main() -> int:
         changed = updated_body != original_body
         summary["copilot"] = {
             "path": str(copilot_mcp_config),
+            "surface_id": copilot_surface.surface_id,
             "changed": changed,
             "mcp_server": "unitext-registry",
         }
@@ -533,6 +557,7 @@ def main() -> int:
         changed = body != existing_body
         summary["project_mcp"] = {
             "path": str(project_mcp),
+            "surface_id": project_mcp_surface.surface_id,
             "changed": changed,
             "mode": "template-seed",
         }

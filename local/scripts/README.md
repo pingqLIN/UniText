@@ -7,6 +7,10 @@
 
 ## Current Scripts
 
+- `../config/integration-surfaces.json`
+  - 宣告目前 repo 的 integration surfaces、delivery resolution、與 verify probes
+  - `bootstrap.py`、`verify-bootstrap.py`、`build-runtime-layer.py` 會共用這份 manifest，而不是各自重複硬編碼 targets
+
 - `bootstrap.py`
   - 跨平台先重建 `runtime/`，再初始化 skills delivery、Codex native-config、Copilot MCP config，並維持 project `.mcp.json` 為 template-safe seed
 - `verify-bootstrap.py`
@@ -15,6 +19,7 @@
   - 支援 `--home-dir`、`--skip-codex`、`--skip-copilot`、`--skip-project-mcp`，可用於 bounded self-repair simulation
 - `build-runtime-layer.py`
   - 由 `registry/` 生成 tracked `runtime/` read model，提供 consumer agents 的低噪音入口與 runtime projections
+  - 目前也會把 integration surface metadata 帶入 `runtime/catalog.json`
 - `register-codex-skills.py`
   - 以 `--source` 指定舊的 Codex skills tree，比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
 - `create-git-bundle.py`

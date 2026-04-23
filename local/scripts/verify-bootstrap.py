@@ -10,6 +10,12 @@ import shutil
 import sys
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.integration_surfaces import find_surface, load_integration_surfaces, surfaces_by_kind
+
 
 UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 60
 
@@ -149,15 +155,23 @@ def main() -> int:
     runtime_skills = repo / "runtime" / "skills"
     registry_skills = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
-    codex_config = home_dir / ".codex" / "config.toml"
-    codex_skills_target = home_dir / ".codex" / "skills"
-    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
+    manifest_path, integration_surfaces = load_integration_surfaces(repo)
+    codex_config_surface = find_surface(integration_surfaces, "codex-native-config")
+    codex_skills_surface = find_surface(integration_surfaces, "codex-skills")
+    copilot_surface = find_surface(integration_surfaces, "copilot-global-mcp")
+    project_mcp_surface = find_surface(integration_surfaces, "project-mcp-seed")
+    codex_config = codex_config_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_skills_target = codex_skills_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    copilot_mcp_config = copilot_surface.resolve_path(repo_root=repo, home_dir=home_dir)
     claude_settings = repo / ".claude" / "settings.json"
-    project_mcp = repo / ".mcp.json"
+    project_mcp = project_mcp_surface.resolve_path(repo_root=repo, home_dir=home_dir)
     targets = [
-        home_dir / ".claude" / "skills",
-        home_dir / ".gemini" / "skills",
-        home_dir / ".agents" / "skills",
+        {
+            "surface_id": surface.surface_id,
+            "path": surface.resolve_path(repo_root=repo, home_dir=home_dir),
+        }
+        for surface in surfaces_by_kind(integration_surfaces, "skills-target")
+        if surface.surface_id != codex_skills_surface.surface_id
     ]
 
     codex_text = read_text(codex_config)
@@ -165,7 +179,8 @@ def main() -> int:
         codex_target_contains_runtime_baseline(codex_skills_target, runtime_skills)
     )
     target_report = []
-    for target in targets:
+    for target_info in targets:
+        target = target_info["path"]
         exists = target.exists() or target.is_symlink()
         is_symlink = target.is_symlink()
         matches = False
@@ -178,6 +193,7 @@ def main() -> int:
                 resolved = ""
         target_report.append(
             {
+                "surface_id": target_info["surface_id"],
                 "path": str(target),
                 "exists": exists,
                 "is_symlink": is_symlink,
@@ -229,10 +245,12 @@ def main() -> int:
 
     report = {
         "repo_root": str(repo),
+        "integration_surfaces_manifest": str(manifest_path),
         "skills_source": str(runtime_skills),
         "targets": target_report,
         "codex": {
             "path": str(codex_config),
+            "surface_id": codex_config_surface.surface_id,
             "exists": codex_config.exists(),
             "skills_path_matches": contains_path(codex_text, str(codex_skills_target)),
             "skills_path_points_to_registry": contains_path(codex_text, str(registry_skills)),
