@@ -1,13 +1,13 @@
 ---
-name: project-development-loop
+name: Project-development-loop
 description: "Reusable autonomous workflow for existing codebases: audit repo state from code and docs, identify goal, in-progress, done, blocked, and optimization items, decide whether to execute immediately or plan first, evaluate reviewer or worker execution shape, review completed work, write short stage reports, optionally log milestones, and repeat until no meaningful maintenance work remains. Supports three invocation styles: default maintenance mode, explicit time-boxed execution, and overnight bounded maintenance. Use for ongoing project orchestration, repo progress audits, task dispatch, development planning, reviewed execution loops, and continuous improvement. Do not use for greenfield bootstrap; use a project bootstrap skill instead."
 runtime_projection: true
-source_of_truth: registry/skills/project-development-loop/SKILL.md
+source_of_truth: registry/skills/Project-development-loop/SKILL.md
 ---
 
 > Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/project-development-loop/SKILL.md`
-> Source of truth: `registry/skills/project-development-loop/SKILL.md`
+> First-read entrypoint: `runtime/skills/Project-development-loop/SKILL.md`
+> Source of truth: `registry/skills/Project-development-loop/SKILL.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill`
 # Project Development Loop
@@ -366,6 +366,6 @@ If the API is unavailable, continue the development loop and include the report 
 
 ## Suggested Invocation Phrases
 
-- `Use $project-development-loop to audit this repo and keep moving until the next reviewed milestone.`
-- `Use $project-development-loop for 2 hours and keep working continuously until the deadline, stopping only for guardrails or final review.`
-- `Use $project-development-loop sleep until 07:00 to work in bounded reviewed batches and leave a morning report.`
+- `Use $Project-development-loop to audit this repo and keep moving until the next reviewed milestone.`
+- `Use $Project-development-loop for 2 hours and keep working continuously until the deadline, stopping only for guardrails or final review.`
+- `Use $Project-development-loop sleep until 07:00 to work in bounded reviewed batches and leave a morning report.`

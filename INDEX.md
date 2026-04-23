@@ -154,7 +154,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `env` | Workspace | `/registry/skills/env` | `active` |
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
-| `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
+| `Project-development-loop` | Workspace | `/registry/skills/Project-development-loop` | `active` |
 
 ### Workflow
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Project Development Loop"
-  short_description: "Run recurring project audit, planning, dispatch, review"
-  default_prompt: "Use $project-development-loop to audit the current project, execute the next justified work, review outcomes, and keep the delivery loop moving."

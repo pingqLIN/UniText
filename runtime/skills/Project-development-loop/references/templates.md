@@ -1,11 +1,11 @@
 ---
 runtime_projection: true
-source_of_truth: registry/skills/project-development-loop/references/templates.md
+source_of_truth: registry/skills/Project-development-loop/references/templates.md
 ---
 
 > Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/project-development-loop/references/templates.md`
-> Source of truth: `registry/skills/project-development-loop/references/templates.md`
+> First-read entrypoint: `runtime/skills/Project-development-loop/references/templates.md`
+> Source of truth: `registry/skills/Project-development-loop/references/templates.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
 # Project Development Loop Templates
