@@ -213,6 +213,8 @@ UniText enforces a **no silent changes** policy:
 
 Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VERIFY`
 
+If the goal is to attach UniText to an already-working local environment rather than replace it wholesale, start with [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md). That plan keeps `local-only`, `project-local`, and governed `registry/` promotion as separate lanes.
+
 ---
 
 ## Documentation
@@ -242,6 +244,7 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
 | [docs/architecture/INTEGRATION_SURFACE_PROFILES.md](docs/architecture/INTEGRATION_SURFACE_PROFILES.md) | Declared integration-surface contract for bootstrap, verify, and runtime catalog enrichment |
 | [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
+| [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) | Operator plan for introducing UniText into an existing environment and deciding when new skills / MCPs should be promoted into governed registry lanes |
 | [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
 | [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md) | Scenario-driven rules for deciding when agents may auto-repair drift, when they must stay bounded, and when human escalation is required |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
@@ -263,6 +266,8 @@ Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `boot
 ### As a reference implementation
 
 Read the core docs to understand the architecture. Adapt the patterns — registry structure, resource spec, delivery modes, operations audit trail — to your own setup.
+
+If you are attaching UniText to an existing machine or project instead of starting from a clean baseline, use [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) first.
 
 ---
 
