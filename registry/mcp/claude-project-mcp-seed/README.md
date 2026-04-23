@@ -20,6 +20,7 @@
 - `status`: `active-baseline`
 - 用途：project-local read-only registry server
 - delivery guidance：
-  - Claude project 可由 bootstrap 腳本寫入 repo root `.mcp.json`
+  - Claude project 使用 tracked repo root `.mcp.json` template-safe seed
   - Codex 可由 bootstrap 腳本寫入 `~/.codex/config.toml` 的 `[mcp_servers.unitext_registry]`
+  - Copilot CLI 可由 bootstrap 腳本寫入 `~/.copilot/mcp-config.json`
 - 下一步：視 CLI 能力再補更完整的 adapter wiring

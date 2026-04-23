@@ -1,0 +1,12 @@
+# Ballot
+- ranked_order:
+  - 4: Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md
+  - 3: Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md
+  - 2: Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md
+  - 1: Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md
+- best_reason: `template2-b.md` cleanly separates canonical authoring from runtime consumption without inventing a second MCP control plane, defines an implementation-realistic runtime root + `current` pointer, and uses `unitext-registry` as an on-demand discovery backplane while keeping the default Codex tool surface deliberately small and verifiable across CLIs.
+- fatal_flaws:
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md: Introduces a new `unitext-runtime` MCP surface and forbids default raw registry reads; this adds major implementation surface area and can make “unblock me” debugging harder unless the curator/admin escape hatch is extremely well-designed.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md: none
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md: Mixes “generated” runtime artifacts into a repo `runtime/` surface and implies enforceable read-allowlists; this risks source hygiene drift and asks for enforcement mechanisms that are not realistic for Codex/CLIs without heavy tooling.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md: Too under-specified on the concrete build/apply/verify API and Codex wiring (paths, manifests, determinism, rollback), so it’s not decision-complete or implementation-realistic as a runtime reset plan.

@@ -35,4 +35,4 @@
 `verify-bootstrap.py` 會接受兩種 `.mcp.json` 狀態：
 
 - tracked template-safe seed
-- 已由 `bootstrap.py` 升級成目前機器解譯器與 repo root 的本機 wiring
+- 舊版 `bootstrap.py` 曾寫入的本機 wiring；新 baseline 應回到 tracked template-safe seed

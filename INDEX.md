@@ -1,9 +1,11 @@
 # UniText — Index
 
 > 狀態：Template Base
-> 角色：所有 human / AI 的第一讀取點，用於 discovery。
+> 角色：human discovery 與 catalog 入口，不是 consumer agent 的預設 startup surface。
 
 `UniText` 以純文本作為共享介面，強調跨 CLI 的統一相容與 AI-first discovery。
+
+如果你是執行任務的 agent，先讀 [RUNTIME.md](RUNTIME.md)，再進入 `runtime/` 相關文件。
 
 ## 1. Core Docs
 
@@ -66,7 +68,7 @@
 
 目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-04-19`，目前 authoring tree 內的 `registry/skills/` 共有 `49` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-04-20`，目前 authoring tree 內的 `registry/skills/` 共有 `50` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 
@@ -147,6 +149,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `cloudflare-zerotrust-device` | Workspace | `/registry/skills/cloudflare-zerotrust-device` | `active` |
 | `env` | Workspace | `/registry/skills/env` | `active` |
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
+| `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
 
 ### Workflow
 
@@ -170,7 +173,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `status` | `active-baseline` |
 | `source_of_truth` | `/registry/mcp/claude-project-mcp-seed/definition.json` |
 | `supported_clis` | `claude, codex, copilot` |
-| `delivery_guidance` | Bootstrap writes a project `.mcp.json`, a Codex native-config entry, and a Copilot `~/.copilot/mcp-config.json` entry pointing to the bundled read-only MCP server. |
+| `delivery_guidance` | The tracked project `.mcp.json` stays a template-safe seed; bootstrap aligns Codex native-config and Copilot `~/.copilot/mcp-config.json` to the bundled read-only MCP server. |
 
 ### Agents
 
@@ -236,7 +239,8 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 ### For AI Agents
 
-1. 先把 `INDEX.md` 當成 discovery 入口
-2. 需要 schema 時讀 `RESOURCE_SPEC.md`
-3. 需要 delivery / mutation 時讀 `OPERATIONS.md`
-4. 不要把任何單一部署的路徑當成規格真相
+1. 先讀 `RUNTIME.md`
+2. 再依序讀 `runtime/START.md`、`runtime/RULES.md`、`runtime/ROUTES.md`
+3. 需要 runtime inventory 時讀 `runtime/catalog.json`
+4. 只有在 runtime surface 明確指到 canonical source 時才回讀 `registry/`
+5. 不要把 `INDEX.md` 當成預設 startup surface，也不要把任何單一部署的路徑當成規格真相

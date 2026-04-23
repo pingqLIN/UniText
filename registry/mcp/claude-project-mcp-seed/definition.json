@@ -8,7 +8,7 @@
         "--root",
         "."
       ],
-      "notes": "Project-local read-only UniText registry server. This relative-path seed is safe to track in GitHub templates; bootstrap may replace command and args with machine-specific absolute paths for the current environment."
+      "notes": "Project-local read-only UniText registry server. This relative-path seed is safe to track in GitHub templates; bootstrap should preserve the tracked seed and keep machine-local wiring outside the shared repo file."
     }
   }
 }

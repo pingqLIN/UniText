@@ -8,9 +8,14 @@
 ## Current Scripts
 
 - `bootstrap.py`
-  - 跨平台初始化 skills delivery、Codex native-config、Copilot MCP config 與 project `.mcp.json`
+  - 跨平台先重建 `runtime/`，再初始化 skills delivery、Codex native-config、Copilot MCP config，並維持 project `.mcp.json` 為 template-safe seed
 - `verify-bootstrap.py`
-  - 跨平台檢查 first-run 結果是否與目前 repo 對齊，並接受 template-safe `.mcp.json` seed 或已 bootstrapped 的本機 wiring
+  - 跨平台檢查 first-run 結果是否與目前 repo 的 runtime surface 對齊，並接受 template-safe `.mcp.json` seed 或 legacy bootstrapped 的本機 wiring
+  - Codex 目標若已 materialize 成 machine-local bundle，也接受「包含完整 runtime baseline + 額外 local skills」的模式
+- `build-runtime-layer.py`
+  - 由 `registry/` 生成 tracked `runtime/` read model，提供 consumer agents 的低噪音入口與 runtime projections
+- `register-codex-skills.py`
+  - 從舊的 Codex skills tree 比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
 - `preview-renormalize.py`
@@ -20,7 +25,7 @@
 - `git-startup.ps1`
   - 為新 session 解析 canonical base branch、要求乾淨工作樹、顯式 fast-forward 更新，並建立新的 feature branch
 - `sync-skills.ps1`
-  - 將 `registry/skills/` 同步到本機 skills targets
+  - 將 `runtime/skills/` 同步到本機 skills targets
 - `scan-skills.ps1`
   - 掃描候選 skills 並輸出 adoption 檢查結果
 - `verify-delivery.ps1`

@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..\\..")
-$source = Join-Path $repo "registry\skills"
+$source = Join-Path $repo "runtime\skills"
 $targets = @(
   "$HOME\.claude\skills",
   "$HOME\.gemini\skills",
@@ -30,12 +30,12 @@ foreach ($target in $targets) {
   $isLink = [bool]($item -and $item.LinkType)
   $linkTarget = if ($isLink) { $item.Target } else { $null }
 
-  if ($isLink -and $linkTarget -like "*registry\skills") {
+  if ($isLink -and $linkTarget -like "*runtime\skills") {
     $summary += [pscustomobject]@{
       target = $target
       mode = "symlink"
       action = "skip"
-      reason = "already points to canonical source"
+      reason = "already points to runtime source"
     }
     continue
   }

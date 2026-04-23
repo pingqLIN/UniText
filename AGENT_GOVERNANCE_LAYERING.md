@@ -42,9 +42,11 @@
 
 `project-map.html` 現在已內建治理面板，會直接使用：
 
-- `Q:\AGENTS.md`
+- `Q:\AGENTS.md`（若存在）
 - `Q:\UniText\AGENTS.md`
 - `local/config/agent-governance-layers.json`
+
+`Q:\AGENTS.md` 是 optional workspace overlay，不是必然存在的 active source。若不存在，resolver 應明確回報 fallback 到 repo-local `AGENTS.md` 與更高層注入指令，而不是把不存在的檔案當成已生效來源。
 
 頁面內可輸入：
 

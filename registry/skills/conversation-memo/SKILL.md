@@ -85,6 +85,8 @@ The handoff should capture:
 
 The handoff does not replace the memo. It exists so downstream adapters can consume stable structured inputs without scraping narrative prose.
 
+Read [references/conversation-memo-handoff-schema.md](references/conversation-memo-handoff-schema.md) when you need the canonical schema shape for that handoff artifact.
+
 ### 4. Separate memo from formal outputs
 
 Do not treat the memo as the final formal artifact by default.

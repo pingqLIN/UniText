@@ -1,6 +1,7 @@
 backup/
 recovered_*/
 .bak_*/
+%SystemDrive%/
 .idea/
 .playwright-mcp/
 .tmp_unitext_protocol.log

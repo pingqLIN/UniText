@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import stat
 import getpass
 import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import textwrap
 from copy import deepcopy
@@ -102,12 +104,92 @@ def remove_path(path: Path) -> None:
     if not path.exists() and not path.is_symlink():
         return
     if path.is_symlink() or path.is_file():
+        try:
+            path.chmod(stat.S_IWRITE)
+        except OSError:
+            pass
         path.unlink()
         return
-    shutil.rmtree(path)
+
+    def onerror(func, failed_path, exc_info) -> None:
+        failed = Path(failed_path)
+        try:
+            failed.chmod(stat.S_IWRITE)
+        except OSError:
+            pass
+        func(failed_path)
+
+    shutil.rmtree(path, onerror=onerror)
 
 
-def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> dict[str, object]:
+def copy_path(source: Path, destination: Path) -> None:
+    if source.is_dir():
+        shutil.copytree(source, destination, symlinks=True)
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+
+
+def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str, object]:
+    baseline_entries = [item.name for item in sorted(source.iterdir())]
+    if dry_run:
+        return {
+            "target": str(target),
+            "action": "sync-baseline",
+            "mode": "bundle",
+            "preserve_local_extras": True,
+            "baseline_entries": baseline_entries,
+        }
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.mkdir(parents=True, exist_ok=True)
+    for item in sorted(source.iterdir()):
+        destination = target / item.name
+        if destination.exists() or destination.is_symlink():
+            remove_path(destination)
+        copy_path(item, destination)
+    return {
+        "target": str(target),
+        "action": "synced",
+        "mode": "bundle",
+        "preserve_local_extras": True,
+        "baseline_entries": baseline_entries,
+    }
+
+
+def ensure_runtime_layer(repo: Path, dry_run: bool) -> dict[str, object]:
+    builder = repo / "local" / "scripts" / "build-runtime-layer.py"
+    if not builder.exists():
+        raise SystemExit(f"runtime builder not found: {builder}")
+
+    command = [sys.executable, str(builder)]
+    if not dry_run:
+        command.append("--write")
+
+    completed = subprocess.run(
+        command,
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=repo,
+    )
+    details = json.loads(completed.stdout) if completed.stdout.strip() else {}
+    if not dry_run:
+        details["action"] = "rebuilt"
+    else:
+        details["action"] = "planned"
+    details["command"] = command
+    return details
+
+
+def set_skills_target(
+    source: Path,
+    target: Path,
+    mode: str,
+    dry_run: bool,
+    *,
+    preserve_local_extras: bool = False,
+) -> dict[str, object]:
     if target.is_symlink():
         resolved = target.readlink()
         if target.resolve() == source.resolve():
@@ -116,6 +198,8 @@ def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> d
             return {"target": str(target), "action": "replace", "mode": "symlink", "reason": f"points to {resolved}"}
         remove_path(target)
     elif target.exists():
+        if preserve_local_extras and target.is_dir():
+            return sync_runtime_baseline(source, target, dry_run)
         if dry_run:
             return {"target": str(target), "action": "replace", "mode": "mirror", "reason": "existing directory or file"}
         remove_path(target)
@@ -247,13 +331,13 @@ def upsert_codex_mcp_block(text: str, server: Path, root: Path, wrapper_path: Pa
     return text + "\n" + block
 
 
-def render_project_mcp(server: Path, root: Path) -> dict[str, object]:
+def render_project_mcp() -> dict[str, object]:
     return {
         "mcpServers": {
             "unitext-registry": {
                 "transport": "stdio",
-                "command": sys.executable,
-                "args": [str(server), "--root", str(root)],
+                "command": "python",
+                "args": ["registry/mcp/claude-project-mcp-seed/server.py", "--root", "."],
             }
         }
     }
@@ -326,10 +410,12 @@ def main() -> int:
     repo = Path(args.repo_root).resolve()
     home_dir = get_home_dir()
     validate_repo_root(repo, root, args.allow_external_repo_root)
-    source = repo / "registry" / "skills"
+    runtime_root = repo / "runtime"
+    runtime_skills = runtime_root / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
     project_mcp = repo / ".mcp.json"
     codex_config = home_dir / ".codex" / "config.toml"
+    codex_skills_target = home_dir / ".codex" / "skills"
     copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
     skills_targets = [
         home_dir / ".claude" / "skills",
@@ -347,14 +433,17 @@ def main() -> int:
         "external_repo_root": repo != root,
         "dry_run": args.dry_run,
         "mode": args.mode,
+        "runtime": {},
+        "skills_source": str(runtime_skills),
         "skills": [],
         "codex": {},
         "copilot": {},
         "project_mcp": {},
     }
 
-    if not source.exists():
-        raise SystemExit(f"skills source not found: {source}")
+    summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
+    if not runtime_skills.exists():
+        raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
     if not server.exists():
         raise SystemExit(f"mcp server not found: {server}")
 
@@ -365,21 +454,31 @@ def main() -> int:
         for target in skills_targets:
             if not args.dry_run and (target.exists() or target.is_symlink()):
                 backup_path(target, run_dir / "skills" / safe_name(target))
-            summary["skills"].append(set_skills_target(source, target, mode, args.dry_run))
+            summary["skills"].append(set_skills_target(runtime_skills, target, mode, args.dry_run))
 
     if not args.skip_codex:
         wrapper_path = codex_config.parent / "diagnostics" / "unitext_registry_wrapper.py"
         log_path = codex_config.parent / "diagnostics" / "unitext_registry_startup.log"
         wrapper = render_codex_wrapper()
+        if not args.dry_run and (codex_skills_target.exists() or codex_skills_target.is_symlink()):
+            backup_path(codex_skills_target, run_dir / "codex" / "skills")
+        codex_skills_result = set_skills_target(
+            runtime_skills,
+            codex_skills_target,
+            mode,
+            args.dry_run,
+            preserve_local_extras=True,
+        )
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
         wrapper_original = wrapper_path.read_text(encoding="utf-8") if wrapper_path.exists() else ""
-        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(source))}")
+        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(codex_skills_target))}")
         updated = upsert_codex_mcp_block(updated, server, repo, wrapper_path, log_path)
         changed = updated != original or wrapper != wrapper_original
         summary["codex"] = {
             "path": str(codex_config),
             "changed": changed,
-            "skills_path": str(source),
+            "skills_path": str(codex_skills_target),
+            "skills_target": codex_skills_result,
             "mcp_server": "unitext_registry",
             "wrapper_path": str(wrapper_path),
             "log_path": str(log_path),
@@ -412,11 +511,16 @@ def main() -> int:
             copilot_mcp_config.write_text(updated + "\n", encoding="utf-8")
 
     if not args.skip_project_mcp:
-        body = render_project_mcp(server, repo)
+        body = render_project_mcp()
         existing = project_mcp.read_text(encoding="utf-8") if project_mcp.exists() else ""
+        existing_body = parse_json_object(existing) if existing else {}
         updated = json.dumps(body, indent=2)
-        changed = updated != existing
-        summary["project_mcp"] = {"path": str(project_mcp), "changed": changed}
+        changed = body != existing_body
+        summary["project_mcp"] = {
+            "path": str(project_mcp),
+            "changed": changed,
+            "mode": "template-seed",
+        }
         if changed and not args.dry_run:
             if project_mcp.exists():
                 backup_path(project_mcp, run_dir / "project-mcp" / ".mcp.json")

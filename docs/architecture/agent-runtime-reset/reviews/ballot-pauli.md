@@ -1,0 +1,12 @@
+# Ballot
+- ranked_order:
+  - 4: Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md
+  - 3: Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md
+  - 2: Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md
+  - 1: Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md
+- best_reason: template2-d is the only candidate that is decision-complete on the core reset: it cleanly separates canonical registry authoring from a materialized, profile-driven runtime surface, explicitly cuts Codex off from `registry/skills`, keeps discovery via the existing read-only MCP backplane, and defines a realistic build/apply/verify flow that fits UniText’s current `local/` and `ops/` layering while staying extensible to other CLIs via the same manifest/profile contract.
+- fatal_flaws:
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md: adds a new `unitext-runtime` MCP server plus a new `.unitext` compiled plane in repo root, increasing moving parts and source-hygiene risk versus reusing existing runtime paths and the current `unitext-registry` discovery backplane
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md: does not actually define how Codex stops consuming `registry/skills` (runtime is mostly docs/contracts), and “minimal catalog includes all active entries” undermines the stated low-noise runtime goal
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md: none
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md: too underspecified on implementation (no concrete build/apply/verify wiring or skills materialization/cutover), so it cannot reliably produce or validate a bounded runtime surface
