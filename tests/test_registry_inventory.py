@@ -45,15 +45,15 @@ class RegistryInventoryTests(unittest.TestCase):
         actual = [path for path in SKILLS_ROOT.iterdir() if path.is_dir()]
         self.assertGreaterEqual(len(actual), 44)
 
-    def test_project_development_loop_registration_uses_uppercase_initial(self):
+    def test_project_development_loop_registration_uses_canonical_lowercase(self):
         actual = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
-        self.assertIn("Project-development-loop", actual)
-        self.assertNotIn("project-development-loop", actual)
+        self.assertIn("project-development-loop", actual)
+        self.assertNotIn("Project-development-loop", actual)
 
         catalog = json.loads(RUNTIME_CATALOG.read_text(encoding="utf-8"))
         skill_ids = {entry["id"] for entry in catalog["entries"] if entry["type"] == "skill"}
-        self.assertIn("Project-development-loop", skill_ids)
-        self.assertNotIn("project-development-loop", skill_ids)
+        self.assertIn("project-development-loop", skill_ids)
+        self.assertNotIn("Project-development-loop", skill_ids)
 
 
 if __name__ == "__main__":

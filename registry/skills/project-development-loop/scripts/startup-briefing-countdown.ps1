@@ -172,7 +172,7 @@ try {
         $frame = $frames[$frameIndex % $frames.Count]
         $statusLine = "$frame [$bar] $remainingSeconds" + 's'
 
-        Write-FixedConsoleLine -Top $anchorTop -Text 'Project-development-loop startup gate' -Color Cyan
+        Write-FixedConsoleLine -Top $anchorTop -Text 'project-development-loop startup gate' -Color Cyan
         Write-FixedConsoleLine -Top ($anchorTop + 1) -Text $prompt -Color Yellow
         Write-FixedConsoleLine -Top ($anchorTop + 2) -Text ''
         Write-FixedConsoleLine -Top ($anchorTop + 3) -Text $statusLine -Color Green

@@ -139,8 +139,24 @@ def copy_path(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
+    if not source.exists() or not source.is_dir():
+        return []
+    if not target.exists() or not target.is_dir():
+        return []
+
+    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    aliases: list[dict[str, str]] = []
+    for item in sorted(target.iterdir()):
+        canonical_name = canonical_by_key.get(item.name.casefold())
+        if canonical_name and item.name != canonical_name:
+            aliases.append({"path": str(item), "canonical_name": canonical_name})
+    return aliases
+
+
 def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str, object]:
     baseline_entries = [item.name for item in sorted(source.iterdir())]
+    alias_entries = find_noncanonical_alias_entries(source, target)
     if dry_run:
         return {
             "target": str(target),
@@ -148,10 +164,13 @@ def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str
             "mode": "bundle",
             "preserve_local_extras": True,
             "baseline_entries": baseline_entries,
+            "pruned_alias_entries": alias_entries,
         }
 
     target.parent.mkdir(parents=True, exist_ok=True)
     target.mkdir(parents=True, exist_ok=True)
+    for alias_entry in alias_entries:
+        remove_path(Path(alias_entry["path"]))
     for item in sorted(source.iterdir()):
         destination = target / item.name
         if destination.exists() or destination.is_symlink():
@@ -163,6 +182,7 @@ def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str
         "mode": "bundle",
         "preserve_local_extras": True,
         "baseline_entries": baseline_entries,
+        "pruned_alias_entries": alias_entries,
     }
 
 

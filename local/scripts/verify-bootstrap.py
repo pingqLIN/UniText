@@ -109,10 +109,27 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def codex_target_contains_runtime_baseline(target: Path, runtime_skills: Path) -> tuple[bool, str, list[str], str | None]:
+def find_noncanonical_alias_entries(target: Path, runtime_skills: Path) -> list[dict[str, str]]:
+    if not target.exists() or not target.is_dir():
+        return []
+    if not runtime_skills.exists() or not runtime_skills.is_dir():
+        return []
+
+    canonical_by_key = {item.name.casefold(): item.name for item in sorted(runtime_skills.iterdir())}
+    aliases: list[dict[str, str]] = []
+    for item in sorted(target.iterdir()):
+        canonical_name = canonical_by_key.get(item.name.casefold())
+        if canonical_name and item.name != canonical_name:
+            aliases.append({"path": str(item), "canonical_name": canonical_name})
+    return aliases
+
+
+def codex_target_contains_runtime_baseline(
+    target: Path, runtime_skills: Path
+) -> tuple[bool, str, list[str], str | None, list[dict[str, str]]]:
     exists = target.exists() or target.is_symlink()
     if not exists:
-        return False, "missing", [], None
+        return False, "missing", [], None, []
 
     if target.is_symlink():
         try:
@@ -121,17 +138,18 @@ def codex_target_contains_runtime_baseline(target: Path, runtime_skills: Path) -
         except OSError:
             resolved = None
             matches = False
-        return matches, "symlink", [], resolved
+        return matches, "symlink", [], resolved, []
 
     if not target.is_dir():
-        return False, "file", [], str(target)
+        return False, "file", [], str(target), []
 
     missing: list[str] = []
     for item in sorted(runtime_skills.iterdir()):
         candidate = target / item.name
         if not candidate.exists() and not candidate.is_symlink():
             missing.append(item.name)
-    return len(missing) == 0, "bundle", missing, str(target)
+    duplicate_aliases = find_noncanonical_alias_entries(target, runtime_skills)
+    return len(missing) == 0 and not duplicate_aliases, "bundle", missing, str(target), duplicate_aliases
 
 
 def project_mcp_matches_bootstrap(server_config: dict[str, object], server: Path, repo: Path) -> bool:
@@ -175,7 +193,13 @@ def main() -> int:
     ]
 
     codex_text = read_text(codex_config)
-    codex_target_contains_baseline, codex_target_mode, codex_target_missing, codex_target_resolved = (
+    (
+        codex_target_contains_baseline,
+        codex_target_mode,
+        codex_target_missing,
+        codex_target_resolved,
+        codex_target_duplicate_aliases,
+    ) = (
         codex_target_contains_runtime_baseline(codex_skills_target, runtime_skills)
     )
     target_report = []
@@ -262,6 +286,7 @@ def main() -> int:
             "runtime_target_resolved": codex_target_resolved,
             "runtime_target_contains_runtime_baseline": codex_target_contains_baseline,
             "runtime_target_missing_baseline": codex_target_missing,
+            "runtime_target_duplicate_aliases": codex_target_duplicate_aliases,
         },
         "copilot": copilot_report,
         "claude_project": {

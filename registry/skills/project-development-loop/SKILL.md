@@ -1,15 +1,7 @@
----
-name: Project-development-loop
+name: project-development-loop
 description: "Reusable autonomous workflow for existing codebases: audit repo state from code and docs, identify goal, in-progress, done, blocked, and optimization items, decide whether to execute immediately or plan first, evaluate reviewer or worker execution shape, review completed work, write short stage reports, optionally log milestones, and repeat until no meaningful maintenance work remains. Supports three invocation styles: default maintenance mode, explicit time-boxed execution, and overnight bounded maintenance. Use for ongoing project orchestration, repo progress audits, task dispatch, development planning, reviewed execution loops, and continuous improvement. Do not use for greenfield bootstrap; use a project bootstrap skill instead."
-runtime_projection: true
-source_of_truth: registry/skills/Project-development-loop/SKILL.md
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/Project-development-loop/SKILL.md`
-> Source of truth: `registry/skills/Project-development-loop/SKILL.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill`
 # Project Development Loop
 
 ## Overview
@@ -108,7 +100,7 @@ Borrow these ideas when designing unattended loops, overnight runs, or deadline-
 - For Pattern B and Pattern C, prefer writing or reusing a thin external supervisor rather than keeping orchestration logic implicit in conversational state.
 - For Pattern C, include a timed telemetry path for whole-machine token usage and a feedback path that the execution agent can actually consume.
 
-Read [references/scheduled-automation.md](references/scheduled-automation.md) when you need the distilled notes from the Claude scheduled-tasks docs.
+Read [references/scheduled-automation.md](./references/scheduled-automation.md) when you need the distilled notes from the Claude scheduled-tasks docs.
 
 ## Core Rules
 
@@ -150,7 +142,7 @@ Produce a concise progress snapshot covering:
 - missing but planned capabilities
 - confidence level of the audit
 
-Read [references/templates.md](references/templates.md) when you need a reusable progress snapshot format.
+Read [references/templates.md](./references/templates.md) when you need a reusable progress snapshot format.
 Immediately follow the snapshot with the startup briefing gate when it applies; otherwise follow it with the next action instead of waiting for permission.
 
 ### 1A. Optional startup briefing gate
@@ -248,7 +240,7 @@ Cover:
 - what should happen next
 - whether outside review is recommended
 
-Read [references/templates.md](references/templates.md) when you need a reusable stage report template.
+Read [references/templates.md](./references/templates.md) when you need a reusable stage report template.
 Keep the report short enough that it does not stall the next loop.
 In Pattern B and Pattern C, always emit a final stage report before the budget ends.
 
@@ -305,7 +297,7 @@ Unless the user asked for a different format, structure each loop result in this
 5. Stage completion report
 6. Continue, optimize, or stop
 
-Use the templates in [references/templates.md](references/templates.md) when you need more structure, but keep outputs concise.
+Use the templates in [references/templates.md](./references/templates.md) when you need more structure, but keep outputs concise.
 
 ## Autonomy Guardrails
 
@@ -366,6 +358,7 @@ If the API is unavailable, continue the development loop and include the report 
 
 ## Suggested Invocation Phrases
 
-- `Use $Project-development-loop to audit this repo and keep moving until the next reviewed milestone.`
-- `Use $Project-development-loop for 2 hours and keep working continuously until the deadline, stopping only for guardrails or final review.`
-- `Use $Project-development-loop sleep until 07:00 to work in bounded reviewed batches and leave a morning report.`
+- `Use $project-development-loop to audit this repo and keep moving until the next reviewed milestone.`
+- `Use $project-development-loop for 2 hours and keep working continuously until the deadline, stopping only for guardrails or final review.`
+- `Use $project-development-loop sleep until 07:00 to work in bounded reviewed batches and leave a morning report.`
+

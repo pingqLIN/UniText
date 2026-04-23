@@ -1,11 +1,11 @@
 ---
 runtime_projection: true
-source_of_truth: registry/skills/Project-development-loop/references/scheduled-automation.md
+source_of_truth: registry/skills/project-development-loop/references/scheduled-automation.md
 ---
 
 > Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/Project-development-loop/references/scheduled-automation.md`
-> Source of truth: `registry/skills/Project-development-loop/references/scheduled-automation.md`
+> First-read entrypoint: `runtime/skills/project-development-loop/references/scheduled-automation.md`
+> Source of truth: `registry/skills/project-development-loop/references/scheduled-automation.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
 # Scheduled Automation Notes
