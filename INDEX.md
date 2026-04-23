@@ -68,7 +68,7 @@
 
 目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-04-20`，目前 authoring tree 內的 `registry/skills/` 共有 `50` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-04-23`，目前 authoring tree 內的 `registry/skills/` 共有 `48` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 
@@ -154,6 +154,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `env` | Workspace | `/registry/skills/env` | `active` |
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
+| `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
 
 ### Workflow
 

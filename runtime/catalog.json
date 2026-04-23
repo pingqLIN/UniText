@@ -826,6 +826,26 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "project-development-loop",
+      "type": "skill",
+      "runtime_path": "runtime/skills/project-development-loop/SKILL.md",
+      "source_of_truth": "registry/skills/project-development-loop/SKILL.md",
+      "entrypoint": "runtime/skills/project-development-loop/SKILL.md",
+      "intent_tags": [
+        "project-development-loop",
+        "reusable",
+        "autonomous",
+        "workflow",
+        "for",
+        "existing",
+        "codebases",
+        "audit"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "skill-creator",
       "type": "skill",
       "runtime_path": "runtime/skills/skill-creator/SKILL.md",
