@@ -3,34 +3,90 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UniText Project Map</title>
-  <meta name="description" content="UniText 專案 MAP 靜態頁面，可瀏覽核心文件、registry 資源與其關聯，並在支援的瀏覽器中直接重掃 repo 內容。" />
+  <title>UniText 執行面專案地圖</title>
+  <meta name="description" content="UniText 執行面優先專案地圖，可瀏覽 `runtime/*` 與 `registry/*` 的對應關係，並在支援的瀏覽器中直接重掃專案內容。" />
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f1e8;
-      --bg-deep: #ebe3d5;
-      --panel: rgba(255, 252, 246, 0.92);
-      --panel-strong: #fffdf8;
-      --panel-muted: rgba(252, 247, 238, 0.88);
-      --ink: #2b241d;
-      --ink-soft: #5a5146;
-      --ink-faint: #7b7063;
-      --line: #ded3c2;
-      --line-strong: #b9a88e;
-      --accent: #2d7f78;
-      --accent-strong: #205e59;
-      --accent-soft: #d7eee8;
-      --warning: #b9771e;
-      --danger: #af5438;
-      --shadow-soft: 0 12px 30px rgba(49, 40, 25, 0.06);
-      --shadow-strong: 0 24px 64px rgba(46, 38, 24, 0.08);
+      --ui-font-scale: 1;
+      --bg: #f3f4f6;
+      --bg-deep: #e8edf3;
+      --panel: rgba(252, 252, 253, 0.96);
+      --panel-strong: #fcfcfd;
+      --panel-muted: rgba(248, 250, 252, 0.94);
+      --ink: #18202a;
+      --ink-soft: #526070;
+      --ink-faint: #738194;
+      --line: #d6dce5;
+      --line-strong: #b8c2d1;
+      --accent: #246b73;
+      --accent-strong: #1d555c;
+      --accent-soft: #dcecef;
+      --warning: #a56a17;
+      --danger: #a34a36;
+      --shadow-soft: 0 8px 18px rgba(15, 23, 42, 0.05);
+      --shadow-strong: 0 14px 32px rgba(15, 23, 42, 0.08);
+      --surface-main-top: rgba(252, 252, 253, 0.98);
+      --surface-main-bottom: rgba(248, 250, 252, 0.96);
+      --surface-secondary-top: rgba(250, 251, 253, 0.98);
+      --surface-secondary-bottom: rgba(245, 248, 251, 0.96);
+      --surface-card: rgba(248, 250, 252, 0.98);
+      --surface-card-soft: rgba(248, 250, 252, 0.9);
+      --surface-hover: rgba(252, 252, 253, 0.98);
+      --surface-accent-soft: rgba(220, 236, 239, 0.72);
+      --surface-map-top: rgba(237, 242, 248, 0.98);
+      --surface-map-bottom: rgba(218, 226, 236, 0.97);
+      --surface-minimap-bottom: rgba(239, 244, 248, 0.96);
+      --focus-outline: rgba(45, 127, 120, 0.32);
+      --tone-pill-text: var(--ink-soft);
+      --type-doc-fill: #f3e6bf;
+      --type-doc-stroke: #b28a44;
+      --type-doc-badge: #eadbb0;
+      --type-directory-fill: #dce9e1;
+      --type-directory-stroke: #5d8370;
+      --type-directory-badge: #d0dfd6;
+      --type-runtime-fill: #d9ebef;
+      --type-runtime-stroke: #3c7f8f;
+      --type-runtime-badge: #cfe2e7;
+      --type-skill-fill: #dee4ef;
+      --type-skill-stroke: #667da4;
+      --type-skill-badge: #d4dbea;
+      --type-mcp-fill: #e7deeb;
+      --type-mcp-stroke: #806b8f;
+      --type-mcp-badge: #ddd1e4;
+      --type-agent-fill: #efddd3;
+      --type-agent-stroke: #aa6b52;
+      --type-agent-badge: #e6d0c2;
+      --type-workflow-fill: #dce5d4;
+      --type-workflow-stroke: #6d8660;
+      --type-workflow-badge: #d2dcc8;
+      --map-guide-stroke-soft: rgba(131, 114, 82, 0.12);
+      --map-guide-stroke: rgba(131, 114, 82, 0.14);
+      --map-orbit-stroke: rgba(131, 114, 82, 0.18);
+      --map-title-ink: #5f5a4b;
+      --map-copy-ink: #7a705e;
+      --map-node-active-fill: #fcfbf5;
+      --map-node-active-stroke: #176b66;
+      --map-node-label: #201c16;
+      --map-node-sub: #6b6256;
+      --map-svg-filter: none;
+      --tour-card-bg: linear-gradient(180deg, rgba(255, 253, 247, 0.98) 0%, rgba(255, 248, 236, 0.96) 100%);
+      --tour-card-border: rgba(205, 191, 162, 0.34);
+      --tour-card-shadow: 0 28px 72px rgba(22, 17, 12, 0.22);
+      --tour-meta-bg: rgba(45, 127, 120, 0.08);
+      --tour-step-bg: rgba(45, 127, 120, 0.12);
+      --tour-step-color: var(--accent-strong);
+      --tour-close-bg: rgba(255, 255, 255, 0.74);
+      --tour-close-border: rgba(122, 108, 86, 0.18);
+      --tour-ring-backdrop: rgba(15, 23, 35, 0.34);
+      --tour-ring-bg: linear-gradient(180deg, rgba(247, 250, 252, 0.24) 0%, rgba(232, 238, 244, 0.16) 100%);
+      --tour-ring-shadow: 0 14px 30px rgba(8, 15, 26, 0.18);
       --display-font: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Noto Serif TC", serif;
       --body-font: "Aptos", "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
       --text-body: 1rem;
       --text-small: 0.875rem;
       --text-label: 0.75rem;
-      --text-title: clamp(2.45rem, 4vw, 4.25rem);
+      --text-title: clamp(2.1rem, 3.4vw, 3.55rem);
       --text-panel: 1.125rem;
       --radius-lg: 28px;
       --radius-md: 18px;
@@ -38,10 +94,145 @@
       --content-width: 1680px;
     }
 
+    :root[data-theme="dark"],
+    body[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f141b;
+      --bg-deep: #18202a;
+      --panel: rgba(28, 34, 43, 0.96);
+      --panel-strong: rgba(31, 39, 49, 0.99);
+      --panel-muted: rgba(24, 30, 38, 0.94);
+      --ink: #e8edf4;
+      --ink-soft: #b3becc;
+      --ink-faint: #8d99ab;
+      --line: #334051;
+      --line-strong: #49566c;
+      --shadow-soft: 0 12px 26px rgba(5, 8, 14, 0.36);
+      --shadow-strong: 0 18px 40px rgba(5, 8, 14, 0.46);
+      --surface-main-top: rgba(28, 35, 44, 0.98);
+      --surface-main-bottom: rgba(20, 26, 34, 0.96);
+      --surface-secondary-top: rgba(25, 31, 39, 0.98);
+      --surface-secondary-bottom: rgba(18, 23, 31, 0.96);
+      --surface-card: rgba(31, 39, 49, 0.98);
+      --surface-card-soft: rgba(33, 41, 52, 0.92);
+      --surface-hover: rgba(37, 46, 58, 0.98);
+      --surface-map-top: rgba(24, 31, 40, 0.98);
+      --surface-map-bottom: rgba(14, 20, 28, 0.97);
+      --surface-minimap-bottom: rgba(21, 28, 37, 0.96);
+      --focus-outline: rgba(117, 198, 195, 0.42);
+      --tone-pill-text: #d2dae5;
+      --map-guide-stroke-soft: rgba(184, 199, 221, 0.11);
+      --map-guide-stroke: rgba(184, 199, 221, 0.16);
+      --map-orbit-stroke: rgba(184, 199, 221, 0.22);
+      --map-title-ink: #d6dde8;
+      --map-copy-ink: #9eacbe;
+      --map-node-active-fill: #102229;
+      --map-node-active-stroke: #7bd2cb;
+      --map-node-label: #edf3f9;
+      --map-node-sub: #a9b8ca;
+      --map-svg-filter: saturate(1.02) brightness(0.98);
+      --tour-card-bg: linear-gradient(180deg, rgba(24, 31, 39, 0.98) 0%, rgba(17, 24, 31, 0.96) 100%);
+      --tour-card-border: rgba(123, 210, 203, 0.22);
+      --tour-card-shadow: 0 28px 72px rgba(4, 7, 13, 0.5);
+      --tour-meta-bg: rgba(117, 198, 195, 0.12);
+      --tour-step-bg: rgba(117, 198, 195, 0.16);
+      --tour-step-color: #c2f0ec;
+      --tour-close-bg: rgba(37, 46, 58, 0.9);
+      --tour-close-border: rgba(141, 153, 171, 0.28);
+      --tour-ring-backdrop: rgba(5, 9, 15, 0.46);
+      --tour-ring-bg: linear-gradient(180deg, rgba(172, 214, 219, 0.14) 0%, rgba(98, 140, 152, 0.1) 100%);
+      --tour-ring-shadow: 0 18px 34px rgba(3, 8, 14, 0.32);
+    }
+
+    :root[data-visual-tone="mono"],
+    body[data-visual-tone="mono"] {
+      --accent: #5d6975;
+      --accent-strong: #434c56;
+      --accent-soft: #dce1e6;
+      --surface-accent-soft: rgba(214, 220, 226, 0.72);
+      --warning: #6d655b;
+      --danger: #7b6060;
+      --type-doc-fill: #e5e0d8;
+      --type-doc-stroke: #756d63;
+      --type-doc-badge: #d8d1c7;
+      --type-directory-fill: #dde2e4;
+      --type-directory-stroke: #5f6d75;
+      --type-directory-badge: #d1d7da;
+      --type-runtime-fill: #dbe0e4;
+      --type-runtime-stroke: #61707a;
+      --type-runtime-badge: #d1d8dc;
+      --type-skill-fill: #e0e2e8;
+      --type-skill-stroke: #6e7686;
+      --type-skill-badge: #d6dae1;
+      --type-mcp-fill: #e4e0e6;
+      --type-mcp-stroke: #746d7b;
+      --type-mcp-badge: #dad4de;
+      --type-agent-fill: #e8ded8;
+      --type-agent-stroke: #857264;
+      --type-agent-badge: #ddd1ca;
+      --type-workflow-fill: #dde2da;
+      --type-workflow-stroke: #677366;
+      --type-workflow-badge: #d3d8d0;
+      --map-guide-stroke-soft: rgba(123, 131, 145, 0.12);
+      --map-guide-stroke: rgba(123, 131, 145, 0.16);
+      --map-orbit-stroke: rgba(123, 131, 145, 0.2);
+      --map-title-ink: #606978;
+      --map-copy-ink: #7a8494;
+      --map-node-active-stroke: #596877;
+    }
+
+    :root[data-visual-tone="vivid"],
+    body[data-visual-tone="vivid"] {
+      --accent: #006b94;
+      --accent-strong: #00526f;
+      --accent-soft: #d7eff9;
+      --surface-accent-soft: rgba(188, 228, 246, 0.7);
+      --warning: #b76b05;
+      --danger: #c14a2a;
+      --type-doc-fill: #ffe3a4;
+      --type-doc-stroke: #b67506;
+      --type-doc-badge: #ffd27a;
+      --type-directory-fill: #ccf1d7;
+      --type-directory-stroke: #1f7a51;
+      --type-directory-badge: #b8e8c8;
+      --type-runtime-fill: #c2e7ff;
+      --type-runtime-stroke: #006eb8;
+      --type-runtime-badge: #a8dbff;
+      --type-skill-fill: #ddd4ff;
+      --type-skill-stroke: #5f4ac2;
+      --type-skill-badge: #c9bcff;
+      --type-mcp-fill: #f1cbff;
+      --type-mcp-stroke: #a43fba;
+      --type-mcp-badge: #e8affb;
+      --type-agent-fill: #ffcfc0;
+      --type-agent-stroke: #c64a28;
+      --type-agent-badge: #ffb7a4;
+      --type-workflow-fill: #daf3ad;
+      --type-workflow-stroke: #5f8d16;
+      --type-workflow-badge: #cae889;
+      --map-guide-stroke-soft: rgba(0, 107, 148, 0.12);
+      --map-guide-stroke: rgba(0, 107, 148, 0.18);
+      --map-orbit-stroke: rgba(0, 107, 148, 0.24);
+      --map-title-ink: #0f4b68;
+      --map-copy-ink: #2f6986;
+      --map-node-active-fill: #fff8ee;
+      --map-node-active-stroke: #006b94;
+    }
+
+    :root[data-text-scale="sm"],
+    body[data-text-scale="sm"] {
+      --ui-font-scale: 0.92;
+    }
+
+    :root[data-text-scale="lg"],
+    body[data-text-scale="lg"] {
+      --ui-font-scale: 1.08;
+    }
+
     * { box-sizing: border-box; }
 
     html {
-      font-size: 16px;
+      font-size: calc(15px * var(--ui-font-scale));
       background: var(--bg);
     }
 
@@ -51,10 +242,7 @@
       font-size: var(--text-body);
       line-height: 1.55;
       color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(20, 108, 101, 0.085), transparent 24%),
-        radial-gradient(circle at top right, rgba(184, 128, 34, 0.09), transparent 22%),
-        linear-gradient(180deg, #fcfbf8 0%, var(--bg) 42%, var(--bg-deep) 100%);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
     }
 
     .page-mode-share-safe [data-share-hide] {
@@ -75,39 +263,39 @@
     .node-button:focus-visible,
     .source-item:focus-visible,
     .edge-item:focus-visible {
-      outline: 3px solid rgba(45, 127, 120, 0.32);
+      outline: 3px solid var(--focus-outline);
       outline-offset: 2px;
     }
 
     .page-shell {
       max-width: calc(var(--content-width) + 48px);
       margin: 0 auto;
-      padding: 24px;
+      padding: 20px;
     }
 
     .masthead {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      margin-bottom: 18px;
-      padding: clamp(22px, 3vw, 34px);
-      border: 1px solid rgba(155, 143, 117, 0.26);
-      border-radius: 36px;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 16px;
+      padding: clamp(18px, 2.2vw, 26px);
+      border: 1px solid rgba(184, 194, 209, 0.82);
+      border-radius: 20px;
       background:
-        linear-gradient(180deg, rgba(255, 252, 245, 0.94) 0%, rgba(255, 249, 241, 0.9) 100%);
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-main-bottom) 100%);
       box-shadow: var(--shadow-strong);
-      backdrop-filter: blur(18px);
+      transition: padding 180ms ease, border-radius 180ms ease, box-shadow 180ms ease, transform 180ms ease;
     }
 
     .masthead-grid {
       display: grid;
       grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.75fr);
-      gap: 24px;
+      gap: 18px;
       align-items: start;
+      transition: gap 180ms ease, grid-template-columns 180ms ease;
     }
 
     .eyebrow {
-      margin: 0 0 12px;
+      margin: 0 0 8px;
       font-size: var(--text-label);
       font-weight: 800;
       letter-spacing: 0.16em;
@@ -126,22 +314,22 @@
     }
 
     .lede {
-      margin: 18px 0 0;
+      margin: 12px 0 0;
       max-width: 66ch;
       color: var(--ink-soft);
-      font-size: 1.03rem;
-      line-height: 1.75;
+      font-size: 0.96rem;
+      line-height: 1.62;
       text-wrap: pretty;
     }
 
     .masthead-aside {
       display: grid;
-      gap: 14px;
-      padding: 18px 18px 16px;
-      border: 1px solid rgba(140, 128, 104, 0.22);
-      border-radius: 24px;
+      gap: 10px;
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(184, 194, 209, 0.72);
+      border-radius: 16px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(249, 245, 236, 0.86) 100%);
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--panel-muted) 100%);
     }
 
     .aside-kicker {
@@ -155,7 +343,7 @@
     .aside-title {
       margin: 0;
       font-family: var(--display-font);
-      font-size: 1.35rem;
+      font-size: 1.22rem;
       line-height: 1.1;
     }
 
@@ -168,23 +356,82 @@
 
     .summary {
       display: flex;
-      gap: 10px;
+      gap: 6px;
       flex-wrap: wrap;
-      margin-top: 18px;
+      margin-top: 14px;
+      transition: margin-top 180ms ease, gap 180ms ease;
+    }
+
+    .summary-hint,
+    .legend-copy {
+      margin: 8px 0 0;
+      color: var(--ink-faint);
+      font-size: 0.79rem;
+      line-height: 1.5;
     }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      min-height: 34px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(103, 130, 120, 0.18);
-      background: linear-gradient(180deg, rgba(245, 252, 249, 0.95) 0%, rgba(229, 246, 240, 0.94) 100%);
-      color: var(--accent-strong);
-      font-size: 0.84rem;
+      min-height: 32px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(184, 194, 209, 0.85);
+      background: var(--surface-card);
+      color: var(--ink);
+      font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.01em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip.quick-filter-chip {
+      gap: 8px;
+      appearance: none;
+      cursor: pointer;
+      text-align: left;
+      transition:
+        border-color 140ms ease,
+        background 140ms ease,
+        color 140ms ease,
+        box-shadow 140ms ease,
+        transform 140ms ease;
+    }
+
+    .chip.quick-filter-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(36, 107, 115, 0.3);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .chip.quick-filter-chip.active {
+      border-color: rgba(36, 107, 115, 0.34);
+      background: linear-gradient(180deg, rgba(36, 107, 115, 0.16) 0%, rgba(36, 107, 115, 0.1) 100%);
+      color: var(--ink);
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .chip.quick-filter-chip.is-diagnostic {
+      border-color: rgba(165, 106, 23, 0.24);
+    }
+
+    .chip-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+    }
+
+    .chip-label {
+      color: inherit;
+      font: inherit;
+    }
+
+    .chip-count {
+      color: inherit;
+      font: inherit;
+      opacity: 0.82;
     }
 
     .legend {
@@ -193,14 +440,14 @@
       flex-wrap: wrap;
     }
 
-    .legend span {
+    .legend .quick-filter-chip {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 7px 11px;
-      border: 1px solid rgba(160, 146, 118, 0.22);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.56);
+      border: 1px solid rgba(184, 194, 209, 0.6);
+      border-radius: 12px;
+      background: var(--surface-card-soft);
       color: var(--ink-soft);
       font-size: 0.78rem;
     }
@@ -212,29 +459,403 @@
       display: inline-block;
     }
 
+    .aside-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+    }
+
+    .aside-hint {
+      color: var(--ink-faint);
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
     .control-deck {
       display: grid;
       gap: 16px;
-      margin-top: 26px;
+      margin-top: 16px;
+      transition: gap 180ms ease, margin-top 180ms ease;
     }
 
     .control-band {
       display: grid;
-      gap: 14px;
-      padding: 16px 18px 18px;
-      border-radius: 24px;
-      border: 1px solid rgba(155, 143, 117, 0.2);
+      gap: 12px;
+      padding: 12px 14px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(184, 194, 209, 0.78);
       background: var(--panel-muted);
     }
 
     .control-band.primary {
       background:
-        linear-gradient(180deg, rgba(252, 253, 250, 0.96) 0%, rgba(243, 247, 243, 0.92) 100%);
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-main-bottom) 100%);
+      transition: padding 180ms ease, gap 180ms ease;
+    }
+
+    body.masthead-compact .masthead {
+      position: sticky;
+      top: 6px;
+      z-index: 24;
+      padding: 6px 8px 7px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    body.masthead-compact .masthead-grid {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    body.masthead-compact .eyebrow {
+      margin-bottom: 2px;
+      font-size: 0.54rem;
+      letter-spacing: 0.1em;
+    }
+
+    body.masthead-compact .masthead h1 {
+      font-size: clamp(1.02rem, 1.35vw, 1.34rem);
+      line-height: 0.94;
+      max-width: none;
+    }
+
+    body.masthead-compact .lede,
+    body.masthead-compact .masthead-aside,
+    body.masthead-compact .control-band.primary .band-copy {
+      display: none;
+    }
+
+    body.masthead-compact .summary {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-top: 4px;
+      gap: 4px;
+      padding-bottom: 1px;
+      scrollbar-width: thin;
+    }
+
+    body.masthead-compact .summary::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    body.masthead-compact .chip {
+      min-height: 24px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+
+    body.masthead-compact .summary-hint {
+      display: none;
+    }
+
+    body.masthead-compact .control-deck {
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    body.masthead-compact .control-band.primary {
+      gap: 6px;
+      padding: 6px 8px 7px;
+    }
+
+    body.masthead-compact .band-head {
+      display: none;
+    }
+
+    body.masthead-compact .band-title {
+      font-size: 0.9rem;
+      line-height: 1.04;
+    }
+
+    body.masthead-compact .band-note {
+      font-size: 0.7rem;
+    }
+
+    body.masthead-compact .toolbar-row {
+      gap: 6px;
+    }
+
+    body.masthead-compact .control-group {
+      gap: 4px;
+      min-width: 140px;
+      flex-basis: 140px;
+    }
+
+    body.masthead-compact .control-group.wide {
+      flex-basis: 220px;
+      min-width: 200px;
+    }
+
+    body.masthead-compact .control-group label {
+      font-size: 0.56rem;
+      letter-spacing: 0.08em;
+    }
+
+    body.masthead-compact .control-note {
+      display: none;
+    }
+
+    body.masthead-compact .control-group input,
+    body.masthead-compact .control-group select,
+    body.masthead-compact .tone-option {
+      min-height: 32px;
+      padding: 5px 8px;
+      border-radius: 9px;
+    }
+
+    body.masthead-compact .tone-switch {
+      gap: 4px;
+    }
+
+    body.tour-active.masthead-compact .summary {
+      display: none;
+    }
+
+    body.tour-active.masthead-compact .control-deck {
+      margin-top: 4px;
+    }
+
+    body.tour-active.masthead-compact .control-band.primary {
+      padding-top: 6px;
+      padding-bottom: 7px;
     }
 
     .control-band.secondary {
       background:
-        linear-gradient(180deg, rgba(255, 250, 240, 0.92) 0%, rgba(250, 244, 230, 0.88) 100%);
+        linear-gradient(180deg, var(--surface-secondary-top) 0%, var(--surface-secondary-bottom) 100%);
+    }
+
+    .workspace-shell {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-main-bottom) 100%);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .workspace-chrome {
+      display: grid;
+      gap: 12px;
+    }
+
+    .workspace-overview {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-kicker {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 10px;
+      background: var(--surface-accent-soft);
+      color: var(--accent-strong);
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .workspace-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.28rem;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .workspace-copy {
+      margin: 4px 0 0;
+      max-width: 78ch;
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .workspace-controls {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-tab,
+    .workspace-preview-card {
+      min-width: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: var(--surface-card);
+      color: var(--ink-soft);
+      transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+    }
+
+    .workspace-tab {
+      display: grid;
+      gap: 2px;
+      min-width: 172px;
+      padding: 8px 11px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .workspace-tab:hover,
+    .workspace-preview-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(36, 107, 115, 0.32);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+    }
+
+    .workspace-tab.active,
+    .workspace-preview-card.active {
+      border-color: rgba(36, 107, 115, 0.36);
+      background: var(--surface-hover);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+      color: var(--ink);
+    }
+
+    .workspace-tab-step,
+    .workspace-preview-index {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 26px;
+      padding: 4px 10px;
+      border: 1px solid rgba(36, 107, 115, 0.24);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(36, 107, 115, 0.14) 0%, rgba(36, 107, 115, 0.08) 100%);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent-strong);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 6px 14px rgba(29, 85, 92, 0.08);
+    }
+
+    .workspace-tab strong,
+    .workspace-preview-card strong {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.18;
+    }
+
+    .workspace-tab small {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: color-mix(in srgb, var(--ink-soft) 84%, var(--ink) 16%);
+    }
+
+    .workspace-stepper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-page-note {
+      display: flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--surface-main-top);
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .workspace-stage {
+      position: relative;
+      min-height: 0;
+      height: clamp(400px, 64vh, 760px);
+    }
+
+    .workspace-page {
+      height: 100%;
+      min-height: 0;
+    }
+
+    .workspace-page .panel {
+      min-height: 0;
+    }
+
+    .workspace-page .control-band,
+    .workspace-page .governance-panel {
+      height: 100%;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .workspace-page[hidden] {
+      display: none !important;
+    }
+
+    .workspace-page-grid {
+      display: grid;
+      gap: 18px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .workspace-page-grid > * {
+      min-height: 0;
+    }
+
+    .workspace-page-grid.governance-grid {
+      grid-template-columns: minmax(320px, 0.94fr) minmax(420px, 1.16fr);
+    }
+
+    .workspace-preview-rail {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    .workspace-preview-card {
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      min-height: 84px;
+      padding: 10px 12px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .workspace-preview-card p {
+      margin: 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.48;
+      color: color-mix(in srgb, var(--ink-soft) 82%, var(--ink) 18%);
+    }
+
+    .workspace-tab.active .workspace-tab-step,
+    .workspace-preview-card.active .workspace-preview-index {
+      border-color: rgba(36, 107, 115, 0.34);
+      background: linear-gradient(180deg, rgba(36, 107, 115, 0.2) 0%, rgba(36, 107, 115, 0.12) 100%);
+      color: var(--ink);
     }
 
     .band-head {
@@ -255,8 +876,8 @@
     .band-copy {
       margin: 4px 0 0;
       color: var(--ink-soft);
-      font-size: var(--text-small);
-      line-height: 1.55;
+      font-size: 0.82rem;
+      line-height: 1.48;
       max-width: 72ch;
     }
 
@@ -268,9 +889,51 @@
 
     .toolbar-row {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       align-items: end;
+    }
+
+    .tone-switch {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .panel-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tone-option {
+      min-width: 0;
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--surface-card);
+      color: var(--tone-pill-text);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: border-color 140ms ease, background 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+    }
+
+    .tone-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(36, 107, 115, 0.32);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .tone-option.active {
+      border-color: rgba(36, 107, 115, 0.38);
+      background: var(--surface-accent-soft);
+      color: var(--accent-strong);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.06);
     }
 
     .control-group {
@@ -293,14 +956,20 @@
       color: var(--ink-faint);
     }
 
+    .control-note {
+      font-size: 0.74rem;
+      line-height: 1.42;
+      color: var(--ink-faint);
+    }
+
     .control-group input,
     .control-group select {
       min-width: 0;
-      min-height: 46px;
-      padding: 11px 14px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255, 252, 247, 0.96);
+      min-height: 42px;
+      padding: 9px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--surface-hover);
       color: var(--ink);
       transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
     }
@@ -332,34 +1001,34 @@
       justify-content: center;
       min-height: 42px;
       padding: 9px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(19, 110, 103, 0.18);
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(234, 248, 243, 0.95) 100%);
+      border-radius: 12px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-hover);
       color: var(--accent-strong);
       font-size: 0.88rem;
       font-weight: 800;
       letter-spacing: 0.01em;
       text-decoration: none;
       cursor: pointer;
-      box-shadow: 0 8px 20px rgba(23, 101, 94, 0.08);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
       transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
     }
 
     button.action.secondary,
     button.mini-action.secondary,
     a.mini-action.secondary {
-      border-color: rgba(182, 132, 53, 0.22);
-      background: linear-gradient(180deg, rgba(255, 254, 248, 0.98) 0%, rgba(255, 243, 214, 0.95) 100%);
-      color: #875a09;
-      box-shadow: 0 8px 20px rgba(160, 113, 27, 0.08);
+      border-color: var(--line-strong);
+      background: var(--surface-card);
+      color: var(--ink-soft);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
     }
 
     button.action:hover,
     button.mini-action:hover,
     a.mini-action:hover {
       transform: translateY(-1px);
-      border-color: rgba(19, 110, 103, 0.34);
-      box-shadow: 0 12px 24px rgba(23, 101, 94, 0.1);
+      border-color: rgba(36, 107, 115, 0.42);
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.07);
     }
 
     button.action:disabled,
@@ -395,8 +1064,8 @@
 
     .status-card {
       padding: 14px 16px;
-      border: 1px solid rgba(160, 146, 118, 0.24);
-      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid var(--line);
+      background: var(--surface-main-top);
       color: var(--ink-soft);
       line-height: 1.65;
       font-size: var(--text-small);
@@ -412,21 +1081,21 @@
     }
 
     .status-card.success {
-      border-color: rgba(19, 110, 103, 0.28);
-      background: linear-gradient(180deg, rgba(244, 255, 251, 0.98) 0%, rgba(232, 249, 241, 0.95) 100%);
-      box-shadow: 0 12px 24px rgba(19, 110, 103, 0.08);
+      border-color: rgba(47, 111, 87, 0.26);
+      background: linear-gradient(180deg, rgba(250, 253, 250, 0.98) 0%, rgba(220, 236, 223, 0.95) 100%);
+      box-shadow: none;
     }
 
     .status-card.progress {
-      border-color: rgba(177, 126, 42, 0.28);
-      background: linear-gradient(180deg, rgba(255, 250, 238, 0.98) 0%, rgba(255, 242, 208, 0.96) 100%);
-      box-shadow: 0 12px 24px rgba(177, 126, 42, 0.08);
+      border-color: rgba(165, 106, 23, 0.3);
+      background: linear-gradient(180deg, rgba(253, 249, 239, 0.98) 0%, rgba(246, 231, 201, 0.95) 100%);
+      box-shadow: none;
     }
 
     .status-card.error {
-      border-color: rgba(173, 68, 38, 0.3);
-      background: linear-gradient(180deg, rgba(255, 247, 243, 0.98) 0%, rgba(255, 232, 223, 0.96) 100%);
-      box-shadow: 0 12px 24px rgba(173, 68, 38, 0.08);
+      border-color: rgba(163, 74, 54, 0.3);
+      background: linear-gradient(180deg, rgba(253, 248, 247, 0.98) 0%, rgba(247, 221, 214, 0.95) 100%);
+      box-shadow: none;
     }
 
     .status-row {
@@ -443,8 +1112,8 @@
       justify-content: center;
       min-width: 82px;
       padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(96, 88, 75, 0.12);
+      border-radius: 10px;
+      background: var(--surface-card-soft);
       color: var(--ink-soft);
       font-size: 0.68rem;
       font-weight: 800;
@@ -473,19 +1142,70 @@
       color: #8b3a20;
     }
 
+    :root[data-theme="dark"] .status-card.success,
+    body[data-theme="dark"] .status-card.success {
+      border-color: rgba(88, 178, 132, 0.28);
+      background: linear-gradient(180deg, rgba(18, 43, 32, 0.96) 0%, rgba(13, 32, 25, 0.96) 100%);
+    }
+
+    :root[data-theme="dark"] .status-card.progress,
+    body[data-theme="dark"] .status-card.progress {
+      border-color: rgba(200, 145, 52, 0.28);
+      background: linear-gradient(180deg, rgba(56, 39, 16, 0.96) 0%, rgba(39, 27, 11, 0.96) 100%);
+    }
+
+    :root[data-theme="dark"] .status-card.error,
+    body[data-theme="dark"] .status-card.error {
+      border-color: rgba(198, 103, 82, 0.26);
+      background: linear-gradient(180deg, rgba(61, 25, 22, 0.96) 0%, rgba(42, 18, 16, 0.96) 100%);
+    }
+
+    :root[data-theme="dark"] .status-card.success .status-pill,
+    body[data-theme="dark"] .status-card.success .status-pill {
+      background: rgba(88, 178, 132, 0.16);
+      color: #a7ebc5;
+    }
+
+    :root[data-theme="dark"] .status-card.progress .status-pill,
+    body[data-theme="dark"] .status-card.progress .status-pill {
+      background: rgba(200, 145, 52, 0.18);
+      color: #ffd78f;
+    }
+
+    :root[data-theme="dark"] .status-card.error .status-pill,
+    body[data-theme="dark"] .status-card.error .status-pill {
+      background: rgba(198, 103, 82, 0.18);
+      color: #ffc0b0;
+    }
+
     .operations-grid {
       display: grid;
       grid-template-columns: minmax(320px, 0.95fr) minmax(280px, 0.8fr);
-      gap: 14px;
+      gap: 16px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .operations-grid > * {
+      min-height: 0;
     }
 
     .info-card {
       padding: 16px 16px 18px;
-      border: 1px solid rgba(160, 146, 118, 0.22);
-      background: rgba(255, 255, 255, 0.68);
+      border: 1px solid var(--line);
+      background: var(--surface-main-top);
       color: var(--ink-soft);
       line-height: 1.65;
       box-shadow: var(--shadow-soft);
+      max-height: min(34vh, 320px);
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .workspace-card {
+      height: 100%;
+      max-height: none;
+      border-radius: 16px;
     }
 
     .card-title {
@@ -501,12 +1221,15 @@
     .governance-panel {
       display: grid;
       gap: 16px;
+      min-height: 0;
       padding: 18px;
-      border-radius: 28px;
-      border: 1px solid rgba(19, 110, 103, 0.18);
+      border-radius: 16px;
+      border: 1px solid var(--line-strong);
       background:
-        linear-gradient(180deg, rgba(240, 250, 246, 0.9) 0%, rgba(248, 245, 236, 0.92) 100%);
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-main-bottom) 100%);
       box-shadow: var(--shadow-soft);
+      overflow: auto;
+      overscroll-behavior: contain;
     }
 
     .governance-head {
@@ -531,35 +1254,61 @@
 
     .control-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
 
     .governance-result {
       padding: 16px 18px;
       min-height: 240px;
-      border: 1px solid rgba(128, 114, 88, 0.22);
-      background:
-        linear-gradient(180deg, rgba(255, 253, 246, 0.98) 0%, rgba(245, 241, 230, 0.98) 100%);
+      max-height: min(40vh, 360px);
+      border: 1px solid var(--line-strong);
+      background: var(--surface-card);
       color: #40392f;
       font-family: "Consolas", "SFMono-Regular", "Menlo", monospace;
       font-size: 0.82rem;
       line-height: 1.7;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .governance-source-note {
+      padding: 12px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: var(--surface-card-soft);
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      line-height: 1.65;
+    }
+
+    .governance-source-note strong {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .governance-source-note code {
+      font-family: "Consolas", "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.78rem;
     }
 
     .layout {
       display: grid;
       grid-template-columns: 320px minmax(640px, 1fr) 360px;
       gap: 18px;
-      align-items: start;
+      align-items: stretch;
+      height: 100%;
+      min-height: 0;
     }
 
     .panel {
+      display: flex;
+      flex-direction: column;
       min-height: 480px;
-      border: 1px solid rgba(155, 143, 117, 0.22);
-      border-radius: 30px;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
       background: var(--panel);
       box-shadow: var(--shadow-soft);
       overflow: hidden;
@@ -571,8 +1320,8 @@
       justify-content: space-between;
       gap: 12px;
       padding: 18px 20px 16px;
-      border-bottom: 1px solid rgba(155, 143, 117, 0.18);
-      background: linear-gradient(180deg, rgba(255, 252, 246, 0.98) 0%, rgba(250, 247, 239, 0.92) 100%);
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-main-bottom) 100%);
     }
 
     .panel-head h2 {
@@ -594,7 +1343,9 @@
     .sidebar {
       padding: 10px 10px 20px;
       overflow: auto;
-      max-height: calc(100vh - 344px);
+      min-height: 0;
+      height: 100%;
+      max-height: none;
     }
 
     .group-title {
@@ -609,21 +1360,22 @@
     .node-button {
       width: 100%;
       text-align: left;
-      border: 0;
+      border: 1px solid transparent;
       margin-bottom: 6px;
       padding: 12px 13px;
-      border-radius: 16px;
-      background: transparent;
+      border-radius: 12px;
+      background: var(--surface-card-soft);
       color: inherit;
       cursor: pointer;
-      transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+      transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
     }
 
     .node-button:hover,
     .node-button.active {
-      background: rgba(240, 235, 223, 0.88);
+      background: var(--surface-hover);
       transform: translateX(2px);
-      box-shadow: inset 0 0 0 1px rgba(155, 143, 117, 0.16);
+      border-color: rgba(36, 107, 115, 0.24);
+      box-shadow: 0 6px 12px rgba(15, 23, 42, 0.05);
     }
 
     .node-head {
@@ -645,13 +1397,12 @@
       justify-content: center;
       min-width: 62px;
       padding: 4px 9px;
-      border-radius: 999px;
-      background: rgba(230, 223, 207, 0.95);
-      color: var(--ink-soft);
+      border-radius: 10px;
+      background: var(--surface-accent-soft);
+      color: var(--accent-strong);
       font-size: 0.68rem;
       font-weight: 800;
       letter-spacing: 0.08em;
-      text-transform: uppercase;
     }
 
     .node-description,
@@ -672,19 +1423,53 @@
       overflow-wrap: anywhere;
     }
 
+    .map-panel {
+      min-height: 0;
+    }
+
+    .map-stage {
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      gap: 12px;
+      min-height: 0;
+      height: 100%;
+      padding: 0 16px 16px;
+    }
+
     .map-wrap {
       position: relative;
+      min-height: 0;
+      height: 100%;
       overflow: auto;
       scroll-behavior: smooth;
+      border: 1px solid var(--line);
+      border-radius: 16px;
       background:
-        radial-gradient(circle at 16% 16%, rgba(19, 110, 103, 0.05), transparent 22%),
-        radial-gradient(circle at 85% 12%, rgba(184, 128, 34, 0.05), transparent 18%),
-        linear-gradient(180deg, rgba(254, 253, 249, 0.98) 0%, rgba(247, 243, 234, 0.98) 100%);
+        linear-gradient(180deg, var(--surface-map-top) 0%, var(--surface-map-bottom) 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.24),
+        inset 0 -18px 34px rgba(29, 39, 55, 0.08);
+    }
+
+    .map-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.12) 0%, transparent 48%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(32, 45, 64, 0.08) 100%);
+      pointer-events: none;
+    }
+
+    #map,
+    #map-minimap {
+      filter: var(--map-svg-filter);
+      transition: filter 140ms ease;
     }
 
     svg {
       display: block;
-      min-height: 940px;
+      min-height: 780px;
     }
 
     .map-caption {
@@ -695,10 +1480,106 @@
       max-width: 64ch;
     }
 
+    .map-minimap {
+      display: grid;
+      gap: 8px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface-card-soft);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+    }
+
+    .map-stage:not(.minimap-eligible) .map-minimap,
+    .map-stage.minimap-hidden .map-minimap {
+      display: none;
+    }
+
+    .map-minimap-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .map-minimap-title {
+      font-size: var(--text-label);
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .map-minimap-copy {
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .map-minimap-frame {
+      position: relative;
+      height: 94px;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background:
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-minimap-bottom) 100%);
+      cursor: pointer;
+    }
+
+    .map-minimap-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(140, 152, 168, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(140, 152, 168, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+
+    .map-minimap-frame:focus-visible {
+      outline: 3px solid var(--focus-outline);
+      outline-offset: 2px;
+    }
+
+    .map-minimap-frame svg {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: block;
+    }
+
+    .map-minimap-frame svg * {
+      pointer-events: none;
+    }
+
+    .map-minimap-viewport {
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-width: 14px;
+      min-height: 12px;
+      border: 2px solid rgba(15, 118, 110, 0.92);
+      border-radius: 10px;
+      background: rgba(36, 107, 115, 0.12);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.66),
+        0 0 0 1px rgba(15, 23, 42, 0.04);
+      pointer-events: none;
+    }
+
+    .map-minimap-toggle[hidden] {
+      display: none !important;
+    }
+
     .detail {
       padding: 20px;
       overflow: auto;
-      max-height: calc(100vh - 344px);
+      min-height: 0;
+      height: 100%;
+      max-height: none;
     }
 
     .detail h3 {
@@ -724,7 +1605,8 @@
 
     .meta-row {
       padding: 12px 14px;
-      background: rgba(249, 245, 236, 0.95);
+      border: 1px solid var(--line);
+      background: var(--surface-card);
     }
 
     .meta-row strong {
@@ -757,8 +1639,8 @@
       width: 100%;
       text-align: left;
       padding: 12px 14px;
-      border: 1px solid rgba(155, 143, 117, 0.2);
-      background: rgba(250, 246, 237, 0.96);
+      border: 1px solid var(--line);
+      background: var(--surface-main-top);
       color: inherit;
     }
 
@@ -772,7 +1654,7 @@
     .source-item:hover,
     button.edge-item:focus-visible,
     .source-item:focus-visible {
-      background: rgba(255, 251, 241, 0.98);
+      background: var(--surface-hover);
       border-color: rgba(19, 110, 103, 0.26);
       box-shadow: 0 10px 22px rgba(19, 110, 103, 0.08);
       transform: translateY(-1px);
@@ -803,13 +1685,231 @@
       max-width: 44ch;
     }
 
+    .tour-layer[hidden] {
+      display: none;
+    }
+
+    .tour-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      pointer-events: none;
+    }
+
+    .tour-backdrop {
+      position: absolute;
+      inset: 0;
+      background: transparent;
+    }
+
+    .tour-spotlight {
+      position: fixed;
+      --tour-spotlight-ring-size: 14px;
+      border-radius: 24px;
+      background: transparent;
+      transition:
+        left 180ms ease,
+        top 180ms ease,
+        width 180ms ease,
+        height 180ms ease,
+        border-radius 180ms ease;
+      pointer-events: none;
+    }
+
+    .tour-spotlight::before,
+    .tour-spotlight::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .tour-spotlight::before {
+      inset: 0;
+      border-radius: inherit;
+      box-shadow:
+        0 0 0 9999px var(--tour-ring-backdrop),
+        0 24px 64px rgba(8, 15, 26, 0.26);
+    }
+
+    .tour-spotlight::after {
+      inset: calc(var(--tour-spotlight-ring-size) * -1);
+      padding: var(--tour-spotlight-ring-size);
+      border-radius: calc(24px + var(--tour-spotlight-ring-size));
+      background: var(--tour-ring-bg);
+      backdrop-filter: blur(13px) saturate(1.08);
+      -webkit-backdrop-filter: blur(13px) saturate(1.08);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.52),
+        var(--tour-ring-shadow);
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+    }
+
+    .tour-card {
+      position: fixed;
+      width: min(380px, calc(100vw - 32px));
+      padding: 20px 20px 18px;
+      border-radius: 26px;
+      border: 1px solid var(--tour-card-border);
+      background: var(--tour-card-bg);
+      color: var(--ink);
+      box-shadow: var(--tour-card-shadow);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      pointer-events: auto;
+    }
+
+    .tour-card-head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    .tour-step-label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--tour-step-bg);
+      color: var(--tour-step-color);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .tour-close {
+      width: 34px;
+      min-width: 34px;
+      min-height: 34px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid var(--tour-close-border);
+      background: var(--tour-close-bg);
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .tour-title {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.4rem;
+      line-height: 1.1;
+    }
+
+    .tour-body {
+      margin: 12px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .tour-body p,
+    .tour-meta p {
+      margin: 0;
+    }
+
+    .tour-body p + p,
+    .tour-meta p + p {
+      margin-top: 8px;
+    }
+
+    .tour-meta {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: var(--tour-meta-bg);
+      color: var(--ink);
+      font-size: 0.84rem;
+      line-height: 1.6;
+    }
+
+    .tour-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .tour-actions-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tour-layer[data-layout="stacked"] .tour-card {
+      width: min(680px, calc(100vw - 24px));
+      max-height: min(52vh, calc(100vh - 20px));
+      padding: 18px 18px 16px;
+      border-radius: 24px;
+      box-shadow: 0 20px 56px rgba(15, 23, 35, 0.28);
+    }
+
+    .tour-layer[data-layout="stacked"] .tour-actions {
+      align-items: stretch;
+    }
+
+    .tour-layer[data-layout="stacked"] .tour-actions-group {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .tour-layer[data-layout="stacked"] .tour-actions-group > .mini-action {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    body.tour-active .tour-target-active {
+      position: relative;
+      isolation: isolate;
+      z-index: 61;
+      scroll-margin-top: 108px;
+      scroll-margin-bottom: 360px;
+      box-shadow:
+        0 18px 44px rgba(15, 23, 35, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.22);
+    }
+
+    body.tour-active .tour-target-active :is(input, select, textarea) {
+      position: relative;
+      z-index: 1;
+      background: rgba(252, 253, 255, 0.98);
+      border-color: rgba(103, 119, 142, 0.34);
+      box-shadow: 0 10px 24px rgba(15, 23, 35, 0.14);
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    body.tour-active .tour-target-active :is(button, .mini-action, a.mini-action, .source-item, .node-button) {
+      position: relative;
+      z-index: 1;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: 0 10px 22px rgba(15, 23, 35, 0.12);
+    }
+
     @media (max-width: 1480px) {
-      .layout {
-        grid-template-columns: 300px minmax(0, 1fr);
+      .workspace-stage {
+        height: clamp(480px, 72vh, 820px);
       }
 
-      .layout > :last-child {
-        grid-column: 1 / -1;
+      .layout {
+        grid-template-columns: 260px minmax(0, 1fr) 280px;
       }
     }
 
@@ -817,8 +1917,17 @@
       .masthead-grid,
       .operations-grid,
       .control-grid,
+      .workspace-page-grid.governance-grid,
       .layout {
         grid-template-columns: 1fr;
+      }
+
+      .workspace-controls {
+        align-items: stretch;
+      }
+
+      .workspace-stage {
+        height: clamp(500px, 82vh, 920px);
       }
 
       .sidebar,
@@ -847,6 +1956,29 @@
         border-radius: 22px;
       }
 
+      .workspace-shell {
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .workspace-tab {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .workspace-stepper {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .workspace-page-note {
+        width: 100%;
+      }
+
+      .workspace-stage {
+        height: clamp(440px, 82vh, 840px);
+      }
+
       .inline-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -861,6 +1993,21 @@
       a.mini-action {
         flex: 1 1 180px;
       }
+
+      .workspace-preview-card {
+        min-height: 0;
+      }
+
+      .tour-layer[data-layout="stacked"] .tour-card {
+        width: calc(100vw - 20px);
+        max-height: min(58vh, calc(100vh - 16px));
+        padding: 16px;
+        border-radius: 22px;
+      }
+
+      .tour-layer[data-layout="stacked"] .tour-actions-group {
+        gap: 8px;
+      }
     }
   </style>
 </head>
@@ -869,22 +2016,21 @@
     <header class="masthead">
       <div class="masthead-grid">
         <section>
-          <p class="eyebrow">__PAGE_EYEBROW__</p>
-          <h1>Project Map</h1>
+          <p class="eyebrow">UniText / 執行面治理控制台</p>
+          <h1>專案地圖</h1>
           <p class="lede">__HEADER_DESCRIPTION__</p>
           <div class="summary" id="summary"></div>
+          <p class="summary-hint">下方這排快速帶入鍵可直接把類型或診斷條件送進主要巡覽控制，省去手動重新選。</p>
         </section>
         <aside class="masthead-aside">
-          <span class="aside-kicker">__ASIDE_KICKER__</span>
-          <h2 class="aside-title">__ASIDE_TITLE__</h2>
-          <p class="aside-copy">__ASIDE_COPY__</p>
-          <div class="legend">
-            <span><i style="background:#f2d79d"></i>Docs</span>
-            <span><i style="background:#d7ece3"></i>Directories</span>
-            <span><i style="background:#dce5f5"></i>Skills</span>
-            <span><i style="background:#e8deef"></i>MCP</span>
-            <span><i style="background:#f2ddd4"></i>Agents</span>
-            <span><i style="background:#dde8d3"></i>Workflow</span>
+          <span class="aside-kicker">操作重點</span>
+          <h2 class="aside-title">先掌握目前執行面，再回查正式來源，最後整理成可交接結果。</h2>
+          <p class="aside-copy">這個頁面主要服務維護者與治理操作者。先看 `runtime/*` 目前對外呈現的執行面，再沿著對應關係回到 `registry/*` 的正式定義，最後檢查診斷資訊與治理層疊解析。</p>
+          <p class="legend-copy">這排快速帶入鍵也可直接帶入主要巡覽控制，方便先切到代理、執行面、失效引用或孤立資源。</p>
+          <div class="legend" id="masthead-quick-filters" aria-label="上方快速帶入"></div>
+          <div class="aside-actions">
+            <button type="button" class="mini-action secondary" id="tour-start">互動導覽</button>
+            <span class="aside-hint">第一次進來可直接走一遍，之後也能隨時重開。</span>
           </div>
         </aside>
       </div>
@@ -893,10 +2039,10 @@
         <section class="control-band primary">
           <div class="band-head">
             <div>
-              <h2 class="band-title">Primary Scan Controls</h2>
-              <p class="band-copy">先鎖定你要看的資源範圍，再切換 map 視角。這一排保留給「看懂目前狀態」所需的最短操作路徑。</p>
+              <h2 class="band-title">主要巡覽控制</h2>
+              <p class="band-copy">先鎖定你要看的範圍，再切換地圖視角。這一排保留給「先看 `runtime/*`、再回 `registry/*`」這條最短理解路徑。</p>
             </div>
-            <div class="band-note">Browse first, resolve second.</div>
+            <div class="band-note">先巡覽，再解析。</div>
           </div>
           <div class="toolbar-row">
             <div class="control-group wide">
@@ -908,116 +2054,255 @@
               <select id="type-filter"><option value="all">全部類型</option></select>
             </div>
             <div class="control-group">
-              <label for="map-mode">Map View</label>
+              <label for="map-mode">地圖視角</label>
               <select id="map-mode">
                 <option value="grid">欄式</option>
                 <option value="radial">圓形</option>
               </select>
             </div>
-          </div>
-        </section>
-
-        <section class="control-band secondary" data-share-hide>
-          <div class="band-head">
-            <div>
-              <h2 class="band-title">Maintenance Controls</h2>
-              <p class="band-copy">這一排只放 repo 連結、重掃與更新策略。平常維護用得到，但不應該壓過主要巡覽工作。</p>
-            </div>
-            <div class="band-note">Local scanning only.</div>
-          </div>
-          <div class="toolbar-row">
-            <div class="control-group">
-              <label for="update-mode">更新模式</label>
-              <select id="update-mode">
-                <option value="manual">手動更新</option>
-                <option value="on-open">開啟網頁時自動更新</option>
-                <option value="interval">定時更新</option>
-              </select>
-            </div>
-            <div class="control-group">
-              <label>定時頻率</label>
-              <div class="inline-grid">
-                <input id="interval-days" type="number" min="0" step="1" value="1" placeholder="天" />
-                <input id="interval-hours" type="number" min="0" step="1" value="0" placeholder="時" />
-                <input id="interval-minutes" type="number" min="0" step="1" value="0" placeholder="分" />
+            <div class="control-group" data-share-hide>
+              <label id="visual-tone-label">色彩模式</label>
+              <div class="tone-switch" role="radiogroup" aria-labelledby="visual-tone-label" aria-describedby="visual-tone-note">
+                <button type="button" class="tone-option" data-visual-tone-option="mono" role="radio" aria-checked="false" tabindex="-1">結構灰</button>
+                <button type="button" class="tone-option active" id="visual-tone-muted" data-visual-tone-option="muted" role="radio" aria-checked="true" tabindex="0">柔霧色</button>
+                <button type="button" class="tone-option" data-visual-tone-option="vivid" role="radio" aria-checked="false" tabindex="-1">高彩度</button>
               </div>
+              <span class="control-note" id="visual-tone-note">結構灰突出層級、柔霧色適合長時間閱讀、高彩度適合快速掃描；三者都不改版面結構。</span>
             </div>
-            <div class="button-row">
-              <button class="action secondary" id="link-repo">連結專案目錄</button>
-              <button class="action" id="refresh-now">立即更新</button>
+            <div class="control-group" data-share-hide>
+              <label id="visual-theme-label">明暗主題</label>
+              <div class="tone-switch" role="radiogroup" aria-labelledby="visual-theme-label" aria-describedby="visual-theme-note">
+                <button type="button" class="tone-option active" id="visual-theme-light" data-visual-theme-option="light" role="radio" aria-checked="true" tabindex="0">日間</button>
+                <button type="button" class="tone-option" data-visual-theme-option="dark" role="radio" aria-checked="false" tabindex="-1">夜間</button>
+              </div>
+              <span class="control-note" id="visual-theme-note">主題只切換表面明暗、陰影與對比；色彩模式維持既有分類語意。</span>
+            </div>
+            <div class="control-group" data-share-hide>
+              <label id="text-scale-label">字級縮放</label>
+              <div class="tone-switch" role="radiogroup" aria-labelledby="text-scale-label" aria-describedby="text-scale-note">
+                <button type="button" class="tone-option" data-text-scale-option="sm" role="radio" aria-checked="false" tabindex="-1">緊湊</button>
+                <button type="button" class="tone-option active" data-text-scale-option="md" role="radio" aria-checked="true" tabindex="0">標準</button>
+                <button type="button" class="tone-option" data-text-scale-option="lg" role="radio" aria-checked="false" tabindex="-1">放大</button>
+              </div>
+              <span class="control-note" id="text-scale-note">整頁文字會同步縮放；上方控制與地圖標籤都會一起調整。</span>
             </div>
           </div>
-          <div class="status-card" id="update-status"></div>
         </section>
 
-        <div class="operations-grid">
-          <article class="info-card" id="diagnostics-card">
-            <span class="card-title">Diagnostics</span>
-          </article>
-          <article class="info-card" id="export-card" data-share-hide>
-            <span class="card-title">Export</span>
-          </article>
-        </div>
-
-        <section class="governance-panel" data-share-hide>
-          <div class="governance-head">
-            <span class="card-title">Resolver Workspace</span>
-            <h2>Governance Layering</h2>
-            <p>在不改動任何 runtime 設定的前提下，直接檢查 `model / environment / instruction profile` 的疊代結果，並把解析報告寫回 repo 內的指定位置。</p>
-          </div>
-          <div class="control-grid">
-            <div class="control-group">
-              <label for="governance-model">治理模型</label>
-              <input id="governance-model" type="text" value="gpt-5.4" />
-            </div>
-            <div class="control-group">
-              <label for="governance-environment">工作環境</label>
-              <input id="governance-environment" type="text" value="codex-local-dev" />
-            </div>
-            <div class="control-group">
-              <label for="governance-profile">指令配置</label>
-              <input id="governance-profile" type="text" value="mapping" />
-            </div>
-            <div class="control-group">
-              <label for="governance-output-path">輸出位置</label>
-              <input id="governance-output-path" type="text" />
-            </div>
-          </div>
-          <div class="card-actions">
-            <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
-            <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
-          </div>
-          <div class="governance-result" id="governance-result">治理解析結果會顯示在這裡。</div>
-        </section>
       </div>
     </header>
 
-    <main class="layout">
-      <section class="panel">
-        <div class="panel-head">
-          <h2>Nodes</h2>
-          <div class="mini-note" id="node-count-label"></div>
+    <section class="workspace-shell">
+      <div class="workspace-chrome">
+        <div class="workspace-overview">
+          <div>
+            <span class="workspace-kicker">分頁工作區</span>
+            <h2 class="workspace-title">把超額資訊拆成可換頁的操作節點</h2>
+            <p class="workspace-copy">這一段控制總高度不要超過約兩倍視窗高。主頁只保留最常停留的巡覽核心，其餘資訊改成聚焦頁與縮小預覽卡，避免把診斷、維護、治理整段直接堆成長頁。</p>
+          </div>
+          <div class="band-note">聚焦主頁，其他頁縮成摘要。</div>
         </div>
-        <div class="sidebar" id="sidebar"></div>
-      </section>
 
-      <section class="panel map-wrap" id="map-wrap">
-        <div class="panel-head">
-          <h2>Map View</h2>
-          <div class="mini-note" id="map-mode-note"></div>
-        </div>
-        <div class="map-caption" id="map-caption"></div>
-        <svg id="map" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
-      </section>
+        <div class="workspace-controls">
+          <div class="workspace-tabs" role="tablist" aria-label="專案地圖工作區">
+            <button type="button" class="workspace-tab active" id="workspace-tab-browse" data-workspace-tab="browse" role="tab" aria-controls="workspace-panel-browse" aria-selected="true">
+              <span class="workspace-tab-step">01</span>
+              <strong>主巡覽</strong>
+              <small>節點清單、地圖、細節</small>
+            </button>
+            <button type="button" class="workspace-tab" id="workspace-tab-ops" data-workspace-tab="ops" role="tab" aria-controls="workspace-panel-ops" aria-selected="false">
+              <span class="workspace-tab-step">02</span>
+              <strong>診斷與交付</strong>
+              <small>健康度、分享輸出、交接摘要</small>
+            </button>
+            <button type="button" class="workspace-tab" id="workspace-tab-governance" data-workspace-tab="governance" role="tab" aria-controls="workspace-panel-governance" aria-selected="false">
+              <span class="workspace-tab-step">03</span>
+              <strong>維護與治理</strong>
+              <small>更新策略、治理解析、報告寫出</small>
+            </button>
+          </div>
 
-      <section class="panel">
-        <div class="panel-head">
-          <h2>Details</h2>
-          <div class="mini-note" id="detail-note"></div>
+          <div class="workspace-stepper">
+            <button type="button" class="mini-action secondary" id="workspace-prev">上一頁</button>
+            <div class="workspace-page-note" id="workspace-page-note">目前聚焦主巡覽頁。</div>
+            <button type="button" class="mini-action secondary" id="workspace-next">下一頁</button>
+          </div>
         </div>
-        <div class="detail" id="detail"></div>
-      </section>
-    </main>
+      </div>
+
+      <div class="workspace-stage" id="workspace-stage">
+        <section class="workspace-page" id="workspace-panel-browse" data-workspace-page-panel="browse" role="tabpanel" aria-labelledby="workspace-tab-browse">
+          <div class="layout">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>節點清單</h2>
+                <div class="mini-note" id="node-count-label"></div>
+              </div>
+              <div class="sidebar" id="sidebar"></div>
+            </section>
+
+            <section class="panel map-panel">
+              <div class="panel-head">
+                <h2>地圖檢視</h2>
+                <div class="panel-head-actions">
+                  <div class="mini-note" id="map-mode-note"></div>
+                  <button type="button" class="mini-action secondary map-minimap-toggle" id="map-minimap-toggle" hidden>隱藏縮圖</button>
+                </div>
+              </div>
+              <div class="map-caption" id="map-caption"></div>
+              <div class="map-stage" id="map-stage">
+                <div class="map-wrap" id="map-wrap">
+                  <svg id="map" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+                <section class="map-minimap" aria-label="地圖縮圖導覽">
+                  <div class="map-minimap-head">
+                    <span class="map-minimap-title">縮圖導覽</span>
+                    <span class="map-minimap-copy" id="map-minimap-copy">框線代表目前瀏覽區域；點擊縮圖可快速移動。</span>
+                  </div>
+                  <div class="map-minimap-frame" id="map-minimap-frame" role="button" tabindex="0" aria-label="點擊縮圖可移動地圖視窗">
+                    <svg id="map-minimap" viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+                    <div class="map-minimap-viewport" id="map-minimap-viewport"></div>
+                  </div>
+                </section>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>節點細節</h2>
+                <div class="mini-note" id="detail-note"></div>
+              </div>
+              <div class="detail" id="detail"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="workspace-page" id="workspace-panel-ops" data-workspace-page-panel="ops" role="tabpanel" aria-labelledby="workspace-tab-ops" hidden>
+          <div class="operations-grid">
+            <article class="info-card workspace-card" id="diagnostics-card">
+              <span class="card-title">診斷檢查</span>
+            </article>
+            <article class="info-card workspace-card" id="export-card" data-share-hide>
+              <span class="card-title">交付輸出</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="workspace-page" id="workspace-panel-governance" data-workspace-page-panel="governance" role="tabpanel" aria-labelledby="workspace-tab-governance" hidden>
+          <div class="workspace-page-grid governance-grid">
+            <section class="control-band secondary" id="maintenance-controls" data-share-hide>
+              <div class="band-head">
+                <div>
+                  <h2 class="band-title">維護控制</h2>
+                  <p class="band-copy">這一排只放專案目錄連結、重掃與更新策略。它是維護 `runtime/*` 對照關係的工具，不應壓過主要巡覽工作。</p>
+                </div>
+                <div class="band-note">僅在本機掃描。</div>
+              </div>
+              <div class="toolbar-row">
+                <div class="control-group">
+                  <label for="update-mode">更新模式</label>
+                  <select id="update-mode">
+                    <option value="manual">手動更新</option>
+                    <option value="on-open">開啟網頁時自動更新</option>
+                    <option value="interval">定時更新</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <label>定時頻率</label>
+                  <div class="inline-grid">
+                    <input id="interval-days" type="number" min="0" step="1" value="1" placeholder="天" />
+                    <input id="interval-hours" type="number" min="0" step="1" value="0" placeholder="時" />
+                    <input id="interval-minutes" type="number" min="0" step="1" value="0" placeholder="分" />
+                  </div>
+                </div>
+                <div class="button-row">
+                  <button class="action secondary" id="link-repo">連結專案目錄</button>
+                  <button class="action" id="refresh-now">立即更新</button>
+                </div>
+              </div>
+              <div class="status-card" id="update-status"></div>
+            </section>
+
+            <section class="governance-panel">
+              <div class="governance-head">
+                <span class="card-title">治理解析工作區</span>
+                <h2>治理層疊解析</h2>
+                <p>在不改動任何執行面設定的前提下，直接檢查治理模型、工作環境與指令配置的層疊結果，並把解析報告寫回專案目錄內的指定位置。</p>
+              </div>
+              <div class="control-grid">
+                <div class="control-group">
+                  <label for="governance-model">治理模型</label>
+                  <select id="governance-model">
+                    <option value="gpt-5.4">gpt-5.4</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <label for="governance-environment">工作環境</label>
+                  <select id="governance-environment">
+                    <option value="codex-local-dev">codex-local-dev</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <label for="governance-profile">指令配置</label>
+                  <select id="governance-profile">
+                    <option value="mapping">mapping</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <label for="governance-output-path">輸出位置</label>
+                  <input id="governance-output-path" type="text" />
+                </div>
+              </div>
+              <div class="card-actions">
+                <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
+                <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
+              </div>
+              <div class="governance-source-note" id="governance-source-note"></div>
+              <div class="governance-result" id="governance-result">治理解析結果會顯示在這裡。</div>
+            </section>
+          </div>
+        </section>
+      </div>
+
+      <div class="workspace-preview-rail" aria-label="其他工作區預覽">
+        <button type="button" class="workspace-preview-card active" data-workspace-preview="browse">
+          <span class="workspace-preview-index">01 / 主頁</span>
+          <strong>主巡覽</strong>
+          <p>長時間停留在這裡讀節點清單、地圖關係與右側細節。</p>
+        </button>
+        <button type="button" class="workspace-preview-card" data-workspace-preview="ops">
+          <span class="workspace-preview-index">02 / 診斷頁</span>
+          <strong>診斷與交付</strong>
+          <p>先看健康度，再決定是否需要分享輸出或複製交接摘要。</p>
+        </button>
+        <button type="button" class="workspace-preview-card" data-workspace-preview="governance">
+          <span class="workspace-preview-index">03 / 治理頁</span>
+          <strong>維護與治理</strong>
+          <p>把更新策略與治理解析留在獨立頁，只有需要時才切入。</p>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="tour-layer" id="tour-layer" hidden aria-hidden="true">
+    <div class="tour-backdrop" id="tour-backdrop"></div>
+    <div class="tour-spotlight" id="tour-spotlight"></div>
+    <section class="tour-card" id="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title">
+      <div class="tour-card-head">
+        <span class="tour-step-label" id="tour-step-label">Step</span>
+        <button type="button" class="tour-close" id="tour-close" aria-label="關閉導覽">×</button>
+      </div>
+      <h2 class="tour-title" id="tour-title">導覽</h2>
+      <div class="tour-body" id="tour-body"></div>
+      <div class="tour-meta" id="tour-meta"></div>
+      <div class="tour-actions">
+        <button type="button" class="mini-action" id="tour-skip">稍後再看</button>
+        <div class="tour-actions-group">
+          <button type="button" class="mini-action" id="tour-prev">上一步</button>
+          <button type="button" class="mini-action secondary" id="tour-next">下一步</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>

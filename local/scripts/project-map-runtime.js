@@ -1,24 +1,37 @@
 (() => {
   const INITIAL_DATA = window.PROJECT_MAP_BOOTSTRAP;
   const PAGE_MODE = window.PROJECT_MAP_PAGE_MODE || "interactive";
-  const PAGE_CAPABILITIES = INITIAL_DATA?.capabilities || {
-    browser_scan: PAGE_MODE === "interactive",
-    governance_resolver: PAGE_MODE === "interactive",
-    native_repo_paths: PAGE_MODE === "interactive",
-  };
-  const GOVERNANCE_ENABLED = Boolean(PAGE_CAPABILITIES.governance_resolver);
-  const NATIVE_REPO_PATHS_ENABLED = Boolean(PAGE_CAPABILITIES.native_repo_paths);
   const { TYPE_ORDER, CORE_DOCS, ROOT_DIRECTORIES, REPO_MARKERS } = window.PROJECT_MAP_CONSTANTS;
-  const TYPE_LABELS = { doc: "Docs", directory: "Directories", skill: "Skills", mcp: "MCP", agent: "Agents", workflow: "Workflow" };
-  const TYPE_STYLES = {
-    doc: { fill: "#f6e7bc", stroke: "#b7882a", badge: "#ead8a7" },
-    directory: { fill: "#deece4", stroke: "#5e8775", badge: "#cfe0d8" },
-    skill: { fill: "#dfe6f2", stroke: "#667da4", badge: "#d0d9e8" },
-    mcp: { fill: "#e8e0ec", stroke: "#7f6a8e", badge: "#ddd0e5" },
-    agent: { fill: "#efddd2", stroke: "#ab6b51", badge: "#e6cfbf" },
-    workflow: { fill: "#dfe7d7", stroke: "#6f8760", badge: "#d3ddc9" },
+  const TYPE_LABELS = {
+    doc: "文件",
+    directory: "根目錄",
+    runtime: "執行面",
+    skill: "技能註冊",
+    mcp: "MCP 註冊",
+    agent: "代理註冊",
+    workflow: "流程註冊",
   };
-  const EDGE_LABELS = { contains: "Contains", references: "References", catalog_entry: "Catalog", maps_to: "Maps To" };
+  const QUICK_FILTER_SPECS = [
+    { kind: "type", value: "agent", label: "代理註冊", colorVar: "--type-agent-fill", colorFallback: "#efddd3" },
+    { kind: "type", value: "directory", label: "根目錄", colorVar: "--type-directory-fill", colorFallback: "#dce9e1" },
+    { kind: "type", value: "doc", label: "文件", colorVar: "--type-doc-fill", colorFallback: "#f3e6bf" },
+    { kind: "type", value: "mcp", label: "MCP 註冊", colorVar: "--type-mcp-fill", colorFallback: "#e7deeb" },
+    { kind: "type", value: "runtime", label: "執行面", colorVar: "--type-runtime-fill", colorFallback: "#d9ebef" },
+    { kind: "type", value: "skill", label: "技能註冊", colorVar: "--type-skill-fill", colorFallback: "#dee4ef" },
+    { kind: "type", value: "workflow", label: "流程註冊", colorVar: "--type-workflow-fill", colorFallback: "#dce5d4" },
+    { kind: "diagnostic", value: "broken-source", label: "失效引用", colorFallback: "#f3d9a0" },
+    { kind: "diagnostic", value: "orphan", label: "孤立資源", colorFallback: "#edd3a5" },
+  ];
+  const TYPE_STYLE_FALLBACKS = {
+    doc: { fill: "#f3e6bf", stroke: "#b28a44", badge: "#eadbb0" },
+    directory: { fill: "#dce9e1", stroke: "#5d8370", badge: "#d0dfd6" },
+    runtime: { fill: "#d9ebef", stroke: "#3c7f8f", badge: "#cfe2e7" },
+    skill: { fill: "#dee4ef", stroke: "#667da4", badge: "#d4dbea" },
+    mcp: { fill: "#e7deeb", stroke: "#806b8f", badge: "#ddd1e4" },
+    agent: { fill: "#efddd3", stroke: "#aa6b52", badge: "#e6d0c2" },
+    workflow: { fill: "#dce5d4", stroke: "#6d8660", badge: "#d2dcc8" },
+  };
+  const EDGE_LABELS = { contains: "包含", references: "引用", catalog_entry: "目錄對應", maps_to: "正式來源對應" };
   const EDGE_STYLES = {
     contains: { stroke: "#c4b89e", width: 1.05, opacity: 0.42, dash: "" },
     references: { stroke: "#2563eb", width: 1.6, opacity: 0.75, dash: "5 5" },
@@ -26,24 +39,55 @@
     maps_to: { stroke: "#ca8a04", width: 1.8, opacity: 0.8, dash: "7 4" },
   };
   const MAP_MODES = new Set(["grid", "radial"]);
+  const VISUAL_TONE_ORDER = ["mono", "muted", "vivid"];
+  const VISUAL_TONES = new Set(VISUAL_TONE_ORDER);
+  const VISUAL_THEME_ORDER = ["light", "dark"];
+  const VISUAL_THEMES = new Set(VISUAL_THEME_ORDER);
+  const TEXT_SCALE_ORDER = ["sm", "md", "lg"];
+  const TEXT_SCALES = new Set(TEXT_SCALE_ORDER);
+  const TEXT_SCALE_FACTORS = { sm: 0.92, md: 1, lg: 1.08 };
   const SETTINGS_KEY = "unitext-project-map-settings-v2";
+  const TOUR_STORAGE_KEY = "unitext-project-map-tour-v1";
   const HANDLE_DB_NAME = "unitext-project-map-db";
   const HANDLE_STORE = "handles";
   const HANDLE_KEY = "repo-root";
   const STRUCTURAL_EDGE_KINDS = new Set(["contains"]);
+  const DEFAULT_NODE_IDS = ["doc:RUNTIME.md", "doc:runtime/START.md", "doc:INDEX.md"];
+  const WORKSPACE_PAGES = [
+    {
+      id: "browse",
+      label: "主巡覽",
+      note: "聚焦節點清單、地圖與細節，保留最短閱讀主線。",
+    },
+    {
+      id: "ops",
+      label: "診斷與交付",
+      note: "集中查看健康度、分享輸出與交接摘要。",
+    },
+    {
+      id: "governance",
+      label: "維護與治理",
+      note: "把更新策略、治理解析與報告寫出拆到獨立工作頁。",
+    },
+  ];
+  const WORKSPACE_PAGE_IDS = new Set(WORKSPACE_PAGES.map((page) => page.id));
 
   let DATA = JSON.parse(JSON.stringify(INITIAL_DATA));
   let nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
+  const pickDefaultNodeId = (lookup) => DEFAULT_NODE_IDS.find((id) => lookup.has(id)) || DATA.nodes?.[0]?.id || null;
   const state = {
     search: "",
     type: "all",
     diagnosticsFilter: "all",
     mapMode: "grid",
+    visualTone: "muted",
+    visualTheme: "light",
+    textScale: "md",
     updateMode: "manual",
     intervalDays: 1,
     intervalHours: 0,
     intervalMinutes: 0,
-    selectedId: nodeById.has("doc:INDEX.md") ? "doc:INDEX.md" : DATA.nodes?.[0]?.id ?? null,
+    selectedId: pickDefaultNodeId(nodeById),
     repoHandle: null,
     repoHandleName: null,
     refreshInFlight: false,
@@ -53,17 +97,41 @@
     lastRefreshSource: "bootstrap",
     lastRefreshState: "idle",
     lastRefreshMessage: "目前顯示的是最近一次靜態產出的 MAP。",
-    browserCanScan: Boolean(PAGE_CAPABILITIES.browser_scan) && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
+    browserCanScan: PAGE_MODE === "interactive" && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
+    workspacePage: "browse",
+    workspaceEngaged: false,
+    mastheadCompact: false,
+    lastMapLayout: null,
+    minimapFramePending: false,
+    minimapEligible: false,
+    minimapDismissed: false,
+    tourOpen: false,
+    tourStepIndex: 0,
+    tourSteps: [],
+    tourAutoStarted: false,
+    activeTourTarget: null,
   };
 
   const summaryEl = document.getElementById("summary");
+  const mastheadEl = document.querySelector(".masthead");
+  const mastheadQuickFiltersEl = document.getElementById("masthead-quick-filters");
+  const workspaceShellEl = document.querySelector(".workspace-shell");
   const sidebarEl = document.getElementById("sidebar");
   const detailEl = document.getElementById("detail");
   const mapEl = document.getElementById("map");
   const mapWrapEl = document.getElementById("map-wrap");
+  const mapStageEl = document.getElementById("map-stage");
+  const mapMinimapEl = document.getElementById("map-minimap");
+  const mapMinimapFrameEl = document.getElementById("map-minimap-frame");
+  const mapMinimapViewportEl = document.getElementById("map-minimap-viewport");
+  const mapMinimapCopyEl = document.getElementById("map-minimap-copy");
+  const mapMinimapToggleEl = document.getElementById("map-minimap-toggle");
   const searchEl = document.getElementById("search");
   const typeFilterEl = document.getElementById("type-filter");
   const mapModeEl = document.getElementById("map-mode");
+  const visualToneOptionEls = Array.from(document.querySelectorAll("[data-visual-tone-option]"));
+  const visualThemeOptionEls = Array.from(document.querySelectorAll("[data-visual-theme-option]"));
+  const textScaleOptionEls = Array.from(document.querySelectorAll("[data-text-scale-option]"));
   const updateModeEl = document.getElementById("update-mode");
   const intervalDaysEl = document.getElementById("interval-days");
   const intervalHoursEl = document.getElementById("interval-hours");
@@ -80,10 +148,30 @@
   const governanceResolveEl = document.getElementById("governance-resolve");
   const governanceWriteEl = document.getElementById("governance-write");
   const governanceResultEl = document.getElementById("governance-result");
+  const governanceSourceNoteEl = document.getElementById("governance-source-note");
   const nodeCountLabelEl = document.getElementById("node-count-label");
   const mapModeNoteEl = document.getElementById("map-mode-note");
   const mapCaptionEl = document.getElementById("map-caption");
   const detailNoteEl = document.getElementById("detail-note");
+  const workspaceTabs = Array.from(document.querySelectorAll("[data-workspace-tab]"));
+  const workspacePanels = Array.from(document.querySelectorAll("[data-workspace-page-panel]"));
+  const workspacePreviewCards = Array.from(document.querySelectorAll("[data-workspace-preview]"));
+  const workspacePrevEl = document.getElementById("workspace-prev");
+  const workspaceNextEl = document.getElementById("workspace-next");
+  const workspacePageNoteEl = document.getElementById("workspace-page-note");
+  const tourStartEl = document.getElementById("tour-start");
+  const tourLayerEl = document.getElementById("tour-layer");
+  const tourBackdropEl = document.getElementById("tour-backdrop");
+  const tourSpotlightEl = document.getElementById("tour-spotlight");
+  const tourCardEl = document.getElementById("tour-card");
+  const tourStepLabelEl = document.getElementById("tour-step-label");
+  const tourTitleEl = document.getElementById("tour-title");
+  const tourBodyEl = document.getElementById("tour-body");
+  const tourMetaEl = document.getElementById("tour-meta");
+  const tourPrevEl = document.getElementById("tour-prev");
+  const tourNextEl = document.getElementById("tour-next");
+  const tourSkipEl = document.getElementById("tour-skip");
+  const tourCloseEl = document.getElementById("tour-close");
 
   const cloneData = (data) => JSON.parse(JSON.stringify(data));
   const escapeHtml = (text) => String(text)
@@ -91,6 +179,63 @@
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+  const cssVar = (name, fallback) => {
+    const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+    return value || fallback;
+  };
+  const normalizeLegacyTone = (value) => {
+    const normalized = String(value || "").trim();
+    if (VISUAL_TONES.has(normalized)) return normalized;
+    if (["balanced", "bright", "dense"].includes(normalized)) return "muted";
+    return "";
+  };
+  const normalizeTheme = (value) => {
+    const normalized = String(value || "").trim();
+    return VISUAL_THEMES.has(normalized) ? normalized : "";
+  };
+  const normalizeTextScale = (value) => {
+    const normalized = String(value || "").trim();
+    return TEXT_SCALES.has(normalized) ? normalized : "";
+  };
+  const getTypeStylesTheme = () => ({
+    doc: {
+      fill: cssVar("--type-doc-fill", TYPE_STYLE_FALLBACKS.doc.fill),
+      stroke: cssVar("--type-doc-stroke", TYPE_STYLE_FALLBACKS.doc.stroke),
+      badge: cssVar("--type-doc-badge", TYPE_STYLE_FALLBACKS.doc.badge),
+    },
+    directory: {
+      fill: cssVar("--type-directory-fill", TYPE_STYLE_FALLBACKS.directory.fill),
+      stroke: cssVar("--type-directory-stroke", TYPE_STYLE_FALLBACKS.directory.stroke),
+      badge: cssVar("--type-directory-badge", TYPE_STYLE_FALLBACKS.directory.badge),
+    },
+    runtime: {
+      fill: cssVar("--type-runtime-fill", TYPE_STYLE_FALLBACKS.runtime.fill),
+      stroke: cssVar("--type-runtime-stroke", TYPE_STYLE_FALLBACKS.runtime.stroke),
+      badge: cssVar("--type-runtime-badge", TYPE_STYLE_FALLBACKS.runtime.badge),
+    },
+    skill: {
+      fill: cssVar("--type-skill-fill", TYPE_STYLE_FALLBACKS.skill.fill),
+      stroke: cssVar("--type-skill-stroke", TYPE_STYLE_FALLBACKS.skill.stroke),
+      badge: cssVar("--type-skill-badge", TYPE_STYLE_FALLBACKS.skill.badge),
+    },
+    mcp: {
+      fill: cssVar("--type-mcp-fill", TYPE_STYLE_FALLBACKS.mcp.fill),
+      stroke: cssVar("--type-mcp-stroke", TYPE_STYLE_FALLBACKS.mcp.stroke),
+      badge: cssVar("--type-mcp-badge", TYPE_STYLE_FALLBACKS.mcp.badge),
+    },
+    agent: {
+      fill: cssVar("--type-agent-fill", TYPE_STYLE_FALLBACKS.agent.fill),
+      stroke: cssVar("--type-agent-stroke", TYPE_STYLE_FALLBACKS.agent.stroke),
+      badge: cssVar("--type-agent-badge", TYPE_STYLE_FALLBACKS.agent.badge),
+    },
+    workflow: {
+      fill: cssVar("--type-workflow-fill", TYPE_STYLE_FALLBACKS.workflow.fill),
+      stroke: cssVar("--type-workflow-stroke", TYPE_STYLE_FALLBACKS.workflow.stroke),
+      badge: cssVar("--type-workflow-badge", TYPE_STYLE_FALLBACKS.workflow.badge),
+    },
+  });
+  const getTextScaleFactor = () => TEXT_SCALE_FACTORS[state.textScale] || TEXT_SCALE_FACTORS.md;
+  const formatSvgFontSize = (size) => Number(size * getTextScaleFactor()).toFixed(1).replace(/\.0$/, "");
   async function copyText(text) {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);
@@ -108,43 +253,603 @@
     return copied;
   }
 
+  function syncMastheadCompactState() {
+    if (!mastheadEl || !workspaceShellEl) return;
+    const workspaceTop = workspaceShellEl.getBoundingClientRect().top;
+    if (window.scrollY < 8 && workspaceTop > 148 && (!mapWrapEl || (mapWrapEl.scrollLeft <= 12 && mapWrapEl.scrollTop <= 12))) {
+      state.workspaceEngaged = false;
+    }
+    const tourTargetInMasthead = Boolean(state.tourOpen && state.activeTourTarget && mastheadEl.contains(state.activeTourTarget));
+    const baseCompact = state.workspaceEngaged || window.scrollY > 18 || workspaceTop <= 116 || (mapWrapEl && (mapWrapEl.scrollLeft > 12 || mapWrapEl.scrollTop > 12));
+    const shouldCompact = baseCompact && !tourTargetInMasthead;
+    state.mastheadCompact = shouldCompact;
+    document.body.classList.toggle("masthead-compact", shouldCompact);
+  }
+
+  function getMinimapMetrics() {
+    if (!mapWrapEl || !mapMinimapFrameEl) return null;
+    const contentWidth = Math.max(mapWrapEl.scrollWidth, state.lastMapLayout?.width || 0);
+    const contentHeight = Math.max(mapWrapEl.scrollHeight, state.lastMapLayout?.height || 0);
+    const frameWidth = mapMinimapFrameEl.clientWidth;
+    const frameHeight = mapMinimapFrameEl.clientHeight;
+    if (!contentWidth || !contentHeight || !frameWidth || !frameHeight) return null;
+
+    const widthRatio = contentWidth / Math.max(mapWrapEl.clientWidth, 1);
+    const heightRatio = contentHeight / Math.max(mapWrapEl.clientHeight, 1);
+    const scale = Math.min(frameWidth / contentWidth, frameHeight / contentHeight);
+    const renderedWidth = contentWidth * scale;
+    const renderedHeight = contentHeight * scale;
+    const offsetX = (frameWidth - renderedWidth) / 2;
+    const offsetY = (frameHeight - renderedHeight) / 2;
+    return {
+      contentWidth,
+      contentHeight,
+      frameWidth,
+      frameHeight,
+      widthRatio,
+      heightRatio,
+      scale,
+      renderedWidth,
+      renderedHeight,
+      offsetX,
+      offsetY,
+    };
+  }
+
+  function syncMinimapVisibility(metrics = getMinimapMetrics()) {
+    if (!mapStageEl || !mapMinimapToggleEl || !mapMinimapFrameEl || !metrics) return;
+    const eligible = metrics.heightRatio > 2;
+    state.minimapEligible = eligible;
+    mapStageEl.classList.toggle("minimap-eligible", eligible);
+    mapStageEl.classList.toggle("minimap-hidden", eligible && state.minimapDismissed);
+    mapMinimapToggleEl.hidden = !eligible;
+    if (!eligible) {
+      mapMinimapToggleEl.disabled = true;
+      mapMinimapToggleEl.textContent = "縮圖未啟用";
+      mapMinimapToggleEl.setAttribute("aria-pressed", "false");
+      mapMinimapFrameEl.tabIndex = -1;
+      if (mapMinimapCopyEl) {
+        mapMinimapCopyEl.textContent = "只有圖面高度相對目前視窗超過 2 倍時，才會顯示縮圖導覽。";
+      }
+      return;
+    }
+    mapMinimapToggleEl.disabled = false;
+    mapMinimapToggleEl.textContent = state.minimapDismissed ? "顯示縮圖" : "隱藏縮圖";
+    mapMinimapToggleEl.setAttribute("aria-pressed", state.minimapDismissed ? "false" : "true");
+    mapMinimapFrameEl.tabIndex = state.minimapDismissed ? -1 : 0;
+  }
+
+  function updateMinimapViewport() {
+    if (!mapWrapEl || !mapMinimapFrameEl || !mapMinimapViewportEl) return;
+    const metrics = getMinimapMetrics();
+    if (!metrics) return;
+    syncMinimapVisibility(metrics);
+    if (!state.minimapEligible || state.minimapDismissed) return;
+
+    const viewportWidth = Math.max(14, mapWrapEl.clientWidth * metrics.scale);
+    const viewportHeight = Math.max(12, mapWrapEl.clientHeight * metrics.scale);
+    const maxLeft = Math.max(metrics.offsetX, metrics.offsetX + metrics.renderedWidth - viewportWidth);
+    const maxTop = Math.max(metrics.offsetY, metrics.offsetY + metrics.renderedHeight - viewportHeight);
+    const left = clamp(metrics.offsetX + (mapWrapEl.scrollLeft * metrics.scale), metrics.offsetX, maxLeft);
+    const top = clamp(metrics.offsetY + (mapWrapEl.scrollTop * metrics.scale), metrics.offsetY, maxTop);
+
+    mapMinimapViewportEl.style.width = `${viewportWidth}px`;
+    mapMinimapViewportEl.style.height = `${viewportHeight}px`;
+    mapMinimapViewportEl.style.left = `${left}px`;
+    mapMinimapViewportEl.style.top = `${top}px`;
+
+    if (mapMinimapCopyEl) {
+      const horizontalCenter = Math.round(((mapWrapEl.scrollLeft + (mapWrapEl.clientWidth / 2)) / metrics.contentWidth) * 100);
+      const verticalCenter = Math.round(((mapWrapEl.scrollTop + (mapWrapEl.clientHeight / 2)) / metrics.contentHeight) * 100);
+      mapMinimapCopyEl.textContent = `維持等比例縮小；只在圖面高度超過目前視窗 2 倍時顯示。現在焦點約在寬度 ${horizontalCenter}% / 高度 ${verticalCenter}% 。`;
+    }
+  }
+
+  function scheduleMinimapViewportUpdate() {
+    if (state.minimapFramePending) return;
+    state.minimapFramePending = true;
+    requestAnimationFrame(() => {
+      state.minimapFramePending = false;
+      updateMinimapViewport();
+      syncMastheadCompactState();
+    });
+  }
+
+  function jumpMapViewportFromMinimap(clientX, clientY) {
+    if (!mapWrapEl || !mapMinimapFrameEl) return;
+    const rect = mapMinimapFrameEl.getBoundingClientRect();
+    const metrics = getMinimapMetrics();
+    if (!metrics || !state.minimapEligible || state.minimapDismissed) return;
+    const ratioX = clamp((clientX - rect.left - metrics.offsetX) / Math.max(metrics.renderedWidth, 1), 0, 1);
+    const ratioY = clamp((clientY - rect.top - metrics.offsetY) / Math.max(metrics.renderedHeight, 1), 0, 1);
+    const targetLeft = clamp((ratioX * metrics.contentWidth) - (mapWrapEl.clientWidth / 2), 0, Math.max(0, metrics.contentWidth - mapWrapEl.clientWidth));
+    const targetTop = clamp((ratioY * metrics.contentHeight) - (mapWrapEl.clientHeight / 2), 0, Math.max(0, metrics.contentHeight - mapWrapEl.clientHeight));
+    mapWrapEl.scrollTo({
+      left: targetLeft,
+      top: targetTop,
+      behavior: "smooth",
+    });
+    scheduleMinimapViewportUpdate();
+  }
+
+  function toggleMinimapVisibility() {
+    if (!state.minimapEligible) return;
+    state.minimapDismissed = !state.minimapDismissed;
+    syncMinimapVisibility();
+    if (!state.minimapDismissed) {
+      scheduleMinimapViewportUpdate();
+      mapMinimapFrameEl?.focus();
+    }
+  }
+
+  function getWorkspacePage(pageId = state.workspacePage) {
+    return WORKSPACE_PAGES.find((page) => page.id === pageId) || WORKSPACE_PAGES[0];
+  }
+
+  function syncWorkspacePages() {
+    const activePage = getWorkspacePage();
+    const activeIndex = WORKSPACE_PAGES.findIndex((page) => page.id === activePage.id);
+    workspaceTabs.forEach((button) => {
+      const isActive = button.dataset.workspaceTab === activePage.id;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+      button.tabIndex = isActive ? 0 : -1;
+    });
+    workspacePanels.forEach((panel) => {
+      panel.hidden = panel.dataset.workspacePagePanel !== activePage.id;
+    });
+    workspacePreviewCards.forEach((card) => {
+      card.classList.toggle("active", card.dataset.workspacePreview === activePage.id);
+    });
+    if (workspacePageNoteEl) {
+      workspacePageNoteEl.textContent = `目前聚焦：${activePage.label}。${activePage.note}`;
+    }
+    if (workspacePrevEl) workspacePrevEl.disabled = activeIndex <= 0;
+    if (workspaceNextEl) workspaceNextEl.disabled = activeIndex >= WORKSPACE_PAGES.length - 1;
+  }
+
+  function setWorkspacePage(pageId, options = {}) {
+    if (!WORKSPACE_PAGE_IDS.has(pageId)) return;
+    const changed = state.workspacePage !== pageId;
+    state.workspacePage = pageId;
+    syncWorkspacePages();
+    if ((changed || options.forceSync) && options.persist !== false) {
+      saveSettings();
+    }
+    if (changed && state.tourOpen && options.updateTour !== false) {
+      requestAnimationFrame(() => updateTourLayout());
+    }
+    scheduleMinimapViewportUpdate();
+    syncMastheadCompactState();
+  }
+
+  function moveWorkspacePage(delta) {
+    const currentIndex = WORKSPACE_PAGES.findIndex((page) => page.id === state.workspacePage);
+    const nextPage = WORKSPACE_PAGES[currentIndex + delta];
+    if (!nextPage) return;
+    setWorkspacePage(nextPage.id);
+  }
+
+  function hasSeenTour() {
+    try {
+      return localStorage.getItem(TOUR_STORAGE_KEY) === "seen";
+    } catch {
+      return false;
+    }
+  }
+
+  function markTourSeen() {
+    try {
+      localStorage.setItem(TOUR_STORAGE_KEY, "seen");
+    } catch {
+      // Ignore storage failures and keep the tour manually accessible.
+    }
+    if (tourStartEl) tourStartEl.textContent = "重新導覽";
+  }
+
+  function isElementVisible(element) {
+    if (!element) return false;
+    if (!element.getClientRects().length) return false;
+    const style = window.getComputedStyle(element);
+    return style.display !== "none" && style.visibility !== "hidden";
+  }
+
+  function getTourSteps() {
+    const baseSteps = [
+      {
+        id: "overview",
+        selector: ".masthead",
+        page: "browse",
+        title: "先用執行面優先的方式看整張圖",
+        body: [
+          "本控制台不單純是從 `registry/*` 開始依序閱讀的工具，而是先協助你掌握 `runtime/*` 目前實際作用在操作面的狀態。",
+          "建議讀法是先掃過首頁摘要與主控制區，再看節點清單、地圖檢視、節點細節三區如何互相對照。",
+        ],
+        meta: ["如果你是第一次接手，先走完這份導覽，再開始自由巡覽，理解成本會低很多。"],
+      },
+      {
+        id: "search",
+        selector: "#search",
+        page: "browse",
+        title: "用搜尋先縮小問題範圍",
+        body: [
+          "搜尋會同時比對節點名稱、描述與路徑。你可以直接打 `runtime/skills`、`catalog`、`governance` 這類關鍵詞。",
+          "當你只知道執行面的名稱，卻還不確定正式來源在哪裡時，先搜 `runtime/*` 名稱，再沿著對應關係往下追最有效。",
+        ],
+        meta: ["搜尋是最快的入口，尤其適合交接、排錯，或比對某個技能、代理、流程是否已經投影到執行面。"],
+      },
+      {
+        id: "primary-controls",
+        selector: ".control-band.primary",
+        page: "browse",
+        title: "先篩類型，再決定地圖視角",
+        body: [
+          "類型篩選可以把視野先縮成執行面、技能註冊、文件等單一層面。",
+          "地圖視角決定你是用欄式閱讀結構，還是用圓形閱讀關聯。欄式適合盤點，圓形適合追單點關係。",
+        ],
+        meta: ["實務上，先切到執行面，再逐步加回註冊類型，最容易看出目前投影結果與正式來源之間是否有落差。"],
+      },
+      {
+        id: "sidebar",
+        selector: "#sidebar",
+        page: "browse",
+        title: "左欄是可快速切換的節點清單",
+        body: [
+          "這裡會列出目前符合搜尋與篩選條件的節點，適合快速切換檢查不同的執行面投影或核心文件。",
+          "清單與地圖是同步的，從左欄進入通常比直接在地圖上找點更快。",
+        ],
+        meta: ["當節點很多時，先從左欄選定一個起點，再讓中間地圖與右欄細節跟著聚焦。"],
+      },
+      {
+        id: "map",
+        selector: "#map-wrap",
+        page: "browse",
+        title: "中間地圖負責回答『它和誰相連』",
+        body: [
+          "地圖會把 `contains`、`catalog_entry`、`maps_to`、`references` 這些關係畫出來，讓你知道執行面節點是從哪裡投影而來。",
+          "你可以把它當成拓樸圖，而不是文件目錄。真正的價值是追關係，而不是只看清單。",
+        ],
+        meta: ["若你想確認某個執行面技能是否真的對回正式來源，請特別看「正式來源對應」與「目錄對應」這兩種邊。"],
+      },
+      {
+        id: "detail",
+        selector: "#detail",
+        page: "browse",
+        title: "右欄細節面板負責回答『這個點到底代表什麼』",
+        body: [
+          "選到任何節點後，右欄會給你描述、路徑、來源與相關邊。這裡是整理交接前最後確認語義的地方。",
+          "如果你要寫報告或交接，先在這裡確認路徑、類型、連結對象都合理，再輸出內容。",
+        ],
+        meta: ["這一欄適合做最終驗證，避免只憑名稱就誤判某個執行面節點真正對應的正式來源。"],
+      },
+      {
+        id: "operations",
+        selector: ".operations-grid",
+        page: "ops",
+        title: "操作區塊用來看健康度與交付結果",
+        body: [
+          "診斷檢查會提示目前地圖是否有缺漏、漂移或結構異常。交付輸出則提供交接相關輸出，方便你把當前理解轉成可交付結果。",
+          "日常巡覽時先看診斷檢查，有明顯落差再回去查 `runtime/*` 與 `registry/*` 的對映。",
+        ],
+        meta: ["如果你只是要快速熟悉專案，先把診斷檢查看過一次，就能知道整張圖是否值得信任。"],
+      },
+      {
+        id: "maintenance",
+        selector: "#maintenance-controls",
+        page: "governance",
+        title: "互動版可以直接重掃專案並更新對照結果",
+        body: [
+          "維護控制只在互動版顯示。這裡可以連結本機專案目錄、設定自動更新模式，或立即重新掃描目前工作樹。",
+          "當你改了 `runtime/catalog.json`、`registry/*` 文件或治理相關檔案，這一區就是重新同步畫面的入口。",
+        ],
+        meta: ["這一區是維護工具，不是主要閱讀入口。先理解結構，再決定是否需要重掃。"],
+      },
+      {
+        id: "governance",
+        selector: ".governance-panel",
+        page: "governance",
+        title: "治理解析區塊負責把理解轉成可交接報告",
+        body: [
+          "治理層疊解析會依目前模型、環境與設定組合出實際生效的治理結果，並能把結果寫回專案目錄內指定位置。",
+          "當你要交接控制台、確認指令層疊，或追查某個規則到底從哪一層來，最後再看這裡。",
+        ],
+        meta: ["這是從『看懂』轉到『可交付』的最後一步，所以放在導覽尾端。"],
+      },
+    ];
+
+    return baseSteps.filter((step) => {
+      if (step.id === "maintenance" && PAGE_MODE !== "interactive") return false;
+      return Boolean(document.querySelector(step.selector));
+    });
+  }
+
+  function clearTourTargetHighlight() {
+    if (!state.activeTourTarget) return;
+    state.activeTourTarget.classList.remove("tour-target-active");
+    state.activeTourTarget = null;
+  }
+
+  function getCurrentTourStep() {
+    return state.tourSteps[state.tourStepIndex] || null;
+  }
+
+  function shouldUseStackedTourLayout(targetRect) {
+    if (!targetRect) return window.innerWidth <= 980;
+    const viewportRatio = window.innerWidth / Math.max(window.innerHeight, 1);
+    const estimatedFloatingWidth = clamp(Math.min(380, window.innerWidth - 32), 280, window.innerWidth - 24);
+    const sideRoom = Math.max(targetRect.left - 24, window.innerWidth - targetRect.right - 24);
+    if (window.innerWidth <= 980) return true;
+    if (viewportRatio < 1.16) return true;
+    if (sideRoom < estimatedFloatingWidth && window.innerWidth < 1280) return true;
+    return false;
+  }
+
+  function updateTourLayout({ scrollTarget = false } = {}) {
+    if (!state.tourOpen || !tourCardEl || !tourSpotlightEl || !tourLayerEl) return;
+    const step = getCurrentTourStep();
+    if (step?.page) {
+      setWorkspacePage(step.page, { persist: false, updateTour: false });
+    }
+    const target = step ? document.querySelector(step.selector) : null;
+    if (!step || !isElementVisible(target)) {
+      finishTour({ markSeen: false });
+      return;
+    }
+
+    clearTourTargetHighlight();
+    state.activeTourTarget = target;
+    target.classList.add("tour-target-active");
+    syncMastheadCompactState();
+    const initialRect = target.getBoundingClientRect();
+    const useStackedLayout = shouldUseStackedTourLayout(initialRect);
+    if (scrollTarget) {
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: useStackedLayout ? "start" : "center",
+        inline: "nearest",
+      });
+    }
+
+    const rect = target.getBoundingClientRect();
+    const layoutMode = shouldUseStackedTourLayout(rect) ? "stacked" : "floating";
+    tourLayerEl.dataset.layout = layoutMode;
+
+    const floatingWidth = clamp(Math.min(380, window.innerWidth - 32), 280, window.innerWidth - 24);
+    const stackedWidth = clamp(Math.min(680, window.innerWidth - 24), 300, window.innerWidth - 20);
+    const cardWidth = layoutMode === "stacked" ? stackedWidth : floatingWidth;
+    tourCardEl.style.width = `${cardWidth}px`;
+    tourCardEl.style.maxHeight = layoutMode === "stacked"
+      ? `${Math.max(240, Math.min(window.innerHeight - 20, Math.round(window.innerHeight * 0.52)))}px`
+      : `${Math.max(240, window.innerHeight - 32)}px`;
+    const cardRect = tourCardEl.getBoundingClientRect();
+
+    const pad = 14;
+    let cardLeft = 16;
+    let cardTop = 16;
+    let spotlightBottomLimit = window.innerHeight - 10;
+
+    if (layoutMode === "stacked") {
+      cardLeft = clamp((window.innerWidth - cardRect.width) / 2, 10, window.innerWidth - cardRect.width - 10);
+      cardTop = Math.max(10, window.innerHeight - cardRect.height - 10);
+      spotlightBottomLimit = Math.max(96, cardTop - 16);
+    } else {
+      cardLeft = rect.right + 24;
+      if (cardLeft + cardRect.width > window.innerWidth - 16) {
+        cardLeft = rect.left - cardRect.width - 24;
+      }
+      if (cardLeft < 16) {
+        cardLeft = clamp(rect.left, 16, window.innerWidth - cardRect.width - 16);
+      }
+
+      cardTop = rect.top;
+      if (cardTop + cardRect.height > window.innerHeight - 16) {
+        cardTop = window.innerHeight - cardRect.height - 16;
+      }
+      if (cardTop < 16) {
+        cardTop = 16;
+      }
+    }
+
+    const spotlightLeft = clamp(rect.left - pad, 10, window.innerWidth - 10);
+    const spotlightTop = clamp(rect.top - pad, 10, Math.max(10, spotlightBottomLimit - 72));
+    const spotlightWidth = clamp(rect.width + pad * 2, 140, window.innerWidth - spotlightLeft - 10);
+    const spotlightHeight = clamp(rect.height + pad * 2, 72, Math.max(72, spotlightBottomLimit - spotlightTop));
+
+    tourSpotlightEl.style.left = `${spotlightLeft}px`;
+    tourSpotlightEl.style.top = `${spotlightTop}px`;
+    tourSpotlightEl.style.width = `${spotlightWidth}px`;
+    tourSpotlightEl.style.height = `${spotlightHeight}px`;
+    tourCardEl.style.left = `${cardLeft}px`;
+    tourCardEl.style.top = `${cardTop}px`;
+  }
+
+  function renderTourStep(options = {}) {
+    if (!state.tourOpen || !tourLayerEl || !tourCardEl) return;
+    const step = getCurrentTourStep();
+    if (!step) {
+      finishTour({ markSeen: false });
+      return;
+    }
+    if (step.page) {
+      setWorkspacePage(step.page, { persist: false, updateTour: false });
+    }
+
+    tourLayerEl.hidden = false;
+    tourLayerEl.setAttribute("aria-hidden", "false");
+    tourStepLabelEl.textContent = `第 ${state.tourStepIndex + 1} 步 / 共 ${state.tourSteps.length} 步`;
+    tourTitleEl.textContent = step.title;
+    tourBodyEl.innerHTML = step.body.map((line) => `<p>${escapeHtml(line.trim())}</p>`).join("");
+    tourMetaEl.innerHTML = step.meta.map((line) => `<p>${escapeHtml(line.trim())}</p>`).join("");
+    tourPrevEl.disabled = state.tourStepIndex === 0;
+    tourNextEl.textContent = state.tourStepIndex === state.tourSteps.length - 1 ? "完成導覽" : "下一步";
+    tourCardEl.scrollTop = 0;
+    requestAnimationFrame(() => updateTourLayout(options));
+  }
+
+  function startTour(startStepId = null) {
+    if (!tourLayerEl || !tourCardEl) return;
+    state.tourSteps = getTourSteps();
+    if (!state.tourSteps.length) return;
+    const preferredIndex = startStepId ? state.tourSteps.findIndex((step) => step.id === startStepId) : 0;
+    state.tourStepIndex = preferredIndex >= 0 ? preferredIndex : 0;
+    state.tourOpen = true;
+    document.body.classList.add("tour-active");
+    const initialStep = getCurrentTourStep();
+    if (initialStep?.page) {
+      setWorkspacePage(initialStep.page, { persist: false, updateTour: false });
+    }
+    renderTourStep({ scrollTarget: true });
+  }
+
+  function finishTour({ markSeen = true } = {}) {
+    if (!tourLayerEl) return;
+    clearTourTargetHighlight();
+    state.tourOpen = false;
+    state.tourSteps = [];
+    state.tourStepIndex = 0;
+    tourLayerEl.hidden = true;
+    tourLayerEl.setAttribute("aria-hidden", "true");
+    delete tourLayerEl.dataset.layout;
+    document.body.classList.remove("tour-active");
+    syncMastheadCompactState();
+    if (markSeen) markTourSeen();
+  }
+
+  function moveTour(delta) {
+    if (!state.tourOpen) return;
+    const nextIndex = state.tourStepIndex + delta;
+    if (nextIndex < 0) return;
+    if (nextIndex >= state.tourSteps.length) {
+      finishTour();
+      return;
+    }
+    state.tourStepIndex = nextIndex;
+    renderTourStep({ scrollTarget: true });
+  }
+
+  function maybeStartTourOnFirstVisit() {
+    if (hasSeenTour() || state.tourAutoStarted) {
+      if (tourStartEl && hasSeenTour()) tourStartEl.textContent = "重新導覽";
+      return;
+    }
+    state.tourAutoStarted = true;
+    window.setTimeout(() => {
+      if (!state.tourOpen) startTour();
+    }, 720);
+  }
+
+  function handleTourKeydown(event) {
+    if (!state.tourOpen) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finishTour();
+      return;
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      moveTour(1);
+      return;
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      moveTour(-1);
+    }
+  }
+
+  window.addEventListener("resize", () => {
+    if (state.tourOpen) updateTourLayout();
+    scheduleMinimapViewportUpdate();
+    syncMastheadCompactState();
+  }, { passive: true });
+  window.addEventListener("scroll", () => {
+    if (state.tourOpen) updateTourLayout();
+    syncMastheadCompactState();
+  }, { passive: true, capture: true });
+  document.addEventListener("keydown", handleTourKeydown);
+
   function normalizeWindowsPath(pathText) {
     return String(pathText || "").trim().replaceAll("/", "\\").replace(/\\+$/, "");
   }
 
+  function formatRepoRelativePath(pathText) {
+    const normalizedPath = normalizeWindowsPath(pathText);
+    const repoRoot = normalizeWindowsPath(DATA.meta?.repo_root_native || "");
+    if (repoRoot && normalizedPath.startsWith(`${repoRoot}\\`)) {
+      return normalizedPath.slice(repoRoot.length + 1);
+    }
+    return normalizedPath;
+  }
+
   function defaultGovernanceOutputPath() {
     const repoRoot = DATA.meta?.repo_root_native || "";
-    if (!NATIVE_REPO_PATHS_ENABLED || !repoRoot) return "";
-    return `${normalizeWindowsPath(repoRoot)}\\ops\\agent-governance`;
+    return repoRoot ? `${normalizeWindowsPath(repoRoot)}\\ops\\agent-governance` : "ops\\agent-governance";
   }
 
   function getGovernanceSources() {
     return DATA.governance?.sources || [];
   }
 
-  function governanceUnavailableResolution() {
-    return {
-      generated_at: new Date().toISOString(),
-      inputs: {
-        model: "unavailable",
-        environment: PAGE_MODE === "share-safe" ? "browser-share-safe" : "unavailable",
-        instruction_profile: "unavailable",
-      },
-      policy_meta: {},
-      matched_layers: [],
-      effective_config: {},
-      provenance: {},
-      agents_hierarchy_note: "Governance resolver is disabled for this page profile.",
-      agents_sources: [],
-      effective_file_rules: [],
-      instruction_evaluation: [
-        "This artifact intentionally excludes governance sources, effective file rules, and local operator-only controls.",
-      ],
+  function collectGovernanceOptions() {
+    const policyLayers = window.AGENT_GOVERNANCE_POLICY?.layers || [];
+    const valuesByKey = {
+      models: [],
+      environments: [],
+      instruction_profiles: [],
     };
+    const seenByKey = {
+      models: new Set(),
+      environments: new Set(),
+      instruction_profiles: new Set(),
+    };
+    policyLayers.forEach((layer) => {
+      const match = layer.match || {};
+      Object.keys(valuesByKey).forEach((key) => {
+        if (!Array.isArray(match[key])) return;
+        match[key].forEach((value) => {
+          const normalizedValue = String(value || "").trim();
+          if (!normalizedValue || seenByKey[key].has(normalizedValue)) return;
+          seenByKey[key].add(normalizedValue);
+          valuesByKey[key].push(normalizedValue);
+        });
+      });
+    });
+    return valuesByKey;
+  }
+
+  function populateGovernanceSelect(selectEl, options, fallbackValue) {
+    if (!selectEl) return;
+    const currentValue = String(selectEl.value || fallbackValue || "").trim();
+    const normalizedFallback = String(fallbackValue || "").trim();
+    const normalizedOptions = Array.from(new Set(
+      (Array.isArray(options) ? options : [])
+        .map((value) => String(value || "").trim())
+        .filter(Boolean),
+    ));
+    if (normalizedFallback && !normalizedOptions.includes(normalizedFallback)) {
+      normalizedOptions.unshift(normalizedFallback);
+    }
+    if (!normalizedOptions.length) return;
+
+    selectEl.innerHTML = "";
+    normalizedOptions.forEach((value) => {
+      const optionEl = document.createElement("option");
+      optionEl.value = value;
+      optionEl.textContent = value;
+      selectEl.appendChild(optionEl);
+    });
+
+    const nextValue = normalizedOptions.includes(currentValue) ? currentValue : normalizedOptions[0];
+    selectEl.value = nextValue;
+  }
+
+  function initializeGovernanceSelectors() {
+    const { models, environments, instruction_profiles: instructionProfiles } = collectGovernanceOptions();
+    populateGovernanceSelect(governanceModelEl, models, "gpt-5.4");
+    populateGovernanceSelect(governanceEnvironmentEl, environments, "codex-local-dev");
+    populateGovernanceSelect(governanceProfileEl, instructionProfiles, "mapping");
   }
 
   function resolveGovernanceInPage() {
-    if (!GOVERNANCE_ENABLED) return governanceUnavailableResolution();
     const policyLayers = window.AGENT_GOVERNANCE_POLICY?.layers || [];
     const precedence = window.AGENT_GOVERNANCE_POLICY?.meta?.precedence || ["base", "model", "environment", "instruction_profile"];
     const inputs = {
@@ -174,6 +879,8 @@
       });
     });
     const effectiveFileRules = (DATA.governance?.effective_file_rules || []).map((item) => ({ ...item }));
+    const effectiveHardRules = effectiveFileRules.filter((item) => item.rule_category !== "operational_guidance");
+    const operationalGuidance = effectiveFileRules.filter((item) => item.rule_category === "operational_guidance");
     return {
       generated_at: new Date().toISOString(),
       inputs,
@@ -189,90 +896,108 @@
       agents_hierarchy_note: DATA.governance?.hierarchy_note || "",
       agents_sources: getGovernanceSources(),
       effective_file_rules: effectiveFileRules,
+      effective_hard_rules: effectiveHardRules,
+      operational_guidance: operationalGuidance,
       instruction_evaluation: [
-        "Runtime/system/developer/global-home instructions remain higher-priority and are not directly inspectable from this static page.",
-        "Within file-based scope, workspace overlay AGENTS applies before repo-local AGENTS, and repo-local rules win if there is a conflict.",
-        `Current file-based source count: ${getGovernanceSources().length}`,
+        "來自 runtime、system、developer 與全域家目錄的指令仍屬於更高優先層級，無法直接從這張靜態頁面完整檢查。",
+        "在檔案層級範圍內，頁面會優先採用結構化治理規則檔；若缺少結構化來源，才退回工作區與 repo-local AGENTS 的文字解析。",
+        `目前納入檔案層級檢查的來源數量：${getGovernanceSources().length}`,
       ],
     };
+  }
+
+  function formatGovernanceSourceLine(source) {
+    const definitionSuffix = source.definition_path ? `（規則檔：${source.definition_path}）` : "";
+    return `- [${source.scope}] ${source.path}${definitionSuffix}`;
   }
 
   function renderGovernanceResolution(resolution, statusText = "") {
     if (!governanceResultEl) return;
     const layerLines = resolution.matched_layers.length
       ? resolution.matched_layers.map((layer) => `- ${layer.id} [${layer.scope}]`).join("\n")
-      : "- None";
+      : "- 無";
     const configLines = Object.keys(resolution.effective_config).length
       ? Object.entries(resolution.effective_config)
         .sort((a, b) => a[0].localeCompare(b[0]))
         .map(([key, value]) => `- ${key}: ${value} (${resolution.provenance[key].source_layer})`)
         .join("\n")
-      : "- None";
+      : "- 無";
     const sourceLines = resolution.agents_sources.length
-      ? resolution.agents_sources.map((source) => `- [${source.scope}] ${source.path}`).join("\n")
-      : "- None";
-    const ruleLines = resolution.effective_file_rules.length
-      ? resolution.effective_file_rules.slice(0, 14).map((rule) => `- [${rule.scope}] ${rule.section}: ${rule.rule}`).join("\n")
-      : "- None";
+      ? resolution.agents_sources.map((source) => formatGovernanceSourceLine(source)).join("\n")
+      : "- 無";
+    const hardRuleLines = resolution.effective_hard_rules.length
+      ? resolution.effective_hard_rules.slice(0, 12).map((rule) => `- [${rule.scope}] ${rule.section}: ${rule.rule}`).join("\n")
+      : "- 無";
+    const guidanceLines = resolution.operational_guidance.length
+      ? resolution.operational_guidance.slice(0, 8).map((rule) => `- [${rule.scope}] ${rule.section}: ${rule.rule}`).join("\n")
+      : "- 無";
     governanceResultEl.textContent = [
       statusText ? `${statusText}\n` : "",
-      "Governance Resolution",
-      `Model: ${resolution.inputs.model}`,
-      `Environment: ${resolution.inputs.environment}`,
-      `Instruction profile: ${resolution.inputs.instruction_profile}`,
+      "治理解析結果",
+      `模型：${resolution.inputs.model}`,
+      `環境：${resolution.inputs.environment}`,
+      `指令設定：${resolution.inputs.instruction_profile}`,
       "",
-      "Matched layers",
+      "符合條件的層級",
       layerLines,
       "",
-      "Effective config",
+      "實際生效的設定",
       configLines,
       "",
-      "AGENTS hierarchy note",
-      resolution.agents_hierarchy_note || "None",
+      "檔案治理層級說明",
+      resolution.agents_hierarchy_note || "無",
       "",
-      "AGENTS sources",
+      "檔案治理來源",
       sourceLines,
       "",
-      "Effective file-based instructions",
-      ruleLines,
-      resolution.effective_file_rules.length > 14 ? `\n... 其餘 ${resolution.effective_file_rules.length - 14} 條規則會寫入報告。` : "",
+      "實際生效的硬性規則",
+      hardRuleLines,
+      resolution.effective_hard_rules.length > 12 ? `\n... 其餘 ${resolution.effective_hard_rules.length - 12} 條硬性規則會寫入報告。` : "",
+      "",
+      "作業指引",
+      guidanceLines,
+      resolution.operational_guidance.length > 8 ? `\n... 其餘 ${resolution.operational_guidance.length - 8} 條作業指引會寫入報告。` : "",
     ].join("\n");
   }
 
   function governanceMarkdown(resolution) {
     const lines = [
-      "# Agent Governance Resolution",
+      "# 治理解析報告",
       "",
-      `- Generated at: \`${resolution.generated_at}\``,
-      `- Model: \`${resolution.inputs.model}\``,
-      `- Environment: \`${resolution.inputs.environment}\``,
-      `- Instruction profile: \`${resolution.inputs.instruction_profile}\``,
+      `- 產生時間：\`${resolution.generated_at}\``,
+      `- 模型：\`${resolution.inputs.model}\``,
+      `- 環境：\`${resolution.inputs.environment}\``,
+      `- 指令設定：\`${resolution.inputs.instruction_profile}\``,
       "",
-      "## Matched Layers",
+      "## 符合條件的層級",
       "",
     ];
     if (resolution.matched_layers.length) {
       resolution.matched_layers.forEach((layer) => {
         lines.push(`- \`${layer.id}\``);
-        lines.push(`  - Scope: \`${layer.scope}\``);
-        lines.push(`  - Description: ${layer.description || "No description"}`);
+        lines.push(`  - 範圍：\`${layer.scope}\``);
+        lines.push(`  - 說明：${layer.description || "無說明"}`);
       });
     } else {
-      lines.push("- None");
+      lines.push("- 無");
     }
-    lines.push("", "## Effective Config", "");
+    lines.push("", "## 實際生效的設定", "");
     Object.entries(resolution.effective_config).sort((a, b) => a[0].localeCompare(b[0])).forEach(([key, value]) => {
-      lines.push(`- \`${key}\` = \`${value}\` (from \`${resolution.provenance[key].source_layer}\`)`);
+      lines.push(`- \`${key}\` = \`${value}\`（來自 \`${resolution.provenance[key].source_layer}\`）`);
     });
-    lines.push("", "## AGENTS Sources", "");
+    lines.push("", "## 檔案治理來源", "");
     resolution.agents_sources.forEach((source) => {
-      lines.push(`- [${source.scope}] \`${source.path}\``);
+      lines.push(formatGovernanceSourceLine(source));
     });
-    lines.push("", "## Effective File-Based Instructions", "");
-    resolution.effective_file_rules.forEach((rule) => {
+    lines.push("", "## 實際生效的硬性規則", "");
+    resolution.effective_hard_rules.forEach((rule) => {
       lines.push(`- [${rule.scope}] \`${rule.section}\` — ${rule.rule}`);
     });
-    lines.push("", "## Evaluation Notes", "");
+    lines.push("", "## 作業指引", "");
+    resolution.operational_guidance.forEach((rule) => {
+      lines.push(`- [${rule.scope}] \`${rule.section}\` — ${rule.rule}`);
+    });
+    lines.push("", "## 評估備註", "");
     resolution.instruction_evaluation.forEach((note) => lines.push(`- ${note}`));
     return `${lines.join("\n")}\n`;
   }
@@ -313,15 +1038,15 @@
   function setData(nextData, source) {
     DATA = cloneData(nextData);
     if (!DATA.meta) DATA.meta = {};
-    if (NATIVE_REPO_PATHS_ENABLED && !DATA.meta.repo_root_native && INITIAL_DATA?.meta?.repo_root_native) {
+    if (!DATA.meta.repo_root_native && INITIAL_DATA?.meta?.repo_root_native) {
       DATA.meta.repo_root_native = INITIAL_DATA.meta.repo_root_native;
     }
-    if (GOVERNANCE_ENABLED && !DATA.governance && INITIAL_DATA?.governance) {
+    if (!DATA.governance && INITIAL_DATA?.governance) {
       DATA.governance = cloneData(INITIAL_DATA.governance);
     }
     nodeById = new Map((DATA.nodes || []).map((node) => [node.id, node]));
     if (!nodeById.has(state.selectedId)) {
-      state.selectedId = nodeById.has("doc:INDEX.md") ? "doc:INDEX.md" : DATA.nodes?.[0]?.id ?? null;
+      state.selectedId = pickDefaultNodeId(nodeById);
     }
     state.lastUpdatedAt = DATA.meta?.generated_at || new Date().toISOString();
     state.lastRefreshSource = source;
@@ -346,30 +1071,151 @@
       if (!raw) return;
       const settings = JSON.parse(raw);
       state.mapMode = MAP_MODES.has(settings.mapMode) ? settings.mapMode : state.mapMode;
+      state.visualTone = normalizeLegacyTone(settings.visualTone) || state.visualTone;
+      state.visualTheme = normalizeTheme(settings.visualTheme) || state.visualTheme;
+      state.textScale = normalizeTextScale(settings.textScale) || state.textScale;
       state.updateMode = settings.updateMode || state.updateMode;
       state.intervalDays = Number.isFinite(settings.intervalDays) ? settings.intervalDays : state.intervalDays;
       state.intervalHours = Number.isFinite(settings.intervalHours) ? settings.intervalHours : state.intervalHours;
       state.intervalMinutes = Number.isFinite(settings.intervalMinutes) ? settings.intervalMinutes : state.intervalMinutes;
+      state.workspacePage = WORKSPACE_PAGE_IDS.has(settings.workspacePage) ? settings.workspacePage : state.workspacePage;
     } catch (_error) {}
   }
 
   function saveSettings() {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-      mapMode: state.mapMode,
-      updateMode: state.updateMode,
-      intervalDays: state.intervalDays,
-      intervalHours: state.intervalHours,
-      intervalMinutes: state.intervalMinutes,
-    }));
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        mapMode: state.mapMode,
+        visualTone: state.visualTone,
+        visualTheme: state.visualTheme,
+        textScale: state.textScale,
+        updateMode: state.updateMode,
+        intervalDays: state.intervalDays,
+        intervalHours: state.intervalHours,
+        intervalMinutes: state.intervalMinutes,
+        workspacePage: state.workspacePage,
+      }));
+    } catch (_error) {}
+  }
+
+  function applyVisualTone() {
+    if (!VISUAL_TONES.has(state.visualTone)) state.visualTone = "muted";
+    document.documentElement.dataset.visualTone = state.visualTone;
+    document.body.dataset.visualTone = state.visualTone;
+    visualToneOptionEls.forEach((button) => {
+      const tone = button.dataset.visualToneOption || "";
+      const isActive = tone === state.visualTone;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-checked", isActive ? "true" : "false");
+      button.tabIndex = isActive ? 0 : -1;
+    });
+  }
+
+  function applyVisualTheme() {
+    if (!VISUAL_THEMES.has(state.visualTheme)) state.visualTheme = "light";
+    document.documentElement.dataset.theme = state.visualTheme;
+    document.body.dataset.theme = state.visualTheme;
+    visualThemeOptionEls.forEach((button) => {
+      const theme = button.dataset.visualThemeOption || "";
+      const isActive = theme === state.visualTheme;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-checked", isActive ? "true" : "false");
+      button.tabIndex = isActive ? 0 : -1;
+    });
+  }
+
+  function applyTextScale() {
+    if (!TEXT_SCALES.has(state.textScale)) state.textScale = "md";
+    document.documentElement.dataset.textScale = state.textScale;
+    document.body.dataset.textScale = state.textScale;
+    textScaleOptionEls.forEach((button) => {
+      const scale = button.dataset.textScaleOption || "";
+      const isActive = scale === state.textScale;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-checked", isActive ? "true" : "false");
+      button.tabIndex = isActive ? 0 : -1;
+    });
+  }
+
+  function setVisualTone(nextTone, options = {}) {
+    if (!VISUAL_TONES.has(nextTone)) return;
+    if (nextTone === state.visualTone) {
+      if (options.focus) {
+        const activeButton = visualToneOptionEls.find((button) => (button.dataset.visualToneOption || "") === nextTone);
+        activeButton?.focus();
+      }
+      return;
+    }
+    state.visualTone = nextTone;
+    applyVisualTone();
+    render();
+    if (options.focus) {
+      const activeButton = visualToneOptionEls.find((button) => (button.dataset.visualToneOption || "") === nextTone);
+      activeButton?.focus();
+    }
+  }
+
+  function setVisualTheme(nextTheme, options = {}) {
+    if (!VISUAL_THEMES.has(nextTheme)) return;
+    if (nextTheme === state.visualTheme) {
+      if (options.focus) {
+        const activeButton = visualThemeOptionEls.find((button) => (button.dataset.visualThemeOption || "") === nextTheme);
+        activeButton?.focus();
+      }
+      return;
+    }
+    state.visualTheme = nextTheme;
+    applyVisualTheme();
+    render();
+    if (options.focus) {
+      const activeButton = visualThemeOptionEls.find((button) => (button.dataset.visualThemeOption || "") === nextTheme);
+      activeButton?.focus();
+    }
+  }
+
+  function setTextScale(nextScale, options = {}) {
+    if (!TEXT_SCALES.has(nextScale)) return;
+    if (nextScale === state.textScale) {
+      if (options.focus) {
+        const activeButton = textScaleOptionEls.find((button) => (button.dataset.textScaleOption || "") === nextScale);
+        activeButton?.focus();
+      }
+      return;
+    }
+    state.textScale = nextScale;
+    applyTextScale();
+    render();
+    if (options.focus) {
+      const activeButton = textScaleOptionEls.find((button) => (button.dataset.textScaleOption || "") === nextScale);
+      activeButton?.focus();
+    }
+  }
+
+  function getMapToneTheme() {
+    return {
+      guideSoft: cssVar("--map-guide-stroke-soft", "rgba(131, 114, 82, 0.12)"),
+      guide: cssVar("--map-guide-stroke", "rgba(131, 114, 82, 0.14)"),
+      orbit: cssVar("--map-orbit-stroke", "rgba(131, 114, 82, 0.18)"),
+      title: cssVar("--map-title-ink", "#5f5a4b"),
+      copy: cssVar("--map-copy-ink", "#7a705e"),
+      activeFill: cssVar("--map-node-active-fill", "#fcfbf5"),
+      activeStroke: cssVar("--map-node-active-stroke", "#176b66"),
+      label: cssVar("--map-node-label", "#201c16"),
+      sub: cssVar("--map-node-sub", "#6b6256"),
+    };
   }
 
   function applySettingsToControls() {
     if (!MAP_MODES.has(state.mapMode)) state.mapMode = "radial";
     mapModeEl.value = state.mapMode;
+    applyVisualTone();
+    applyVisualTheme();
+    applyTextScale();
     updateModeEl.value = state.updateMode;
     intervalDaysEl.value = String(state.intervalDays);
     intervalHoursEl.value = String(state.intervalHours);
     intervalMinutesEl.value = String(state.intervalMinutes);
+    syncWorkspacePages();
   }
 
   function intervalMs() {
@@ -412,6 +1258,94 @@
     return parts.length ? parts.join(" ") : "0 分";
   }
 
+  function syncPrimaryBrowseControls(options = {}) {
+    if (options.syncSearch !== false && searchEl) searchEl.value = state.search || "";
+    if (typeFilterEl) typeFilterEl.value = state.type || "all";
+  }
+
+  function resetPrimaryBrowseFilters() {
+    state.search = "";
+    state.type = "all";
+    state.diagnosticsFilter = "all";
+    syncPrimaryBrowseControls();
+  }
+
+  function getQuickFilterCount(spec) {
+    if (spec.kind === "type") return Number(DATA.counts?.[spec.value] || 0);
+    if (spec.value === "broken-source") return Number(DATA.diagnostics?.broken_reference_count || 0);
+    if (spec.value === "orphan") return Number(DATA.diagnostics?.orphan_node_count || 0);
+    return 0;
+  }
+
+  function isQuickFilterActive(spec) {
+    if (spec.kind === "type") return state.type === spec.value && state.diagnosticsFilter === "all";
+    return state.diagnosticsFilter === spec.value;
+  }
+
+  function applyQuickFilter(kind, value) {
+    const isActive = kind === "type"
+      ? state.type === value && state.diagnosticsFilter === "all"
+      : state.diagnosticsFilter === value;
+    if (isActive) {
+      resetPrimaryBrowseFilters();
+      setWorkspacePage("browse", { persist: false, updateTour: false });
+      render();
+      return;
+    }
+    state.search = "";
+    if (kind === "type") {
+      state.type = value;
+      state.diagnosticsFilter = "all";
+    } else {
+      state.type = "all";
+      state.diagnosticsFilter = value;
+    }
+    syncPrimaryBrowseControls();
+    setWorkspacePage("browse", { persist: false, updateTour: false });
+    render();
+  }
+
+  function renderQuickFilterRail(containerEl, { showCounts = true } = {}) {
+    if (!containerEl) return;
+    containerEl.innerHTML = "";
+    QUICK_FILTER_SPECS.forEach((spec) => {
+      const count = getQuickFilterCount(spec);
+      if (spec.kind === "type" && count <= 0) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "chip quick-filter-chip";
+      if (spec.kind === "diagnostic") button.classList.add("is-diagnostic");
+      if (isQuickFilterActive(spec)) button.classList.add("active");
+      button.setAttribute("aria-pressed", isQuickFilterActive(spec) ? "true" : "false");
+      button.dataset.filterKind = spec.kind;
+      button.dataset.filterValue = spec.value;
+
+      const dotEl = document.createElement("span");
+      dotEl.className = "chip-dot";
+      dotEl.style.background = spec.kind === "type"
+        ? cssVar(spec.colorVar, spec.colorFallback)
+        : spec.value === "broken-source"
+          ? "rgba(165, 106, 23, 0.72)"
+          : "rgba(165, 128, 51, 0.66)";
+
+      const labelEl = document.createElement("span");
+      labelEl.className = "chip-label";
+      labelEl.textContent = spec.label;
+      button.appendChild(dotEl);
+      button.appendChild(labelEl);
+
+      if (showCounts) {
+        const countEl = document.createElement("span");
+        countEl.className = "chip-count";
+        countEl.textContent = String(count);
+        button.appendChild(countEl);
+      }
+
+      button.addEventListener("click", () => applyQuickFilter(spec.kind, spec.value));
+      containerEl.appendChild(button);
+    });
+  }
+
   function computeVisibleNodes() {
     return (DATA.nodes || []).filter((node) => nodeMatchesFilters(node));
   }
@@ -433,23 +1367,21 @@
     const target = nodeById.get(nodeId);
     if (!target) return;
     if (reveal && !nodeMatchesFilters(target)) {
-      state.search = "";
-      state.type = "all";
-      state.diagnosticsFilter = "all";
-      searchEl.value = "";
-      typeFilterEl.value = "all";
+      resetPrimaryBrowseFilters();
     }
+    if (reveal) setWorkspacePage("browse", { persist: false, updateTour: false });
     state.selectedId = nodeId;
     render();
   }
 
   function applyDiagnosticsFilter(mode) {
-    state.search = "";
-    state.type = "all";
-    state.diagnosticsFilter = mode;
-    searchEl.value = "";
-    typeFilterEl.value = "all";
-    render();
+    if (mode === "all") {
+      resetPrimaryBrowseFilters();
+      setWorkspacePage("browse", { persist: false, updateTour: false });
+      render();
+      return;
+    }
+    applyQuickFilter("diagnostic", mode);
   }
 
   function relatedEdges(nodeId, allowedIds = null) {
@@ -462,28 +1394,8 @@
   }
 
   function updateSummary() {
-    summaryEl.innerHTML = "";
-    Object.entries(DATA.counts || {}).forEach(([type, count]) => {
-      const chip = document.createElement("div");
-      chip.className = "chip";
-      chip.textContent = `${TYPE_LABELS[type] || type}: ${count}`;
-      summaryEl.appendChild(chip);
-    });
-    const diagnostics = DATA.diagnostics || {};
-    [
-      { label: "Broken refs", value: diagnostics.broken_reference_count || 0 },
-      { label: "Orphans", value: diagnostics.orphan_node_count || 0 },
-    ].forEach((item) => {
-      const chip = document.createElement("div");
-      chip.className = "chip";
-      chip.textContent = `${item.label}: ${item.value}`;
-      if (item.value > 0) {
-        chip.style.background = "linear-gradient(180deg, #fff8ee 0%, #ffe7c7 100%)";
-        chip.style.color = "#8a5b06";
-        chip.style.borderColor = "rgba(202, 138, 4, 0.18)";
-      }
-      summaryEl.appendChild(chip);
-    });
+    renderQuickFilterRail(summaryEl, { showCounts: true });
+    renderQuickFilterRail(mastheadQuickFiltersEl, { showCounts: true });
     typeFilterEl.innerHTML = '<option value="all">全部類型</option>';
     TYPE_ORDER.forEach((type) => {
       const count = DATA.counts?.[type] || 0;
@@ -494,16 +1406,35 @@
       if (state.type === type) option.selected = true;
       typeFilterEl.appendChild(option);
     });
+    syncPrimaryBrowseControls();
+  }
+
+  function renderGovernanceSourceNote() {
+    if (!governanceSourceNoteEl) return;
+    const { models, environments, instruction_profiles: instructionProfiles } = collectGovernanceOptions();
+    const sourceList = getGovernanceSources();
+    const definitionPath = formatRepoRelativePath(
+      sourceList.find((source) => source.definition_path)?.definition_path || "local/config/agent-file-governance-rules.json",
+    );
+    const sourceTargets = sourceList.length
+      ? sourceList.map((source) => `${source.scope}: ${formatRepoRelativePath(source.path)}`).join("；")
+      : "目前沒有結構化檔案治理來源";
+    governanceSourceNoteEl.innerHTML = [
+      "<strong>預先帶入來源</strong>",
+      `模型 / 工作環境 / 指令配置的選項來自 <code>local/config/agent-governance-layers.json</code> 的 <code>layers.match</code>。`,
+      `目前帶入：模型 <code>${escapeHtml(models.join(" / ") || "gpt-5.4")}</code>；環境 <code>${escapeHtml(environments.join(" / ") || "codex-local-dev")}</code>；指令配置 <code>${escapeHtml(instructionProfiles.join(" / ") || "mapping")}</code>。`,
+      `檔案治理來源優先讀取 <code>${escapeHtml(definitionPath)}</code>；目前映射到 ${escapeHtml(sourceTargets)}。若結構化規則檔不存在，才退回 workspace / repo 的 <code>AGENTS.md</code> 文字解析。`,
+    ].join("<br>");
   }
 
   function updateStatusCard(errorText = "") {
     const modeLabel = { manual: "手動更新", "on-open": "開啟網頁時自動更新", interval: "定時更新" }[state.updateMode];
     const strategyNote = {
       manual: "不做背景掃描，只有按下「立即更新」才重新解析；執行開銷最低。",
-      "on-open": "每次開啟頁面時做一次掃描，能降低 stale 風險，但會增加進頁時間。",
+      "on-open": "每次開啟頁面時做一次掃描，能降低資料過期風險，但會增加進頁時間。",
       interval: "頁面開啟期間依頻率重掃；資料較新，但會持續產生檔案 I/O 與重新繪圖成本。",
     }[state.updateMode];
-    const repoText = state.repoHandleName ? `已連結：${state.repoHandleName}` : "尚未連結 repo root";
+    const repoText = state.repoHandleName ? `已連結：${state.repoHandleName}` : "尚未連結專案根目錄";
     const intervalText = state.updateMode === "interval" ? `；頻率：${describeInterval()}` : "";
     const supportText = state.browserCanScan
       ? "此瀏覽器支援頁內掃描與更新。"
@@ -545,30 +1476,33 @@
   function buildHandoffSummary() {
     const diagnostics = DATA.diagnostics || {};
     const counts = DATA.counts || {};
-    const exportArtifactsStale = state.lastRefreshSource !== "bootstrap";
     const topBrokenSources = getBrokenSources().slice(0, 5)
       .map((item) => `- ${item.source_label} (${item.count}) — ${item.source_path}`)
       .join("\n");
     return [
-      "# UniText Project Map Handoff",
+      "# UniText 專案地圖交接摘要",
       "",
-      `- Generated at: ${state.lastUpdatedAt || DATA.meta?.generated_at || "unknown"}`,
-      `- Page mode: ${PAGE_MODE}`,
-      `- Node count: ${Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0)}`,
-      `- Edge count: ${(DATA.edges || []).length}`,
-      `- Broken references: ${diagnostics.broken_reference_count || 0}`,
-      `- Orphan resources: ${diagnostics.orphan_node_count || 0}`,
-      `- Static artifacts: ${exportArtifactsStale ? `stale after browser refresh (${state.lastRefreshSource})` : "aligned with the current page bootstrap"}`,
+      `- 產生時間：${state.lastUpdatedAt || DATA.meta?.generated_at || "未知"}`,
+      `- 頁面模式：${PAGE_MODE}`,
+      `- 節點數量：${Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0)}`,
+      `- 關聯數量：${(DATA.edges || []).length}`,
+      `- 失效引用：${diagnostics.broken_reference_count || 0}`,
+      `- 孤立資源：${diagnostics.orphan_node_count || 0}`,
       "",
-      "## Resource Counts",
+      "## 執行面閱讀重點",
+      "",
+      "- 先看執行面文件與執行面投影，再回到 `registry/*` 的正式來源。",
+      "- 把執行面對應回註冊來源的關聯邊，視為理解結構時最主要的追查路徑。",
+      "",
+      "## 資源數量",
       "",
       ...Object.entries(counts).sort((a, b) => a[0].localeCompare(b[0])).map(([key, value]) => `- ${key}: ${value}`),
       "",
-      "## Top Broken Sources",
+      "## 主要失效來源",
       "",
-      topBrokenSources || "- None",
+      topBrokenSources || "- 無",
       "",
-      "## Share Artifacts",
+      "## 可交付檔案",
       "",
       "- site/project-map.html",
       "- site/project-map-share.html",
@@ -583,33 +1517,33 @@
     const orphanCount = diagnostics.orphan_node_count || 0;
     const brokenSources = getBrokenSources();
     const activeFilterLabel = state.diagnosticsFilter === "orphan"
-      ? "目前只看 orphan resources"
+      ? "目前只顯示孤立資源"
       : state.diagnosticsFilter === "broken-source"
-        ? "目前只看 broken reference sources"
+        ? "目前只顯示失效引用來源"
         : "目前顯示全部節點";
     const sourceMarkup = brokenSources.length
       ? `
-        <div class="section-title" style="margin-top:12px;">Broken Source Drill-down</div>
+        <div class="section-title" style="margin-top:12px;">失效來源下鑽檢查</div>
         <div class="source-list">
           ${brokenSources.slice(0, 8).map((item) => `
             <button type="button" class="source-item diagnostics-source-jump" data-source-id="${escapeHtml(item.source_id)}">
               <strong>${escapeHtml(item.source_label)}</strong>
-              <div class="source-meta">${escapeHtml(item.source_path)}；${item.count} 個未映射 target；點擊可跳到來源節點</div>
+              <div class="source-meta">${escapeHtml(item.source_path)}；${item.count} 個尚未映射的目標；點擊可跳到來源節點</div>
             </button>
           `).join("")}
         </div>
-        ${brokenSources.length > 8 ? `<div class="edge-visibility">其餘 ${brokenSources.length - 8} 個 source 可於 JSON / handoff 檔查看。</div>` : ""}
+        ${brokenSources.length > 8 ? `<div class="edge-visibility">其餘 ${brokenSources.length - 8} 個來源可於 JSON / 交接檔查看。</div>` : ""}
       `
-      : `<div class="edge-visibility">目前沒有 broken reference sources。</div>`;
+      : `<div class="edge-visibility">目前沒有失效引用來源。</div>`;
     diagnosticsCardEl.innerHTML = `
-      <span class="card-title">Diagnostics</span>
-      <div><strong>Broken references</strong>：${brokenCount}</div>
-      <div><strong>Orphan resources</strong>：${orphanCount}</div>
-      <div class="edge-visibility">先看這兩個數字，就能快速判斷目前 registry 連結是否有 drift。</div>
+      <span class="card-title">診斷檢查</span>
+      <div><strong>失效引用</strong>：${brokenCount}</div>
+      <div><strong>孤立資源</strong>：${orphanCount}</div>
+      <div class="edge-visibility">先看這兩個數字，就能快速判斷目前執行面與正式來源的對應是否有明顯落差。</div>
       <div class="edge-visibility">${activeFilterLabel}</div>
       <div class="card-actions">
-        <button type="button" class="mini-action secondary" id="filter-broken-sources" ${brokenCount ? "" : "disabled"}>只看 broken sources</button>
-        <button type="button" class="mini-action secondary" id="filter-orphans" ${orphanCount ? "" : "disabled"}>只看 orphan</button>
+        <button type="button" class="mini-action secondary" id="filter-broken-sources" ${brokenCount ? "" : "disabled"}>只看失效來源</button>
+        <button type="button" class="mini-action secondary" id="filter-orphans" ${orphanCount ? "" : "disabled"}>只看孤立資源</button>
         <button type="button" class="mini-action" id="filter-clear-diagnostics" ${state.diagnosticsFilter === "all" ? "disabled" : ""}>清除診斷篩選</button>
       </div>
       ${sourceMarkup}
@@ -626,37 +1560,18 @@
 
   function updateExportCard() {
     if (!exportCardEl) return;
-    const exportArtifactsStale = state.lastRefreshSource !== "bootstrap";
     const shareHref = new URL("./project-map-share.html", window.location.href).href;
     const handoffMdHref = new URL("./project-map-handoff.md", window.location.href).href;
     const handoffJsonHref = new URL("./project-map-handoff.json", window.location.href).href;
-    const staleWarningMarkup = exportArtifactsStale
-      ? `
-        <div class="status-card progress">
-          <div class="status-row">
-            <span class="status-pill">stale</span>
-            <span class="status-inline-note">目前畫面資料來自頁內重掃，靜態 share/handoff 檔尚未同步更新。</span>
-          </div>
-          <div><strong>目前來源</strong>：${escapeHtml(state.lastRefreshSource)}</div>
-          <div><strong>建議動作</strong>：重新執行 <code>python local/scripts/build-project-map.py</code> 後，再交付 share-safe / handoff artifacts。</div>
-        </div>
-      `
-      : "";
-    const staticLinkMarkup = exportArtifactsStale
-      ? ""
-      : `
-        <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
-        <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.md</a>
-        <a class="mini-action secondary" href="${handoffJsonHref}" target="_blank" rel="noopener noreferrer">開啟 handoff.json</a>
-      `;
     exportCardEl.innerHTML = `
-      <span class="card-title">Export</span>
-      <div><strong>Share-safe artifact</strong>：可直接打開唯讀分享版快照。</div>
-      <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的 share-safe 頁面與 handoff 檔，而不是把操作者介面直接丟給下一位。</div>
-      ${staleWarningMarkup}
+      <span class="card-title">交付輸出</span>
+      <div><strong>分享用輸出</strong>：可直接打開唯讀分享版快照。</div>
+      <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的分享頁與交接檔，而不是把操作者介面直接丟給下一位。</div>
       <div class="card-actions">
-        ${staticLinkMarkup}
-        <button type="button" class="mini-action" id="copy-handoff-summary">複製 handoff 摘要</button>
+        <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
+        <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟交接摘要.md</a>
+        <a class="mini-action secondary" href="${handoffJsonHref}" target="_blank" rel="noopener noreferrer">開啟交接摘要.json</a>
+        <button type="button" class="mini-action" id="copy-handoff-summary">複製交接摘要</button>
       </div>
     `;
     exportCardEl.querySelector("#copy-handoff-summary")?.addEventListener("click", async () => {
@@ -665,7 +1580,7 @@
       const original = button.textContent;
       try {
         await copyText(buildHandoffSummary());
-        button.textContent = "已複製";
+        button.textContent = "已複製摘要";
         window.setTimeout(() => { button.textContent = original; }, 1400);
       } catch (_error) {
         button.textContent = "複製失敗";
@@ -682,19 +1597,15 @@
 
   async function writeGovernanceReports() {
     const resolution = await resolveGovernanceAction();
-    if (!GOVERNANCE_ENABLED || !NATIVE_REPO_PATHS_ENABLED) {
-      renderGovernanceResolution(resolution, "此頁面設定為唯讀 surface，不提供治理報告輸出。");
-      return;
-    }
     const handle = await ensureRepoHandle(true);
     if (!handle) {
-      renderGovernanceResolution(resolution, "尚未連結 repo root，無法寫出治理報告。");
+      renderGovernanceResolution(resolution, "尚未連結專案根目錄，無法寫出治理報告。");
       return;
     }
     const outputPath = governanceOutputPathEl?.value?.trim() || defaultGovernanceOutputPath();
     const relativeSegments = repoRelativeSegmentsFromNativePath(outputPath);
     if (!relativeSegments) {
-      renderGovernanceResolution(resolution, `輸出位置必須位於目前 repo 之內：${DATA.meta?.repo_root_native || "unknown repo root"}`);
+      renderGovernanceResolution(resolution, `輸出位置必須位於目前專案目錄之內：${DATA.meta?.repo_root_native || "未知專案根目錄"}`);
       return;
     }
     const outputDirHandle = await ensureDirectoryFromSegments(handle, relativeSegments);
@@ -705,6 +1616,7 @@
 
   function renderSidebar(visible) {
     sidebarEl.innerHTML = "";
+    const typeStyles = getTypeStylesTheme();
     const grouped = new Map(TYPE_ORDER.map((type) => [type, []]));
     visible.forEach((node) => grouped.get(node.type)?.push(node));
     TYPE_ORDER.forEach((type) => {
@@ -718,10 +1630,10 @@
         const button = document.createElement("button");
         button.className = "node-button";
         if (node.id === state.selectedId) button.classList.add("active");
-        const typeStyle = TYPE_STYLES[node.type] || TYPE_STYLES.directory;
+        const typeStyle = typeStyles[node.type] || typeStyles.directory;
         button.innerHTML = `
-          <div class="node-head"><strong>${node.label}</strong><span class="node-type" style="background:${typeStyle.badge}">${node.type}</span></div>
-          <span class="node-description">${node.description || "No description"}</span>
+          <div class="node-head"><strong>${node.label}</strong><span class="node-type" style="background:${typeStyle.badge}">${TYPE_LABELS[node.type] || node.type}</span></div>
+          <span class="node-description">${node.description || "沒有額外描述"}</span>
           <span class="node-path">${node.path}</span>
         `;
         button.addEventListener("click", () => { state.selectedId = node.id; render(); });
@@ -738,7 +1650,7 @@
       detailNoteEl.textContent = "聚焦節點後，會顯示所有關聯邊";
       return;
     }
-    detailNoteEl.textContent = state.mapMode === "grid" ? "欄式視圖會依資源類型分層" : "圓形視圖會以所選節點為中心展開";
+    detailNoteEl.textContent = state.mapMode === "grid" ? "欄式視圖會依資源類型由上往下排列" : "圓形視圖會以所選節點為中心展開";
     const relatedAll = relatedEdges(selected.id);
     const outgoing = relatedAll.filter((edge) => edge.from === selected.id);
     const incoming = relatedAll.filter((edge) => edge.to === selected.id);
@@ -747,12 +1659,12 @@
       `<h3>${selected.label}</h3>`,
       `<p>${selected.description || "沒有額外描述。"}</p>`,
       '<div class="meta">',
-      `<div class="meta-row"><strong>Type</strong>${selected.type}</div>`,
-      `<div class="meta-row"><strong>Path</strong>${selected.path}</div>`,
+      `<div class="meta-row"><strong>資源類型</strong>${TYPE_LABELS[selected.type] || selected.type}</div>`,
+      `<div class="meta-row"><strong>路徑</strong>${selected.path}</div>`,
     ];
-    if (selected.logical_path) detailParts.push(`<div class="meta-row"><strong>Logical Path</strong>${selected.logical_path}</div>`);
-    if (selected.status) detailParts.push(`<div class="meta-row"><strong>Status</strong>${selected.status}</div>`);
-    if (selected.source_path) detailParts.push(`<div class="meta-row"><strong>Source File</strong>${selected.source_path}</div>`);
+    if (selected.logical_path) detailParts.push(`<div class="meta-row"><strong>邏輯路徑</strong>${selected.logical_path}</div>`);
+    if (selected.status) detailParts.push(`<div class="meta-row"><strong>狀態</strong>${selected.status}</div>`);
+    if (selected.source_path) detailParts.push(`<div class="meta-row"><strong>來源檔案</strong>${selected.source_path}</div>`);
     detailParts.push("</div>");
 
     function pushEdgeSection(title, list, mode) {
@@ -772,22 +1684,22 @@
     }
 
     if (relatedAll.length) {
-      pushEdgeSection("Outgoing", outgoing, "outgoing");
-      pushEdgeSection("Incoming", incoming, "incoming");
+      pushEdgeSection("向外關聯", outgoing, "outgoing");
+      pushEdgeSection("向內關聯", incoming, "incoming");
     } else {
       detailParts.push('<p class="empty">目前沒有關聯邊。</p>');
     }
     if (brokenSource) {
-      detailParts.push('<div class="section-title">Broken References</div>');
-      detailParts.push(`<p class="empty">這個來源節點目前有 ${brokenSource.count} 個連結解析到 repo 內檔案，但那些 target 尚未被納入目前的 MAP 範圍。</p>`);
+      detailParts.push('<div class="section-title">失效引用</div>');
+      detailParts.push(`<p class="empty">這個來源節點目前有 ${brokenSource.count} 個連結解析到專案目錄內的檔案，但那些目標尚未被納入目前的地圖範圍。</p>`);
       detailParts.push('<div class="edge-list">');
       brokenSource.targets.forEach((item) => {
         detailParts.push(`
           <div class="edge-item">
-            <strong>Unmapped Target</strong>
+            <strong>未映射目標</strong>
             <div class="edge-direction">${escapeHtml(item.target)}</div>
             <div>${escapeHtml(item.resolved_path)}</div>
-            <div class="broken-target-meta">來源檔已引用此路徑，但 generator 目前沒有把它建成節點。這通常代表它是 repo 內未納入的文件、模板，或超出現階段 canonical source set 的資源。</div>
+            <div class="broken-target-meta">來源檔已引用此路徑，但產生器目前沒有把它建成節點。這通常代表它是專案目錄內尚未納入的文件、模板，或超出目前執行面與正式來源集合的資源。</div>
           </div>
         `);
       });
@@ -844,21 +1756,37 @@
   function layoutGrid(visible) {
     const grouped = new Map(TYPE_ORDER.map((type) => [type, []]));
     visible.forEach((node) => grouped.get(node.type)?.push(node));
-    const columnWidth = 220;
-    const baseX = 90;
-    const topPadding = 90;
-    const rowGap = 82;
-    const boxHeight = 56;
+    const labelColumnWidth = 140;
+    const baseX = labelColumnWidth + 48;
+    const topPadding = 86;
+    const rowGap = 94;
+    const columnWidth = 214;
+    const boxWidth = 194;
+    const boxHeight = 60;
     const positions = new Map();
-    let maxRows = 0;
+    let maxColumns = 1;
     TYPE_ORDER.forEach((type, index) => {
       const items = (grouped.get(type) || []).slice().sort((a, b) => a.label.localeCompare(b.label));
-      maxRows = Math.max(maxRows, items.length);
-      items.forEach((node, rowIndex) => {
-        positions.set(node.id, { nodeId: node.id, x: baseX + index * columnWidth, y: topPadding + rowIndex * rowGap, width: 188, height: boxHeight, type });
+      maxColumns = Math.max(maxColumns, items.length || 1);
+      items.forEach((node, columnIndex) => {
+        positions.set(node.id, {
+          nodeId: node.id,
+          x: baseX + columnIndex * columnWidth,
+          y: topPadding + index * rowGap,
+          width: boxWidth,
+          height: boxHeight,
+          type,
+        });
       });
     });
-    return { positions, width: baseX + TYPE_ORDER.length * columnWidth + 120, height: Math.max(920, topPadding + maxRows * rowGap + 120) };
+    return {
+      positions,
+      width: Math.max(1380, baseX + maxColumns * columnWidth + 120),
+      height: Math.max(780, topPadding + TYPE_ORDER.length * rowGap + 86),
+      labelX: 40,
+      labelColumnWidth,
+      rowYByType: new Map(TYPE_ORDER.map((type, index) => [type, topPadding + index * rowGap])),
+    };
   }
 
   function layoutOrbit(visible, mode) {
@@ -951,9 +1879,97 @@
     });
   }
 
+  function renderMinimap(layout, visible, visibleIds, selectedId) {
+    if (!mapMinimapEl) return;
+    const positions = layout.positions;
+    const mapTone = getMapToneTheme();
+    const typeStyles = getTypeStylesTheme();
+    mapMinimapEl.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
+    mapMinimapEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    mapMinimapEl.innerHTML = "";
+
+    const backdropLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    if (state.mapMode === "grid") {
+      TYPE_ORDER.forEach((type) => {
+        const y = layout.rowYByType?.get(type);
+        if (typeof y !== "number") return;
+        const guide = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        guide.setAttribute("x1", String((layout.labelColumnWidth || 140) + 12));
+        guide.setAttribute("y1", String(y + 30));
+        guide.setAttribute("x2", String(layout.width - 12));
+        guide.setAttribute("y2", String(y + 30));
+        guide.setAttribute("stroke", mapTone.guideSoft);
+        guide.setAttribute("stroke-width", "1");
+        guide.setAttribute("stroke-dasharray", "5 8");
+        backdropLayer.appendChild(guide);
+      });
+    } else {
+      const depthValues = Array.from((layout.depths || new Map()).values()).filter((depth) => depth > 0);
+      const maxDepth = depthValues.length ? Math.max(...depthValues) : 0;
+      for (let depth = 1; depth <= maxDepth; depth += 1) {
+        const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        ring.setAttribute("cx", String(layout.center.x));
+        ring.setAttribute("cy", String(layout.center.y));
+        ring.setAttribute("r", String(180 + ((depth - 1) * 150)));
+        ring.setAttribute("fill", "none");
+        ring.setAttribute("stroke", mapTone.guideSoft);
+        ring.setAttribute("stroke-width", "1");
+        ring.setAttribute("stroke-dasharray", "4 8");
+        backdropLayer.appendChild(ring);
+      }
+    }
+    mapMinimapEl.appendChild(backdropLayer);
+
+    const edgeLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    buildVisibleEdges(visibleIds).forEach((edge) => {
+      const from = positions.get(edge.from);
+      const to = positions.get(edge.to);
+      if (!from || !to) return;
+      const style = EDGE_STYLES[edge.kind] || EDGE_STYLES.contains;
+      const active = edge.from === selectedId || edge.to === selectedId;
+      const edgeShape = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      edgeShape.setAttribute("x1", String(from.x + from.width / 2));
+      edgeShape.setAttribute("y1", String(from.y + from.height / 2));
+      edgeShape.setAttribute("x2", String(to.x + to.width / 2));
+      edgeShape.setAttribute("y2", String(to.y + to.height / 2));
+      edgeShape.setAttribute("stroke", active ? mapTone.activeStroke : style.stroke);
+      edgeShape.setAttribute("stroke-width", active ? "1.4" : "1");
+      edgeShape.setAttribute("stroke-opacity", active ? "0.78" : String(Math.min(style.opacity, 0.42)));
+      if (style.dash) edgeShape.setAttribute("stroke-dasharray", style.dash);
+      edgeLayer.appendChild(edgeShape);
+    });
+    mapMinimapEl.appendChild(edgeLayer);
+
+    const nodeLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    visible.forEach((node) => {
+      const box = positions.get(node.id);
+      if (!box) return;
+      const typeStyle = typeStyles[node.type] || typeStyles.directory;
+      const active = node.id === selectedId;
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("x", String(box.x));
+      rect.setAttribute("y", String(box.y));
+      rect.setAttribute("width", String(box.width));
+      rect.setAttribute("height", String(box.height));
+      rect.setAttribute("rx", active ? "16" : "12");
+      rect.setAttribute("fill", active ? mapTone.activeFill : typeStyle.fill);
+      rect.setAttribute("stroke", active ? mapTone.activeStroke : typeStyle.stroke);
+      rect.setAttribute("stroke-width", active ? "2" : "0.9");
+      rect.setAttribute("fill-opacity", active ? "0.98" : "0.78");
+      nodeLayer.appendChild(rect);
+    });
+    mapMinimapEl.appendChild(nodeLayer);
+
+    state.lastMapLayout = { width: layout.width, height: layout.height };
+    syncMinimapVisibility();
+    scheduleMinimapViewportUpdate();
+  }
+
   function renderMap(visible, visibleIds) {
     const selectedId = state.selectedId;
     const layout = state.mapMode === "grid" ? layoutGrid(visible) : layoutOrbit(visible, state.mapMode);
+    const mapTone = getMapToneTheme();
+    const typeStyles = getTypeStylesTheme();
     const positions = layout.positions;
     mapEl.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
     mapEl.style.width = `${layout.width}px`;
@@ -961,15 +1977,33 @@
     mapEl.innerHTML = "";
     const titleLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     if (state.mapMode === "grid") {
+      const helper = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      helper.setAttribute("x", "40");
+      helper.setAttribute("y", "42");
+      helper.setAttribute("fill", mapTone.copy);
+      helper.setAttribute("font-size", formatSvgFontSize(11.4));
+      helper.textContent = "欄式視圖改為由上往下看類型，橫向拖移看完整列。";
+      titleLayer.appendChild(helper);
+
       TYPE_ORDER.forEach((type) => {
-        const sample = Array.from(positions.values()).find((entry) => entry.type === type);
-        const x = sample ? sample.x : 90 + TYPE_ORDER.indexOf(type) * 220;
+        const y = layout.rowYByType?.get(type) ?? 86 + TYPE_ORDER.indexOf(type) * 94;
+        const guide = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        guide.setAttribute("x1", String((layout.labelColumnWidth || 140) + 16));
+        guide.setAttribute("y1", String(y + 30));
+        guide.setAttribute("x2", String(layout.width - 28));
+        guide.setAttribute("y2", String(y + 30));
+        guide.setAttribute("stroke", mapTone.guide);
+        guide.setAttribute("stroke-width", "1");
+        guide.setAttribute("stroke-dasharray", "5 8");
+        titleLayer.appendChild(guide);
+
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("x", String(x));
-        label.setAttribute("y", "46");
-        label.setAttribute("fill", "#5f5a4b");
-        label.setAttribute("font-size", "15");
+        label.setAttribute("x", String(layout.labelX || 40));
+        label.setAttribute("y", String(y + 34));
+        label.setAttribute("fill", mapTone.title);
+        label.setAttribute("font-size", formatSvgFontSize(14.2));
         label.setAttribute("font-weight", "700");
+        label.setAttribute("dominant-baseline", "middle");
         label.textContent = TYPE_LABELS[type] || type;
         titleLayer.appendChild(label);
       });
@@ -984,7 +2018,7 @@
         ring.setAttribute("cy", String(layout.center.y));
         ring.setAttribute("r", String(180 + ((depth - 1) * 150)));
         ring.setAttribute("fill", "none");
-        ring.setAttribute("stroke", "rgba(131, 114, 82, 0.18)");
+        ring.setAttribute("stroke", mapTone.orbit);
         ring.setAttribute("stroke-width", "1");
         ring.setAttribute("stroke-dasharray", "4 8");
         orbitLayer.appendChild(ring);
@@ -993,16 +2027,16 @@
       const header = document.createElementNS("http://www.w3.org/2000/svg", "text");
       header.setAttribute("x", "44");
       header.setAttribute("y", "46");
-      header.setAttribute("fill", "#5f5a4b");
-      header.setAttribute("font-size", "16");
+      header.setAttribute("fill", mapTone.title);
+      header.setAttribute("font-size", formatSvgFontSize(15.2));
       header.setAttribute("font-weight", "700");
       header.textContent = `圓形視圖：以 ${selected?.label || "目前節點"} 為中心`;
       titleLayer.appendChild(header);
       const sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
       sub.setAttribute("x", "44");
       sub.setAttribute("y", "70");
-      sub.setAttribute("fill", "#7a705e");
-      sub.setAttribute("font-size", "12");
+      sub.setAttribute("fill", mapTone.copy);
+      sub.setAttribute("font-size", formatSvgFontSize(11.2));
       sub.textContent = "第一圈優先呈現直接相鄰節點；更外圈為較遠或未連通節點。";
       titleLayer.appendChild(sub);
     }
@@ -1020,7 +2054,7 @@
       edgeShape.setAttribute("y1", String(from.y + from.height / 2));
       edgeShape.setAttribute("x2", String(to.x + to.width / 2));
       edgeShape.setAttribute("y2", String(to.y + to.height / 2));
-      edgeShape.setAttribute("stroke", active ? "#0f766e" : style.stroke);
+      edgeShape.setAttribute("stroke", active ? mapTone.activeStroke : style.stroke);
       edgeShape.setAttribute("stroke-width", active ? String(style.width + 0.9) : String(style.width));
       edgeShape.setAttribute("stroke-opacity", active ? "0.96" : String(style.opacity));
       if (style.dash) edgeShape.setAttribute("stroke-dasharray", style.dash);
@@ -1035,7 +2069,7 @@
       const active = node.id === selectedId;
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       group.style.cursor = "pointer";
-      const typeStyle = TYPE_STYLES[node.type] || TYPE_STYLES.directory;
+      const typeStyle = typeStyles[node.type] || typeStyles.directory;
 
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
       rect.setAttribute("x", String(box.x));
@@ -1043,16 +2077,16 @@
       rect.setAttribute("width", String(box.width));
       rect.setAttribute("height", String(box.height));
       rect.setAttribute("rx", active ? "18" : "14");
-      rect.setAttribute("fill", active ? "#fcfbf5" : typeStyle.fill);
-      rect.setAttribute("stroke", active ? "#176b66" : typeStyle.stroke);
+      rect.setAttribute("fill", active ? mapTone.activeFill : typeStyle.fill);
+      rect.setAttribute("stroke", active ? mapTone.activeStroke : typeStyle.stroke);
       rect.setAttribute("stroke-width", active ? "2.1" : "1.1");
       group.appendChild(rect);
 
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
       label.setAttribute("x", String(box.x + 16));
       label.setAttribute("y", String(box.y + 23));
-      label.setAttribute("fill", "#201c16");
-      label.setAttribute("font-size", active ? "14.4" : "13.2");
+      label.setAttribute("fill", mapTone.label);
+      label.setAttribute("font-size", formatSvgFontSize(active ? 13.4 : 12.4));
       label.setAttribute("font-weight", active ? "700" : "600");
       label.textContent = node.label.length > 27 ? `${node.label.slice(0, 26)}…` : node.label;
       group.appendChild(label);
@@ -1060,8 +2094,8 @@
       const typeTag = document.createElementNS("http://www.w3.org/2000/svg", "text");
       typeTag.setAttribute("x", String(box.x + box.width - 14));
       typeTag.setAttribute("y", String(box.y + 23));
-      typeTag.setAttribute("fill", active ? "#176b66" : typeStyle.stroke);
-      typeTag.setAttribute("font-size", "10.4");
+      typeTag.setAttribute("fill", active ? mapTone.activeStroke : typeStyle.stroke);
+      typeTag.setAttribute("font-size", formatSvgFontSize(9.8));
       typeTag.setAttribute("font-weight", "700");
       typeTag.setAttribute("text-anchor", "end");
       typeTag.textContent = (TYPE_LABELS[node.type] || node.type).toUpperCase();
@@ -1070,8 +2104,8 @@
       const sub = document.createElementNS("http://www.w3.org/2000/svg", "text");
       sub.setAttribute("x", String(box.x + 16));
       sub.setAttribute("y", String(box.y + 42));
-      sub.setAttribute("fill", "#6b6256");
-      sub.setAttribute("font-size", active ? "11.2" : "10.8");
+      sub.setAttribute("fill", mapTone.sub);
+      sub.setAttribute("font-size", formatSvgFontSize(active ? 10.6 : 10.2));
       sub.textContent = node.status || "active";
       group.appendChild(sub);
 
@@ -1082,13 +2116,14 @@
       nodeLayer.appendChild(group);
     });
     mapEl.appendChild(nodeLayer);
+    renderMinimap(layout, visible, visibleIds, selectedId);
 
     if (state.mapMode === "grid") {
-      mapModeNoteEl.textContent = "欄式視圖：依資源類型分欄，適合全域巡覽";
-      mapCaptionEl.textContent = "欄式視圖有助於看清每一類資源的總量與大致關係。";
+      mapModeNoteEl.textContent = "欄式視圖：類型由上往下，橫向拖移看完整列";
+      mapCaptionEl.textContent = "欄式視圖改成由上往下排列資源類型，同列節點沿水平方向展開，方便保留較大的節點尺寸並用左右拖移讀完整列。";
     } else {
       mapModeNoteEl.textContent = "圓形視圖：以所選節點為圓心向外展開";
-      mapCaptionEl.textContent = "第一圈優先是直接關聯節點，越外圈代表越遠或未連通的節點。";
+      mapCaptionEl.textContent = "第一圈優先呈現直接關聯節點，其中最有價值的是執行面投影與正式來源之間的對應。";
     }
     const selectedBox = getFocusBox(selectedId, positions);
     if (selectedBox) {
@@ -1097,7 +2132,9 @@
   }
 
   function render() {
+    syncWorkspacePages();
     updateSummary();
+    renderGovernanceSourceNote();
     updateDiagnosticsCard();
     updateExportCard();
     const visible = computeVisibleNodes();
@@ -1106,6 +2143,10 @@
     renderSidebar(visible);
     renderMap(visible, ids);
     renderDetail(ids);
+    syncMastheadCompactState();
+    if (state.tourOpen) {
+      requestAnimationFrame(() => updateTourLayout());
+    }
   }
 
   function parseFrontmatter(text) {
@@ -1223,14 +2264,14 @@
     const dirHandle = await getDirectoryHandle(rootHandle, relativePath);
     const names = [];
     for await (const [name, handle] of dirHandle.entries()) {
-      if (handle.kind === "directory" && !name.startsWith(".")) names.push(name);
+      if (handle.kind === "directory") names.push(name);
     }
     return names.sort((a, b) => a.localeCompare(b));
   }
 
   async function scanRepo(rootHandle) {
     for (const marker of REPO_MARKERS) {
-      const exists = marker.endsWith("/skills") || marker.endsWith("/mcp")
+      const exists = marker.endsWith("/skills") || marker.endsWith("/mcp") || marker.endsWith("/agents") || marker.endsWith("/workflow")
         ? await pathExists(rootHandle, marker, "directory")
         : await pathExists(rootHandle, marker, "file");
       if (!exists) throw new Error(`選取的資料夾缺少 repo marker: ${marker}`);
@@ -1239,13 +2280,17 @@
     const nodes = [];
     const pathToNodeId = new Map();
     const logicalToNodeId = new Map();
+    const sourceToRegistryNodeId = new Map();
     function register(node) {
       nodes.push(node);
       pathToNodeId.set(node.path, node.id);
       if (node.logical_path) logicalToNodeId.set(node.logical_path, node.id);
+      if (["skill", "mcp", "agent", "workflow"].includes(node.type) && node.source_path) {
+        sourceToRegistryNodeId.set(node.source_path, node.id);
+      }
     }
 
-    register({ id: "repo:root", type: "directory", label: "Repo Root", path: "/", logical_path: "/", status: "repo-root", description: "Repository root directory" });
+    register({ id: "repo:root", type: "directory", label: "專案根目錄", path: "/", logical_path: "/", status: "repo-root", description: "專案根目錄" });
     ROOT_DIRECTORIES.forEach(([relative, label, logicalPath]) => {
       register({
         id: nodeIdFor("dir", relative),
@@ -1253,8 +2298,8 @@
         label,
         path: `/${relative}`,
         logical_path: logicalPath,
-        status: "canonical-root",
-        description: `Canonical ${label} root`,
+        status: relative.startsWith("runtime/") ? "runtime-root" : "canonical-root",
+        description: `${label}根目錄`,
         source_path: `/${relative}`,
       });
     });
@@ -1272,6 +2317,41 @@
         description: extractTitle(text, relative.replace(/\.md$/i, "")),
         source_path: `/${relative}`,
       });
+    }
+
+    if (await pathExists(rootHandle, "runtime/catalog.json", "file")) {
+      const catalogText = await readTextFromRepo(rootHandle, "runtime/catalog.json");
+      const catalog = JSON.parse(catalogText);
+      register({
+        id: nodeIdFor("doc", "runtime/catalog.json"),
+        type: "doc",
+        label: "執行面目錄",
+        path: "/runtime/catalog.json",
+        logical_path: "/runtime/catalog.json",
+        status: "runtime-doc",
+        description: catalog.meta?.description || "記錄目前執行面投影結果的目錄檔。",
+        source_path: "/runtime/catalog.json",
+      });
+
+      for (const entry of catalog.entries || []) {
+        if (!entry?.runtime_path || !entry?.source_of_truth) continue;
+        const entryType = entry.type || "resource";
+        const descriptionParts = [
+          `執行面${entryType}入口`,
+          entry.hot_path ? "高頻路徑" : null,
+          `正式來源：${entry.source_of_truth}`,
+        ].filter(Boolean);
+        register({
+          id: nodeIdFor("runtime", `${entryType}:${entry.id}`),
+          type: "runtime",
+          label: entry.id,
+          path: `/${entry.runtime_path}`,
+          logical_path: `/${entry.runtime_path}`,
+          status: entry.hot_path ? "runtime-hot-path" : "runtime-projection",
+          description: descriptionParts.join(" · "),
+          source_path: `/${entry.source_of_truth}`,
+        });
+      }
     }
 
     for (const skillName of await listChildDirectories(rootHandle, "registry/skills")) {
@@ -1366,7 +2446,10 @@
         addEdge("repo:root", node.id, "contains");
         return;
       }
-      if (node.path.startsWith("/registry/skills/")) addEdge(nodeIdFor("dir", "registry/skills"), node.id, "contains");
+      if (node.path.startsWith("/runtime/skills/")) addEdge(nodeIdFor("dir", "runtime/skills"), node.id, "contains");
+      else if (node.path.startsWith("/runtime/agents/")) addEdge(nodeIdFor("dir", "runtime/agents"), node.id, "contains");
+      else if (node.path.startsWith("/runtime/workflow/")) addEdge(nodeIdFor("dir", "runtime/workflow"), node.id, "contains");
+      else if (node.path.startsWith("/registry/skills/")) addEdge(nodeIdFor("dir", "registry/skills"), node.id, "contains");
       else if (node.path.startsWith("/registry/mcp/")) addEdge(nodeIdFor("dir", "registry/mcp"), node.id, "contains");
       else if (node.path.startsWith("/registry/agents/")) addEdge(nodeIdFor("dir", "registry/agents"), node.id, "contains");
       else if (node.path.startsWith("/registry/workflow/")) addEdge(nodeIdFor("dir", "registry/workflow"), node.id, "contains");
@@ -1426,6 +2509,14 @@
       });
     }
 
+    const runtimeCatalogId = pathToNodeId.get("/runtime/catalog.json");
+    nodes.forEach((node) => {
+      if (node.type !== "runtime") return;
+      if (runtimeCatalogId) addEdge(runtimeCatalogId, node.id, "catalog_entry");
+      const registryTargetId = sourceToRegistryNodeId.get(node.source_path);
+      if (registryTargetId) addEdge(node.id, registryTargetId, "maps_to");
+    });
+
     const counts = {};
     nodes.forEach((node) => { counts[node.type] = (counts[node.type] || 0) + 1; });
     const nonStructuralTouches = {};
@@ -1458,7 +2549,7 @@
       };
     });
     return {
-      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 3, page_mode: "interactive" },
+      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 },
       counts,
       diagnostics: {
         broken_reference_count: brokenReferences.length,
@@ -1511,12 +2602,12 @@
     if (state.refreshInFlight) return;
     const handle = await ensureRepoHandle(requestInteractive);
     if (!handle) {
-      setRefreshState("error", "尚未連結 repo root。");
-      updateStatusCard("尚未連結 repo root，無法執行頁內更新。");
+      setRefreshState("error", "尚未連結專案根目錄。");
+      updateStatusCard("尚未連結專案根目錄，無法執行頁內更新。");
       return;
     }
     state.refreshInFlight = true;
-    setRefreshState("progress", "正在重新掃描 repo 並重建節點關係。");
+    setRefreshState("progress", "正在重新掃描專案並重建節點關係。");
     updateStatusCard();
     const startedAt = performance.now();
     try {
@@ -1573,10 +2664,168 @@
   function setupControls() {
     loadSettings();
     applySettingsToControls();
-    if (governanceOutputPathEl && GOVERNANCE_ENABLED) governanceOutputPathEl.value = defaultGovernanceOutputPath();
+    initializeGovernanceSelectors();
+    if (governanceOutputPathEl) governanceOutputPathEl.value = defaultGovernanceOutputPath();
+    workspaceTabs.forEach((button) => {
+      button.addEventListener("click", () => {
+        setWorkspacePage(button.dataset.workspaceTab || "browse");
+      });
+    });
+    workspacePreviewCards.forEach((button) => {
+      button.addEventListener("click", () => {
+        setWorkspacePage(button.dataset.workspacePreview || "browse");
+      });
+    });
+    workspacePrevEl?.addEventListener("click", () => { moveWorkspacePage(-1); });
+    workspaceNextEl?.addEventListener("click", () => { moveWorkspacePage(1); });
+    workspaceShellEl?.addEventListener("pointerdown", () => {
+      state.workspaceEngaged = true;
+      syncMastheadCompactState();
+    }, { passive: true });
+    workspaceShellEl?.addEventListener("focusin", () => {
+      state.workspaceEngaged = true;
+      syncMastheadCompactState();
+    });
+    mapWrapEl?.addEventListener("scroll", () => {
+      scheduleMinimapViewportUpdate();
+    }, { passive: true });
+    mapMinimapFrameEl?.addEventListener("click", (event) => {
+      jumpMapViewportFromMinimap(event.clientX, event.clientY);
+    });
+    mapMinimapFrameEl?.addEventListener("keydown", (event) => {
+      const horizontalStep = Math.max(80, mapWrapEl?.clientWidth ? mapWrapEl.clientWidth * 0.3 : 120);
+      const verticalStep = Math.max(48, mapWrapEl?.clientHeight ? mapWrapEl.clientHeight * 0.3 : 72);
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        mapWrapEl?.scrollBy({ left: horizontalStep, top: 0, behavior: "smooth" });
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        mapWrapEl?.scrollBy({ left: -horizontalStep, top: 0, behavior: "smooth" });
+        return;
+      }
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        mapWrapEl?.scrollBy({ left: 0, top: verticalStep, behavior: "smooth" });
+        return;
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        mapWrapEl?.scrollBy({ left: 0, top: -verticalStep, behavior: "smooth" });
+      }
+    });
     searchEl.addEventListener("input", () => { state.search = searchEl.value.trim().toLowerCase(); render(); });
     typeFilterEl.addEventListener("change", () => { state.type = typeFilterEl.value; render(); });
     mapModeEl.addEventListener("change", () => { state.mapMode = mapModeEl.value; saveSettings(); render(); });
+    visualToneOptionEls.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextTone = button.dataset.visualToneOption || "";
+        if (!VISUAL_TONES.has(nextTone)) return;
+        setVisualTone(nextTone);
+        saveSettings();
+      });
+      button.addEventListener("keydown", (event) => {
+        const currentIndex = VISUAL_TONE_ORDER.indexOf(state.visualTone);
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          event.preventDefault();
+          const nextTone = VISUAL_TONE_ORDER[(currentIndex + 1) % VISUAL_TONE_ORDER.length];
+          setVisualTone(nextTone, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const nextTone = VISUAL_TONE_ORDER[(currentIndex - 1 + VISUAL_TONE_ORDER.length) % VISUAL_TONE_ORDER.length];
+          setVisualTone(nextTone, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "Home") {
+          event.preventDefault();
+          setVisualTone(VISUAL_TONE_ORDER[0], { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "End") {
+          event.preventDefault();
+          setVisualTone(VISUAL_TONE_ORDER[VISUAL_TONE_ORDER.length - 1], { focus: true });
+          saveSettings();
+        }
+      });
+    });
+    visualThemeOptionEls.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextTheme = button.dataset.visualThemeOption || "";
+        if (!VISUAL_THEMES.has(nextTheme)) return;
+        setVisualTheme(nextTheme);
+        saveSettings();
+      });
+      button.addEventListener("keydown", (event) => {
+        const currentIndex = VISUAL_THEME_ORDER.indexOf(state.visualTheme);
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          event.preventDefault();
+          const nextTheme = VISUAL_THEME_ORDER[(currentIndex + 1) % VISUAL_THEME_ORDER.length];
+          setVisualTheme(nextTheme, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const nextTheme = VISUAL_THEME_ORDER[(currentIndex - 1 + VISUAL_THEME_ORDER.length) % VISUAL_THEME_ORDER.length];
+          setVisualTheme(nextTheme, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "Home") {
+          event.preventDefault();
+          setVisualTheme(VISUAL_THEME_ORDER[0], { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "End") {
+          event.preventDefault();
+          setVisualTheme(VISUAL_THEME_ORDER[VISUAL_THEME_ORDER.length - 1], { focus: true });
+          saveSettings();
+        }
+      });
+    });
+    textScaleOptionEls.forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextScale = button.dataset.textScaleOption || "";
+        if (!TEXT_SCALES.has(nextScale)) return;
+        setTextScale(nextScale);
+        saveSettings();
+      });
+      button.addEventListener("keydown", (event) => {
+        const currentIndex = TEXT_SCALE_ORDER.indexOf(state.textScale);
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          event.preventDefault();
+          const nextScale = TEXT_SCALE_ORDER[(currentIndex + 1) % TEXT_SCALE_ORDER.length];
+          setTextScale(nextScale, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const nextScale = TEXT_SCALE_ORDER[(currentIndex - 1 + TEXT_SCALE_ORDER.length) % TEXT_SCALE_ORDER.length];
+          setTextScale(nextScale, { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "Home") {
+          event.preventDefault();
+          setTextScale(TEXT_SCALE_ORDER[0], { focus: true });
+          saveSettings();
+          return;
+        }
+        if (event.key === "End") {
+          event.preventDefault();
+          setTextScale(TEXT_SCALE_ORDER[TEXT_SCALE_ORDER.length - 1], { focus: true });
+          saveSettings();
+        }
+      });
+    });
     updateModeEl.addEventListener("change", () => { state.updateMode = updateModeEl.value; saveSettings(); scheduleRefreshTimer(); updateStatusCard(); });
     [intervalDaysEl, intervalHoursEl, intervalMinutesEl].forEach((input) => input.addEventListener("change", rememberIntervalInputs));
     linkRepoEl.addEventListener("click", async () => {
@@ -1584,16 +2833,20 @@
       catch (error) { updateStatusCard(error instanceof Error ? error.message : String(error)); }
     });
     refreshNowEl.addEventListener("click", () => { refreshFromRepo("manual-button", true); });
-    if (GOVERNANCE_ENABLED) {
-      governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
-      governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
-    }
+    governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
+    governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
+    mapMinimapToggleEl?.addEventListener("click", () => { toggleMinimapVisibility(); });
+    tourStartEl?.addEventListener("click", () => { startTour(); });
+    tourPrevEl?.addEventListener("click", () => { moveTour(-1); });
+    tourNextEl?.addEventListener("click", () => { moveTour(1); });
+    tourSkipEl?.addEventListener("click", () => { finishTour(); });
+    tourCloseEl?.addEventListener("click", () => { finishTour(); });
+    tourBackdropEl?.addEventListener("click", () => { finishTour(); });
   }
 
   setupControls();
   render();
-  if (GOVERNANCE_ENABLED) {
-    renderGovernanceResolution(resolveGovernanceInPage(), "已載入預設治理解析。");
-  }
+  renderGovernanceResolution(resolveGovernanceInPage(), "已載入預設治理解析。");
   maybeAutoRefreshOnLoad();
+  maybeStartTourOnFirstVisit();
 })();
