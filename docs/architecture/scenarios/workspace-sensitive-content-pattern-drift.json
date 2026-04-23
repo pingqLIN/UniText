@@ -1,0 +1,30 @@
+{
+  "id": "workspace-sensitive-content-pattern-drift",
+  "layer": "boundary",
+  "class": "A2",
+  "trigger": [
+    "validate-workspace-sensitive-metadata-rules false",
+    "verify-workspace-boundaries false after public reference docs change",
+    "live workspace hostname pattern starts flagging generic cloud guidance"
+  ],
+  "failure_signal": [
+    "workspace-sensitive self-tests fail for safe public examples",
+    "verify-workspace-boundaries reports content_violations from generic hostname, domain, or ingress guidance"
+  ],
+  "repair_action": [
+    "restore the canonical live workspace hostname content pattern",
+    "restore required safe and positive self-test cases for hostname detection"
+  ],
+  "verify_action": [
+    "rerun validate-workspace-sensitive-metadata-rules.ps1",
+    "rerun verify-workspace-boundaries.ps1"
+  ],
+  "rollback": [
+    "discard the temporary repo fixture"
+  ],
+  "escalate_when": [
+    "repair would need to widen scope beyond the canonical hostname rule",
+    "content violations remain after canonical pattern restore",
+    "the remaining violations point to real live metadata rather than pattern overreach"
+  ]
+}

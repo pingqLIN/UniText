@@ -45,7 +45,7 @@
 截至目前，以下類型內容應特別保守處理：
 
 - 社群文草稿與對外發佈文案
-- `SKILL0_COLLABORATION_VISION.md`
+- `docs/concepts/SKILL0_COLLABORATION_VISION.md`
 - 其他與 `skill-0` 或外部審查相關的策略討論
 
 ## 6. Operational Interpretation

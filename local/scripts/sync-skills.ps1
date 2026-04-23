@@ -17,6 +17,35 @@ if (-not (Test-Path $source)) {
   throw "skills source not found: $source"
 }
 
+function Get-CanonicalAliasEntries {
+  param(
+    [string]$SourcePath,
+    [string]$TargetPath
+  )
+
+  if (-not (Test-Path -LiteralPath $TargetPath)) {
+    return @()
+  }
+
+  $canonicalByKey = @{}
+  Get-ChildItem -LiteralPath $SourcePath -Force | ForEach-Object {
+    $canonicalByKey[$_.Name.ToLowerInvariant()] = $_.Name
+  }
+
+  $aliases = @()
+  Get-ChildItem -LiteralPath $TargetPath -Force | ForEach-Object {
+    $canonicalName = $canonicalByKey[$_.Name.ToLowerInvariant()]
+    if ($canonicalName -and $_.Name -cne $canonicalName) {
+      $aliases += [pscustomobject]@{
+        path = $_.FullName
+        canonical_name = $canonicalName
+      }
+    }
+  }
+
+  return $aliases
+}
+
 $runId = Get-Date -Format "yyyyMMdd_HHmmss"
 $runDir = Join-Path $repo "ops\history\sync_$runId"
 $summary = @()
@@ -29,6 +58,11 @@ foreach ($target in $targets) {
   $item = if (Test-Path $target) { Get-Item $target -Force } else { $null }
   $isLink = [bool]($item -and $item.LinkType)
   $linkTarget = if ($isLink) { $item.Target } else { $null }
+  $aliasEntries = if ((Test-Path -LiteralPath $target) -and -not $isLink) {
+    @(Get-CanonicalAliasEntries -SourcePath $source -TargetPath $target)
+  } else {
+    @()
+  }
 
   if ($isLink -and $linkTarget -like "*runtime\skills") {
     $summary += [pscustomobject]@{
@@ -46,6 +80,7 @@ foreach ($target in $targets) {
       mode = if ($isLink) { "symlink" } else { "mirror" }
       action = "dry-run"
       reason = if ($isLink) { "link target mismatch - review required" } else { "would backup and sync" }
+      alias_prune_candidates = $aliasEntries
     }
     continue
   }
@@ -65,6 +100,10 @@ foreach ($target in $targets) {
     Copy-Item $target $backupTarget -Recurse
   }
 
+  foreach ($aliasEntry in $aliasEntries) {
+    Remove-Item -LiteralPath $aliasEntry.path -Recurse -Force
+  }
+
   $log = Join-Path $runDir ("sync-" + ([IO.Path]::GetFileName($target)) + ".log")
   $output = & robocopy $source $target /E /R:1 /W:1 /NFL /NDL /NJH /NJS /NP 2>&1
   $output | Tee-Object -FilePath $log | Out-Host
@@ -81,6 +120,7 @@ foreach ($target in $targets) {
     reason = "robocopy /E completed"
     log = $log
     exit_code = $exit
+    pruned_alias_entries = $aliasEntries
   }
 }
 

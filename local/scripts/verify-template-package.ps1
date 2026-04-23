@@ -65,9 +65,9 @@ $forbidden = @(
   "recovered_20260318_165117",
   ".bak_20260315_00",
   "ops\\history",
-  "EXTERNAL_REVIEW_PACKAGE.md",
-  "EXTERNAL_REVIEW_COVER_NOTE.md",
-  "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+  "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md",
+  "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md",
+  "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md",
   "PROJECT_STATUS_REPORT_2026-03-23.md"
 )
 

@@ -1,4 +1,4 @@
-[English](README.md) | [繁體中文](i18n/zh-TW/README.md) | [简体中文](i18n/zh-CN/README.md) | [日本語](i18n/ja/README.md) | [Deutsch](i18n/de/README.md) | [Français](i18n/fr/README.md) | [Español](i18n/es/README.md) | [한국어](i18n/ko/README.md) | [Italiano](i18n/it/README.md)
+[English](README.md) | [繁體中文](i18n/zh-TW/README.md)
 
 # UniText
 
@@ -13,6 +13,12 @@
 UniText is not just a folder of prompts, skills, or MCP stubs. It is a governed way to keep one canonical definition of shared AI resources while separating machine-local wiring, project-local activation, and operational history. The point is to stop every CLI from growing its own drifting copy of the same capability.
 
 That is why this repository includes `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, and publishability checks in one place. UniText is trying to make shared AI tooling portable, reviewable, and repeatable across different CLIs, different machines, and different stages of a project lifecycle.
+
+Current documentation maintenance is intentionally narrow:
+
+- `English` in repo root is the canonical source
+- `繁體中文 (zh-TW)` is the only actively maintained translated surface
+- older locale waves are kept as archived snapshots under `i18n/.clean/archived-locales/` rather than active release gates
 
 ---
 
@@ -143,7 +149,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
+`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -224,17 +230,20 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Secret storage, redaction, and password/API key handling boundaries |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
 | [BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md](BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md) | Reusable template for documenting boundary drift incidents and permanent controls |
-| [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` external-review shortlist, not the full registry inventory |
+| [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` external-review shortlist, not the full registry inventory |
 | [TEST_BASELINE.md](TEST_BASELINE.md) | Current automated test baseline, coverage scope, and rebuild priorities |
-| [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
-| [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
-| [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Short-form review summary for fast orientation |
+| [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
+| [docs/reviews/external-review-bundle.contract.json](docs/reviews/external-review-bundle.contract.json) | Machine-readable membership and reading order contract for the external review package |
+| [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
+| [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md) | Short-form review summary for fast orientation |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Template release cleanup scope, exclusions, and export flow |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
-| [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
-| [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
-| [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
+| [docs/architecture/INTEGRATION_SURFACE_PROFILES.md](docs/architecture/INTEGRATION_SURFACE_PROFILES.md) | Declared integration-surface contract for bootstrap, verify, and runtime catalog enrichment |
+| [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
+| [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md) | Scenario-driven rules for deciding when agents may auto-repair drift, when they must stay bounded, and when human escalation is required |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
 Reading order for humans: `README.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`

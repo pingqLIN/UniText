@@ -1,9 +1,11 @@
+import json
 import unittest
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = REPO_ROOT / "registry" / "skills"
+RUNTIME_CATALOG = REPO_ROOT / "runtime" / "catalog.json"
 
 
 def visible_skill_dirs() -> list[Path]:
@@ -50,6 +52,16 @@ class RegistryInventoryTests(unittest.TestCase):
     def test_skill_inventory_excludes_hidden_directories(self):
         actual = {path.name for path in visible_skill_dirs()}
         self.assertNotIn(".clean", actual)
+
+    def test_project_development_loop_registration_uses_canonical_lowercase(self):
+        actual = {path.name for path in visible_skill_dirs()}
+        self.assertIn("project-development-loop", actual)
+        self.assertNotIn("Project-development-loop", actual)
+
+        catalog = json.loads(RUNTIME_CATALOG.read_text(encoding="utf-8"))
+        skill_ids = {entry["id"] for entry in catalog["entries"] if entry["type"] == "skill"}
+        self.assertIn("project-development-loop", skill_ids)
+        self.assertNotIn("Project-development-loop", skill_ids)
 
 
 if __name__ == "__main__":

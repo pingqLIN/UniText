@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import getpass
 import json
 import os
@@ -8,6 +9,12 @@ import re
 import shutil
 import sys
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.integration_surfaces import find_surface, load_integration_surfaces, surfaces_by_kind
 
 
 UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 60
@@ -93,10 +100,36 @@ def read_json(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def codex_target_contains_runtime_baseline(target: Path, runtime_skills: Path) -> tuple[bool, str, list[str], str | None]:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Verify UniText bootstrap state for local CLI runtimes.")
+    parser.add_argument("--home-dir")
+    parser.add_argument("--skip-codex", action="store_true")
+    parser.add_argument("--skip-copilot", action="store_true")
+    parser.add_argument("--skip-project-mcp", action="store_true")
+    return parser.parse_args()
+
+
+def find_noncanonical_alias_entries(target: Path, runtime_skills: Path) -> list[dict[str, str]]:
+    if not target.exists() or not target.is_dir():
+        return []
+    if not runtime_skills.exists() or not runtime_skills.is_dir():
+        return []
+
+    canonical_by_key = {item.name.casefold(): item.name for item in sorted(runtime_skills.iterdir())}
+    aliases: list[dict[str, str]] = []
+    for item in sorted(target.iterdir()):
+        canonical_name = canonical_by_key.get(item.name.casefold())
+        if canonical_name and item.name != canonical_name:
+            aliases.append({"path": str(item), "canonical_name": canonical_name})
+    return aliases
+
+
+def codex_target_contains_runtime_baseline(
+    target: Path, runtime_skills: Path
+) -> tuple[bool, str, list[str], str | None, list[dict[str, str]]]:
     exists = target.exists() or target.is_symlink()
     if not exists:
-        return False, "missing", [], None
+        return False, "missing", [], None, []
 
     if target.is_symlink():
         try:
@@ -105,17 +138,18 @@ def codex_target_contains_runtime_baseline(target: Path, runtime_skills: Path) -
         except OSError:
             resolved = None
             matches = False
-        return matches, "symlink", [], resolved
+        return matches, "symlink", [], resolved, []
 
     if not target.is_dir():
-        return False, "file", [], str(target)
+        return False, "file", [], str(target), []
 
     missing: list[str] = []
     for item in sorted(runtime_skills.iterdir()):
         candidate = target / item.name
         if not candidate.exists() and not candidate.is_symlink():
             missing.append(item.name)
-    return len(missing) == 0, "bundle", missing, str(target)
+    duplicate_aliases = find_noncanonical_alias_entries(target, runtime_skills)
+    return len(missing) == 0 and not duplicate_aliases, "bundle", missing, str(target), duplicate_aliases
 
 
 def project_mcp_matches_bootstrap(server_config: dict[str, object], server: Path, repo: Path) -> bool:
@@ -133,28 +167,44 @@ def project_mcp_matches_template_seed(server_config: dict[str, object]) -> bool:
 
 
 def main() -> int:
+    args = parse_args()
     repo = get_repo_root()
-    home_dir = get_home_dir()
+    home_dir = Path(args.home_dir).resolve() if args.home_dir else get_home_dir()
     runtime_skills = repo / "runtime" / "skills"
     registry_skills = repo / "registry" / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
-    codex_config = home_dir / ".codex" / "config.toml"
-    codex_skills_target = home_dir / ".codex" / "skills"
-    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
+    manifest_path, integration_surfaces = load_integration_surfaces(repo)
+    codex_config_surface = find_surface(integration_surfaces, "codex-native-config")
+    codex_skills_surface = find_surface(integration_surfaces, "codex-skills")
+    copilot_surface = find_surface(integration_surfaces, "copilot-global-mcp")
+    project_mcp_surface = find_surface(integration_surfaces, "project-mcp-seed")
+    codex_config = codex_config_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_skills_target = codex_skills_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    copilot_mcp_config = copilot_surface.resolve_path(repo_root=repo, home_dir=home_dir)
     claude_settings = repo / ".claude" / "settings.json"
-    project_mcp = repo / ".mcp.json"
+    project_mcp = project_mcp_surface.resolve_path(repo_root=repo, home_dir=home_dir)
     targets = [
-        home_dir / ".claude" / "skills",
-        home_dir / ".gemini" / "skills",
-        home_dir / ".agents" / "skills",
+        {
+            "surface_id": surface.surface_id,
+            "path": surface.resolve_path(repo_root=repo, home_dir=home_dir),
+        }
+        for surface in surfaces_by_kind(integration_surfaces, "skills-target")
+        if surface.surface_id != codex_skills_surface.surface_id
     ]
 
     codex_text = read_text(codex_config)
-    codex_target_contains_baseline, codex_target_mode, codex_target_missing, codex_target_resolved = (
+    (
+        codex_target_contains_baseline,
+        codex_target_mode,
+        codex_target_missing,
+        codex_target_resolved,
+        codex_target_duplicate_aliases,
+    ) = (
         codex_target_contains_runtime_baseline(codex_skills_target, runtime_skills)
     )
     target_report = []
-    for target in targets:
+    for target_info in targets:
+        target = target_info["path"]
         exists = target.exists() or target.is_symlink()
         is_symlink = target.is_symlink()
         matches = False
@@ -167,6 +217,7 @@ def main() -> int:
                 resolved = ""
         target_report.append(
             {
+                "surface_id": target_info["surface_id"],
                 "path": str(target),
                 "exists": exists,
                 "is_symlink": is_symlink,
@@ -218,10 +269,12 @@ def main() -> int:
 
     report = {
         "repo_root": str(repo),
+        "integration_surfaces_manifest": str(manifest_path),
         "skills_source": str(runtime_skills),
         "targets": target_report,
         "codex": {
             "path": str(codex_config),
+            "surface_id": codex_config_surface.surface_id,
             "exists": codex_config.exists(),
             "skills_path_matches": contains_path(codex_text, str(codex_skills_target)),
             "skills_path_points_to_registry": contains_path(codex_text, str(registry_skills)),
@@ -233,6 +286,7 @@ def main() -> int:
             "runtime_target_resolved": codex_target_resolved,
             "runtime_target_contains_runtime_baseline": codex_target_contains_baseline,
             "runtime_target_missing_baseline": codex_target_missing,
+            "runtime_target_duplicate_aliases": codex_target_duplicate_aliases,
         },
         "copilot": copilot_report,
         "claude_project": {
@@ -242,18 +296,25 @@ def main() -> int:
         },
         "project_mcp": project_mcp_report,
     }
-    report["ok"] = (
-        all(item["matches_expected"] for item in target_report)
-        and report["codex"]["skills_path_matches"]
+    codex_ok = True if args.skip_codex else (
+        report["codex"]["skills_path_matches"]
         and not report["codex"]["skills_path_points_to_registry"]
         and report["codex"]["startup_timeout_matches"]
         and report["codex"]["mcp_command_matches"]
         and report["codex"]["mcp_args_match"]
         and report["codex"]["runtime_target_exists"]
         and report["codex"]["runtime_target_contains_runtime_baseline"]
-        and (not report["copilot"]["cli_present"] or report["copilot"]["mcp_server_matches"])
+    )
+    copilot_ok = True if args.skip_copilot else (
+        not report["copilot"]["cli_present"] or report["copilot"]["mcp_server_matches"]
+    )
+    project_mcp_ok = True if args.skip_project_mcp else report["project_mcp"]["matches_expected"]
+    report["ok"] = (
+        all(item["matches_expected"] for item in target_report)
+        and codex_ok
+        and copilot_ok
         and report["claude_project"]["registry_permissions_match"]
-        and report["project_mcp"]["matches_expected"]
+        and project_mcp_ok
     )
     print(json.dumps(report, indent=2))
     return 0 if report["ok"] else 1

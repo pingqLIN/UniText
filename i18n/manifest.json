@@ -1,8 +1,10 @@
 {
-  "version": 1,
+  "version": 2,
   "default_locale": "en",
   "locales": [
-    "zh-TW",
+    "zh-TW"
+  ],
+  "archived_locales": [
     "zh-CN",
     "ja",
     "de",
@@ -11,10 +13,11 @@
     "ko",
     "it"
   ],
+  "archive_root": "i18n/.clean/archived-locales",
   "source_docs": [
     "AGENTS.md",
     "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
-    "COPILOT_CLI_ADAPTER_NOTE.md",
+    "docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md",
     "DOCUMENT_PLACEMENT_POLICY.md",
     "NO_PUBLISH_POLICY.md",
     "README.md",
@@ -25,19 +28,27 @@
     "PROJECT_MODES.md",
     "SECRET_HANDLING_GUIDELINES.md",
     "MILESTONES.md",
-    "ESSENTIAL_SKILLS_SHORTLIST.md",
-    "EXTERNAL_REVIEW_PACKAGE.md",
-    "EXTERNAL_REVIEW_COVER_NOTE.md",
-    "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+    "docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md",
+    "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md",
+    "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md",
+    "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md",
     "REBUILD_AS_NEW_PROJECT.md",
     "TEMPLATE_RELEASE_PACKAGE.md",
     "TEMPLATE_RELEASE_CHECKLIST.md",
-    "PROJECT_STATUS_REPORT_2026-03-23.md",
-    "SKILL0_COLLABORATION_VISION.md",
+    "docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md",
+    "docs/concepts/SKILL0_COLLABORATION_VISION.md",
     "WORKSPACE_SENSITIVE_METADATA_RULES.md",
     "local/scripts/README.md",
     "local/docs/ADOPTION_CHECKLIST.md",
     "local/docs/CLI_COMPAT_MATRIX.md"
+  ],
+  "required_source_docs": [
+    "README.md",
+    "INDEX.md",
+    "OPERATIONS.md",
+    "DOCUMENT_PLACEMENT_POLICY.md",
+    "WORKSPACE_SENSITIVE_METADATA_RULES.md",
+    "NO_PUBLISH_POLICY.md"
   ],
   "excluded": [
     "local/docs/JOURNAL.md",

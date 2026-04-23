@@ -71,6 +71,21 @@ def copy_path(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
+    if not source.exists() or not source.is_dir():
+        return []
+    if not target.exists() or not target.is_dir():
+        return []
+
+    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    aliases: list[dict[str, str]] = []
+    for item in sorted(target.iterdir()):
+        canonical_name = canonical_by_key.get(item.name.casefold())
+        if canonical_name and item.name != canonical_name:
+            aliases.append({"path": str(item), "canonical_name": canonical_name})
+    return aliases
+
+
 def list_skill_names(root: Path) -> list[str]:
     return [
         item.name
@@ -79,27 +94,32 @@ def list_skill_names(root: Path) -> list[str]:
     ]
 
 
-def ensure_materialized_runtime_bundle(runtime_skills: Path, codex_target: Path) -> str:
+def ensure_materialized_runtime_bundle(runtime_skills: Path, codex_target: Path) -> tuple[str, list[dict[str, str]]]:
+    alias_entries = find_noncanonical_alias_entries(runtime_skills, codex_target)
     if codex_target.is_symlink() and codex_target.resolve() == runtime_skills.resolve():
         remove_path(codex_target)
         shutil.copytree(runtime_skills, codex_target, symlinks=True)
-        return "converted-symlink-to-bundle"
+        return "converted-symlink-to-bundle", alias_entries
 
     codex_target.mkdir(parents=True, exist_ok=True)
+    for alias_entry in alias_entries:
+        remove_path(Path(alias_entry["path"]))
     for item in sorted(runtime_skills.iterdir()):
         destination = codex_target / item.name
         if destination.exists() or destination.is_symlink():
             remove_path(destination)
         copy_path(item, destination)
-    return "refreshed-existing-bundle"
+    return "refreshed-existing-bundle", alias_entries
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Restore missing legacy Codex skills into the machine-local Codex bundle.")
+    parser = argparse.ArgumentParser(
+        description="Restore missing legacy Codex skills into the machine-local Codex bundle."
+    )
     parser.add_argument(
         "--source",
-        default="ops/history/bootstrap_20260420_060459/codex/skills",
-        help="Source directory containing the old Codex skills tree.",
+        required=True,
+        help="Source directory containing the legacy Codex skills tree to restore from.",
     )
     parser.add_argument("--dry-run", action="store_true", help="Report the restore plan without mutating the target.")
     parser.add_argument("--write", action="store_true", help="Apply the restore plan.")
@@ -113,7 +133,7 @@ def main() -> int:
     repo = get_repo_root()
     home_dir = get_home_dir()
     runtime_skills = repo / "runtime" / "skills"
-    source_root = (repo / args.source).resolve()
+    source_root = Path(args.source).expanduser().resolve()
     codex_target = home_dir / ".codex" / "skills"
 
     if not source_root.exists():
@@ -123,8 +143,18 @@ def main() -> int:
 
     source_skill_names = list_skill_names(source_root)
     current_skill_names = list_skill_names(codex_target)
-    missing = [name for name in source_skill_names if name not in current_skill_names]
-    existing_overlap = [name for name in source_skill_names if name in current_skill_names]
+    runtime_skill_keys = {name.casefold() for name in list_skill_names(runtime_skills)}
+    current_skill_keys = {name.casefold() for name in current_skill_names}
+    missing = [
+        name
+        for name in source_skill_names
+        if name.casefold() not in current_skill_keys and name.casefold() not in runtime_skill_keys
+    ]
+    existing_overlap = [
+        name
+        for name in source_skill_names
+        if name.casefold() in current_skill_keys or name.casefold() in runtime_skill_keys
+    ]
 
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -151,7 +181,9 @@ def main() -> int:
     if codex_target.exists() or codex_target.is_symlink():
         backup_path(codex_target, run_dir / "codex" / "skills")
 
-    summary["codex_target_prepare"] = ensure_materialized_runtime_bundle(runtime_skills, codex_target)
+    codex_target_prepare, pruned_aliases = ensure_materialized_runtime_bundle(runtime_skills, codex_target)
+    summary["codex_target_prepare"] = codex_target_prepare
+    summary["codex_target_pruned_aliases"] = pruned_aliases
 
     restored: list[str] = []
     for skill_name in missing:

@@ -68,10 +68,10 @@ template package 不應包含：
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
 - review-specific docs
-  - `EXTERNAL_REVIEW_PACKAGE.md`
-  - `EXTERNAL_REVIEW_COVER_NOTE.md`
-  - `EXTERNAL_REVIEW_HIGHLIGHTS.md`
-  - `PROJECT_STATUS_REPORT_2026-03-23.md`
+  - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
+  - `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md`
+  - `docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md`
 
 ## 4. Export Command
 
@@ -144,4 +144,3 @@ python local/scripts/create-git-bundle.py
 而不是：
 
 **authoring workspace snapshot**
-

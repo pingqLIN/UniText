@@ -24,4 +24,5 @@
 
 - [README.md](README.md) 給 human orientation。
 - [INDEX.md](INDEX.md) 給 human discovery 與 catalog。
+- [docs/architecture/runtime-transition-inventory.md](docs/architecture/runtime-transition-inventory.md) 給 runtime reset 盤點與歷史入口。
 - 如果 runtime surface 缺資料，再從 `runtime/` 指到對應 canonical doc。

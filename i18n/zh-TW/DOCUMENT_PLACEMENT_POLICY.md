@@ -1,4 +1,4 @@
-[English](../../DOCUMENT_PLACEMENT_POLICY.md) | [繁體中文](DOCUMENT_PLACEMENT_POLICY.md) | [简体中文](../zh-CN/DOCUMENT_PLACEMENT_POLICY.md) | [日本語](../ja/DOCUMENT_PLACEMENT_POLICY.md) | [Deutsch](../de/DOCUMENT_PLACEMENT_POLICY.md) | [Français](../fr/DOCUMENT_PLACEMENT_POLICY.md) | [Español](../es/DOCUMENT_PLACEMENT_POLICY.md) | [한국어](../ko/DOCUMENT_PLACEMENT_POLICY.md) | [Italiano](../it/DOCUMENT_PLACEMENT_POLICY.md)
+[English](../../DOCUMENT_PLACEMENT_POLICY.md) | [繁體中文](DOCUMENT_PLACEMENT_POLICY.md)
 
 # UniText — 文件放置政策
 

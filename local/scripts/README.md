@@ -7,15 +7,21 @@
 
 ## Current Scripts
 
+- `../config/integration-surfaces.json`
+  - 宣告目前 repo 的 integration surfaces、delivery resolution、與 verify probes
+  - `bootstrap.py`、`verify-bootstrap.py`、`build-runtime-layer.py` 會共用這份 manifest，而不是各自重複硬編碼 targets
+
 - `bootstrap.py`
   - 跨平台先重建 `runtime/`，再初始化 skills delivery、Codex native-config、Copilot MCP config，並維持 project `.mcp.json` 為 template-safe seed
 - `verify-bootstrap.py`
   - 跨平台檢查 first-run 結果是否與目前 repo 的 runtime surface 對齊，並接受 template-safe `.mcp.json` seed 或 legacy bootstrapped 的本機 wiring
   - Codex 目標若已 materialize 成 machine-local bundle，也接受「包含完整 runtime baseline + 額外 local skills」的模式
+  - 支援 `--home-dir`、`--skip-codex`、`--skip-copilot`、`--skip-project-mcp`，可用於 bounded self-repair simulation
 - `build-runtime-layer.py`
   - 由 `registry/` 生成 tracked `runtime/` read model，提供 consumer agents 的低噪音入口與 runtime projections
+  - 目前也會把 integration surface metadata 帶入 `runtime/catalog.json`
 - `register-codex-skills.py`
-  - 從舊的 Codex skills tree 比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
+  - 以 `--source` 指定舊的 Codex skills tree，比對目前 `C:\\Users\\miles\\.codex\\skills`，並把缺掉的 legacy skills 重新掛回 machine-local Codex bundle
 - `create-git-bundle.py`
   - 建立可攜的 `git bundle` 備份，降低僅靠本地工作樹的單點風險
 - `preview-renormalize.py`
@@ -65,13 +71,26 @@
 - `lib/workspace-sensitive-metadata.ps1`
   - 載入 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json`，讓 boundary / template / publishability 驗證共用同一套規則
 - `validate-workspace-sensitive-metadata-rules.ps1`
-  - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性與自帶案例是否通過
+    - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性、自帶案例，以及 repo-side `shared_surface_scope` 參照是否仍有效
 - `preview-renormalize.ps1`
   - Windows PowerShell wrapper；呼叫 `preview-renormalize.py` 並回傳 PowerShell object
 - `run-renormalize.ps1`
   - Windows PowerShell wrapper；呼叫 `run-renormalize.py`，保留既有 `Scope / Apply / Force` 入口
 - `audit-i18n-drift.py`
   - 讀取 `i18n/manifest.json`，列出各 locale 哪些官方文件缺翻譯、翻譯落後，或尚未被 Git 歷史追蹤到；支援 `json / markdown`、依 `locale / source-doc` 縮小範圍，以及直接輸出成工作報表
+  - active gate 由 `required_source_docs` 決定，其餘 mirrored docs 以 optional coverage 顯示，不直接阻斷 release/health gate
+- `run-self-repair-simulation.py`
+    - 執行 bounded self-repair 情境模擬；目前支援 `runtime-target-drift`、`review-bundle-contract-drift`、`workspace-sensitive-boundary-drift`、`workspace-sensitive-content-pattern-drift`
+    - 使用 temporary home fixture 與 override flags，避免為了模擬直接改動真實本機 wiring
+- `repair-external-review-bundle-contract.py`
+    - 只做 external-review bundle contract 的 guided repair：正規化已知 legacy review 路徑，並確保 `reading_order` 項目仍包含在 `files`
+    - 不負責新增或刪除 package 成員；若修正後仍缺檔，應升級為 human review
+- `repair-workspace-sensitive-rules.py`
+    - 只做 workspace-sensitive boundary rules 的 guided repair：正規化 `shared_surface_scope` 中已知 moved docs 的 legacy 路徑
+    - 不修改 regex、self-test 或 shared surface 的政策範圍；若修正後仍有缺路徑，應升級為 human review
+- `repair-workspace-sensitive-content-patterns.py`
+    - 只做 workspace-sensitive content patterns 的 guided repair：恢復 canonical `live workspace hostname` pattern 與必要的 safe / positive self-test cases
+    - 不負責擴大政策範圍，也不自動裁決剩餘 violation 是否應改規格；若 canonical restore 後仍失敗，應升級為 human review
 - `export-rebuild-project.ps1`
   - 將目前 repo 重建成可重新命名、可重新初始化的 fresh-project baseline，輸出到 `ops/rebuild-project/`
 - `verify-rebuild-project.ps1`

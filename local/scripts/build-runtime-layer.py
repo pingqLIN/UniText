@@ -6,8 +6,20 @@ import json
 import os
 import re
 import shutil
+import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.integration_surfaces import (
+    cli_ids_for_resource_type,
+    default_delivery_guidance,
+    load_integration_surfaces,
+    surfaces_for_resource_type,
+)
 
 
 REPO_MARKERS = [
@@ -28,6 +40,11 @@ class RuntimeEntry:
     resource_type: str
     runtime_path: str
     source_of_truth: str
+    canonical_location: str
+    status: str | None
+    supported_clis: list[str]
+    delivery_guidance: str
+    available_surfaces: list[str]
     entrypoint: str
     intent_tags: list[str]
     consumer_scope: str
@@ -40,6 +57,11 @@ class RuntimeEntry:
             "type": self.resource_type,
             "runtime_path": self.runtime_path,
             "source_of_truth": self.source_of_truth,
+            "canonical_location": self.canonical_location,
+            "status": self.status,
+            "supported_clis": self.supported_clis,
+            "delivery_guidance": self.delivery_guidance,
+            "available_surfaces": self.available_surfaces,
             "entrypoint": self.entrypoint,
             "intent_tags": self.intent_tags,
             "consumer_scope": self.consumer_scope,
@@ -251,7 +273,32 @@ def load_catalog_exclusions(repo_root: Path) -> set[str]:
     return set(skills.keys())
 
 
-def build_skill_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEntry]:
+def canonical_location_for(resource_type: str, resource_id: str) -> str:
+    roots = {
+        "skill": "skills",
+        "agent": "agents",
+        "workflow": "workflow",
+    }
+    return f"/registry/{roots[resource_type]}/{resource_id}"
+
+
+def metadata_from_frontmatter(
+    frontmatter: dict[str, str],
+    *,
+    resource_type: str,
+    matched_surfaces: list[object],
+) -> tuple[str | None, list[str], str]:
+    status = frontmatter.get("status") or None
+    supported_clis_raw = frontmatter.get("supported_clis", "")
+    if supported_clis_raw:
+        supported_clis = [item.strip() for item in supported_clis_raw.split(",") if item.strip()]
+    else:
+        supported_clis = cli_ids_for_resource_type(matched_surfaces, resource_type)
+    delivery_guidance = frontmatter.get("delivery_guidance") or default_delivery_guidance(resource_type, matched_surfaces)
+    return status, supported_clis, delivery_guidance
+
+
+def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_skills_root = runtime_root / "skills"
     if runtime_skills_root.exists():
         shutil.rmtree(runtime_skills_root)
@@ -285,6 +332,12 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
             entrypoint_name="SKILL.md",
         )
         frontmatter, body = parse_frontmatter(source_file.read_text(encoding="utf-8"))
+        matched_surfaces = surfaces_for_resource_type(integration_surfaces, "skill")
+        status, supported_clis, delivery_guidance = metadata_from_frontmatter(
+            frontmatter,
+            resource_type="skill",
+            matched_surfaces=matched_surfaces,
+        )
         summary_source = " ".join(filter(None, [frontmatter.get("name", ""), frontmatter.get("description", ""), body[:400]]))
         entries.append(
             RuntimeEntry(
@@ -292,6 +345,11 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
                 resource_type="skill",
                 runtime_path=repo_relative(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
+                canonical_location=canonical_location_for("skill", skill_dir.name),
+                status=status,
+                supported_clis=supported_clis,
+                delivery_guidance=delivery_guidance,
+                available_surfaces=[surface.surface_id for surface in matched_surfaces],
                 entrypoint=repo_relative(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
@@ -302,7 +360,7 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
     return entries
 
 
-def build_agent_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEntry]:
+def build_agent_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_agents_root = runtime_root / "agents"
     if runtime_agents_root.exists():
         shutil.rmtree(runtime_agents_root)
@@ -333,6 +391,12 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
             entrypoint_name="AGENT.md",
         )
         frontmatter, body = parse_frontmatter(source_file.read_text(encoding="utf-8"))
+        matched_surfaces = surfaces_for_resource_type(integration_surfaces, "agent")
+        status, supported_clis, delivery_guidance = metadata_from_frontmatter(
+            frontmatter,
+            resource_type="agent",
+            matched_surfaces=matched_surfaces,
+        )
         summary_source = " ".join(filter(None, [frontmatter.get("name", ""), frontmatter.get("description", ""), body[:400]]))
         entries.append(
             RuntimeEntry(
@@ -340,6 +404,11 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
                 resource_type="agent",
                 runtime_path=repo_relative(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
+                canonical_location=canonical_location_for("agent", agent_dir.name),
+                status=status,
+                supported_clis=supported_clis,
+                delivery_guidance=delivery_guidance,
+                available_surfaces=[surface.surface_id for surface in matched_surfaces],
                 entrypoint=repo_relative(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
@@ -350,7 +419,7 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEnt
     return entries
 
 
-def build_workflow_wrappers(repo_root: Path, runtime_root: Path) -> list[RuntimeEntry]:
+def build_workflow_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_workflow_root = runtime_root / "workflow"
     if runtime_workflow_root.exists():
         shutil.rmtree(runtime_workflow_root)
@@ -380,13 +449,24 @@ def build_workflow_wrappers(repo_root: Path, runtime_root: Path) -> list[Runtime
             resource_type="workflow-support",
             entrypoint_name="WORKFLOW.md",
         )
-        body = source_file.read_text(encoding="utf-8")
+        frontmatter, body = parse_frontmatter(source_file.read_text(encoding="utf-8"))
+        matched_surfaces = surfaces_for_resource_type(integration_surfaces, "workflow")
+        status, supported_clis, delivery_guidance = metadata_from_frontmatter(
+            frontmatter,
+            resource_type="workflow",
+            matched_surfaces=matched_surfaces,
+        )
         entries.append(
             RuntimeEntry(
                 resource_id=workflow_dir.name,
                 resource_type="workflow",
                 runtime_path=repo_relative(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
+                canonical_location=canonical_location_for("workflow", workflow_dir.name),
+                status=status,
+                supported_clis=supported_clis,
+                delivery_guidance=delivery_guidance,
+                available_surfaces=[surface.surface_id for surface in matched_surfaces],
                 entrypoint=repo_relative(runtime_file, repo_root),
                 intent_tags=slug_tags(body[:400]),
                 consumer_scope="runtime-first",
@@ -397,12 +477,14 @@ def build_workflow_wrappers(repo_root: Path, runtime_root: Path) -> list[Runtime
     return entries
 
 
-def write_catalog(repo_root: Path, runtime_root: Path, entries: list[RuntimeEntry]) -> None:
+def write_catalog(repo_root: Path, runtime_root: Path, entries: list[RuntimeEntry], integration_manifest: Path) -> None:
     catalog = {
         "meta": {
+            "catalog_version": 2,
             "generated_by": "local/scripts/build-runtime-layer.py",
             "description": "Tracked runtime read model for consumer agents.",
             "source_of_truth_root": "registry/",
+            "integration_surfaces_manifest": repo_relative(integration_manifest, repo_root),
         },
         "entries": [entry.as_dict() for entry in sorted(entries, key=lambda item: (item.resource_type, item.resource_id))],
     }
@@ -417,17 +499,19 @@ def main() -> int:
     repo_root = get_repo_root()
     validate_repo_root(repo_root)
     runtime_root = repo_root / "runtime"
+    integration_manifest, integration_surfaces = load_integration_surfaces(repo_root)
 
     if not args.write:
         summary = {
             "repo_root": str(repo_root),
             "runtime_root": str(runtime_root),
+            "integration_surfaces_manifest": str(integration_manifest),
             "actions": [
                 "rebuild runtime/skills from registry/skills",
                 "rebuild runtime/agents from registry/agents",
                 "rebuild runtime/workflow from registry/workflow",
                 "rewrite relative links back to registry source files",
-                "refresh runtime/catalog.json",
+                "refresh runtime/catalog.json with integration surface metadata",
             ],
         }
         print(json.dumps(summary, indent=2, ensure_ascii=False))
@@ -435,14 +519,15 @@ def main() -> int:
 
     runtime_root.mkdir(parents=True, exist_ok=True)
     entries: list[RuntimeEntry] = []
-    entries.extend(build_skill_wrappers(repo_root, runtime_root))
-    entries.extend(build_agent_wrappers(repo_root, runtime_root))
-    entries.extend(build_workflow_wrappers(repo_root, runtime_root))
-    write_catalog(repo_root, runtime_root, entries)
+    entries.extend(build_skill_wrappers(repo_root, runtime_root, integration_surfaces))
+    entries.extend(build_agent_wrappers(repo_root, runtime_root, integration_surfaces))
+    entries.extend(build_workflow_wrappers(repo_root, runtime_root, integration_surfaces))
+    write_catalog(repo_root, runtime_root, entries, integration_manifest)
 
     summary = {
         "repo_root": str(repo_root),
         "runtime_root": str(runtime_root),
+        "integration_surfaces_manifest": str(integration_manifest),
         "skills": len([entry for entry in entries if entry.resource_type == "skill"]),
         "agents": len([entry for entry in entries if entry.resource_type == "agent"]),
         "workflow": len([entry for entry in entries if entry.resource_type == "workflow"]),

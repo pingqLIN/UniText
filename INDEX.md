@@ -23,10 +23,10 @@
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
-15. `SKILL0_COLLABORATION_VISION.md`
-16. `PROJECT_MAP_WEB_AUTOMATION_REPORT.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md`
+15. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+16. `docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md`
 
 ## 2. Resource Catalog
 
@@ -66,18 +66,20 @@
 
 ### Review Shortlist
 
-目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
+目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-04-20`，目前 authoring tree 內的 `registry/skills/` 共有 `50` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-04-23`，目前 authoring tree 內的 `registry/skills/` 共有 `54` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 
-若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
+若要整理給外部審查者的資料，請以 [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
+
+若要調整 review package 的成員、reading order 或 export contract，請先看 [docs/reviews/external-review-bundle.contract.json](docs/reviews/external-review-bundle.contract.json)。
 
 若要直接給審查者最短入口，請先看：
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 
@@ -105,13 +107,15 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md)。
 
-若要規劃如何逐步把目前偏 `PowerShell-first` 的治理腳本改寫成更通用的跨平台工具鏈，請看 [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)。
+若要規劃如何逐步把目前偏 `PowerShell-first` 的治理腳本改寫成更通用的跨平台工具鏈，請看 [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md)。
 
-若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
+若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md)。
 
-若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [PROJECT_MAP_WEB_AUTOMATION_REPORT.md](PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
+若要以情境模擬方式檢查 system agent 在未來碰到 drift、repair、bootstrap 障礙時能否自我修復，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。
+
+若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
 
 目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
@@ -150,6 +154,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `env` | Workspace | `/registry/skills/env` | `active` |
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
+| `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
 
 ### Workflow
 

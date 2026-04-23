@@ -8,7 +8,7 @@
         "--root",
         "."
       ],
-      "notes": "Project-local read-only UniText registry server. This relative-path seed is safe to track in GitHub templates; bootstrap should preserve the tracked seed and keep machine-local wiring outside the shared repo file."
+      "notes": "Lightweight project-local read-only UniText registry server for on-demand registry inspection. It exposes a narrow tool surface for summary, entry listing, and safe file reads. It is not required for normal skill lookup and does not need to be mounted by default. This relative-path seed is safe to track in GitHub templates; bootstrap should preserve the tracked seed and keep machine-local wiring outside the shared repo file."
     }
   }
 }
