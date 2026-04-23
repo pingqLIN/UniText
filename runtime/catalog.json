@@ -1723,14 +1723,14 @@
       ],
       "entrypoint": "runtime/skills/project-development-loop/SKILL.md",
       "intent_tags": [
-        "name",
         "project-development-loop",
-        "description",
         "reusable",
         "autonomous",
         "workflow",
         "for",
-        "existing"
+        "existing",
+        "codebases",
+        "audit"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
