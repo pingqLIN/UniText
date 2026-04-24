@@ -1563,10 +1563,14 @@
     const shareHref = new URL("./project-map-share.html", window.location.href).href;
     const handoffMdHref = new URL("./project-map-handoff.md", window.location.href).href;
     const handoffJsonHref = new URL("./project-map-handoff.json", window.location.href).href;
+    const staticArtifactNote = state.lastRefreshSource !== "bootstrap"
+      ? `<div class="edge-visibility"><strong>Static artifacts:</strong> 頁內重掃只更新目前瀏覽器中的 MAP。交付前請執行 <code>python local/scripts/build-project-map.py</code> 重新生成分享頁與交接檔。</div>`
+      : `<div class="edge-visibility"><strong>Static artifacts:</strong> 分享頁與交接檔對齊目前載入的靜態 bootstrap 輸出。</div>`;
     exportCardEl.innerHTML = `
       <span class="card-title">交付輸出</span>
       <div><strong>分享用輸出</strong>：可直接打開唯讀分享版快照。</div>
       <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的分享頁與交接檔，而不是把操作者介面直接丟給下一位。</div>
+      ${staticArtifactNote}
       <div class="card-actions">
         <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
         <a class="mini-action secondary" href="${handoffMdHref}" target="_blank" rel="noopener noreferrer">開啟交接摘要.md</a>

@@ -114,13 +114,17 @@ def find_noncanonical_alias_entries(target: Path, runtime_skills: Path) -> list[
     if not runtime_skills.exists() or not runtime_skills.is_dir():
         return []
 
-    canonical_by_key = {item.name.casefold(): item.name for item in sorted(runtime_skills.iterdir())}
+    canonical_by_key = {item.name.casefold(): item.name for item in runtime_bundle_entries(runtime_skills)}
     aliases: list[dict[str, str]] = []
     for item in sorted(target.iterdir()):
         canonical_name = canonical_by_key.get(item.name.casefold())
         if canonical_name and item.name != canonical_name:
             aliases.append({"path": str(item), "canonical_name": canonical_name})
     return aliases
+
+
+def runtime_bundle_entries(runtime_skills: Path) -> list[Path]:
+    return [item for item in sorted(runtime_skills.iterdir()) if not item.name.startswith(".")]
 
 
 def codex_target_contains_runtime_baseline(
@@ -143,7 +147,7 @@ def codex_target_contains_runtime_baseline(
         return False, "file", [], str(target), []
 
     missing: list[str] = []
-    for item in sorted(runtime_skills.iterdir()):
+    for item in runtime_bundle_entries(runtime_skills):
         candidate = target / item.name
         if not candidate.exists() and not candidate.is_symlink():
             missing.append(item.name)

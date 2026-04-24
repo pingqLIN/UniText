@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import subprocess
 import sys
 import tempfile
@@ -33,7 +34,74 @@ def can_create_directory_symlink() -> bool:
         return link.is_symlink()
 
 
+def load_bootstrap_module():
+    bootstrap = REPO_ROOT / "local" / "scripts" / "bootstrap.py"
+    spec = importlib.util.spec_from_file_location("unitext_bootstrap", bootstrap)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Could not load bootstrap module from {bootstrap}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class BootstrapVerifySmokeTests(unittest.TestCase):
+    def test_runtime_bundle_sync_excludes_hidden_source_entries(self):
+        bootstrap = load_bootstrap_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "runtime-skills"
+            source.mkdir()
+            (source / "env").mkdir()
+            (source / "env" / "SKILL.md").write_text("# env\n", encoding="utf-8")
+            (source / ".system").mkdir()
+            (source / ".system" / "marker.txt").write_text("local overlay\n", encoding="utf-8")
+
+            target = root / "codex-skills"
+            result = bootstrap.set_skills_target(source, target, "mirror", dry_run=False)
+
+            self.assertEqual(result["action"], "created")
+            self.assertTrue((target / "env" / "SKILL.md").exists())
+            self.assertFalse((target / ".system").exists())
+
+    def test_runtime_bundle_sync_preserves_target_hidden_extras(self):
+        bootstrap = load_bootstrap_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            source = root / "runtime-skills"
+            source.mkdir()
+            (source / "env").mkdir()
+            (source / "env" / "SKILL.md").write_text("# env\n", encoding="utf-8")
+            (source / ".system").mkdir()
+            (source / ".system" / "marker.txt").write_text("source overlay\n", encoding="utf-8")
+
+            target = root / "codex-skills"
+            target.mkdir()
+            (target / ".system").mkdir()
+            (target / ".system" / "marker.txt").write_text("target overlay\n", encoding="utf-8")
+
+            dry_run = bootstrap.set_skills_target(
+                source,
+                target,
+                "mirror",
+                dry_run=True,
+                preserve_local_extras=True,
+            )
+            self.assertEqual(dry_run["baseline_entries"], ["env"])
+
+            result = bootstrap.set_skills_target(
+                source,
+                target,
+                "mirror",
+                dry_run=False,
+                preserve_local_extras=True,
+            )
+
+            self.assertEqual(result["action"], "synced")
+            self.assertTrue((target / "env" / "SKILL.md").exists())
+            self.assertEqual((target / ".system" / "marker.txt").read_text(encoding="utf-8"), "target overlay\n")
+
     def test_bootstrap_force_to_temp_home_passes_verify(self):
         if not can_create_directory_symlink():
             self.skipTest("Directory symlink creation is unavailable on this host.")

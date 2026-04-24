@@ -48,9 +48,9 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertNotIn("Q:\\\\UniText", share_html)
         self.assertNotIn("Q:\\\\AGENTS.md", share_html)
         self.assertNotIn('"effective_file_rules"', share_html)
-        self.assertNotIn("Maintenance Controls", share_html)
-        self.assertNotIn("Governance Layering", share_html)
         self.assertNotIn('id="export-card"', share_html)
+        self.assertNotIn('id="maintenance-controls"', share_html)
+        self.assertNotIn('class="governance-panel"', share_html)
 
     def test_interactive_html_keeps_operator_surface_data(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
@@ -60,8 +60,9 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn('"effective_file_rules"', interactive_html)
         self.assertIn("window.AGENT_GOVERNANCE_POLICY = {", interactive_html)
         self.assertIn('"governance_resolver": true', interactive_html)
-        self.assertIn("Maintenance Controls", interactive_html)
-        self.assertIn("Governance Layering", interactive_html)
+        self.assertIn('id="export-card"', interactive_html)
+        self.assertIn('id="maintenance-controls"', interactive_html)
+        self.assertIn('class="governance-panel"', interactive_html)
 
     def test_handoff_payload_describes_surface_contract(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)

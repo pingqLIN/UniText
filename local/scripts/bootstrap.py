@@ -138,13 +138,23 @@ def copy_path(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def runtime_bundle_entries(source: Path) -> list[Path]:
+    return [item for item in sorted(source.iterdir()) if not item.name.startswith(".")]
+
+
+def copy_runtime_bundle(source: Path, target: Path) -> None:
+    target.mkdir(parents=True, exist_ok=True)
+    for item in runtime_bundle_entries(source):
+        copy_path(item, target / item.name)
+
+
 def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
     if not source.exists() or not source.is_dir():
         return []
     if not target.exists() or not target.is_dir():
         return []
 
-    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    canonical_by_key = {item.name.casefold(): item.name for item in runtime_bundle_entries(source)}
     aliases: list[dict[str, str]] = []
     for item in sorted(target.iterdir()):
         canonical_name = canonical_by_key.get(item.name.casefold())
@@ -154,7 +164,8 @@ def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str
 
 
 def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str, object]:
-    baseline_entries = [item.name for item in sorted(source.iterdir())]
+    baseline_items = runtime_bundle_entries(source)
+    baseline_entries = [item.name for item in baseline_items]
     alias_entries = find_noncanonical_alias_entries(source, target)
     if dry_run:
         return {
@@ -170,7 +181,7 @@ def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str
     target.mkdir(parents=True, exist_ok=True)
     for alias_entry in alias_entries:
         remove_path(Path(alias_entry["path"]))
-    for item in sorted(source.iterdir()):
+    for item in baseline_items:
         destination = target / item.name
         if destination.exists() or destination.is_symlink():
             remove_path(destination)
@@ -243,7 +254,7 @@ def set_skills_target(
         except OSError as exc:
             if mode == "symlink":
                 raise RuntimeError(f"symlink creation failed for {target}: {exc}") from exc
-    shutil.copytree(source, target)
+    copy_runtime_bundle(source, target)
     return {"target": str(target), "action": "created", "mode": "mirror"}
 
 

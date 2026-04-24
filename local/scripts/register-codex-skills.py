@@ -71,13 +71,29 @@ def copy_path(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def visible_skill_dirs(root: Path) -> list[Path]:
+    if not root.exists() or not root.is_dir():
+        return []
+    return [
+        item
+        for item in sorted(root.iterdir())
+        if item.is_dir() and not item.name.startswith(".") and item.name not in EXCLUDED_SKILL_NAMES
+    ]
+
+
+def copy_runtime_bundle(source: Path, target: Path) -> None:
+    target.mkdir(parents=True, exist_ok=True)
+    for item in visible_skill_dirs(source):
+        copy_path(item, target / item.name)
+
+
 def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
     if not source.exists() or not source.is_dir():
         return []
     if not target.exists() or not target.is_dir():
         return []
 
-    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    canonical_by_key = {item.name.casefold(): item.name for item in visible_skill_dirs(source)}
     aliases: list[dict[str, str]] = []
     for item in sorted(target.iterdir()):
         canonical_name = canonical_by_key.get(item.name.casefold())
@@ -87,24 +103,20 @@ def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str
 
 
 def list_skill_names(root: Path) -> list[str]:
-    return [
-        item.name
-        for item in sorted(root.iterdir())
-        if item.is_dir() and item.name not in EXCLUDED_SKILL_NAMES
-    ]
+    return [item.name for item in visible_skill_dirs(root)]
 
 
 def ensure_materialized_runtime_bundle(runtime_skills: Path, codex_target: Path) -> tuple[str, list[dict[str, str]]]:
     alias_entries = find_noncanonical_alias_entries(runtime_skills, codex_target)
     if codex_target.is_symlink() and codex_target.resolve() == runtime_skills.resolve():
         remove_path(codex_target)
-        shutil.copytree(runtime_skills, codex_target, symlinks=True)
+        copy_runtime_bundle(runtime_skills, codex_target)
         return "converted-symlink-to-bundle", alias_entries
 
     codex_target.mkdir(parents=True, exist_ok=True)
     for alias_entry in alias_entries:
         remove_path(Path(alias_entry["path"]))
-    for item in sorted(runtime_skills.iterdir()):
+    for item in visible_skill_dirs(runtime_skills):
         destination = codex_target / item.name
         if destination.exists() or destination.is_symlink():
             remove_path(destination)

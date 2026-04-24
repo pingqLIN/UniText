@@ -541,9 +541,9 @@ def build_page_copy(page_mode: str) -> dict[str, str]:
 
 def strip_share_safe_blocks(html: str) -> str:
     operator_only_patterns = [
-        re.compile(r"\s*<section class=\"control-band secondary\" data-share-hide>.*?</section>\s*", re.DOTALL),
-        re.compile(r"\s*<article class=\"info-card\" id=\"export-card\" data-share-hide>\s*<span class=\"card-title\">Export</span>\s*</article>\s*", re.DOTALL),
-        re.compile(r"\s*<section class=\"governance-panel\" data-share-hide>.*?</section>\s*", re.DOTALL),
+        re.compile(r"\s*<article\b(?=[^>]*\bid=\"export-card\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</article>\s*", re.DOTALL),
+        re.compile(r"\s*<section\b(?=[^>]*\bid=\"maintenance-controls\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</section>\s*", re.DOTALL),
+        re.compile(r"\s*<section\b(?=[^>]*\bclass=\"[^\"]*\bgovernance-panel\b[^\"]*\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</section>\s*", re.DOTALL),
     ]
     for pattern in operator_only_patterns:
         html = pattern.sub("\n", html)
