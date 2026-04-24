@@ -481,6 +481,8 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertTrue(good["validation_ok"])
         self.assertEqual(good["name"], "good-skill")
         self.assertFalse(bad["validation_ok"])
+        self.assertIsNone(bad["name"])
+        self.assertFalse(bad["has_description"])
         self.assertIn("Duplicate key", bad["validation_message"])
 
     def test_generate_index_entries_uses_explicit_root(self):
