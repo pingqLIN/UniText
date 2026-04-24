@@ -56,7 +56,7 @@ python -m unittest discover -s tests -p "test*.py"
 若環境使用 `py` 啟動 Python：
 
 ```powershell
-py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_copilot_session tests.security.test_catalog_generation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe
+py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 ## 3. What This Baseline Covers
