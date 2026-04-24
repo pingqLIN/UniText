@@ -27,7 +27,7 @@ Fix:
 
 This was the reliable fix in the Windows workflow that created:
 
-- `Q:\Projects\Tracing-Paper-System\.runtime\tracing-paper-system-tunnel.json`
+- `Q:\Projects\<project>\.runtime\<project>-tunnel.json`
 
 ## Public URL returns `404` while localhost returns `200`
 
