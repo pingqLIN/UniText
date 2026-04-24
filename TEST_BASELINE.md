@@ -6,7 +6,7 @@
 
 ## 1. Current Baseline
 
-本輪 runtime-first consolidation 後，tracked automated tests 仍以高訊號 smoke coverage 為主，但已不再只覆蓋 4 個最小檔案。`python -m unittest` 在此 repo 不會自動 discover 測試，請使用下方 explicit suite 或 discover command。
+本輪 runtime-first consolidation 後，tracked automated tests 仍以高訊號 smoke coverage 為主，但已不再只覆蓋 4 個最小檔案。請使用下方 explicit suite 或 discover command；`tests/` 與 `tests/security/` 已有 package markers，讓 discover 可遞迴涵蓋 security tests。
 
 目前保留並可直接執行的基線如下：
 
@@ -73,6 +73,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 - current project map / governance entry surfaces
 - interactive vs. share-safe project-map contract and handoff metadata
 - generated project-map artifact output contract before browser execution
+- recursive unittest discovery coverage for top-level and security tests
 
 ## 4. What This Baseline Does Not Yet Cover
 

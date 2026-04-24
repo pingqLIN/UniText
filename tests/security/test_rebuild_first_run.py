@@ -54,8 +54,9 @@ class RebuildFirstRunTests(unittest.TestCase):
         output_base = REPO_ROOT / "ops" / "rebuild-project"
         output_base.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=output_base, prefix="unit_") as output_dir:
-            package_name = "rebuild-first-run"
-            package_path = Path(output_dir) / package_name
+            output_root = Path(output_dir)
+            package_name = f"rebuild-first-run-{output_root.name}"
+            package_path = output_root / package_name
             export_result = run_command(
                 [
                     powershell,

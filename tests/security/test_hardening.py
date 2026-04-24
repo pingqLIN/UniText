@@ -295,7 +295,7 @@ class SecurityHardeningTests(unittest.TestCase):
         output_base.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=output_base, prefix="unit_") as temp_dir:
             output_root = Path(temp_dir)
-            package_name = "rebuild-test"
+            package_name = f"rebuild-test-{output_root.name}"
             package_path = output_root / package_name
             export_result = run_command(
                 [
