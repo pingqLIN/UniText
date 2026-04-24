@@ -25,6 +25,11 @@ def write_skill(root: Path, name: str, body: str = "# Skill\n") -> None:
 
 
 class RuntimeBundleHiddenEntryTests(unittest.TestCase):
+    def test_system_runtime_overlay_is_gitignored(self):
+        ignore_lines = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+
+        self.assertIn("runtime/skills/.system/", ignore_lines)
+
     def test_verify_ignores_hidden_runtime_source_entries(self):
         verify = load_script_module("verify-bootstrap.py")
 

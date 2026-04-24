@@ -6,6 +6,7 @@ recovered_*/
 .playwright-mcp/
 .tmp_unitext_protocol.log
 **/__pycache__/
+runtime/skills/.system/
 ops/history/backup_*/
 ops/history/bootstrap_*/
 ops/history/drift_*/
