@@ -45,6 +45,8 @@ def is_eol_only(repo_root: Path, path: str) -> bool:
         ],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
     )
     return result.returncode == 0
 
