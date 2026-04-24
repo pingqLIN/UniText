@@ -39,8 +39,30 @@
 - 新增 shared governance doc 或 shared control script 時，若它屬於 repo-side boundary review 範圍，應同步加入 `shared_surface_scope`
 - 新增 live metadata 類型時，優先補 `content_patterns`，再補對應 `self_test_cases`
 - 若某個 placeholder 應視為安全範例，必須補一個 `expected_labels = []` 的 self-test case
+- 若某條 content pattern 在 public reference docs 上產生誤報，優先收窄 canonical regex 並補 safe self-test；不要把整批 reference docs 移出 `shared_surface_scope`
 - 若某條 regex 只是在 script 內作為規則字串出現，應明確設定 `skip_script_pattern_lines`
 - 不要把 authoring-only 或 operations-only 路徑塞進 `shared_surface_scope` 來解決誤報；應先檢查文件放置是否錯層
+- repo-side validation 現在會額外檢查 `shared_surface_scope` 內的路徑是否仍存在；若文件已搬家，應先修正規則引用，而不是繞過驗證
+- starter template 驗證不會把 review-only docs 視為必備，因此 `shared_surface_scope` 的存在性檢查只在 repo-side validate / boundary verify 啟用
+
+### 3.1 Content Pattern Overreach
+
+`content_patterns` 的 canonical baseline 應該偏向：
+
+- 針對明確 governance / configuration 語境做偵測
+- 對 generic public reference wording 保守處理
+
+例如：
+
+- `live workspace hostname` 應該優先抓 `Zone hostname`、`MCP hostname`、`public/custom hostname` 這類宣告語境
+- 不應只因為一行同時提到 `domain`、`ingress`、或公有雲示例 hostname 就直接視為 live metadata
+- `C:\Users\<user>\...` 這類明確 placeholder path 應作為安全文件範例處理；真實帳號、服務目錄或專案絕對路徑仍應被攔截
+
+當真實 repo 出現 public-doc false positives 時，先做的不是擴大 ignore scope，而是：
+
+1. 補一條 safe self-test，固定重現誤報樣本
+2. 收窄 canonical regex
+3. 重跑 validate / boundary verify
 
 ## 4. Required Validation
 
