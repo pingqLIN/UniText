@@ -5,6 +5,7 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -268,7 +269,7 @@ def run_runtime_target_drift() -> dict[str, object]:
             build_wrong_target(home_dir / relative)
 
         verify_before_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "verify-bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -279,7 +280,7 @@ def run_runtime_target_drift() -> dict[str, object]:
         before_report = json.loads(before_stdout)
 
         bootstrap_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -295,7 +296,7 @@ def run_runtime_target_drift() -> dict[str, object]:
         bootstrap_report = json.loads(bootstrap_stdout) if bootstrap_stdout.strip() else {}
 
         verify_after_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "verify-bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -362,7 +363,7 @@ def run_review_bundle_contract_drift() -> dict[str, object]:
         before_code, before_stdout, before_stderr = run_command(export_before_command)
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-external-review-bundle-contract.py"),
             "--repo-root",
             str(fixture_root),
@@ -436,7 +437,7 @@ def run_workspace_sensitive_boundary_drift() -> dict[str, object]:
         before_report = json.loads(before_stdout) if before_stdout.strip() else {}
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-rules.py"),
             "--repo-root",
             str(fixture_root),
@@ -528,7 +529,7 @@ def run_workspace_sensitive_content_pattern_drift() -> dict[str, object]:
         before_verify_report = json.loads(before_verify_stdout) if before_verify_stdout.strip() else {}
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-content-patterns.py"),
             "--repo-root",
             str(fixture_root),

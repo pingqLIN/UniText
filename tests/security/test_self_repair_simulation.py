@@ -1,3 +1,4 @@
+import ast
 import json
 import shutil
 import subprocess
@@ -11,6 +12,15 @@ SCRIPT = REPO_ROOT / "local" / "scripts" / "run-self-repair-simulation.py"
 
 
 class SelfRepairSimulationTests(unittest.TestCase):
+    def test_runner_does_not_hardcode_python_executable(self):
+        tree = ast.parse(SCRIPT.read_text(encoding="utf-8"))
+        command_literals = [
+            node.value
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        ]
+        self.assertNotIn("python", command_literals)
+
     def run_scenario(self, scenario: str) -> dict[str, object]:
         if shutil.which("powershell") is None:
             self.skipTest("Windows PowerShell executable not available")
