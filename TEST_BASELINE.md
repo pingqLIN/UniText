@@ -16,6 +16,8 @@
   - 驗證 release hygiene report 的 blocker / warning / clean-scope 分類
 - `tests/security/test_i18n_wave.py`
   - 驗證 i18n wave report 能區分 line-ending-only、changed、untracked 與 clean
+- `tests/security/test_i18n_drift.py`
+  - 驗證 i18n drift audit 的 required / optional issue counting、archived locale 邊界與 external repo-root CLI path
 - `tests/security/test_copilot_session.py`
   - 驗證 Copilot session payload 與 project MCP wiring 檢查邏輯
 - `tests/security/test_catalog_generation.py`
@@ -40,7 +42,7 @@
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 快速 discover gate：
@@ -61,7 +63,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 - template / rebuild package dry-run membership, output-root safety, and ignored temp actual-write verification
 - workspace-sensitive metadata rule validation, including positive/negative fixture cases
 - release hygiene and publishability report classification
-- i18n wave classification logic
+- i18n wave classification and drift audit issue counting
 - minimum registry inventory integrity
 - isolated `bootstrap -> verify` smoke coverage for local runtime wiring
 - hidden local runtime overlay handling for materialized Codex bundles
@@ -76,7 +78,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 - 真實使用者 home / live CLI config 上的 bootstrap end-to-end 行為
 - rebuild package post-export first-run behavior beyond package structure verification
 - live publishability decision with real remote / review state
-- i18n drift coverage beyond the wave-classification fixture layer
+- i18n live translation quality / semantic drift
 - rendered project-map browser behavior with real Playwright screenshots or Lighthouse
 - cross-platform script parity
 
