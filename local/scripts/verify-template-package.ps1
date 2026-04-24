@@ -57,9 +57,14 @@ $required = @(
   "local\\scripts\\lib\\integration_surfaces.py",
   "local\\scripts\\lib\\renormalize_core.py",
   "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
+  "local\\scripts\\validate-workspace-sensitive-metadata-rules.py",
   "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
+  "local\\scripts\\lib\\workspace_sensitive_metadata.py",
+  "local\\scripts\\lib\\workspace_boundaries.py",
   "local\\scripts\\verify-workspace-boundaries.ps1",
+  "local\\scripts\\verify-workspace-boundaries.py",
   "local\\scripts\\get-publishability-report.ps1",
+  "local\\scripts\\get-publishability-report.py",
   "local\\scripts\\get-document-placement-recommendation.ps1"
 )
 

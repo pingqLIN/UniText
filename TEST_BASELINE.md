@@ -25,7 +25,7 @@
 - `tests/security/test_catalog_generation.py`
   - 驗證 catalog generation 對正式、excluded、stray skill entries 的分類
 - `tests/security/test_workspace_sensitive_metadata.py`
-  - 驗證 workspace-sensitive metadata rules 的 repo baseline、fixture 正反案例、以及 self-test sample 掃描豁免
+  - 驗證 workspace-sensitive metadata rules 的 repo baseline、fixture 正反案例、self-test sample 掃描豁免，以及 Python governance entrypoints 的基本 contract
 - `tests/security/test_renormalize_parity.py`
   - 驗證 `preview/run-renormalize` 的 Python core 與 PowerShell wrapper 在 preview 模式下輸出一致
 - `tests/test_registry_inventory.py`
@@ -67,6 +67,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - template / rebuild package dry-run membership, output-root safety, and ignored temp actual-write verification
 - rebuild package isolated first-run bootstrap and verify path
 - workspace-sensitive metadata rule validation, including positive/negative fixture cases
+- Python-first boundary / publishability / workspace-sensitive validation entrypoint contracts
 - renormalize Python core and PowerShell wrapper preview parity
 - release hygiene and publishability report classification
 - i18n wave classification and drift audit issue counting

@@ -3,35 +3,17 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
-$libPath = Join-Path $PSScriptRoot "lib\\workspace-sensitive-metadata.ps1"
-. $libPath
-$rules = Get-WorkspaceSensitiveMetadataRules -RootPath $root
-$rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules -RootPath $root -RequireScopeExists
-$effectiveScope = if ($Scope -and $Scope.Count -gt 0) { $Scope } else { @($rules.shared_surface_scope) }
-$tracked = & git -C $root ls-files -- $effectiveScope
+$script = Join-Path $PSScriptRoot "verify-workspace-boundaries.py"
+$args = @($script, "--format", "json")
 
-if ($LASTEXITCODE -ne 0) {
-  throw "git ls-files failed while resolving tracked files for boundary verification."
+foreach ($entry in @($Scope | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
+  $args += @("--scope", $entry)
 }
 
-$trackedFiles = @($tracked | Where-Object { $_ })
-$pathRules = @($rules.path_rules)
-$contentPatterns = @($rules.content_patterns)
+$raw = (& python @args | Out-String).Trim()
 
-$contentFiles = $trackedFiles | Where-Object {
-  [IO.Path]::GetExtension($_) -in @(".md", ".json", ".jsonc", ".txt", ".ps1", ".py", ".toml", ".yml", ".yaml")
+if ([string]::IsNullOrWhiteSpace($raw)) {
+  throw "verify-workspace-boundaries.py returned empty output"
 }
 
-$pathViolations = @(Find-WorkspaceSensitivePathViolations -TrackedFiles $trackedFiles -PathRules $pathRules)
-$contentViolations = @(Find-WorkspaceSensitiveContentViolations -RootPath $root -Files $contentFiles -ContentPatterns $contentPatterns)
-
-[pscustomobject]@{
-  scanned_scope = $effectiveScope
-  scanned_file_count = $trackedFiles.Count
-  rules_ok = [bool]$rulesCheck.ok
-  rules_errors = @($rulesCheck.errors)
-  path_violations = @($pathViolations)
-  content_violations = @($contentViolations)
-  ok = [bool]$rulesCheck.ok -and (@($pathViolations).Count -eq 0) -and (@($contentViolations).Count -eq 0)
-}
+$raw | ConvertFrom-Json

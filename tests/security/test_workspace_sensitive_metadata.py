@@ -10,6 +10,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LIB_PATH = REPO_ROOT / "local" / "scripts" / "lib" / "workspace-sensitive-metadata.ps1"
 VALIDATE_SCRIPT = REPO_ROOT / "local" / "scripts" / "validate-workspace-sensitive-metadata-rules.ps1"
+PY_VALIDATE_SCRIPT = REPO_ROOT / "local" / "scripts" / "validate-workspace-sensitive-metadata-rules.py"
+PY_BOUNDARY_SCRIPT = REPO_ROOT / "local" / "scripts" / "verify-workspace-boundaries.py"
+PY_PUBLISHABILITY_SCRIPT = REPO_ROOT / "local" / "scripts" / "get-publishability-report.py"
 
 
 def get_powershell_executable():
@@ -70,6 +73,30 @@ def write_rules(root: Path, overrides: dict | None = None) -> dict:
         encoding="utf-8",
     )
     return rules
+
+
+class PythonWorkspaceSensitiveMetadataTests(unittest.TestCase):
+    def test_python_governance_entrypoints_return_expected_contracts(self):
+        validate = run_command(["python", str(PY_VALIDATE_SCRIPT), "--format", "json"])
+        self.assertEqual(validate.returncode, 0, validate.stdout + validate.stderr)
+        validate_payload = json.loads(validate.stdout)
+        self.assertTrue(validate_payload["ok"], validate_payload)
+        self.assertEqual(as_list(validate_payload["errors"]), [])
+
+        boundary = run_command(["python", str(PY_BOUNDARY_SCRIPT), "--format", "json"])
+        self.assertEqual(boundary.returncode, 0, boundary.stdout + boundary.stderr)
+        boundary_payload = json.loads(boundary.stdout)
+        self.assertTrue(boundary_payload["ok"], boundary_payload)
+        self.assertTrue(boundary_payload["rules_ok"], boundary_payload)
+        self.assertEqual(as_list(boundary_payload["path_violations"]), [])
+        self.assertEqual(as_list(boundary_payload["content_violations"]), [])
+
+        publishability = run_command(["python", str(PY_PUBLISHABILITY_SCRIPT), "--format", "json"])
+        self.assertEqual(publishability.returncode, 0, publishability.stdout + publishability.stderr)
+        publishability_payload = json.loads(publishability.stdout)
+        self.assertIn("working_tree_clean", publishability_payload)
+        self.assertIn("shared_surface_changes", publishability_payload)
+        self.assertTrue(publishability_payload["boundary_ok"], publishability_payload)
 
 
 class WorkspaceSensitiveMetadataTests(unittest.TestCase):

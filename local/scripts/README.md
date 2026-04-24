@@ -39,6 +39,12 @@
 - `health-check.ps1`
   - 對 registry 與 scripts 做最小健康檢查
   - 額外輸出 non-blocking `i18n drift` telemetry，讓 backlog 可見但不直接把 health gate 打成失敗
+- `verify-workspace-boundaries.py`
+  - 跨平台 boundary verification core；掃描 tracked shared surfaces，回報 path / content violations
+- `get-publishability-report.py`
+  - 跨平台 publishability report core；只提供本地結構判斷，不授權 publish / push
+- `validate-workspace-sensitive-metadata-rules.py`
+  - 跨平台 rules validation core；驗證 shared-surface scope、regex、自測案例與必要 metadata
 - `report-i18n-wave.py`
   - 分析目前 `i18n/` dirty worktree，區分純行尾變更、實質翻譯改動與新檔案波次
 - `report-release-hygiene.py`
@@ -62,16 +68,20 @@
 - `verify-template-package.ps1`
   - 驗證輸出的 template package 是否包含必要 starter 結構，且不含 review-only / local-only 內容
 - `verify-workspace-boundaries.ps1`
-  - 驗證目前 authoring repo 的 tracked shared surfaces 是否混入 live workspace metadata、authoring-only docs、或 operations state
+  - Windows PowerShell wrapper；呼叫 `verify-workspace-boundaries.py`，驗證目前 authoring repo 的 tracked shared surfaces 是否混入 live workspace metadata、authoring-only docs、或 operations state
 - `get-publishability-report.ps1`
-  - 彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
+  - Windows PowerShell wrapper；呼叫 `get-publishability-report.py`，彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
   - 對 changed markdown docs 補上 document placement observation，幫助判斷它目前落點是否符合 policy
 - `get-document-placement-recommendation.ps1`
   - 依文件角色輸出建議落點，區分 tracked shared layer、`local/docs/`、`local/docs/authoring/`、與 `ops/`
 - `lib/workspace-sensitive-metadata.ps1`
   - 載入 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json`，讓 boundary / template / publishability 驗證共用同一套規則
+- `lib/workspace_sensitive_metadata.py`
+  - Python 版 workspace-sensitive metadata core，作為跨平台 governance scripts 的共用邏輯
+- `lib/workspace_boundaries.py`
+  - Python 版 boundary payload builder，供 boundary verify 與 publishability report 共用
 - `validate-workspace-sensitive-metadata-rules.ps1`
-    - 驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性、自帶案例，以及 repo-side `shared_surface_scope` 參照是否仍有效
+    - Windows PowerShell wrapper；呼叫 `validate-workspace-sensitive-metadata-rules.py`，驗證 shared `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的結構、regex 可編譯性、自帶案例，以及 repo-side `shared_surface_scope` 參照是否仍有效
 - `preview-renormalize.ps1`
   - Windows PowerShell wrapper；呼叫 `preview-renormalize.py` 並回傳 PowerShell object
 - `run-renormalize.ps1`
@@ -106,5 +116,6 @@
 ## Platform Note
 
 - 新的 first-run 路徑優先使用 `bootstrap.py` 與 `verify-bootstrap.py`。
-- `preview-renormalize` / `run-renormalize` 已進入第一批 `Python core + PowerShell wrapper` 改寫。
+- `preview-renormalize` / `run-renormalize` 已完成第一批 `Python core + PowerShell wrapper` 改寫。
+- boundary / publishability / workspace-sensitive rules validation 已進入第二批 `Python core + PowerShell wrapper` 改寫。
 - `sync-skills.ps1` 仍保留作 Windows PowerShell 參考實作與治理樣板。
