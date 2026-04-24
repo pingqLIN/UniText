@@ -270,6 +270,46 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertEqual(payload["forbidden_present"], [])
         self.assertEqual(payload["content_violations"], [])
 
+    def test_external_review_contract_validates_and_export_uses_contract(self):
+        contract_path = REPO_ROOT / "docs" / "reviews" / "external-review-bundle.contract.json"
+        repair_script = REPO_ROOT / "local" / "scripts" / "repair-external-review-bundle-contract.py"
+        result = run_command([sys.executable, str(repair_script)])
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["validation"]["ok"], payload)
+        self.assertFalse(payload["changed"], payload)
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+
+        export_script = REPO_ROOT / "local" / "scripts" / "export-review-package.ps1"
+        export_result = run_command(
+            [
+                powershell,
+                "-NoProfile",
+                "-Command",
+                f"& {quote_powershell_string(export_script)} -DryRun | ConvertTo-Json -Depth 8",
+            ]
+        )
+        self.assertEqual(export_result.returncode, 0, export_result.stdout + export_result.stderr)
+        export_payload = json.loads(export_result.stdout)
+
+        expected_items = (
+            [("file", normalize_manifest_path(path)) for path in contract["files"]]
+            + [("dir", normalize_manifest_path(path)) for path in contract["directories"]]
+            + [("dir", f"registry/skills/{skill}") for skill in contract["skills"]["core"]]
+            + [("dir", f"registry/skills/{skill}") for skill in contract["skills"]["expansion"]]
+        )
+        actual_items = [
+            (item["kind"], normalize_manifest_path(item["path"]))
+            for item in export_payload["items"]
+        ]
+
+        self.assertEqual(actual_items, expected_items)
+        self.assertEqual(export_payload["item_count"], len(expected_items))
+
     def test_export_rebuild_rejects_escape_output_root(self):
         script = REPO_ROOT / "local" / "scripts" / "export-rebuild-project.ps1"
         powershell = get_powershell_executable()
