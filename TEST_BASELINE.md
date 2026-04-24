@@ -26,6 +26,8 @@
   - 驗證 catalog generation 對正式、excluded、stray skill entries 的分類
 - `tests/security/test_workspace_sensitive_metadata.py`
   - 驗證 workspace-sensitive metadata rules 的 repo baseline、fixture 正反案例、以及 self-test sample 掃描豁免
+- `tests/security/test_renormalize_parity.py`
+  - 驗證 `preview/run-renormalize` 的 Python core 與 PowerShell wrapper 在 preview 模式下輸出一致
 - `tests/test_registry_inventory.py`
   - 驗證目前 review shortlist 與主要擴張 skill families 仍存在於 registry
 - `tests/test_bootstrap_verify_smoke.py`
@@ -44,7 +46,7 @@
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 快速 discover gate：
@@ -56,7 +58,7 @@ python -m unittest discover -s tests -p "test*.py"
 若環境使用 `py` 啟動 Python：
 
 ```powershell
-py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 ## 3. What This Baseline Covers
@@ -65,6 +67,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - template / rebuild package dry-run membership, output-root safety, and ignored temp actual-write verification
 - rebuild package isolated first-run bootstrap and verify path
 - workspace-sensitive metadata rule validation, including positive/negative fixture cases
+- renormalize Python core and PowerShell wrapper preview parity
 - release hygiene and publishability report classification
 - i18n wave classification and drift audit issue counting
 - minimum registry inventory integrity
@@ -84,7 +87,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - live publishability decision with real remote / review state
 - i18n live translation quality / semantic drift
 - rendered project-map browser behavior with real Playwright screenshots or Lighthouse
-- cross-platform script parity
+- cross-platform parity beyond the renormalize preview family
 
 ## 5. Rebuild Priorities
 
