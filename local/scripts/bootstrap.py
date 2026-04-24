@@ -420,7 +420,11 @@ def main() -> int:
     else:
         summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
     if not runtime_skills.exists():
-        raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
+        if not args.dry_run:
+            raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
+        runtime_details = summary.get("runtime", {})
+        if isinstance(runtime_details, dict):
+            runtime_details["runtime_skills_missing_after_plan"] = str(runtime_skills)
     if not server.exists():
         raise SystemExit(f"mcp server not found: {server}")
 

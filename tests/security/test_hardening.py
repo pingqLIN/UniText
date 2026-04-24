@@ -220,6 +220,9 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertIn("README.md", sources)
         self.assertIn("registry/mcp/claude-project-mcp-seed", sources)
         self.assertIn("local/scripts/bootstrap.py", sources)
+        self.assertIn("local/scripts/build-runtime-layer.py", sources)
+        self.assertIn("local/scripts/lib/integration_surfaces.py", sources)
+        self.assertIn("local/config/integration-surfaces.json", sources)
         self.assertIn("registry/skills/example-skill", targets)
         self.assertIn("machine-local runtime state", payload["excluded"])
 

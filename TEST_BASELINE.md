@@ -12,6 +12,8 @@
 
 - `tests/security/test_hardening.py`
   - 驗證安全 hardening guardrails、template / rebuild package dry-run 與 actual-write 成功路徑、以及 high-risk script input validation 沒有退化
+- `tests/security/test_rebuild_first_run.py`
+  - 驗證匯出的 rebuild package 可在 isolated temp home 內完成 `bootstrap.py --dry-run`、`bootstrap.py --force` 與 `verify-bootstrap.py`
 - `tests/security/test_release_hygiene.py`
   - 驗證 release hygiene report 的 blocker / warning / clean-scope 分類
 - `tests/security/test_i18n_wave.py`
@@ -42,7 +44,7 @@
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 快速 discover gate：
@@ -61,6 +63,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 
 - hardening guardrails for sensitive scripts
 - template / rebuild package dry-run membership, output-root safety, and ignored temp actual-write verification
+- rebuild package isolated first-run bootstrap and verify path
 - workspace-sensitive metadata rule validation, including positive/negative fixture cases
 - release hygiene and publishability report classification
 - i18n wave classification and drift audit issue counting
@@ -76,7 +79,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 目前這個 baseline 還沒有完整覆蓋：
 
 - 真實使用者 home / live CLI config 上的 bootstrap end-to-end 行為
-- rebuild package post-export first-run behavior beyond package structure verification
+- live rebuild package adoption against a real user home / CLI config
 - live publishability decision with real remote / review state
 - i18n live translation quality / semantic drift
 - rendered project-map browser behavior with real Playwright screenshots or Lighthouse
@@ -88,7 +91,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 
 1. 真實 home-dir / live config 邊界下的 `bootstrap.py` / `verify-bootstrap.py` 驗證
 2. `build-project-map.py` 的 browser rendering / Lighthouse 檢查
-3. template / rebuild package post-export first-run smoke
+3. template / rebuild live adoption smoke against real CLI config
 4. boundary / metadata rule validation 的 cross-script integration cases
 
 ## 6. Policy Note

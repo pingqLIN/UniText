@@ -45,6 +45,7 @@
   - `.github/pull_request_template.md`
   - `.mcp.json`
   - `.claude/settings.json`
+  - `local/config/integration-surfaces.json`
 - generic examples
   - `registry/skills/example-skill/`
   - `registry/agents/example-agent/`
@@ -57,12 +58,14 @@
   - `local/docs/PATH_MAP.md`
   - `local/scripts/bootstrap.py`
   - `local/scripts/verify-bootstrap.py`
+  - `local/scripts/build-runtime-layer.py`
   - `local/scripts/create-git-bundle.py`
   - `local/scripts/preview-renormalize.py`
   - `local/scripts/preview-renormalize.ps1`
   - `local/scripts/run-renormalize.ps1`
   - `local/scripts/run-renormalize.py`
   - `local/scripts/lib/renormalize_core.py`
+  - `local/scripts/lib/integration_surfaces.py`
   - `local/scripts/sync-skills.ps1`
   - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
   - `local/scripts/lib/workspace-sensitive-metadata.ps1`
