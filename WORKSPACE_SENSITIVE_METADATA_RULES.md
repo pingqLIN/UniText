@@ -54,6 +54,7 @@
 
 - `live workspace hostname` 應該優先抓 `Zone hostname`、`MCP hostname`、`public/custom hostname` 這類宣告語境
 - 不應只因為一行同時提到 `domain`、`ingress`、或公有雲示例 hostname 就直接視為 live metadata
+- `C:\Users\<user>\...` 這類明確 placeholder path 應作為安全文件範例處理；真實帳號、服務目錄或專案絕對路徑仍應被攔截
 
 當真實 repo 出現 public-doc false positives 時，先做的不是擴大 ignore scope，而是：
 

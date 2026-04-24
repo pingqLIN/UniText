@@ -67,7 +67,7 @@
   "content_patterns": [
     {
       "label": "machine-specific Windows path",
-      "regex": "(?i)\\b[A-Z]:\\\\(Users|Services|Projects)\\\\",
+      "regex": "(?i)\\b[A-Z]:\\\\(Users|Services|Projects)\\\\(?!<[^>]+>\\\\)",
       "skip_script_pattern_lines": false
     },
     {
@@ -140,6 +140,11 @@
     {
       "label": "allow ingress placeholder command",
       "sample": "kubectl get pods -n <ingress-ns> -l app.kubernetes.io/name=ingress-nginx",
+      "expected_labels": []
+    },
+    {
+      "label": "allow placeholder Windows user path",
+      "sample": "Use C:\\Users\\<user>\\.cloudflared\\cert.pem as placeholder documentation.",
       "expected_labels": []
     },
     {
