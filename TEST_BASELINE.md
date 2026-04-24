@@ -28,6 +28,8 @@
   - 驗證 workspace-sensitive metadata rules 的 repo baseline、fixture 正反案例、self-test sample 掃描豁免，以及 Python governance entrypoints 的基本 contract
 - `tests/security/test_renormalize_parity.py`
   - 驗證 `preview/run-renormalize` 的 Python core 與 PowerShell wrapper 在 preview 模式下輸出一致
+- `tests/security/test_self_repair_simulation.py`
+  - 驗證 workspace-sensitive boundary drift 與 content-pattern drift 的 self-repair simulation 可在 temporary fixture 中 recover
 - `tests/test_registry_inventory.py`
   - 驗證目前 review shortlist 與主要擴張 skill families 仍存在於 registry
 - `tests/test_bootstrap_verify_smoke.py`
@@ -46,7 +48,7 @@
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 快速 discover gate：
@@ -58,7 +60,7 @@ python -m unittest discover -s tests -p "test*.py"
 若環境使用 `py` 啟動 Python：
 
 ```powershell
-py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 ## 3. What This Baseline Covers
@@ -70,6 +72,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - Python-first boundary / publishability / workspace-sensitive validation entrypoint contracts
 - renormalize Python core and PowerShell wrapper preview parity
 - release hygiene and publishability report classification
+- bounded self-repair simulation recovery for workspace-sensitive rule drift
 - i18n wave classification and drift audit issue counting
 - minimum registry inventory integrity
 - isolated `bootstrap -> verify` smoke coverage for local runtime wiring
