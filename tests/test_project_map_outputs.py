@@ -1,0 +1,85 @@
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_PATH = REPO_ROOT / "local" / "scripts" / "build-project-map.py"
+
+
+def run_command(args):
+    return subprocess.run(
+        args,
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+
+
+class ProjectMapOutputTests(unittest.TestCase):
+    def test_cli_writes_self_contained_interactive_share_and_handoff_artifacts(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = run_command([sys.executable, str(SCRIPT_PATH), "--output-dir", temp_dir])
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            summary = json.loads(result.stdout)
+
+            output_root = Path(temp_dir)
+            json_path = output_root / "project-map.json"
+            html_path = output_root / "site" / "project-map.html"
+            share_html_path = output_root / "site" / "project-map-share.html"
+            handoff_json_path = output_root / "site" / "project-map-handoff.json"
+            handoff_md_path = output_root / "site" / "project-map-handoff.md"
+
+            self.assertEqual(Path(summary["json_path"]), json_path)
+            self.assertEqual(Path(summary["html_path"]), html_path)
+            self.assertEqual(Path(summary["share_html_path"]), share_html_path)
+            self.assertEqual(Path(summary["handoff_json_path"]), handoff_json_path)
+            self.assertEqual(Path(summary["handoff_md_path"]), handoff_md_path)
+
+            for path in (json_path, html_path, share_html_path, handoff_json_path, handoff_md_path):
+                self.assertTrue(path.is_file(), f"Missing generated artifact: {path}")
+
+            payload = json.loads(json_path.read_text(encoding="utf-8"))
+            interactive_html = html_path.read_text(encoding="utf-8")
+            share_html = share_html_path.read_text(encoding="utf-8")
+            handoff = json.loads(handoff_json_path.read_text(encoding="utf-8"))
+            handoff_markdown = handoff_md_path.read_text(encoding="utf-8")
+
+        self.assertGreater(summary["node_count"], 0)
+        self.assertGreater(summary["edge_count"], 0)
+        self.assertEqual(summary["node_count"], len(payload["nodes"]))
+        self.assertEqual(summary["edge_count"], len(payload["edges"]))
+
+        for placeholder in (
+            "__BOOTSTRAP_DATA__",
+            "__PAGE_MODE__",
+            "__GOVERNANCE_POLICY__",
+            "__RUNTIME_SOURCE__",
+        ):
+            self.assertNotIn(placeholder, interactive_html)
+            self.assertNotIn(placeholder, share_html)
+
+        self.assertIn('window.PROJECT_MAP_PAGE_MODE = "interactive";', interactive_html)
+        self.assertIn('window.PROJECT_MAP_PAGE_MODE = "share-safe";', share_html)
+        self.assertIn("window.PROJECT_MAP_BOOTSTRAP =", interactive_html)
+        self.assertIn("window.PROJECT_MAP_BOOTSTRAP =", share_html)
+        self.assertIn("window.AGENT_GOVERNANCE_POLICY = {", interactive_html)
+        self.assertIn("window.AGENT_GOVERNANCE_POLICY = null;", share_html)
+        self.assertIn('id="link-repo"', interactive_html)
+        self.assertNotIn('id="link-repo"', share_html)
+        self.assertNotIn('id="maintenance-controls"', share_html)
+        self.assertNotIn('class="governance-panel"', share_html)
+
+        self.assertFalse(handoff["surface_contract"]["share_safe"]["browser_scan"])
+        self.assertFalse(handoff["surface_contract"]["share_safe"]["governance_resolver"])
+        self.assertFalse(handoff["surface_contract"]["share_safe"]["native_repo_paths"])
+        self.assertIn("Share-safe page", handoff_markdown)
+
+
+if __name__ == "__main__":
+    unittest.main()
