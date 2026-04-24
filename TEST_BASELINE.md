@@ -20,6 +20,8 @@
   - 驗證 Copilot session payload 與 project MCP wiring 檢查邏輯
 - `tests/security/test_catalog_generation.py`
   - 驗證 catalog generation 對正式、excluded、stray skill entries 的分類
+- `tests/security/test_workspace_sensitive_metadata.py`
+  - 驗證 workspace-sensitive metadata rules 的 repo baseline、fixture 正反案例、以及 self-test sample 掃描豁免
 - `tests/test_registry_inventory.py`
   - 驗證目前 review shortlist 與主要擴張 skill families 仍存在於 registry
 - `tests/test_bootstrap_verify_smoke.py`
@@ -38,7 +40,7 @@
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_copilot_session tests.security.test_catalog_generation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
 ```
 
 快速 discover gate：
@@ -57,6 +59,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 
 - hardening guardrails for sensitive scripts
 - template / rebuild package dry-run membership, output-root safety, and ignored temp actual-write verification
+- workspace-sensitive metadata rule validation, including positive/negative fixture cases
 - release hygiene and publishability report classification
 - i18n wave classification logic
 - minimum registry inventory integrity
@@ -84,7 +87,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 1. 真實 home-dir / live config 邊界下的 `bootstrap.py` / `verify-bootstrap.py` 驗證
 2. `build-project-map.py` 的 browser rendering / Lighthouse 檢查
 3. template / rebuild package post-export first-run smoke
-4. boundary / metadata rule validation 的正向與反向案例
+4. boundary / metadata rule validation 的 cross-script integration cases
 
 ## 6. Policy Note
 
