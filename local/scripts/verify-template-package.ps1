@@ -110,8 +110,8 @@ $contentViolations = @($rawViolations | ForEach-Object {
   package_path = $resolvedPath
   rules_ok = [bool]$rulesCheck.ok
   rules_errors = @($rulesCheck.errors)
-  missing = $missing
-  forbidden_present = $presentForbidden
+  missing = @($missing)
+  forbidden_present = @($presentForbidden)
   content_violations = @($contentViolations)
   ok = [bool]$rulesCheck.ok -and ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and (@($contentViolations).Count -eq 0)
 }

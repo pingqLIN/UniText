@@ -19,11 +19,15 @@ $required = @(
 $missing = @($required | Where-Object {
   -not (Test-Path (Join-Path $resolvedPath $_))
 })
+$forbiddenPresent = @()
+if ($null -ne $templateResult.forbidden_present) {
+  $forbiddenPresent = @($templateResult.forbidden_present)
+}
 
 [pscustomobject]@{
   package_path = $resolvedPath
   template_ok = [bool]$templateResult.ok
-  missing = $missing
-  forbidden_present = $templateResult.forbidden_present
+  missing = @($missing)
+  forbidden_present = $forbiddenPresent
   ok = [bool]$templateResult.ok -and ($missing.Count -eq 0)
 }
