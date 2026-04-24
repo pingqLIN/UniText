@@ -50,6 +50,10 @@ def load_bootstrap_module():
     return module
 
 
+def normalize_manifest_path(value: str) -> str:
+    return "/".join(part for part in value.replace("\\", "/").split("/") if part)
+
+
 class SecurityHardeningTests(unittest.TestCase):
     def test_with_server_rejects_shell_string_by_default(self):
         script = REPO_ROOT / "registry" / "skills" / "webapp-testing" / "scripts" / "with_server.py"
@@ -190,6 +194,30 @@ class SecurityHardeningTests(unittest.TestCase):
         )
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("ops/template-package", result.stdout + result.stderr)
+
+    def test_export_template_dry_run_lists_required_starter_members(self):
+        script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+        result = run_command(
+            [
+                powershell,
+                "-NoProfile",
+                "-Command",
+                f"& '{script}' -DryRun | ConvertTo-Json -Depth 6",
+            ]
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        sources = {normalize_manifest_path(item["source"]) for item in payload["items"]}
+        targets = {normalize_manifest_path(item["target"]) for item in payload["items"]}
+
+        self.assertIn("README.md", sources)
+        self.assertIn("registry/mcp/claude-project-mcp-seed", sources)
+        self.assertIn("local/scripts/bootstrap.py", sources)
+        self.assertIn("registry/skills/example-skill", targets)
+        self.assertIn("machine-local runtime state", payload["excluded"])
 
     def test_batch_adopt_rejects_invalid_skill_id(self):
         script = REPO_ROOT / "local" / "scripts" / "batch-adopt-skills.ps1"

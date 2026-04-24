@@ -11,7 +11,7 @@
 目前保留並可直接執行的基線如下：
 
 - `tests/security/test_hardening.py`
-  - 驗證安全 hardening guardrails 沒有退化
+  - 驗證安全 hardening guardrails、template package dry-run membership、以及 high-risk script input validation 沒有退化
 - `tests/security/test_release_hygiene.py`
   - 驗證 release hygiene report 的 blocker / warning / clean-scope 分類
 - `tests/security/test_i18n_wave.py`
@@ -54,6 +54,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 ## 3. What This Baseline Covers
 
 - hardening guardrails for sensitive scripts
+- template package dry-run membership and output-root safety
 - release hygiene and publishability report classification
 - i18n wave classification logic
 - minimum registry inventory integrity
@@ -67,7 +68,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_release_hygi
 目前這個 baseline 還沒有完整覆蓋：
 
 - 真實使用者 home / live CLI config 上的 bootstrap end-to-end 行為
-- template export / rebuild export success path
+- template export / verify / rebuild actual write success path
 - live publishability decision with real remote / review state
 - i18n drift coverage beyond the wave-classification fixture layer
 - rendered project-map browser behavior with real Playwright screenshots
