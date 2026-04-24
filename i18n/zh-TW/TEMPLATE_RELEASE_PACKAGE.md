@@ -12,6 +12,7 @@
 - 排除 local-only state
 - 排除歷史治理殘留
 - 適合其他使用者 fork / clone 後自行擴充
+- 能讓 Claude、Codex、Gemini、Copilot 在 Windows / macOS / Linux 上朝同一套 shared baseline 對齊
 
 這份 package 的定位是：
 
@@ -32,27 +33,51 @@
   - `RESOURCE_SPEC.md`
   - `OPERATIONS.md`
   - `PROJECT_MODES.md`
+  - `WORKSPACE_SENSITIVE_METADATA_RULES.json`
+  - `WORKSPACE_SENSITIVE_METADATA_RULES.md`
   - `SECRET_HANDLING_GUIDELINES.md`
   - `MILESTONES.md`
   - `TEMPLATE_RELEASE_PACKAGE.md`
   - `TEMPLATE_RELEASE_CHECKLIST.md`
 - template-safe root config
+  - `.gitattributes`
   - `.gitignore`
+  - `.github/pull_request_template.md`
+  - `.mcp.json`
+  - `.claude/settings.json`
+  - `local/config/integration-surfaces.json`
 - generic examples
   - `registry/skills/example-skill/`
   - `registry/agents/example-agent/`
   - `registry/mcp/example-mcp/`
   - `registry/workflow/example-workflow/`
+- runnable MCP baseline
+  - `registry/mcp/claude-project-mcp-seed/`
 - starter local overlay skeleton
   - `local/README.md`
   - `local/docs/PATH_MAP.md`
   - `local/scripts/bootstrap.py`
   - `local/scripts/verify-bootstrap.py`
+  - `local/scripts/build-runtime-layer.py`
   - `local/scripts/create-git-bundle.py`
+  - `local/scripts/preview-renormalize.py`
+  - `local/scripts/preview-renormalize.ps1`
+  - `local/scripts/run-renormalize.ps1`
+  - `local/scripts/run-renormalize.py`
+  - `local/scripts/lib/renormalize_core.py`
+  - `local/scripts/lib/integration_surfaces.py`
   - `local/scripts/sync-skills.ps1`
+  - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
+  - `local/scripts/lib/workspace-sensitive-metadata.ps1`
+  - `local/scripts/verify-workspace-boundaries.ps1`
+  - `local/scripts/get-publishability-report.ps1`
 - release metadata
-  - `manifest.json`
-  - `release.json`
+- `manifest.json`
+- `release.json`
+
+starter template 也應保留 repo-level line-ending policy，避免不同機器上的 `core.autocrlf` 在首次修改 shared docs 或 scripts 時產生不必要的 CRLF 噪音。
+若要做 line-ending cleanup，應優先使用 `preview-renormalize.py` 或 `preview-renormalize.ps1` 看 blast radius，再用 `run-renormalize.py` 或 `run-renormalize.ps1 -Scope ...` 做受控批次，而不是直接對整個 repo 無差別套用。
+starter template 也應保留最小 GitHub collaboration baseline，至少包含 `.github/pull_request_template.md`，讓 review 與驗證欄位有一致格式，而不是每次重新手寫。
 
 ## 3. Exclude
 
@@ -64,9 +89,10 @@ template package 不應包含：
 - `ops/history/`
 - `ops/review-package/`
 - `ops/template-package/`
-- authoring notes and review archives
 - `local/docs/PATH_MAP.md`
 - 實際使用者帳號、家目錄、絕對路徑
+- workspace-specific Cloudflare baseline references with live IDs、hostnames、redirect URIs、or runtime paths
+- authoring notes、review archives 與其他 local-only 補充材料
 - review-specific docs
   - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md`
   - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md`
@@ -99,6 +125,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-templ
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1 -Path .\ops\template-package\<package-name>
 ```
 
+若要在匯出前先檢查 authoring repo 的 tracked shared surfaces：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-workspace-boundaries.ps1
+```
+
+若要直接輸出成「全新的 starter project」而不是一般 template package：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\export-rebuild-project.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-rebuild-project.ps1 -Path .\ops\rebuild-project\<package-name>
+```
+
 匯出後，新使用者的 first-run 建議路徑：
 
 ```bash
@@ -108,6 +147,8 @@ python local/scripts/verify-bootstrap.py
 python local/scripts/create-git-bundle.py
 ```
 
+若系統只提供 `python3`，請將上述命令中的 `python` 改為 `python3`。
+
 ## 5. Export Interpretation
 
 匯出的 template package 代表：
@@ -115,6 +156,10 @@ python local/scripts/create-git-bundle.py
 - UniText 的核心契約
 - 一份乾淨的 starter layout
 - 一組最小 generic examples
+- 一條可重複的 cross-platform `bootstrap -> verify` 路徑
+- 一份可由 Claude 直接讀取的 `.claude/settings.json`
+- 一份可由 project-local MCP 使用的 `.mcp.json` seed
+- 一個可供 Copilot CLI 透過 bootstrap 註冊 MCP wiring 的 shared baseline
 
 它不代表：
 
@@ -122,6 +167,9 @@ python local/scripts/create-git-bundle.py
 - 所有已納管 skills
 - 所有 review / audit 證據
 - 已完成的本機 delivery wiring
+- 任意機器都已經完成的 interpreter pinning
+- live workspace-specific infrastructure references；若需要保留結構，只能改成 sanitized placeholder docs
+- authoring repo branch 本身已可安全推送；push suitability 仍需另做 repo-side boundary review
 
 ## 6. Current Interpretation
 
