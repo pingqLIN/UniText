@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import os
 import shutil
@@ -13,6 +14,7 @@ VALIDATE_SCRIPT = REPO_ROOT / "local" / "scripts" / "validate-workspace-sensitiv
 PY_VALIDATE_SCRIPT = REPO_ROOT / "local" / "scripts" / "validate-workspace-sensitive-metadata-rules.py"
 PY_BOUNDARY_SCRIPT = REPO_ROOT / "local" / "scripts" / "verify-workspace-boundaries.py"
 PY_PUBLISHABILITY_SCRIPT = REPO_ROOT / "local" / "scripts" / "get-publishability-report.py"
+REPAIR_CONTENT_SCRIPT = REPO_ROOT / "local" / "scripts" / "repair-workspace-sensitive-content-patterns.py"
 
 
 def get_powershell_executable():
@@ -75,6 +77,14 @@ def write_rules(root: Path, overrides: dict | None = None) -> dict:
     return rules
 
 
+def load_repair_content_module():
+    spec = importlib.util.spec_from_file_location("repair_workspace_sensitive_content_patterns", REPAIR_CONTENT_SCRIPT)
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    return module
+
+
 class PythonWorkspaceSensitiveMetadataTests(unittest.TestCase):
     def test_python_governance_entrypoints_return_expected_contracts(self):
         validate = run_command(["python", str(PY_VALIDATE_SCRIPT), "--format", "json"])
@@ -97,6 +107,23 @@ class PythonWorkspaceSensitiveMetadataTests(unittest.TestCase):
         self.assertIn("working_tree_clean", publishability_payload)
         self.assertIn("shared_surface_changes", publishability_payload)
         self.assertTrue(publishability_payload["boundary_ok"], publishability_payload)
+
+    def test_content_pattern_repair_constants_match_rules_baseline(self):
+        module = load_repair_content_module()
+        rules = json.loads((REPO_ROOT / "WORKSPACE_SENSITIVE_METADATA_RULES.json").read_text(encoding="utf-8"))
+        patterns_by_label = {
+            pattern["label"]: pattern
+            for pattern in rules["content_patterns"]
+        }
+        self_tests_by_label = {
+            case["label"]: case
+            for case in rules["self_test_cases"]
+        }
+
+        for label, expected in module.CANONICAL_CONTENT_PATTERNS.items():
+            self.assertEqual(patterns_by_label[label], expected)
+        for label, expected in module.CANONICAL_SELF_TEST_CASES.items():
+            self.assertEqual(self_tests_by_label[label], expected)
 
 
 class WorkspaceSensitiveMetadataTests(unittest.TestCase):
