@@ -29,6 +29,16 @@ class SelfRepairSimulationTests(unittest.TestCase):
         self.assertEqual(payload["classification"], "recovered")
         return payload
 
+    def test_runtime_target_drift_recovers(self):
+        payload = self.run_scenario("runtime-target-drift")
+        self.assertFalse(payload["before"]["verify_ok"])
+        self.assertTrue(payload["after"]["verify_ok"])
+
+    def test_review_bundle_contract_drift_recovers(self):
+        payload = self.run_scenario("review-bundle-contract-drift")
+        self.assertFalse(payload["before"]["export_ok"])
+        self.assertTrue(payload["after"]["export_ok"])
+
     def test_workspace_sensitive_boundary_drift_recovers(self):
         payload = self.run_scenario("workspace-sensitive-boundary-drift")
         self.assertFalse(payload["before"]["validate_ok"])

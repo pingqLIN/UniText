@@ -29,7 +29,7 @@
 - `tests/security/test_renormalize_parity.py`
   - 驗證 `preview/run-renormalize` 的 Python core 與 PowerShell wrapper 在 preview 模式下輸出一致
 - `tests/security/test_self_repair_simulation.py`
-  - 驗證 workspace-sensitive boundary drift 與 content-pattern drift 的 self-repair simulation 可在 temporary fixture 中 recover
+  - 驗證 runtime target drift、review bundle contract drift、workspace-sensitive boundary drift 與 content-pattern drift 的 self-repair simulation 可在 temporary fixture 中 recover
 - `tests/test_registry_inventory.py`
   - 驗證目前 review shortlist 與主要擴張 skill families 仍存在於 registry
 - `tests/test_bootstrap_verify_smoke.py`
