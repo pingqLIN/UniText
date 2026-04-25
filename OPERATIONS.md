@@ -5,6 +5,8 @@
 
 所有 delivery 與 mutation 都應以 `UniText` 的純文本 registry / spec 契約為 source of truth。
 
+Consumer agent 的預設讀取面是 `runtime/`，不是 `registry/`。`registry/` 仍然是 canonical authoring source；`runtime/` 是 tracked runtime read model；`local/` 才是 machine-local wiring。
+
 若操作涉及 password、API key、token、credential 等 sensitive material，請同時遵守 `SECRET_HANDLING_GUIDELINES.md`。
 
 ## 1. Scope
@@ -15,6 +17,7 @@
 - delivery modes
 - delivery triggers
 - adoption flow
+- adoption lanes
 - drift / repair
 - logical-to-physical mapping
 
@@ -82,6 +85,8 @@ delivery 只能由明確 trigger 啟動：
 
 ## 6. Adoption Flow
 
+Detailed operator guidance for attaching UniText to an existing machine or project is tracked in [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md).
+
 1. `SCAN`
    - 掃描候選來源，列出可 adopt 的資源與 readiness 狀態
 2. `REVIEW`
@@ -95,6 +100,37 @@ delivery 只能由明確 trigger 啟動：
    - 若 CLI 支援 `native-config`，可在 `bootstrap` 階段寫入 machine-local config，但 canonical definition 仍留在 `registry/`
 6. `VERIFY`
    - 驗證檔案存在性、路徑解析、delivery mode 與目標 CLI 載入條件是否成立
+
+## 6.1 Adoption Lanes
+
+在 `SCAN` 之後、任何 tracked mutation 之前，每個新資源都應先落到一條 lane：
+
+| Lane | Meaning | Expected surfaces |
+|---|---|---|
+| `local-only overlay` | machine-specific、user-specific、敏感或尚未 review-ready 的資源 | local host wiring、active CLI skill dir、ignored local notes |
+| `project-local MCP / companion` | 只屬於單一 repo 或單一 delivery context 的資源 | target project `.mcp.json`、repo-local notes、project companion docs |
+| `governed registry promotion` | 已可被多專案 / 多 operator 共用的 shared asset | `registry/` → rebuilt `runtime/` → delivery adapter |
+
+預設優先序：
+
+1. 先問能不能留在較小的 lane
+2. 只有在 reusable、share-safe、可 review 時才升級到 governed registry promotion
+3. 若分類不清楚，停在 `REVIEW`
+
+## 6.2 Governance Gate For New Skills And MCPs
+
+新的 skill 或 MCP 要進入 governed `registry/`，至少要同時滿足：
+
+- 可重用，不只綁定單一作者機器
+- 不依賴 plaintext secret、私有 callback URL、或個人絕對路徑
+- 可清楚說明 canonical `id` 與 source / provenance
+- 通過 `local/docs/ADOPTION_CHECKLIST.md`
+- 放置位置符合 `DOCUMENT_PLACEMENT_POLICY.md`
+
+若不滿足：
+
+- 保持在 `local-only overlay` 或 `project-local MCP / companion`
+- 不要先放進 `registry/` 再補分類
 
 ## 6.1 First-Run Baseline
 
@@ -127,7 +163,24 @@ delivery 只能由明確 trigger 啟動：
 | Logical area | Meaning | Physical mapping examples |
 |---|---|---|
 | `/registry/skills` | canonical skill sources | shared directory、repo subdir、mounted path |
+| `/runtime` | tracked runtime read model | repo `runtime/` directory、generated projections、runtime catalog |
 | `/registry/mcp` | canonical MCP definitions | config folder、generated manifest root |
 | `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
 | `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |
 | `/operations` | inventories、backups、drift logs | ops folder、state store、audit directory |
+
+## 9. Self-Repair Simulation
+
+若要評估未來執行過程產生障礙時，system agent 是否有能力自我修復，不要直接憑直覺判斷；請先套用一個固定的 scenario simulation。
+
+最小判斷順序：
+
+1. `detectable`
+2. `bounded`
+3. `reversible`
+4. `verifiable`
+5. `escalatable`
+
+只有當前四項都成立時，agent 才能嘗試 autonomous self-repair。若缺少任何一項，應降級成 guided repair 或 human gate。
+
+完整規則、repair classes、scenario config template 與目前 `UniText` 的評估，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。

@@ -16,12 +16,13 @@
     "NO_PUBLISH_POLICY.md",
     "DOCUMENT_PLACEMENT_POLICY.md",
     "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
-    "COPILOT_CLI_ADAPTER_NOTE.md",
-    "SKILL0_COLLABORATION_VISION.md",
-    "ESSENTIAL_SKILLS_SHORTLIST.md",
-    "EXTERNAL_REVIEW_PACKAGE.md",
-    "EXTERNAL_REVIEW_COVER_NOTE.md",
-    "EXTERNAL_REVIEW_HIGHLIGHTS.md",
+    "docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md",
+    "docs/concepts/SKILL0_COLLABORATION_VISION.md",
+    "docs/reviews/external-review-bundle.contract.json",
+    "docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md",
+    "docs/reviews/EXTERNAL_REVIEW_PACKAGE.md",
+    "docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md",
+    "docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md",
     ".github",
     ".mcp.json",
     ".claude/settings.json",
@@ -70,7 +71,7 @@
     },
     {
       "label": "live workspace hostname",
-      "regex": "(?i)\\b(?:zone hostname|ingress|hostnames?|domain)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
+      "regex": "(?i)\\b(?:zone hostnames?|public hostnames?|custom hostnames?|mcp hostnames?|health hostnames?)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
       "skip_script_pattern_lines": true
     },
     {
@@ -99,6 +100,31 @@
       "label": "flag live hostname in governance text",
       "sample": "Zone hostname: colorgeek.co",
       "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "flag live mcp hostname in governance text",
+      "sample": "MCP hostname: mcp.colorgeek.co",
+      "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "allow azure bare hostname guidance",
+      "sample": "Always prepend https:// when presenting URLs to the user. For example, report https://myapp.azurewebsites.net, never myapp.azurewebsites.net.",
+      "expected_labels": []
+    },
+    {
+      "label": "allow domain account guidance",
+      "sample": "Use VMNAME\\\\user for local, DOMAIN\\\\user for domain accounts.",
+      "expected_labels": []
+    },
+    {
+      "label": "allow domain controller guidance",
+      "sample": "VMAccess extension error on domain controller",
+      "expected_labels": []
+    },
+    {
+      "label": "allow ingress placeholder command",
+      "sample": "kubectl get pods -n <ingress-ns> -l app.kubernetes.io/name=ingress-nginx",
+      "expected_labels": []
     },
     {
       "label": "flag machine-specific path",

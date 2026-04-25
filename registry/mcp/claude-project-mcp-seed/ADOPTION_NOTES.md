@@ -13,4 +13,5 @@
 目前 `claude-project-mcp-seed` 已提升為可執行 baseline：
 
 - registry 內保留相對路徑版 canonical definition
-- `bootstrap.py` 會在本機 delivery 時寫入絕對路徑版 `.mcp.json` 與 Codex config
+- tracked `.mcp.json` 保持 template-safe relative-path seed
+- `bootstrap.py` 只負責 machine-local wiring，例如 Codex config 與 Copilot MCP config

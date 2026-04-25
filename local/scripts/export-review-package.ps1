@@ -8,6 +8,8 @@ $ErrorActionPreference = "Stop"
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 . (Join-Path $PSScriptRoot "lib\path-safety.ps1")
+$contractPath = Join-Path $root "docs/reviews/external-review-bundle.contract.json"
+$contract = Get-Content $contractPath -Raw | ConvertFrom-Json
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $folder = if ($Name) {
   Assert-SafeSimpleName -Value $Name -Label "Name" -Pattern '^[a-z0-9][a-z0-9_-]{0,127}$'
@@ -20,67 +22,35 @@ if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBa
   throw "OutputRoot must remain under ops/review-package: $outputBase"
 }
 $package = Join-Path $outputBase $folder
-$coreSkills = @(
-  "pdf",
-  "docx",
-  "xlsx",
-  "pptx",
-  "mcp-builder",
-  "skill-creator",
-  "webapp-testing",
-  "doc-coauthoring"
-)
-$expansionSkills = @(
-  "frontend-design",
-  "web-artifacts-builder",
-  "internal-comms",
-  "theme-factory"
-)
-$items = @(
-  [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_COVER_NOTE.md" },
-  [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_HIGHLIGHTS.md" },
-  [pscustomobject]@{ kind = "file"; path = "README.md" },
-  [pscustomobject]@{ kind = "file"; path = "INDEX.md" },
-  [pscustomobject]@{ kind = "file"; path = "VISION.md" },
-  [pscustomobject]@{ kind = "file"; path = "RESOURCE_SPEC.md" },
-  [pscustomobject]@{ kind = "file"; path = "OPERATIONS.md" },
-  [pscustomobject]@{ kind = "file"; path = "SECRET_HANDLING_GUIDELINES.md" },
-  [pscustomobject]@{ kind = "file"; path = "PROJECT_MODES.md" },
-  [pscustomobject]@{ kind = "file"; path = "MILESTONES.md" },
-  [pscustomobject]@{ kind = "file"; path = "PROJECT_STATUS_REPORT_2026-03-23.md" },
-  [pscustomobject]@{ kind = "file"; path = "ESSENTIAL_SKILLS_SHORTLIST.md" },
-  [pscustomobject]@{ kind = "file"; path = "EXTERNAL_REVIEW_PACKAGE.md" },
-  [pscustomobject]@{ kind = "file"; path = "local\\docs\\ADOPTION_CHECKLIST.md" },
-  [pscustomobject]@{ kind = "file"; path = "local\\docs\\CLI_COMPAT_MATRIX.md" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\README.md" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\bootstrap.py" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\verify-bootstrap.py" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\create-git-bundle.py" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\scan-skills.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\sync-skills.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\verify-delivery.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\health-check.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\batch-adopt-skills.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\generate-index-entries.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\rollback-skills.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\export-review-package.ps1" },
-  [pscustomobject]@{ kind = "file"; path = "local\\scripts\\lib\\path-safety.ps1" },
-  [pscustomobject]@{ kind = "dir"; path = "registry\\agents\\registry-curator" },
-  [pscustomobject]@{ kind = "dir"; path = "registry\\mcp\\claude-project-mcp-seed" },
-  [pscustomobject]@{ kind = "dir"; path = "registry\\workflow\\claude-plans" }
-)
+$coreSkills = @($contract.skills.core)
+$expansionSkills = @($contract.skills.expansion)
+$items = @()
+
+$items += @($contract.files) | ForEach-Object {
+  [pscustomobject]@{
+    kind = "file"
+    path = [string]$_
+  }
+}
+
+$items += @($contract.directories) | ForEach-Object {
+  [pscustomobject]@{
+    kind = "dir"
+    path = [string]$_
+  }
+}
 
 $items += $coreSkills | ForEach-Object {
   [pscustomobject]@{
     kind = "dir"
-    path = "registry\\skills\\$_"
+    path = "registry/skills/$_"
   }
 }
 
 $items += $expansionSkills | ForEach-Object {
   [pscustomobject]@{
     kind = "dir"
-    path = "registry\\skills\\$_"
+    path = "registry/skills/$_"
   }
 }
 
@@ -131,16 +101,11 @@ $manifest = [ordered]@{
   generated_at = (Get-Date).ToString("s")
   source_root = "."
   package_path = $package
-  phase_target = "external-review-ready"
+  phase_target = [string]$contract.phase_target
+  contract_path = "docs/reviews/external-review-bundle.contract.json"
+  reading_order = @($contract.reading_order)
   item_count = $items.Count
-  excluded = @(
-    "backup/",
-    "recovered_*/",
-    ".bak_*/",
-    "ops/history/",
-    "local/docs/authoring/",
-    "untracked experiments"
-  )
+  excluded = @($contract.excluded)
   skills_core = $coreSkills
   skills_expansion = $expansionSkills
   items = $items

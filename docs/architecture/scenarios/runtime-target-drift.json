@@ -1,0 +1,28 @@
+{
+  "id": "runtime-target-drift",
+  "layer": "local-wiring",
+  "class": "A1",
+  "trigger": [
+    "verify-bootstrap false",
+    "skills target mismatch"
+  ],
+  "failure_signal": [
+    "one or more home skills targets do not resolve to runtime/skills",
+    "verify-bootstrap reports ok = false"
+  ],
+  "repair_action": [
+    "rerun bootstrap with explicit repo-root and bounded local targets",
+    "limit scope to skills targets during simulation"
+  ],
+  "verify_action": [
+    "rerun verify-bootstrap against the same simulated home"
+  ],
+  "rollback": [
+    "discard the temporary home fixture"
+  ],
+  "escalate_when": [
+    "verify still fails after bootstrap",
+    "runtime skills source is missing",
+    "repo markers do not validate"
+  ]
+}

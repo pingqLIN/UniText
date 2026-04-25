@@ -8,7 +8,18 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 . (Join-Path $PSScriptRoot "lib\path-safety.ps1")
-$srcRoot = (Resolve-Path $Source).Path
+$safeIds = @(
+  foreach ($id in $Ids) {
+    Assert-SafeSimpleName -Value $id -Label "Id" -Pattern '^[a-z0-9][a-z0-9-]{0,63}$'
+  }
+)
+
+$srcPath = Resolve-Path $Source -ErrorAction SilentlyContinue
+if (-not $srcPath) {
+  throw "Source root not found: $Source"
+}
+
+$srcRoot = $srcPath.Path
 $skillsRoot = Get-NormalizedFullPath -BasePath $repo -CandidatePath "registry\skills"
 $dstRoot = Get-NormalizedFullPath -BasePath $repo -CandidatePath $Destination
 if (-not (Test-IsUnderPath -RootPath $skillsRoot -CandidatePath $dstRoot)) {
@@ -29,8 +40,7 @@ if (-not $DryRun) {
   New-Item -ItemType Directory -Force -Path $runDir | Out-Null
 }
 
-foreach ($id in $Ids) {
-  $safeId = Assert-SafeSimpleName -Value $id -Label "Id" -Pattern '^[a-z0-9][a-z0-9-]{0,63}$'
+foreach ($safeId in $safeIds) {
   $src = Get-NormalizedFullPath -BasePath $srcRoot -CandidatePath $safeId
   $dst = Get-NormalizedFullPath -BasePath $dstRoot -CandidatePath $safeId
 

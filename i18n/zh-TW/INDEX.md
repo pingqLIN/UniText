@@ -21,8 +21,9 @@
 10. `REBUILD_AS_NEW_PROJECT.md`
 11. `SECRET_HANDLING_GUIDELINES.md`
 12. `NO_PUBLISH_POLICY.md`
-13. `COPILOT_CLI_ADAPTER_NOTE.md`
-14. `SKILL0_COLLABORATION_VISION.md`
+13. `docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md`
+14. `docs/concepts/SKILL0_COLLABORATION_VISION.md`
+15. `docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md`
 
 ## 2. Resource Catalog
 
@@ -62,16 +63,16 @@
 
 ### Review Shortlist
 
-目前外部審查主集以 [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
+目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
 ### Review Package
 
-若要整理給外部審查者的資料，請以 [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
+若要整理給外部審查者的資料，請以 [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) 為入口，並使用 `local/scripts/export-review-package.ps1` 產出可重複生成的 review package。
 
 若要直接給審查者最短入口，請先看：
 
-- [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md)
-- [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md)
+- [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md)
+- [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md)
 
 ### Template Release
 
@@ -95,11 +96,15 @@
 - `local/scripts/bootstrap.py`
 - `local/scripts/verify-bootstrap.py`
 
+目前 active i18n baseline 僅維護英文 root 文件與 `zh-TW` mirrored surface；其餘 locale waves 已移到 `i18n/.clean/archived-locales/`，不再納入 release 或 drift gate。
+
 ### Related Concept Notes
 
-若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md)。
+若要理解 `Copilot CLI` 目前的 repo-level bootstrap baseline、限制與後續跨平台驗證方向，請看 [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md)。
 
-若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md)。
+若要評估 `UniText` 與 `skill-0` 的合作方式，請看 [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md)。
+
+若要用情境模擬檢查未來 runtime drift、review package drift、boundary drift 或 active locale drift 是否可由系統 agent 自我修復，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。
 
 ### Skills
 

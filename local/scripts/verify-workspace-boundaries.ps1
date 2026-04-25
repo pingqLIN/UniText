@@ -7,7 +7,7 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
 $libPath = Join-Path $PSScriptRoot "lib\\workspace-sensitive-metadata.ps1"
 . $libPath
 $rules = Get-WorkspaceSensitiveMetadataRules -RootPath $root
-$rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules
+$rulesCheck = Test-WorkspaceSensitiveMetadataRules -Rules $rules -RootPath $root -RequireScopeExists
 $effectiveScope = if ($Scope -and $Scope.Count -gt 0) { $Scope } else { @($rules.shared_surface_scope) }
 $tracked = & git -C $root ls-files -- $effectiveScope
 

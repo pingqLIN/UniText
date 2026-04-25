@@ -1,0 +1,4 @@
+interface:
+  display_name: "Conversation Memo"
+  short_description: "Capture raw talks and derive memo outputs"
+  default_prompt: "Use $conversation-memo to archive a discussion, write a memo, and identify formal outputs."

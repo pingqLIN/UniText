@@ -1,0 +1,16 @@
+{
+  "task_id": "",
+  "agent_label": "",
+  "model": "",
+  "first_read": [],
+  "followup_reads": [],
+  "forbidden_source_hit": false,
+  "scores": {
+    "routing_correctness": 0,
+    "source_hygiene": 0,
+    "output_correctness": 0,
+    "efficiency": 0
+  },
+  "critical_fail": false,
+  "notes": ""
+}

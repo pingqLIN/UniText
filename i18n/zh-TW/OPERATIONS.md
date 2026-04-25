@@ -127,3 +127,19 @@ delivery 只能由明確 trigger 啟動：
 | `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
 | `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |
 | `/operations` | inventories、backups、drift logs | ops folder、state store、audit directory |
+
+## 9. Self-Repair Simulation
+
+若未來要判斷某種 drift、repair 或 bootstrap obstacle 是否可交給系統 agent 自主修復，不應直接靠直覺判斷，而應先放進固定的情境模擬框架。
+
+最小判斷順序是：
+
+1. 是否可偵測
+2. 是否有明確邊界
+3. 是否可回復
+4. 是否可驗證
+5. 是否需要升級給人類 operator
+
+只有前四項都成立時，系統 agent 才適合嘗試自動 self-repair；否則應停在 detect-only、guided repair 或 human gate。
+
+完整情境類型、修復分級與 YAML 配置模板，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。

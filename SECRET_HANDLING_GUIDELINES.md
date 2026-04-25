@@ -125,7 +125,39 @@ UniText 的基本原則是：
 - 完整 Authorization header
 - 可直接重放的 cookie 值
 
-## 7. Documentation Rules
+## 7. Environment Baseline Boundary
+
+除了 secret value 本身，UniText 也不應把 authoring workspace 的本地環境習慣帶進 shared baseline。
+
+這裡的 `local-only environment habit` 包含：
+
+- `localhost`、`127.0.0.1`、或只對單一作者機器成立的 callback URL
+- 本機絕對路徑、作者帳號名稱、或 machine-specific working directory
+- 只為本地開發方便而存在的 debug flag、feature override、stub endpoint
+- staging / production 不應承接的測試帳號、測試 provider、或臨時 fallback 值
+
+治理原則：
+
+1. tracked shared docs 只能描述 env schema、layering、placeholder、或 sanitized example
+2. `registry/`、root shared docs、template package 不應包含 local-only override 值
+3. authoring 機器專用 env baseline 應留在 ignored local layer，而不是 shared layer
+4. release/export 流程應優先從 template-safe source 產出 env baseline，不應從作者本機 `.env` 或等價檔案複製
+5. 若某文件同時需要 shared guidance 與 live local baseline，應拆成 sanitized/shared 與 local/live pair
+
+允許出現在 shared surface 的例子：
+
+- `API_BASE_URL=https://api.example.com`
+- `OPENAI_API_KEY=sk-example-redacted`
+- `Set this value through CI or your platform secret manager`
+
+不應出現在 shared surface 的例子：
+
+- `API_BASE_URL=http://localhost:3000`
+- `CALLBACK_URL=http://127.0.0.1:8787/callback`
+- `MODEL_CACHE_DIR=C:\\Users\\miles\\...`
+- `DEBUG_BYPASS_AUTH=true`
+
+## 8. Documentation Rules
 
 當文件需要提到 secret handling 時，應遵守：
 
@@ -143,7 +175,7 @@ Authorization: Bearer token-example-redacted
    - 已知風險是什麼
    - 目標升級路線是什麼
 
-## 8. Audit and Export Rules
+## 9. Audit and Export Rules
 
 任何 review package、template package、inventory export、ops snapshot 都必須：
 
@@ -166,7 +198,7 @@ Authorization: Bearer token-example-redacted
 - 可共享的 sanitized guidance / template example
 - 僅留在 authoring repo 的 live baseline reference
 
-## 9. Recommendation Ladder
+## 10. Recommendation Ladder
 
 UniText 對 secret storage 的建議優先序如下：
 
@@ -181,18 +213,19 @@ UniText 對 secret storage 的建議優先序如下：
 4. `runtime session only`
    - 作為輔助，不應是唯一長期持久化策略
 
-## 10. Minimum Checklist
+## 11. Minimum Checklist
 
 在 UniText 中新增任何會處理 secret 的資源或 adapter 前，至少確認：
 
 - secret 是否被排除在 `registry/` 之外
 - secret 是否被排除在 `ops/` 之外
 - 文件是否只記錄 location / state，而沒有記錄 value
+- local-only env habit 是否被排除在 shared env baseline 之外
 - export / review package 是否有 redaction
 - 是否已記錄目前採用的 storage backend
 - 是否已記錄升級路線
 
-## 11. Practical Guidance for Browser Extensions
+## 12. Practical Guidance for Browser Extensions
 
 以 browser extension 類場景為例：
 
@@ -202,13 +235,14 @@ UniText 對 secret storage 的建議優先序如下：
 - UI 應支援 staged draft，不可因 provider 切換或 hover/collapse 導致 key 遺失
 - 若要達到較高安全等級，應改用 native host + OS secret store，而不是只靠 extension storage
 
-## 12. Current UniText Position
+## 13. Current UniText Position
 
 截至目前，UniText 對 secret handling 的正式立場是：
 
 - canonical registry 不承載 secret
 - local overlay 可以記錄 secret backend 與路徑類型
 - operations artifacts 必須 redacted
+- shared env baseline 不承載 local-only environment habit
 - 若某整合尚未接上 OS secret store，必須在文件中明示為 interim model
 
 這份文件應被視為：

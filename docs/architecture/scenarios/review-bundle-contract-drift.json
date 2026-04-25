@@ -1,0 +1,28 @@
+{
+  "id": "review-bundle-contract-drift",
+  "layer": "review-bundle",
+  "class": "A2",
+  "trigger": [
+    "export-review-package dry-run fails",
+    "external review contract references missing moved files"
+  ],
+  "failure_signal": [
+    "export-review-package reports missing review package sources",
+    "contract reading_order or files still points at legacy root locations"
+  ],
+  "repair_action": [
+    "normalize legacy review document paths in external-review-bundle.contract.json",
+    "ensure reading_order entries remain present in files"
+  ],
+  "verify_action": [
+    "rerun export-review-package.ps1 -DryRun"
+  ],
+  "rollback": [
+    "discard the temporary repo fixture"
+  ],
+  "escalate_when": [
+    "repair leaves unresolved missing paths",
+    "contract member changes require new review scope decisions",
+    "export still fails after contract normalization"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "workspace-sensitive-boundary-drift",
+  "layer": "boundary",
+  "class": "A2",
+  "trigger": [
+    "validate-workspace-sensitive-metadata-rules false",
+    "shared surface scope still points at moved legacy docs"
+  ],
+  "failure_signal": [
+    "missing shared_surface_scope entries in the repo root",
+    "validate-workspace-sensitive-metadata-rules reports missing_shared_surface_scope"
+  ],
+  "repair_action": [
+    "normalize known legacy moved paths inside shared_surface_scope",
+    "preserve scope order while deduplicating repaired entries"
+  ],
+  "verify_action": [
+    "rerun validate-workspace-sensitive-metadata-rules.ps1"
+  ],
+  "rollback": [
+    "discard the temporary repo fixture"
+  ],
+  "escalate_when": [
+    "missing scope entries remain after normalization",
+    "repair would need regex or content-pattern changes",
+    "boundary verify still fails after reference repair"
+  ]
+}

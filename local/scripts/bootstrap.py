@@ -2,16 +2,24 @@
 from __future__ import annotations
 
 import argparse
+import stat
 import getpass
 import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import textwrap
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.integration_surfaces import find_surface, load_integration_surfaces, surfaces_by_kind
 
 
 REPO_MARKERS = [
@@ -74,7 +82,10 @@ def get_home_dir() -> Path:
 
 
 def safe_name(path: Path) -> str:
-    return path.name or path.parent.name or "target"
+    parts = [part for part in (path.parent.name, path.name) if part]
+    if parts:
+        return "-".join(parts)
+    return "target"
 
 
 def write_json(path: Path, body: object) -> None:
@@ -102,12 +113,112 @@ def remove_path(path: Path) -> None:
     if not path.exists() and not path.is_symlink():
         return
     if path.is_symlink() or path.is_file():
+        try:
+            path.chmod(stat.S_IWRITE)
+        except OSError:
+            pass
         path.unlink()
         return
-    shutil.rmtree(path)
+
+    def onerror(func, failed_path, exc_info) -> None:
+        failed = Path(failed_path)
+        try:
+            failed.chmod(stat.S_IWRITE)
+        except OSError:
+            pass
+        func(failed_path)
+
+    shutil.rmtree(path, onerror=onerror)
 
 
-def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> dict[str, object]:
+def copy_path(source: Path, destination: Path) -> None:
+    if source.is_dir():
+        shutil.copytree(source, destination, symlinks=True)
+        return
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source, destination)
+
+
+def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
+    if not source.exists() or not source.is_dir():
+        return []
+    if not target.exists() or not target.is_dir():
+        return []
+
+    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    aliases: list[dict[str, str]] = []
+    for item in sorted(target.iterdir()):
+        canonical_name = canonical_by_key.get(item.name.casefold())
+        if canonical_name and item.name != canonical_name:
+            aliases.append({"path": str(item), "canonical_name": canonical_name})
+    return aliases
+
+
+def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str, object]:
+    baseline_entries = [item.name for item in sorted(source.iterdir())]
+    alias_entries = find_noncanonical_alias_entries(source, target)
+    if dry_run:
+        return {
+            "target": str(target),
+            "action": "sync-baseline",
+            "mode": "bundle",
+            "preserve_local_extras": True,
+            "baseline_entries": baseline_entries,
+            "pruned_alias_entries": alias_entries,
+        }
+
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.mkdir(parents=True, exist_ok=True)
+    for alias_entry in alias_entries:
+        remove_path(Path(alias_entry["path"]))
+    for item in sorted(source.iterdir()):
+        destination = target / item.name
+        if destination.exists() or destination.is_symlink():
+            remove_path(destination)
+        copy_path(item, destination)
+    return {
+        "target": str(target),
+        "action": "synced",
+        "mode": "bundle",
+        "preserve_local_extras": True,
+        "baseline_entries": baseline_entries,
+        "pruned_alias_entries": alias_entries,
+    }
+
+
+def ensure_runtime_layer(repo: Path, dry_run: bool) -> dict[str, object]:
+    builder = repo / "local" / "scripts" / "build-runtime-layer.py"
+    if not builder.exists():
+        raise SystemExit(f"runtime builder not found: {builder}")
+
+    command = [sys.executable, str(builder)]
+    if not dry_run:
+        command.append("--write")
+
+    completed = subprocess.run(
+        command,
+        check=True,
+        capture_output=True,
+        text=True,
+        cwd=repo,
+    )
+    details = json.loads(completed.stdout) if completed.stdout.strip() else {}
+    if not dry_run:
+        details["action"] = "rebuilt"
+    else:
+        details["action"] = "planned"
+    details["command"] = command
+    return details
+
+
+def set_skills_target(
+    source: Path,
+    target: Path,
+    mode: str,
+    dry_run: bool,
+    *,
+    preserve_local_extras: bool = False,
+) -> dict[str, object]:
     if target.is_symlink():
         resolved = target.readlink()
         if target.resolve() == source.resolve():
@@ -116,6 +227,8 @@ def set_skills_target(source: Path, target: Path, mode: str, dry_run: bool) -> d
             return {"target": str(target), "action": "replace", "mode": "symlink", "reason": f"points to {resolved}"}
         remove_path(target)
     elif target.exists():
+        if preserve_local_extras and target.is_dir():
+            return sync_runtime_baseline(source, target, dry_run)
         if dry_run:
             return {"target": str(target), "action": "replace", "mode": "mirror", "reason": "existing directory or file"}
         remove_path(target)
@@ -247,13 +360,13 @@ def upsert_codex_mcp_block(text: str, server: Path, root: Path, wrapper_path: Pa
     return text + "\n" + block
 
 
-def render_project_mcp(server: Path, root: Path) -> dict[str, object]:
+def render_project_mcp() -> dict[str, object]:
     return {
         "mcpServers": {
             "unitext-registry": {
                 "transport": "stdio",
-                "command": sys.executable,
-                "args": [str(server), "--root", str(root)],
+                "command": "python",
+                "args": ["registry/mcp/claude-project-mcp-seed/server.py", "--root", "."],
             }
         }
     }
@@ -311,9 +424,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Bootstrap UniText delivery for local CLI runtimes.")
     parser.add_argument("--repo-root", default=str(root))
     parser.add_argument("--allow-external-repo-root", action="store_true")
+    parser.add_argument("--home-dir")
+    parser.add_argument("--history-root")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--mode", choices=["auto", "symlink", "mirror"], default="auto")
+    parser.add_argument("--skip-runtime-build", action="store_true")
     parser.add_argument("--skip-skills", action="store_true")
     parser.add_argument("--skip-codex", action="store_true")
     parser.add_argument("--skip-copilot", action="store_true")
@@ -324,37 +440,64 @@ def main() -> int:
         raise SystemExit("non-dry-run bootstrap requires --force")
 
     repo = Path(args.repo_root).resolve()
-    home_dir = get_home_dir()
+    home_dir = Path(args.home_dir).resolve() if args.home_dir else get_home_dir()
     validate_repo_root(repo, root, args.allow_external_repo_root)
-    source = repo / "registry" / "skills"
+    runtime_root = repo / "runtime"
+    runtime_skills = runtime_root / "skills"
     server = repo / "registry" / "mcp" / "claude-project-mcp-seed" / "server.py"
-    project_mcp = repo / ".mcp.json"
-    codex_config = home_dir / ".codex" / "config.toml"
-    copilot_mcp_config = home_dir / ".copilot" / "mcp-config.json"
+    manifest_path, integration_surfaces = load_integration_surfaces(repo)
+    project_mcp_surface = find_surface(integration_surfaces, "project-mcp-seed")
+    codex_config_surface = find_surface(integration_surfaces, "codex-native-config")
+    codex_skills_surface = find_surface(integration_surfaces, "codex-skills")
+    copilot_surface = find_surface(integration_surfaces, "copilot-global-mcp")
+    project_mcp = project_mcp_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_config = codex_config_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    codex_skills_target = codex_skills_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    copilot_mcp_config = copilot_surface.resolve_path(repo_root=repo, home_dir=home_dir)
+    skills_target_surfaces = [
+        surface
+        for surface in surfaces_by_kind(integration_surfaces, "skills-target")
+        if surface.surface_id != codex_skills_surface.surface_id
+    ]
     skills_targets = [
-        home_dir / ".claude" / "skills",
-        home_dir / ".gemini" / "skills",
-        home_dir / ".agents" / "skills",
+        {
+            "surface_id": surface.surface_id,
+            "path": surface.resolve_path(repo_root=repo, home_dir=home_dir),
+        }
+        for surface in skills_target_surfaces
     ]
     mode = "symlink" if args.mode == "auto" else args.mode
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = repo / "ops" / "history" / f"bootstrap_{stamp}"
+    history_root = Path(args.history_root).resolve() if args.history_root else repo / "ops" / "history"
+    run_dir = history_root / f"bootstrap_{stamp}"
     summary: dict[str, object] = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "generation_state": "dry_run" if args.dry_run else "apply",
         "repo_root": str(repo),
         "script_repo_root": str(root),
         "external_repo_root": repo != root,
+        "home_dir": str(home_dir),
+        "integration_surfaces_manifest": str(manifest_path),
         "dry_run": args.dry_run,
         "mode": args.mode,
+        "runtime": {},
+        "skills_source": str(runtime_skills),
         "skills": [],
         "codex": {},
         "copilot": {},
         "project_mcp": {},
     }
 
-    if not source.exists():
-        raise SystemExit(f"skills source not found: {source}")
+    if args.skip_runtime_build:
+        summary["runtime"] = {
+            "action": "skipped",
+            "reason": "--skip-runtime-build",
+            "target": str(runtime_root),
+        }
+    else:
+        summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
+    if not runtime_skills.exists():
+        raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
     if not server.exists():
         raise SystemExit(f"mcp server not found: {server}")
 
@@ -362,24 +505,38 @@ def main() -> int:
         run_dir.mkdir(parents=True, exist_ok=False)
 
     if not args.skip_skills:
-        for target in skills_targets:
+        for target_info in skills_targets:
+            target = target_info["path"]
             if not args.dry_run and (target.exists() or target.is_symlink()):
                 backup_path(target, run_dir / "skills" / safe_name(target))
-            summary["skills"].append(set_skills_target(source, target, mode, args.dry_run))
+            result = set_skills_target(runtime_skills, target, mode, args.dry_run)
+            result["surface_id"] = target_info["surface_id"]
+            summary["skills"].append(result)
 
     if not args.skip_codex:
         wrapper_path = codex_config.parent / "diagnostics" / "unitext_registry_wrapper.py"
         log_path = codex_config.parent / "diagnostics" / "unitext_registry_startup.log"
         wrapper = render_codex_wrapper()
+        if not args.dry_run and (codex_skills_target.exists() or codex_skills_target.is_symlink()):
+            backup_path(codex_skills_target, run_dir / "codex" / "skills")
+        codex_skills_result = set_skills_target(
+            runtime_skills,
+            codex_skills_target,
+            mode,
+            args.dry_run,
+            preserve_local_extras=codex_skills_surface.preserve_local_extras,
+        )
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
         wrapper_original = wrapper_path.read_text(encoding="utf-8") if wrapper_path.exists() else ""
-        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(source))}")
+        updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(codex_skills_target))}")
         updated = upsert_codex_mcp_block(updated, server, repo, wrapper_path, log_path)
         changed = updated != original or wrapper != wrapper_original
         summary["codex"] = {
             "path": str(codex_config),
+            "surface_id": codex_config_surface.surface_id,
             "changed": changed,
-            "skills_path": str(source),
+            "skills_path": str(codex_skills_target),
+            "skills_target": codex_skills_result,
             "mcp_server": "unitext_registry",
             "wrapper_path": str(wrapper_path),
             "log_path": str(log_path),
@@ -402,6 +559,7 @@ def main() -> int:
         changed = updated_body != original_body
         summary["copilot"] = {
             "path": str(copilot_mcp_config),
+            "surface_id": copilot_surface.surface_id,
             "changed": changed,
             "mcp_server": "unitext-registry",
         }
@@ -412,11 +570,17 @@ def main() -> int:
             copilot_mcp_config.write_text(updated + "\n", encoding="utf-8")
 
     if not args.skip_project_mcp:
-        body = render_project_mcp(server, repo)
+        body = render_project_mcp()
         existing = project_mcp.read_text(encoding="utf-8") if project_mcp.exists() else ""
+        existing_body = parse_json_object(existing) if existing else {}
         updated = json.dumps(body, indent=2)
-        changed = updated != existing
-        summary["project_mcp"] = {"path": str(project_mcp), "changed": changed}
+        changed = body != existing_body
+        summary["project_mcp"] = {
+            "path": str(project_mcp),
+            "surface_id": project_mcp_surface.surface_id,
+            "changed": changed,
+            "mode": "template-seed",
+        }
         if changed and not args.dry_run:
             if project_mcp.exists():
                 backup_path(project_mcp, run_dir / "project-mcp" / ".mcp.json")

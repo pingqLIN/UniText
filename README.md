@@ -1,4 +1,4 @@
-[English](README.md) | [繁體中文](i18n/zh-TW/README.md) | [简体中文](i18n/zh-CN/README.md) | [日本語](i18n/ja/README.md) | [Deutsch](i18n/de/README.md) | [Français](i18n/fr/README.md) | [Español](i18n/es/README.md) | [한국어](i18n/ko/README.md) | [Italiano](i18n/it/README.md)
+[English](README.md) | [繁體中文](i18n/zh-TW/README.md)
 
 # UniText
 
@@ -14,6 +14,12 @@ UniText is not just a folder of prompts, skills, or MCP stubs. It is a governed 
 
 That is why this repository includes `registry/`, `local/`, `ops/`, template export, rebuild flow, boundary verification, bootstrap, and publishability checks in one place. UniText is trying to make shared AI tooling portable, reviewable, and repeatable across different CLIs, different machines, and different stages of a project lifecycle.
 
+Current documentation maintenance is intentionally narrow:
+
+- `English` in repo root is the canonical source
+- `繁體中文 (zh-TW)` is the only actively maintained translated surface
+- older locale waves are kept as archived snapshots under `i18n/.clean/archived-locales/` rather than active release gates
+
 ---
 
 ## Why This Exists
@@ -25,7 +31,7 @@ If you use more than one AI CLI tool, your resources end up scattered:
 - Agent instructions that only one CLI knows about
 - No way to tell which copy is canonical
 
-UniText solves this with a single shared registry and a governed delivery layer. **One definition. Every tool.**
+UniText solves this with a single shared registry, a tracked runtime read model, and a governed delivery layer. **One definition. Every tool.**
 
 ---
 
@@ -39,6 +45,12 @@ UniText/
 │   ├── agents/        ← agent instructions & personas
 │   └── workflow/      ← runbooks, plans, conventions
 │
+├── runtime/           ← tracked runtime read model (what consumer agents read first)
+│   ├── START.md       ← low-noise agent entrypoint
+│   ├── RULES.md       ← runtime-safe rule quickref
+│   ├── ROUTES.md      ← intent → entrypoint mapping
+│   └── skills/        ← runtime projections back to canonical sources
+│
 ├── local/             ← deployment overlay (how it's wired here)
 │   ├── docs/          ← path maps, deployment notes
 │   └── scripts/       ← sync scripts for this machine
@@ -47,7 +59,7 @@ UniText/
     └── history/       ← timestamped audit trail
 ```
 
-The `registry/` layer is platform-agnostic — it uses logical canonical paths (`/registry/skills`, `/registry/mcp`) rather than OS-specific absolute paths. The `local/` layer resolves those to your actual machine. The shared repo baseline includes a template-safe `.mcp.json` seed and `.claude/settings.json`, while `bootstrap.py` upgrades them to active machine wiring when needed.
+The `registry/` layer is platform-agnostic — it uses logical canonical paths (`/registry/skills`, `/registry/mcp`) rather than OS-specific absolute paths. The `runtime/` layer is the tracked consumer-facing read model. The `local/` layer resolves that runtime surface to your actual machine. The shared repo baseline includes a template-safe `.mcp.json` seed and `.claude/settings.json`, while `bootstrap.py` rebuilds `runtime/`, upgrades machine-local skill targets, and keeps tracked project MCP wiring template-safe.
 
 ---
 
@@ -58,7 +70,8 @@ The `registry/` layer is platform-agnostic — it uses logical canonical paths (
 | Layer | Role |
 |-------|------|
 | **Registry** | Defines what shared resources exist and their canonical identity |
-| **Adapter** | Delivers registry content to each CLI (mirror, symlink, native-config, pointer) |
+| **Runtime** | Provides the tracked, low-noise consumer read model and runtime projections |
+| **Adapter** | Delivers runtime content to each CLI (mirror, symlink, native-config, pointer) |
 | **Operations** | Governs when and how mutations happen — with backup, dry-run, and audit trail |
 
 ### Resource Types
@@ -136,7 +149,7 @@ python local/scripts/verify-bootstrap.py
 
 If your system exposes Python as `python3`, replace `python` with `python3`.
 
-`bootstrap.py` aligns the shared skills targets, updates Codex `skills_path`, upgrades the project `.mcp.json` to the active machine interpreter and repo root, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
+`bootstrap.py` rebuilds the tracked `runtime/` layer, aligns machine-local skills targets to `runtime/skills`, updates Codex `skills_path` to its own local target, preserves the tracked project `.mcp.json` as a template-safe seed, and registers the same `unitext-registry` MCP server in `~/.copilot/mcp-config.json` when `Copilot CLI` is present. `sync-skills.ps1` remains available as the Windows PowerShell reference implementation. Copilot keeps using repo instructions from `AGENTS.md` / related files rather than a duplicated skills delivery path. See [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) for the current scope, constraints, and remaining gaps.
 
 ---
 
@@ -146,7 +159,7 @@ If your system exposes Python as `python3`, replace `python` with `python3`.
 |-----|--------------|-------|
 | **Claude Code** | mirror / symlink + project-local settings | `.claude/settings.json`, repo `.mcp.json`, `~/.claude/skills` |
 | **Gemini CLI** | mirror / symlink | `~/.gemini/skills` |
-| **Codex** | native-config + project-local MCP | `skills_path` and `[mcp_servers.*]` in `~/.codex/config.toml` |
+| **Codex** | native-config + project-local MCP | `skills_path` points at the local runtime target under `~/.codex/skills`; MCP stays in `~/.codex/config.toml` |
 | **Copilot CLI** | global MCP config + repo instructions | `~/.copilot/mcp-config.json` for MCP wiring; repo instructions come from `AGENTS.md` / related files |
 
 See [template/examples/local/README.md](template/examples/local/README.md) for the starter local overlay, including the exported path-map stub at `template/examples/local/docs/PATH_MAP.template.md`.
@@ -177,14 +190,14 @@ python local/scripts/bootstrap.py --force
 python local/scripts/verify-bootstrap.py
 ```
 
-That route is the authoritative setup path because it pins the current machine interpreter, repo root, and Codex wiring without baking author-specific absolute paths into the shared template.
+That route is the authoritative setup path because it rebuilds `runtime/`, aligns machine-local delivery targets, and keeps the tracked project MCP seed relative-path and template-safe.
 
 The repo baseline also ships a minimal GitHub review scaffold through `.github/pull_request_template.md`, so human review, validation notes, and follow-up risks have a stable shape instead of being improvised per branch.
 
 `verify-bootstrap.py` accepts either:
 
 - the tracked template-safe `.mcp.json` seed
-- or the locally bootstrapped `.mcp.json` that points at the current machine interpreter and repo root
+- or the older locally bootstrapped `.mcp.json` form while existing machines transition back to the shared seed
 
 ---
 
@@ -200,12 +213,15 @@ UniText enforces a **no silent changes** policy:
 
 Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VERIFY`
 
+If the goal is to attach UniText to an already-working local environment rather than replace it wholesale, start with [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md). That plan keeps `local-only`, `project-local`, and governed `registry/` promotion as separate lanes.
+
 ---
 
 ## Documentation
 
 | File | Purpose |
 |------|---------|
+| [RUNTIME.md](RUNTIME.md) | Agent-first startup entrypoint for the runtime surface |
 | [INDEX.md](INDEX.md) | Discovery entry point — what resources exist and where |
 | [VISION.md](VISION.md) | Architecture principles and design rationale |
 | [RESOURCE_SPEC.md](RESOURCE_SPEC.md) | Metadata contract for all shared resources |
@@ -216,20 +232,26 @@ Formal adoption flow: `SCAN → REVIEW → DRY-RUN → ADOPT → DELIVER → VER
 | [SECRET_HANDLING_GUIDELINES.md](SECRET_HANDLING_GUIDELINES.md) | Secret storage, redaction, and password/API key handling boundaries |
 | [MILESTONES.md](MILESTONES.md) | Quantified phase goals and external-review readiness checkpoints |
 | [BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md](BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md) | Reusable template for documenting boundary drift incidents and permanent controls |
-| [ESSENTIAL_SKILLS_SHORTLIST.md](ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` external-review shortlist, not the full registry inventory |
+| [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) | Curated `8 + 4` external-review shortlist, not the full registry inventory |
 | [TEST_BASELINE.md](TEST_BASELINE.md) | Current automated test baseline, coverage scope, and rebuild priorities |
-| [EXTERNAL_REVIEW_PACKAGE.md](EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
-| [EXTERNAL_REVIEW_COVER_NOTE.md](EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
-| [EXTERNAL_REVIEW_HIGHLIGHTS.md](EXTERNAL_REVIEW_HIGHLIGHTS.md) | Short-form review summary for fast orientation |
+| [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) | Reviewer-facing scope, reading order, and repeatable package export flow |
+| [docs/reviews/external-review-bundle.contract.json](docs/reviews/external-review-bundle.contract.json) | Machine-readable membership and reading order contract for the external review package |
+| [docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md](docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md) | Submission note for external reviewers |
+| [docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md](docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md) | Short-form review summary for fast orientation |
 | [TEMPLATE_RELEASE_PACKAGE.md](TEMPLATE_RELEASE_PACKAGE.md) | Template release cleanup scope, exclusions, and export flow |
 | [TEMPLATE_RELEASE_CHECKLIST.md](TEMPLATE_RELEASE_CHECKLIST.md) | Pre-release cleanup checklist for a starter package |
 | [REBUILD_AS_NEW_PROJECT.md](REBUILD_AS_NEW_PROJECT.md) | Fresh-project rebuild flow for turning the current repo into a clean starter baseline |
-| [COPILOT_CLI_ADAPTER_NOTE.md](COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
-| [CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
-| [SKILL0_COLLABORATION_VISION.md](SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md](docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md) | Scope note for bringing Copilot CLI into the same cross-platform starter baseline without overstating support |
+| [docs/architecture/INTEGRATION_SURFACE_PROFILES.md](docs/architecture/INTEGRATION_SURFACE_PROFILES.md) | Declared integration-surface contract for bootstrap, verify, and runtime catalog enrichment |
+| [docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md](docs/plans/CROSS_PLATFORM_SCRIPT_PORTABILITY_PLAN.md) | Migration plan for gradually moving PowerShell-first governance scripts toward a more portable cross-platform toolchain |
+| [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) | Operator plan for introducing UniText into an existing environment and deciding when new skills / MCPs should be promoted into governed registry lanes |
+| [docs/concepts/SKILL0_COLLABORATION_VISION.md](docs/concepts/SKILL0_COLLABORATION_VISION.md) | Concept note for how UniText can collaborate with skill-0 as a decomposition and primitive-extraction project |
+| [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md) | Scenario-driven rules for deciding when agents may auto-repair drift, when they must stay bounded, and when human escalation is required |
 | [NO_PUBLISH_POLICY.md](NO_PUBLISH_POLICY.md) | Local-first publishing boundary for agents and collaborators |
 
-Reading order: `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+Reading order for humans: `README.md` → `INDEX.md` → `VISION.md` → `RESOURCE_SPEC.md` → `OPERATIONS.md` → `PROJECT_MODES.md` → `WORKSPACE_SENSITIVE_METADATA_RULES.md` → `DOCUMENT_PLACEMENT_POLICY.md` → `TEMPLATE_RELEASE_PACKAGE.md` → `REBUILD_AS_NEW_PROJECT.md` → `SECRET_HANDLING_GUIDELINES.md` → `NO_PUBLISH_POLICY.md`
+
+Reading order for consumer agents: `RUNTIME.md` → `runtime/START.md` → `runtime/RULES.md` → `runtime/ROUTES.md` → `runtime/catalog.json`
 
 The authoring repo is not automatically publish-safe just because template or rebuild exports validate cleanly. Use `local/scripts/verify-workspace-boundaries.ps1` when you need a repo-side boundary check for tracked shared surfaces.
 
@@ -244,6 +266,8 @@ Fork this repo. Keep the shipped `.claude/settings.json`, `.mcp.json`, and `boot
 ### As a reference implementation
 
 Read the core docs to understand the architecture. Adapt the patterns — registry structure, resource spec, delivery modes, operations audit trail — to your own setup.
+
+If you are attaching UniText to an existing machine or project instead of starting from a clean baseline, use [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) first.
 
 ---
 
