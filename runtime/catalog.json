@@ -1552,6 +1552,43 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "notepad-plus-plus-plugin-workflow",
+      "type": "skill",
+      "runtime_path": "runtime/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "source_of_truth": "registry/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "canonical_location": "/registry/skills/notepad-plus-plus-plugin-workflow",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "intent_tags": [
+        "notepad-plus-plus-plugin-workflow",
+        "use",
+        "for",
+        "notepad",
+        "plugin",
+        "extension",
+        "work",
+        "including"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "obsidian-index-adapter",
       "type": "skill",
       "runtime_path": "runtime/skills/obsidian-index-adapter/SKILL.md",
