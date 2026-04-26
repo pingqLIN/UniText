@@ -511,17 +511,29 @@ def main() -> int:
         if not runtime_root.is_absolute():
             runtime_root = (repo_root / runtime_root).resolve()
 
-    if args.output_dir is not None and not str(runtime_root).startswith(str(repo_root.resolve()) + "\\"):
+    if args.output_dir is not None:
+        try:
+            runtime_root.relative_to(repo_root.resolve())
+        except ValueError:
+            print(
+                json.dumps(
+                    {
+                        "error": "output-dir must be inside the repository root when used with build-runtime-layer.py.",
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+            return 1
         print(
             json.dumps(
                 {
-                    "error": "output-dir must be inside the repository root when used with build-runtime-layer.py.",
+                    "info": "Using repository-relative output-dir for dry-run/build output.",
                 },
                 indent=2,
                 ensure_ascii=False,
             )
         )
-        return 1
     integration_manifest, integration_surfaces = load_integration_surfaces(repo_root)
 
     if not args.write:
