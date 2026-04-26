@@ -23,11 +23,13 @@ Summary:
 
 Warnings are quality backlog, not hard failures.
 
+Initial scan showed `10` missing-direct-reference warnings. A follow-up fix in `Q:\Projects\skills-governance` taught the scanner to accept both `references/foo.md` and `./references/foo.md` links, reducing this category to `2`.
+
 | Category | Count | Interpretation |
 |---|---:|---|
 | Optional registration missing | 54 | `registry/skills-registry.json` in `skills-governance` is optional and currently empty; this should not block UniText runtime adoption. |
 | Deep reference path | 96 | Several skills keep SDK or service-specific references under nested folders. This is usually acceptable for large provider families, but should be reviewed when a skill becomes hard to re-enter. |
-| No direct references link | 10 | `references/` exists, but `SKILL.md` does not link directly to reference files. This is the highest-value warning class to reduce first. |
+| No direct references link | 2 | `references/` exists, but `SKILL.md` does not link directly to reference files. This is the highest-value warning class to reduce first. |
 
 Top warning-heavy skills:
 
@@ -51,10 +53,9 @@ Use `skills-governance` as a read-only quality gate for UniText:
 
 ## Next Maintenance Candidate
 
-Start with the 10 skills where `references/` exists but `SKILL.md` does not link directly to reference files. The likely fix is to add concise first-read links from `SKILL.md` into the most important reference files, then rerun:
+Start with the 2 remaining skills where `references/` exists but `SKILL.md` does not link directly to reference files. The likely fix is to add concise first-read links from `SKILL.md` into the most important reference files, then rerun:
 
 ```powershell
 pwsh -NoProfile -File scripts/sg.ps1 scan
 python -m unittest discover -s tests -p "test*.py"
 ```
-
