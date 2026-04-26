@@ -106,6 +106,19 @@ def repo_relative(path: Path, repo_root: Path) -> str:
     return path.relative_to(repo_root).as_posix()
 
 
+def runtime_projection_display_path(runtime_file: Path, repo_root: Path) -> str:
+    relative_parts = Path(repo_relative(runtime_file, repo_root)).parts
+    if "runtime" in relative_parts:
+        runtime_index = relative_parts.index("runtime")
+        display_parts = list(relative_parts[runtime_index + 1 :])
+        if display_parts and display_parts[0].startswith(".runtime-dryrun-"):
+            display_parts = display_parts[1:]
+        display_path = Path("runtime") / Path(*display_parts)
+    else:
+        display_path = Path("runtime") / Path(*relative_parts)
+    return display_path.as_posix()
+
+
 def rewrite_relative_links(
     text: str,
     *,
@@ -164,7 +177,7 @@ def build_projection_preamble(
     resource_type: str,
 ) -> str:
     source_relative = repo_relative(source_file, repo_root)
-    runtime_relative = repo_relative(runtime_file, repo_root)
+    runtime_relative = runtime_projection_display_path(runtime_file, repo_root)
     return "\n".join(
         [
             f"> Runtime projection for consumer agents.",
@@ -343,14 +356,14 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
             RuntimeEntry(
                 resource_id=skill_dir.name,
                 resource_type="skill",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("skill", skill_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
                 hot_path=skill_dir.name in {"env", "cloudflare-governance", "doc-coauthoring", "frontend-design", "webapp-testing"},
@@ -402,14 +415,14 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
             RuntimeEntry(
                 resource_id=agent_dir.name,
                 resource_type="agent",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("agent", agent_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
                 hot_path=agent_dir.name == "registry-curator",
@@ -460,14 +473,14 @@ def build_workflow_wrappers(repo_root: Path, runtime_root: Path, integration_sur
             RuntimeEntry(
                 resource_id=workflow_dir.name,
                 resource_type="workflow",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("workflow", workflow_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(body[:400]),
                 consumer_scope="runtime-first",
                 hot_path=False,
