@@ -80,6 +80,12 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn("Static artifacts:", runtime_source)
         self.assertIn("python local/scripts/build-project-map.py", runtime_source)
 
+    def test_runtime_governance_note_points_to_current_policy_file(self):
+        runtime_source = RUNTIME_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("local/config/agent-governance-layers.json", runtime_source)
+        self.assertNotIn("local/config/agent-file-governance-rules.json", runtime_source)
+
 
 if __name__ == "__main__":
     unittest.main()

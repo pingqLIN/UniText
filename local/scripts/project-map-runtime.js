@@ -1418,7 +1418,7 @@
     const { models, environments, instruction_profiles: instructionProfiles } = collectGovernanceOptions();
     const sourceList = getGovernanceSources();
     const definitionPath = formatRepoRelativePath(
-      sourceList.find((source) => source.definition_path)?.definition_path || "local/config/agent-file-governance-rules.json",
+      sourceList.find((source) => source.definition_path)?.definition_path || "local/config/agent-governance-layers.json",
     );
     const sourceTargets = sourceList.length
       ? sourceList.map((source) => `${source.scope}: ${formatRepoRelativePath(source.path)}`).join("；")
