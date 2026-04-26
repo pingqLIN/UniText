@@ -23,13 +23,13 @@ Summary:
 
 Warnings are quality backlog, not hard failures.
 
-Initial scan showed `10` missing-direct-reference warnings. A follow-up fix in `Q:\Projects\skills-governance` taught the scanner to accept both `references/foo.md` and `./references/foo.md` links, reducing this category to `2`.
+Initial scan showed `10` missing-direct-reference warnings. A follow-up fix in `Q:\Projects\skills-governance` taught the scanner to accept both `references/foo.md` and `./references/foo.md` links, reducing this category to `2`. The two remaining true positives were then fixed in UniText by turning bare reference paths into Markdown links.
 
 | Category | Count | Interpretation |
 |---|---:|---|
 | Optional registration missing | 54 | `registry/skills-registry.json` in `skills-governance` is optional and currently empty; this should not block UniText runtime adoption. |
 | Deep reference path | 96 | Several skills keep SDK or service-specific references under nested folders. This is usually acceptable for large provider families, but should be reviewed when a skill becomes hard to re-enter. |
-| No direct references link | 2 | `references/` exists, but `SKILL.md` does not link directly to reference files. This is the highest-value warning class to reduce first. |
+| No direct references link | 0 | Cleared on 2026-04-26. Keep this at zero for future registry changes. |
 
 Top warning-heavy skills:
 
@@ -53,7 +53,7 @@ Use `skills-governance` as a read-only quality gate for UniText:
 
 ## Next Maintenance Candidate
 
-Start with the 2 remaining skills where `references/` exists but `SKILL.md` does not link directly to reference files. The likely fix is to add concise first-read links from `SKILL.md` into the most important reference files, then rerun:
+The direct-reference warning class is clear. The remaining backlog is to decide whether optional registration should stay non-blocking and whether deep Azure/reference trees need family-specific exceptions. Rerun:
 
 ```powershell
 pwsh -NoProfile -File scripts/sg.ps1 scan

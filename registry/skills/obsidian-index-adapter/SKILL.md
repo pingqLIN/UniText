@@ -130,9 +130,9 @@ The resulting note should include:
 
 Preferred template details live in:
 
-- `references/adapter-workflow.md`
-- `references/guardrails.md`
-- `references/note-schema.md`
+- [references/adapter-workflow.md](./references/adapter-workflow.md)
+- [references/guardrails.md](./references/guardrails.md)
+- [references/note-schema.md](./references/note-schema.md)
 
 ## Resources
 
