@@ -494,14 +494,77 @@ def write_catalog(repo_root: Path, runtime_root: Path, entries: list[RuntimeEntr
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the tracked runtime layer for consumer agents.")
     parser.add_argument("--write", action="store_true", help="Write the runtime layer into the repository.")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Optional output directory for generated runtime files. Without --write this becomes a dry-run target.",
+    )
     args = parser.parse_args()
 
     repo_root = get_repo_root()
     validate_repo_root(repo_root)
-    runtime_root = repo_root / "runtime"
+    if args.output_dir is None:
+        runtime_root = repo_root / "runtime"
+    else:
+        runtime_root = args.output_dir
+        if not runtime_root.is_absolute():
+            runtime_root = (repo_root / runtime_root).resolve()
+
+    if args.output_dir is not None and not str(runtime_root).startswith(str(repo_root.resolve()) + "\\"):
+        print(
+            json.dumps(
+                {
+                    "error": "output-dir must be inside the repository root when used with build-runtime-layer.py.",
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+        return 1
     integration_manifest, integration_surfaces = load_integration_surfaces(repo_root)
 
     if not args.write:
+        if args.output_dir is not None:
+            if runtime_root.resolve() == (repo_root / "runtime").resolve():
+                print(
+                    json.dumps(
+                        {
+                            "error": "Dry-run output-dir may not target runtime/. Use --write to update tracked runtime.",
+                        },
+                        indent=2,
+                        ensure_ascii=False,
+                    )
+                )
+                return 1
+
+            if runtime_root.exists():
+                shutil.rmtree(runtime_root)
+            entries: list[RuntimeEntry] = []
+            entries.extend(build_skill_wrappers(repo_root, runtime_root, integration_surfaces))
+            entries.extend(build_agent_wrappers(repo_root, runtime_root, integration_surfaces))
+            entries.extend(build_workflow_wrappers(repo_root, runtime_root, integration_surfaces))
+            write_catalog(repo_root, runtime_root, entries, integration_manifest)
+            summary = {
+                "repo_root": str(repo_root),
+                "runtime_root": str(runtime_root),
+                "integration_surfaces_manifest": str(integration_manifest),
+                "dry_run": True,
+                "actions": [
+                    "rebuild runtime/skills from registry/skills",
+                    "rebuild runtime/agents from registry/agents",
+                    "rebuild runtime/workflow from registry/workflow",
+                    "rewrite relative links back to registry source files",
+                    "refresh runtime/catalog.json with integration surface metadata",
+                ],
+                "skills": len([entry for entry in entries if entry.resource_type == "skill"]),
+                "agents": len([entry for entry in entries if entry.resource_type == "agent"]),
+                "workflow": len([entry for entry in entries if entry.resource_type == "workflow"]),
+                "catalog_entries": len(entries),
+            }
+            print(json.dumps(summary, indent=2, ensure_ascii=False))
+            return 0
+
         summary = {
             "repo_root": str(repo_root),
             "runtime_root": str(runtime_root),
