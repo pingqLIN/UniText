@@ -5,7 +5,7 @@ license: MIT
 metadata:
   author: Microsoft
   version: "3.0.1"
-compatibility: Requires Azure CLI (az) for configuration and testing
+  compatibility: Requires Azure CLI (az) for configuration and testing
 ---
 
 # Azure AI Gateway
