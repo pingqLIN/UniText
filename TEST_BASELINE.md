@@ -42,13 +42,15 @@
   - 驗證 interactive / share-safe project-map surface contract、handoff contract，以及頁內 refresh 後 static artifacts 的 stale 提醒
 - `tests/test_project_map_outputs.py`
   - 驗證 `build-project-map.py --output-dir` 可產出 self-contained interactive / share-safe / handoff artifacts，且分享版不帶 operator-only controls
+- `tests/test_project_map_browser_smoke.py`
+  - 使用 Playwright / Chromium 開啟 generated interactive 與 share-safe project-map HTML，驗證頁面可渲染且沒有 console 或 page errors；若本機沒有 Playwright 或 Chromium，測試會明確 skip
 
 ## 2. Recommended Command
 
 完整 explicit gate：
 
 ```bash
-python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+python -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs tests.test_project_map_browser_smoke
 ```
 
 快速 discover gate：
@@ -60,7 +62,7 @@ python -m unittest discover -s tests -p "test*.py"
 若環境使用 `py` 啟動 Python：
 
 ```powershell
-py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs
+py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_first_run tests.security.test_release_hygiene tests.security.test_i18n_wave tests.security.test_i18n_drift tests.security.test_copilot_session tests.security.test_catalog_generation tests.security.test_workspace_sensitive_metadata tests.security.test_renormalize_parity tests.security.test_self_repair_simulation tests.test_registry_inventory tests.test_bootstrap_verify_smoke tests.test_runtime_bundle_hidden_entries tests.test_project_map_baseline tests.test_project_map_share_safe tests.test_project_map_outputs tests.test_project_map_browser_smoke
 ```
 
 ## 3. What This Baseline Covers
@@ -80,6 +82,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - current project map / governance entry surfaces
 - interactive vs. share-safe project-map contract and handoff metadata
 - generated project-map artifact output contract before browser execution
+- generated project-map browser rendering smoke for interactive and share-safe HTML
 - recursive unittest discovery coverage for top-level and security tests
 
 ## 4. What This Baseline Does Not Yet Cover
@@ -90,7 +93,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - live rebuild package adoption against a real user home / CLI config
 - live publishability decision with real remote / review state
 - i18n live translation quality / semantic drift
-- rendered project-map browser behavior with real Playwright screenshots or Lighthouse
+- rendered project-map visual quality with Playwright screenshots or Lighthouse
 - cross-platform parity beyond the renormalize preview family
 
 ## 5. Rebuild Priorities
@@ -98,7 +101,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 下一波應優先補回的測試：
 
 1. 真實 home-dir / live config 邊界下的 `bootstrap.py` / `verify-bootstrap.py` 驗證
-2. `build-project-map.py` 的 browser rendering / Lighthouse 檢查
+2. `build-project-map.py` 的 Playwright screenshot / Lighthouse 檢查
 3. template / rebuild live adoption smoke against real CLI config
 4. boundary / metadata rule validation 的 cross-script integration cases
 

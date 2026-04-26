@@ -1058,11 +1058,15 @@
   }
 
   function syncActionButtons() {
-    refreshNowEl.disabled = state.refreshInFlight;
-    linkRepoEl.disabled = state.refreshInFlight;
-    refreshNowEl.textContent = state.refreshInFlight ? "更新中..." : "立即更新";
-    linkRepoEl.textContent = state.refreshInFlight ? "目錄鎖定中" : "連結專案目錄";
-    refreshNowEl.dataset.state = state.lastRefreshState;
+    if (refreshNowEl) {
+      refreshNowEl.disabled = state.refreshInFlight;
+      refreshNowEl.textContent = state.refreshInFlight ? "更新中..." : "立即更新";
+      refreshNowEl.dataset.state = state.lastRefreshState;
+    }
+    if (linkRepoEl) {
+      linkRepoEl.disabled = state.refreshInFlight;
+      linkRepoEl.textContent = state.refreshInFlight ? "目錄鎖定中" : "連結專案目錄";
+    }
   }
 
   function loadSettings() {
@@ -1207,28 +1211,28 @@
 
   function applySettingsToControls() {
     if (!MAP_MODES.has(state.mapMode)) state.mapMode = "radial";
-    mapModeEl.value = state.mapMode;
+    if (mapModeEl) mapModeEl.value = state.mapMode;
     applyVisualTone();
     applyVisualTheme();
     applyTextScale();
-    updateModeEl.value = state.updateMode;
-    intervalDaysEl.value = String(state.intervalDays);
-    intervalHoursEl.value = String(state.intervalHours);
-    intervalMinutesEl.value = String(state.intervalMinutes);
+    if (updateModeEl) updateModeEl.value = state.updateMode;
+    if (intervalDaysEl) intervalDaysEl.value = String(state.intervalDays);
+    if (intervalHoursEl) intervalHoursEl.value = String(state.intervalHours);
+    if (intervalMinutesEl) intervalMinutesEl.value = String(state.intervalMinutes);
     syncWorkspacePages();
   }
 
   function intervalMs() {
-    const days = Math.max(0, Number(intervalDaysEl.value || state.intervalDays || 0));
-    const hours = Math.max(0, Number(intervalHoursEl.value || state.intervalHours || 0));
-    const minutes = Math.max(0, Number(intervalMinutesEl.value || state.intervalMinutes || 0));
+    const days = Math.max(0, Number(intervalDaysEl?.value || state.intervalDays || 0));
+    const hours = Math.max(0, Number(intervalHoursEl?.value || state.intervalHours || 0));
+    const minutes = Math.max(0, Number(intervalMinutesEl?.value || state.intervalMinutes || 0));
     return (((days * 24) + hours) * 60 + minutes) * 60 * 1000;
   }
 
   function rememberIntervalInputs() {
-    state.intervalDays = Math.max(0, Number(intervalDaysEl.value || 0));
-    state.intervalHours = Math.max(0, Number(intervalHoursEl.value || 0));
-    state.intervalMinutes = Math.max(0, Number(intervalMinutesEl.value || 0));
+    state.intervalDays = Math.max(0, Number(intervalDaysEl?.value || 0));
+    state.intervalHours = Math.max(0, Number(intervalHoursEl?.value || 0));
+    state.intervalMinutes = Math.max(0, Number(intervalMinutesEl?.value || 0));
     saveSettings();
     scheduleRefreshTimer();
     updateStatusCard();
@@ -1428,6 +1432,10 @@
   }
 
   function updateStatusCard(errorText = "") {
+    if (!updateStatusEl) {
+      syncActionButtons();
+      return;
+    }
     const modeLabel = { manual: "手動更新", "on-open": "開啟網頁時自動更新", interval: "定時更新" }[state.updateMode];
     const strategyNote = {
       manual: "不做背景掃描，只有按下「立即更新」才重新解析；執行開銷最低。",
@@ -2830,13 +2838,13 @@
         }
       });
     });
-    updateModeEl.addEventListener("change", () => { state.updateMode = updateModeEl.value; saveSettings(); scheduleRefreshTimer(); updateStatusCard(); });
-    [intervalDaysEl, intervalHoursEl, intervalMinutesEl].forEach((input) => input.addEventListener("change", rememberIntervalInputs));
-    linkRepoEl.addEventListener("click", async () => {
+    updateModeEl?.addEventListener("change", () => { state.updateMode = updateModeEl.value; saveSettings(); scheduleRefreshTimer(); updateStatusCard(); });
+    [intervalDaysEl, intervalHoursEl, intervalMinutesEl].forEach((input) => input?.addEventListener("change", rememberIntervalInputs));
+    linkRepoEl?.addEventListener("click", async () => {
       try { await connectRepoDirectory(); }
       catch (error) { updateStatusCard(error instanceof Error ? error.message : String(error)); }
     });
-    refreshNowEl.addEventListener("click", () => { refreshFromRepo("manual-button", true); });
+    refreshNowEl?.addEventListener("click", () => { refreshFromRepo("manual-button", true); });
     governanceResolveEl?.addEventListener("click", () => { void resolveGovernanceAction(); });
     governanceWriteEl?.addEventListener("click", () => { void writeGovernanceReports(); });
     mapMinimapToggleEl?.addEventListener("click", () => { toggleMinimapVisibility(); });
