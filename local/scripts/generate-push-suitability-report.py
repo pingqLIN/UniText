@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -15,7 +16,7 @@ def repo_root() -> Path:
 def run_json_script(script_name: str) -> dict[str, Any]:
     script = Path(__file__).resolve().parent / script_name
     result = subprocess.run(
-        ["python", str(script)],
+        [sys.executable, str(script)],
         text=True,
         capture_output=True,
         encoding="utf-8",
@@ -39,6 +40,50 @@ def run_git(args: list[str]) -> str:
     return result.stdout.strip()
 
 
+def try_run_git_config(args: list[str]) -> str | None:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root()), *args],
+        text=True,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if result.returncode == 1:
+        return None
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or f"git {' '.join(args)} failed")
+    return result.stdout.strip()
+
+
+def tracking_branch_name(merge_ref: str) -> str:
+    if merge_ref.startswith("refs/heads/"):
+        return merge_ref.removeprefix("refs/heads/")
+    return merge_ref
+
+
+def tracking_ref_name(remote: str, merge_ref: str) -> str:
+    return f"{remote}/{tracking_branch_name(merge_ref)}"
+
+
+def tracking_remote_ref(remote: str, merge_ref: str) -> str:
+    return f"refs/remotes/{remote}/{tracking_branch_name(merge_ref)}"
+
+
+def git_ref_exists(ref: str) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root()), "show-ref", "--verify", "--quiet", ref],
+        text=True,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if result.returncode == 0:
+        return True
+    if result.returncode == 1:
+        return False
+    raise RuntimeError(result.stderr.strip() or result.stdout.strip() or f"git show-ref --verify {ref} failed")
+
+
 def branch_head() -> str:
     return run_git(["branch", "--show-current"])
 
@@ -47,15 +92,49 @@ def branch_status() -> str:
     return run_git(["status", "--short", "--branch"]).splitlines()[0]
 
 
-def ahead_behind_status() -> dict[str, int | str]:
+def ahead_behind_status() -> dict[str, int | str | bool | None]:
     branch = branch_head()
     if not branch:
-        return {"branch": "", "tracking": "", "ahead": 0, "behind": 0}
-    upstream = run_git(["rev-parse", "--abbrev-ref", f"{branch}@{{upstream}}"])
-    counts = run_git(["rev-list", "--left-right", "--count", f"{branch}...{upstream}"]).split()
+        return {
+            "branch": "",
+            "tracking": None,
+            "upstream_configured": False,
+            "tracking_resolved": False,
+            "ahead": None,
+            "behind": None,
+        }
+    remote = try_run_git_config(["config", "--get", f"branch.{branch}.remote"])
+    merge_ref = try_run_git_config(["config", "--get", f"branch.{branch}.merge"])
+    if not remote or not merge_ref:
+        return {
+            "branch": branch,
+            "tracking": None,
+            "upstream_configured": False,
+            "tracking_resolved": False,
+            "ahead": None,
+            "behind": None,
+        }
+    tracking = tracking_ref_name(remote, merge_ref)
+    if not git_ref_exists(tracking_remote_ref(remote, merge_ref)):
+        return {
+            "branch": branch,
+            "tracking": tracking,
+            "upstream_configured": True,
+            "tracking_resolved": False,
+            "ahead": None,
+            "behind": None,
+        }
+    counts = run_git(["rev-list", "--left-right", "--count", f"{branch}...{tracking}"]).split()
     ahead = int(counts[0]) if len(counts) >= 1 else 0
     behind = int(counts[1]) if len(counts) >= 2 else 0
-    return {"branch": branch, "tracking": upstream, "ahead": ahead, "behind": behind}
+    return {
+        "branch": branch,
+        "tracking": tracking,
+        "upstream_configured": True,
+        "tracking_resolved": True,
+        "ahead": ahead,
+        "behind": behind,
+    }
 
 
 def recent_commits(limit: int = 5) -> list[str]:
@@ -69,6 +148,11 @@ def recommendation_lines(payload: dict[str, Any]) -> list[str]:
     bootstrap = payload["bootstrap"]
     boundary = payload["boundary"]
     tracking = payload["tracking"]
+    tracking_branch = tracking.get("branch", "")
+    upstream_configured = bool(tracking.get("upstream_configured", tracking.get("tracking")))
+    tracking_resolved = bool(tracking.get("tracking_resolved", upstream_configured and tracking.get("tracking")))
+    ahead = tracking.get("ahead")
+    behind = tracking.get("behind")
 
     if not bootstrap["ok"]:
         lines.append("Do not push until bootstrap verification returns `ok = true`.")
@@ -76,19 +160,32 @@ def recommendation_lines(payload: dict[str, Any]) -> list[str]:
         lines.append("Do not push until workspace boundary violations are resolved.")
     if not publishability["structurally_publishable_if_permission_is_granted"]:
         lines.append("Do not push until publishability blockers are cleared.")
-    if tracking["ahead"] > 0:
+    if not tracking_branch:
+        lines.append("Push suitability review is incomplete because HEAD is detached; switch to a branch before any push review.")
+    elif not upstream_configured:
         lines.append(
-            f"Review the local `{tracking['ahead']}`-commit batch against `origin/main` before any push discussion."
+            f"Configure an upstream tracking branch for `{tracking_branch}` before treating this branch as push-ready."
         )
-    if tracking["behind"] > 0:
+    elif not tracking_resolved:
         lines.append(
-            f"Reconcile the local branch with `{tracking['tracking']}` before any push, because it is behind by `{tracking['behind']}`."
+            f"Fetch or repair the upstream tracking ref `{tracking['tracking']}` before treating commit distance as authoritative."
+        )
+    if isinstance(ahead, int) and ahead > 0:
+        lines.append(
+            f"Review the local `{ahead}`-commit batch against `{tracking['tracking']}` before any push discussion."
+        )
+    if isinstance(behind, int) and behind > 0:
+        lines.append(
+            f"Reconcile the local branch with `{tracking['tracking']}` before any push, because it is behind by `{behind}`."
         )
     if (
-        bootstrap["ok"]
+        tracking_branch
+        and upstream_configured
+        and tracking_resolved
+        and bootstrap["ok"]
         and boundary["ok"]
         and publishability["structurally_publishable_if_permission_is_granted"]
-        and tracking["behind"] == 0
+        and behind == 0
     ):
         lines.append("Structurally ready for push review if the user explicitly grants push permission.")
     return lines
@@ -121,6 +218,10 @@ def build_payload() -> dict[str, Any]:
 
 def format_markdown(payload: dict[str, Any]) -> str:
     tracking = payload["tracking"]
+    upstream_configured = bool(tracking.get("upstream_configured", tracking.get("tracking")))
+    tracking_resolved = bool(tracking.get("tracking_resolved", upstream_configured and tracking.get("tracking")))
+    ahead = tracking.get("ahead")
+    behind = tracking.get("behind")
     bootstrap = payload["bootstrap"]
     boundary = payload["boundary"]
     publishability = payload["publishability"]
@@ -137,9 +238,11 @@ def format_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- Repo: `{payload['repo_root']}`",
         f"- Branch status: `{payload['branch_status']}`",
-        f"- Upstream tracking: `{tracking['tracking']}`",
-        f"- Ahead commits: `{tracking['ahead']}`",
-        f"- Behind commits: `{tracking['behind']}`",
+        f"- Upstream tracking: `{tracking['tracking'] or 'not configured'}`",
+        f"- Upstream configured: `{str(upstream_configured).lower()}`",
+        f"- Upstream resolved: `{str(tracking_resolved).lower()}`",
+        f"- Ahead commits: `{ahead if ahead is not None else 'unknown'}`",
+        f"- Behind commits: `{behind if behind is not None else 'unknown'}`",
         f"- Working tree clean: `{str(publishability['working_tree_clean']).lower()}`",
         "",
         "## Verification Summary",
@@ -165,7 +268,7 @@ def format_markdown(payload: dict[str, Any]) -> str:
 
 
 def default_output_path() -> Path:
-    return repo_root() / "docs" / "reports" / "status" / f"PUSH_SUITABILITY_REPORT_{date.today().isoformat()}.md"
+    return repo_root() / "ops" / "reports" / f"PUSH_SUITABILITY_REPORT_{date.today().isoformat()}.md"
 
 
 def main() -> int:
