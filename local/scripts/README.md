@@ -43,6 +43,8 @@
   - 跨平台 boundary verification core；掃描 tracked shared surfaces，回報 path / content violations
 - `get-publishability-report.py`
   - 跨平台 publishability report core；只提供本地結構判斷，不授權 publish / push
+- `generate-push-suitability-report.py`
+  - 聚合 `verify-bootstrap.py`、`verify-workspace-boundaries.py`、`get-publishability-report.py` 與 git tracking 狀態，產出可重複生成的 local-only push suitability report
 - `validate-workspace-sensitive-metadata-rules.py`
   - 跨平台 rules validation core；驗證 shared-surface scope、regex、自測案例與必要 metadata
 - `report-i18n-wave.py`
@@ -72,6 +74,8 @@
 - `get-publishability-report.ps1`
   - Windows PowerShell wrapper；呼叫 `get-publishability-report.py`，彙整 branch 目前的 local-only / ops / shared-surface 變更與 boundary verify 結果，作為 push suitability 的本地報告
   - 對 changed markdown docs 補上 document placement observation，幫助判斷它目前落點是否符合 policy
+- `generate-push-suitability-report.ps1`
+  - Windows PowerShell wrapper；呼叫 `generate-push-suitability-report.py`，輸出本地 push suitability markdown 報告到 `docs/reports/status/`
 - `get-document-placement-recommendation.ps1`
   - 依文件角色輸出建議落點，區分 tracked shared layer、`local/docs/`、`local/docs/authoring/`、與 `ops/`
 - `lib/workspace-sensitive-metadata.ps1`
