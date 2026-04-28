@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -38,6 +39,18 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         )
         self.assertNotIn("governance", share_payload)
 
+    def test_interactive_payload_includes_global_workspace_and_repo_sources(self):
+        payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
+        sources = payload["governance"]["sources"]
+        scopes = [source["scope"] for source in sources]
+
+        self.assertEqual(scopes, ["global-home", "workspace", "repo"])
+        self.assertTrue(sources[0]["project_external"])
+        self.assertTrue(sources[1]["project_external"])
+        self.assertFalse(sources[2]["project_external"])
+        self.assertIn(".codex", sources[0]["path"])
+        self.assertEqual(payload["governance"]["effective_hard_rules"][0]["rule_category"], "hard_rule")
+
     def test_share_safe_html_omits_native_paths_and_governance_sources(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
         share_html = BUILD_PROJECT_MAP.render_html(payload, page_mode="share-safe")
@@ -47,10 +60,17 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn("window.AGENT_GOVERNANCE_POLICY = null;", share_html)
         self.assertNotIn("Q:\\\\UniText", share_html)
         self.assertNotIn("Q:\\\\AGENTS.md", share_html)
+        self.assertNotIn("C:\\\\Users\\\\miles", share_html)
+        self.assertNotIn(".codex\\\\AGENTS.md", share_html)
         self.assertNotIn('"effective_file_rules"', share_html)
         self.assertNotIn('id="export-card"', share_html)
+        self.assertNotIn('id="workspace-tab-governance"', share_html)
+        self.assertNotIn('id="workspace-panel-governance"', share_html)
         self.assertNotIn('id="maintenance-controls"', share_html)
         self.assertNotIn('class="governance-panel"', share_html)
+        self.assertNotIn('id="governance-resolve"', share_html)
+        self.assertNotIn('id="governance-write"', share_html)
+        self.assertNotIn('id="governance-funnel"', share_html)
 
     def test_interactive_html_keeps_operator_surface_data(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
@@ -63,15 +83,36 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn('id="export-card"', interactive_html)
         self.assertIn('id="maintenance-controls"', interactive_html)
         self.assertIn('class="governance-panel"', interactive_html)
+        self.assertIn('id="masthead-toggle"', interactive_html)
+        self.assertIn('id="map-fit"', interactive_html)
+        self.assertIn('id="governance-analysis-path"', interactive_html)
+        self.assertIn('id="governance-funnel"', interactive_html)
+        self.assertNotIn('id="masthead-quick-filters"', interactive_html)
+        self.assertNotIn('class="workspace-preview-rail"', interactive_html)
+
+    def test_runtime_contains_latched_masthead_drag_pan_and_expanded_text_scale(self):
+        runtime_source = RUNTIME_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("autoCollapsedLatch", runtime_source)
+        self.assertIn("setupMapDragPan", runtime_source)
+        self.assertIn("suppressNextMapClick", runtime_source)
+        self.assertIn('TEXT_SCALE_ORDER = ["xs", "sm", "md", "lg", "xl"]', runtime_source)
+        self.assertIn("getConfiguredGovernanceSources", runtime_source)
+        self.assertIn("manual-path-only", runtime_source)
+        self.assertIn("Configured source is manual, unreadable, or path-mismatched", runtime_source)
+        self.assertIn("unverified_path_classification", runtime_source)
 
     def test_handoff_payload_describes_surface_contract(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
         handoff_payload = BUILD_PROJECT_MAP.build_handoff_payload(payload)
+        rendered_handoff = json.dumps(handoff_payload, ensure_ascii=False)
 
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["browser_scan"])
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["governance_resolver"])
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["native_repo_paths"])
         self.assertIn("native repo path", handoff_payload["handoff_notes"][1])
+        self.assertNotIn("C:\\Users\\miles", rendered_handoff)
+        self.assertNotIn(".codex\\AGENTS.md", rendered_handoff)
 
     def test_runtime_marks_static_export_artifacts_as_stale_after_browser_refresh(self):
         runtime_source = RUNTIME_PATH.read_text(encoding="utf-8")

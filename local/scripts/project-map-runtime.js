@@ -43,9 +43,9 @@
   const VISUAL_TONES = new Set(VISUAL_TONE_ORDER);
   const VISUAL_THEME_ORDER = ["light", "dark"];
   const VISUAL_THEMES = new Set(VISUAL_THEME_ORDER);
-  const TEXT_SCALE_ORDER = ["sm", "md", "lg"];
+  const TEXT_SCALE_ORDER = ["xs", "sm", "md", "lg", "xl"];
   const TEXT_SCALES = new Set(TEXT_SCALE_ORDER);
-  const TEXT_SCALE_FACTORS = { sm: 0.92, md: 1, lg: 1.08 };
+  const TEXT_SCALE_FACTORS = { xs: 0.84, sm: 0.92, md: 1, lg: 1.12, xl: 1.24 };
   const SETTINGS_KEY = "unitext-project-map-settings-v2";
   const TOUR_STORAGE_KEY = "unitext-project-map-tour-v1";
   const HANDLE_DB_NAME = "unitext-project-map-db";
@@ -101,6 +101,13 @@
     workspacePage: "browse",
     workspaceEngaged: false,
     mastheadCompact: false,
+    autoCollapsedLatch: false,
+    mastheadManualOpen: false,
+    mapZoom: 1,
+    governanceAnalysisPath: "",
+    governanceSourceOverrides: {},
+    activeGovernanceLayer: "runtime",
+    suppressNextMapClick: false,
     lastMapLayout: null,
     minimapFramePending: false,
     minimapEligible: false,
@@ -114,7 +121,7 @@
 
   const summaryEl = document.getElementById("summary");
   const mastheadEl = document.querySelector(".masthead");
-  const mastheadQuickFiltersEl = document.getElementById("masthead-quick-filters");
+  const mastheadToggleEl = document.getElementById("masthead-toggle");
   const workspaceShellEl = document.querySelector(".workspace-shell");
   const sidebarEl = document.getElementById("sidebar");
   const detailEl = document.getElementById("detail");
@@ -126,6 +133,15 @@
   const mapMinimapViewportEl = document.getElementById("map-minimap-viewport");
   const mapMinimapCopyEl = document.getElementById("map-minimap-copy");
   const mapMinimapToggleEl = document.getElementById("map-minimap-toggle");
+  const mapPanLeftEl = document.getElementById("map-pan-left");
+  const mapPanRightEl = document.getElementById("map-pan-right");
+  const mapPanUpEl = document.getElementById("map-pan-up");
+  const mapPanDownEl = document.getElementById("map-pan-down");
+  const mapZoomInEl = document.getElementById("map-zoom-in");
+  const mapZoomOutEl = document.getElementById("map-zoom-out");
+  const mapFitEl = document.getElementById("map-fit");
+  const mapResetEl = document.getElementById("map-reset");
+  const mapZoomLabelEl = document.getElementById("map-zoom-label");
   const searchEl = document.getElementById("search");
   const typeFilterEl = document.getElementById("type-filter");
   const mapModeEl = document.getElementById("map-mode");
@@ -149,6 +165,13 @@
   const governanceWriteEl = document.getElementById("governance-write");
   const governanceResultEl = document.getElementById("governance-result");
   const governanceSourceNoteEl = document.getElementById("governance-source-note");
+  const governanceAnalysisPathEl = document.getElementById("governance-analysis-path");
+  const governanceGlobalPathEl = document.getElementById("governance-global-path");
+  const governanceWorkspacePathEl = document.getElementById("governance-workspace-path");
+  const governanceRepoPathEl = document.getElementById("governance-repo-path");
+  const governanceSourceStatusEl = document.getElementById("governance-source-status");
+  const governanceFunnelEl = document.getElementById("governance-funnel");
+  const governanceLayerDetailEl = document.getElementById("governance-layer-detail");
   const nodeCountLabelEl = document.getElementById("node-count-label");
   const mapModeNoteEl = document.getElementById("map-mode-note");
   const mapCaptionEl = document.getElementById("map-caption");
@@ -256,14 +279,30 @@
   function syncMastheadCompactState() {
     if (!mastheadEl || !workspaceShellEl) return;
     const workspaceTop = workspaceShellEl.getBoundingClientRect().top;
-    if (window.scrollY < 8 && workspaceTop > 148 && (!mapWrapEl || (mapWrapEl.scrollLeft <= 12 && mapWrapEl.scrollTop <= 12))) {
+    if (!state.autoCollapsedLatch && window.scrollY < 8 && workspaceTop > 148 && (!mapWrapEl || (mapWrapEl.scrollLeft <= 12 && mapWrapEl.scrollTop <= 12))) {
       state.workspaceEngaged = false;
     }
     const tourTargetInMasthead = Boolean(state.tourOpen && state.activeTourTarget && mastheadEl.contains(state.activeTourTarget));
     const baseCompact = state.workspaceEngaged || window.scrollY > 18 || workspaceTop <= 116 || (mapWrapEl && (mapWrapEl.scrollLeft > 12 || mapWrapEl.scrollTop > 12));
-    const shouldCompact = baseCompact && !tourTargetInMasthead;
+    if (baseCompact && !state.mastheadManualOpen && !tourTargetInMasthead) {
+      state.autoCollapsedLatch = true;
+      state.mastheadManualOpen = false;
+    }
+    const shouldCompact = state.autoCollapsedLatch && !state.mastheadManualOpen && !tourTargetInMasthead;
     state.mastheadCompact = shouldCompact;
     document.body.classList.toggle("masthead-compact", shouldCompact);
+    if (mastheadToggleEl) {
+      mastheadToggleEl.setAttribute("aria-expanded", shouldCompact ? "false" : "true");
+      mastheadToggleEl.textContent = shouldCompact ? "展開上方說明" : "收合上方說明";
+    }
+  }
+
+  function toggleMastheadCompact() {
+    const shouldOpen = state.mastheadCompact;
+    state.autoCollapsedLatch = !shouldOpen;
+    state.mastheadManualOpen = shouldOpen;
+    state.mastheadCompact = !shouldOpen;
+    syncMastheadCompactState();
   }
 
   function getMinimapMetrics() {
@@ -771,6 +810,16 @@
     return String(pathText || "").trim().replaceAll("/", "\\").replace(/\\+$/, "");
   }
 
+  function lowerComparablePath(pathText) {
+    return normalizeWindowsPath(pathText).toLowerCase();
+  }
+
+  function isPathWithin(childPath, parentPath) {
+    const child = lowerComparablePath(childPath);
+    const parent = lowerComparablePath(parentPath);
+    return Boolean(child && parent && (child === parent || child.startsWith(`${parent}\\`)));
+  }
+
   function formatRepoRelativePath(pathText) {
     const normalizedPath = normalizeWindowsPath(pathText);
     const repoRoot = normalizeWindowsPath(DATA.meta?.repo_root_native || "");
@@ -787,6 +836,88 @@
 
   function getGovernanceSources() {
     return DATA.governance?.sources || [];
+  }
+
+  function getSourceByScope(scope) {
+    return getGovernanceSources().find((source) => source.scope === scope) || null;
+  }
+
+  function setGovernanceInputDefaults() {
+    if (governanceAnalysisPathEl && !governanceAnalysisPathEl.value) {
+      governanceAnalysisPathEl.value = state.governanceAnalysisPath || DATA.governance?.analysis_path || DATA.meta?.repo_root_native || "";
+    }
+    const pathInputs = {
+      "global-home": governanceGlobalPathEl,
+      workspace: governanceWorkspacePathEl,
+      repo: governanceRepoPathEl,
+    };
+    Object.entries(pathInputs).forEach(([scope, inputEl]) => {
+      if (!inputEl || inputEl.value) return;
+      const source = getSourceByScope(scope);
+      inputEl.value = state.governanceSourceOverrides[scope] || source?.suggested_path || source?.path || "";
+    });
+  }
+
+  function rememberGovernanceSettings() {
+    state.governanceAnalysisPath = governanceAnalysisPathEl?.value?.trim() || "";
+    state.governanceSourceOverrides = {
+      "global-home": governanceGlobalPathEl?.value?.trim() || "",
+      workspace: governanceWorkspacePathEl?.value?.trim() || "",
+      repo: governanceRepoPathEl?.value?.trim() || "",
+    };
+    saveSettings();
+    const resolution = resolveGovernanceInPage();
+    renderGovernanceResolution(resolution, "已更新治理設定。");
+  }
+
+  function classifyGovernanceAnalysisPath(pathText) {
+    const analysisPath = normalizeWindowsPath(pathText || DATA.governance?.analysis_path || DATA.meta?.repo_root_native || "");
+    const repoRoot = normalizeWindowsPath(DATA.meta?.repo_root_native || "");
+    const workspaceSource = getSourceByScope("workspace");
+    const workspaceRoot = normalizeWindowsPath((workspaceSource?.path || "").replace(/\\AGENTS\.md$/i, ""));
+    if (!analysisPath) {
+      return { path: "", scope_hint: "unknown", note: "尚未指定任意操作路徑。", verified: false, unverified_path_classification: true };
+    }
+    if (repoRoot && isPathWithin(analysisPath, repoRoot)) {
+      return { path: analysisPath, scope_hint: "repo", note: "路徑落在目前 repo 內，global-home、workspace、repo-local 皆可作為檔案治理候選。", verified: false, unverified_path_classification: true };
+    }
+    if (workspaceRoot && isPathWithin(analysisPath, workspaceRoot)) {
+      return { path: analysisPath, scope_hint: "workspace", note: "路徑落在工作區層級但不一定落在目前 repo 內，repo-local 規則只作為目前頁面的 evidence，不應推定適用。", verified: false, unverified_path_classification: true };
+    }
+    return { path: analysisPath, scope_hint: "external", note: "路徑不在目前 repo/workspace 判定範圍內，只能保留 global-home 與手動來源路徑作為可檢查候選。", verified: false, unverified_path_classification: true };
+  }
+
+  function sourceAppliesToPath(source, pathClassification) {
+    if (!source) return false;
+    if (source.scope === "global-home") return true;
+    if (!pathClassification?.path) return Boolean(source.applies_to_path);
+    if (source.scope === "repo") return pathClassification.scope_hint === "repo";
+    if (source.scope === "workspace") return pathClassification.scope_hint === "repo" || pathClassification.scope_hint === "workspace";
+    return Boolean(source.applies_to_path);
+  }
+
+  function getConfiguredGovernanceSources(pathClassification = classifyGovernanceAnalysisPath(state.governanceAnalysisPath)) {
+    return getGovernanceSources().map((source) => {
+      const manualPath = state.governanceSourceOverrides[source.scope] || "";
+      const configuredPath = normalizeWindowsPath(manualPath || source.path || source.suggested_path || "");
+      const manualExternal = Boolean(manualPath && configuredPath !== normalizeWindowsPath(source.path || ""));
+      const applies = sourceAppliesToPath(source, pathClassification);
+      return {
+        ...source,
+        path: configuredPath,
+        manual_path: manualPath,
+        source_kind: manualExternal ? "manual-path" : source.source_kind,
+        readable: manualExternal ? false : Boolean(source.readable),
+        inspectable: manualExternal ? false : Boolean(source.inspectable),
+        handle_bound: manualExternal ? false : Boolean(source.handle_bound),
+        permission_state: manualExternal ? "manual-path-only" : source.permission_state,
+        applies_to_path: applies,
+        evidence_only: !applies,
+        unresolved_reason: manualExternal
+          ? "手動外部路徑只記錄指向；靜態頁面不直接讀取專案外內容。"
+          : source.unresolved_reason,
+      };
+    });
   }
 
   function collectGovernanceOptions() {
@@ -855,8 +986,11 @@
     const inputs = {
       model: governanceModelEl?.value?.trim() || "gpt-5.4",
       environment: governanceEnvironmentEl?.value?.trim() || "codex-local-dev",
-      instruction_profile: governanceProfileEl?.value?.trim() || "mapping",
-    };
+        instruction_profile: governanceProfileEl?.value?.trim() || "mapping",
+      };
+    const pathClassification = classifyGovernanceAnalysisPath(state.governanceAnalysisPath || governanceAnalysisPathEl?.value || "");
+    const agentsSources = getConfiguredGovernanceSources(pathClassification);
+    const sourcesByScope = new Map(agentsSources.map((source) => [source.scope, source]));
     const matchesLayer = (layer) => {
       const match = layer.match || {};
       if (Array.isArray(match.models) && !match.models.includes(inputs.model)) return false;
@@ -878,12 +1012,24 @@
         provenance[key] = { value, source_layer: layer.id, scope: layer.scope };
       });
     });
-    const effectiveFileRules = (DATA.governance?.effective_file_rules || []).map((item) => ({ ...item }));
-    const effectiveHardRules = effectiveFileRules.filter((item) => item.rule_category !== "operational_guidance");
-    const operationalGuidance = effectiveFileRules.filter((item) => item.rule_category === "operational_guidance");
+    const effectiveFileRules = (DATA.governance?.effective_file_rules || []).map((item) => {
+      const source = sourcesByScope.get(item.scope);
+      const sourceMatches = source
+        ? normalizeWindowsPath(source.path || "") === normalizeWindowsPath(item.source_path || "") && Boolean(source.inspectable)
+        : true;
+      const applies = Boolean(source?.applies_to_path) && sourceMatches;
+      const unresolvedReason = sourceMatches
+        ? item.unresolved_reason
+        : "Configured source is manual, unreadable, or path-mismatched; bundled rules are stale evidence only.";
+      return { ...item, effective: applies, evidence_only: !applies, unresolved_reason: unresolvedReason };
+    });
+    const effectiveHardRules = effectiveFileRules.filter((item) => item.effective && item.rule_category !== "operational_guidance");
+    const operationalGuidance = effectiveFileRules.filter((item) => item.effective && item.rule_category === "operational_guidance");
     return {
       generated_at: new Date().toISOString(),
       inputs,
+      analysis_path: pathClassification.path,
+      path_classification: pathClassification,
       policy_meta: window.AGENT_GOVERNANCE_POLICY?.meta || {},
       matched_layers: matchedLayers.map((layer) => ({
         id: layer.id,
@@ -894,25 +1040,82 @@
       effective_config: effectiveConfig,
       provenance,
       agents_hierarchy_note: DATA.governance?.hierarchy_note || "",
-      agents_sources: getGovernanceSources(),
+      agents_sources: agentsSources,
       effective_file_rules: effectiveFileRules,
       effective_hard_rules: effectiveHardRules,
       operational_guidance: operationalGuidance,
       instruction_evaluation: [
         "來自 runtime、system、developer 與全域家目錄的指令仍屬於更高優先層級，無法直接從這張靜態頁面完整檢查。",
         "在檔案層級範圍內，頁面會優先採用結構化治理規則檔；若缺少結構化來源，才退回工作區與 repo-local AGENTS 的文字解析。",
-        `目前納入檔案層級檢查的來源數量：${getGovernanceSources().length}`,
+        `目前納入檔案層級檢查的來源數量：${agentsSources.filter((source) => source.applies_to_path).length}`,
       ],
     };
   }
 
   function formatGovernanceSourceLine(source) {
     const definitionSuffix = source.definition_path ? `（規則檔：${source.definition_path}）` : "";
-    return `- [${source.scope}] ${source.path}${definitionSuffix}`;
+    const modeSuffix = source.evidence_only ? "（不適用目前路徑，僅作證據）" : "";
+    const permissionSuffix = source.permission_state ? `；${source.permission_state}` : "";
+    return `- [${source.scope}] ${source.path}${definitionSuffix}${modeSuffix}${permissionSuffix}`;
+  }
+
+  function renderGovernanceSourceStatus(resolution) {
+    if (!governanceSourceStatusEl) return;
+    const sources = resolution.agents_sources || [];
+    governanceSourceStatusEl.innerHTML = sources.map((source) => {
+      const appliesText = source.applies_to_path ? "適用目前路徑" : "不適用目前路徑，僅保留為 evidence";
+      const inspectText = source.inspectable ? "內容已納入解析" : "未讀取內容";
+      const reason = source.unresolved_reason ? `<span>${escapeHtml(source.unresolved_reason)}</span>` : "";
+      return [
+        `<article class="governance-source-card">`,
+        `<strong>${escapeHtml(source.scope)} · ${escapeHtml(appliesText)}</strong>`,
+        `<code>${escapeHtml(formatRepoRelativePath(source.path || source.suggested_path || ""))}</code>`,
+        `<span>${escapeHtml(inspectText)}；${escapeHtml(source.permission_state || "unknown")}</span>`,
+        reason,
+        `</article>`,
+      ].join("");
+    }).join("");
+  }
+
+  function governanceLayerDetailText(resolution, layerId) {
+    const source = (resolution.agents_sources || []).find((item) => item.scope === layerId);
+    const detailByLayer = {
+      runtime: [
+        "Runtime / Platform / System 是最上層硬邊界。",
+        "這部分包含平台、安全、工具與 developer 指令；靜態頁只能列為不可覆寫前提，不能宣稱已完整解析。",
+      ].join("\n"),
+      "global-home": source
+        ? `global-home 來源會對多數工作目錄產生影響。\n路徑：${source.path}\n狀態：${source.inspectable ? "已納入解析" : source.unresolved_reason || "未讀取內容"}`
+        : "未找到 global-home 來源。",
+      workspace: source
+        ? `workspace 來源用於工作區層級覆寫。\n路徑：${source.path}\n目前路徑：${source.applies_to_path ? "適用" : "僅作 evidence"}`
+        : "未找到 workspace 來源。",
+      repo: source
+        ? `repo-local 來源是專案內可控規則。\n路徑：${source.path}\n目前路徑：${source.applies_to_path ? "適用" : "僅作 evidence"}`
+        : "未找到 repo-local 來源。",
+      request: [
+        "Current User Request 是本輪任務意圖。",
+        "它會在不違反上層規則的前提下決定實作方向；若與上層安全或 repo policy 衝突，以上層為準。",
+      ].join("\n"),
+    };
+    return detailByLayer[layerId] || "選擇一個漏斗層級查看說明。";
+  }
+
+  function renderGovernanceFunnel(resolution) {
+    if (!governanceFunnelEl || !governanceLayerDetailEl) return;
+    const layerButtons = Array.from(governanceFunnelEl.querySelectorAll("[data-governance-layer]"));
+    layerButtons.forEach((button) => {
+      const active = (button.dataset.governanceLayer || "") === state.activeGovernanceLayer;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    governanceLayerDetailEl.textContent = governanceLayerDetailText(resolution, state.activeGovernanceLayer);
   }
 
   function renderGovernanceResolution(resolution, statusText = "") {
     if (!governanceResultEl) return;
+    renderGovernanceSourceStatus(resolution);
+    renderGovernanceFunnel(resolution);
     const layerLines = resolution.matched_layers.length
       ? resolution.matched_layers.map((layer) => `- ${layer.id} [${layer.scope}]`).join("\n")
       : "- 無";
@@ -937,6 +1140,8 @@
       `模型：${resolution.inputs.model}`,
       `環境：${resolution.inputs.environment}`,
       `指令設定：${resolution.inputs.instruction_profile}`,
+      `任意操作路徑：${resolution.analysis_path || "未指定"}`,
+      `路徑判定：${resolution.path_classification?.scope_hint || "unknown"} - ${resolution.path_classification?.note || ""}`,
       "",
       "符合條件的層級",
       layerLines,
@@ -968,6 +1173,8 @@
       `- 模型：\`${resolution.inputs.model}\``,
       `- 環境：\`${resolution.inputs.environment}\``,
       `- 指令設定：\`${resolution.inputs.instruction_profile}\``,
+      `- 任意操作路徑：\`${resolution.analysis_path || "未指定"}\``,
+      `- 路徑判定：\`${resolution.path_classification?.scope_hint || "unknown"}\` ${resolution.path_classification?.note || ""}`,
       "",
       "## 符合條件的層級",
       "",
@@ -1017,7 +1224,7 @@
     const repoRootLower = repoRoot.toLowerCase();
     const targetLower = target.toLowerCase();
     if (targetLower === repoRootLower) return [];
-    if (!targetLower.startsWith(`${repoRootLower}\\`)) return null;
+    if (!isPathWithin(target, repoRoot)) return null;
     return splitRelativeSegments(target.slice(repoRoot.length + 1));
   }
 
@@ -1083,6 +1290,11 @@
       state.intervalHours = Number.isFinite(settings.intervalHours) ? settings.intervalHours : state.intervalHours;
       state.intervalMinutes = Number.isFinite(settings.intervalMinutes) ? settings.intervalMinutes : state.intervalMinutes;
       state.workspacePage = WORKSPACE_PAGE_IDS.has(settings.workspacePage) ? settings.workspacePage : state.workspacePage;
+      state.mapZoom = Number.isFinite(settings.mapZoom) ? clamp(settings.mapZoom, 0.72, 1.6) : state.mapZoom;
+      state.governanceAnalysisPath = settings.governanceAnalysisPath || state.governanceAnalysisPath;
+      state.governanceSourceOverrides = settings.governanceSourceOverrides && typeof settings.governanceSourceOverrides === "object"
+        ? settings.governanceSourceOverrides
+        : state.governanceSourceOverrides;
     } catch (_error) {}
   }
 
@@ -1098,6 +1310,9 @@
         intervalHours: state.intervalHours,
         intervalMinutes: state.intervalMinutes,
         workspacePage: state.workspacePage,
+        mapZoom: state.mapZoom,
+        governanceAnalysisPath: state.governanceAnalysisPath,
+        governanceSourceOverrides: state.governanceSourceOverrides,
       }));
     } catch (_error) {}
   }
@@ -1219,7 +1434,10 @@
     if (intervalDaysEl) intervalDaysEl.value = String(state.intervalDays);
     if (intervalHoursEl) intervalHoursEl.value = String(state.intervalHours);
     if (intervalMinutesEl) intervalMinutesEl.value = String(state.intervalMinutes);
+    if (governanceAnalysisPathEl) governanceAnalysisPathEl.value = state.governanceAnalysisPath || "";
     syncWorkspacePages();
+    setGovernanceInputDefaults();
+    applyMapZoom();
   }
 
   function intervalMs() {
@@ -1399,7 +1617,6 @@
 
   function updateSummary() {
     renderQuickFilterRail(summaryEl, { showCounts: true });
-    renderQuickFilterRail(mastheadQuickFiltersEl, { showCounts: true });
     typeFilterEl.innerHTML = '<option value="all">全部類型</option>';
     TYPE_ORDER.forEach((type) => {
       const count = DATA.counts?.[type] || 0;
@@ -1416,7 +1633,7 @@
   function renderGovernanceSourceNote() {
     if (!governanceSourceNoteEl) return;
     const { models, environments, instruction_profiles: instructionProfiles } = collectGovernanceOptions();
-    const sourceList = getGovernanceSources();
+    const sourceList = getConfiguredGovernanceSources();
     const definitionPath = formatRepoRelativePath(
       sourceList.find((source) => source.definition_path)?.definition_path || "local/config/agent-governance-layers.json",
     );
@@ -1875,12 +2092,12 @@
     const paddingX = state.mapMode === "grid" ? 64 : 96;
     const paddingY = state.mapMode === "grid" ? 56 : 84;
     const targetLeft = clamp(
-      box.x + (box.width / 2) - (mapWrapEl.clientWidth / 2),
+      ((box.x + (box.width / 2)) * state.mapZoom) - (mapWrapEl.clientWidth / 2),
       0,
       Math.max(0, mapWrapEl.scrollWidth - mapWrapEl.clientWidth),
     );
     const targetTop = clamp(
-      box.y + (box.height / 2) - (mapWrapEl.clientHeight / 2),
+      ((box.y + (box.height / 2)) * state.mapZoom) - (mapWrapEl.clientHeight / 2),
       0,
       Math.max(0, mapWrapEl.scrollHeight - mapWrapEl.clientHeight),
     );
@@ -1889,6 +2106,51 @@
       top: Math.max(0, targetTop - paddingY),
       behavior: "smooth",
     });
+  }
+
+  function applyMapZoom() {
+    state.mapZoom = clamp(Number(state.mapZoom) || 1, 0.72, 1.6);
+    if (mapZoomLabelEl) mapZoomLabelEl.textContent = `${Math.round(state.mapZoom * 100)}%`;
+    if (!mapEl || !state.lastMapLayout) return;
+    mapEl.style.width = `${Math.round(state.lastMapLayout.width * state.mapZoom)}px`;
+    mapEl.style.height = `${Math.round(state.lastMapLayout.height * state.mapZoom)}px`;
+    scheduleMinimapViewportUpdate();
+  }
+
+  function setMapZoom(nextZoom) {
+    if (!mapWrapEl) return;
+    const beforeCenterX = mapWrapEl.scrollLeft + (mapWrapEl.clientWidth / 2);
+    const beforeCenterY = mapWrapEl.scrollTop + (mapWrapEl.clientHeight / 2);
+    const previousZoom = state.mapZoom || 1;
+    state.mapZoom = clamp(nextZoom, 0.72, 1.6);
+    applyMapZoom();
+    const ratio = state.mapZoom / previousZoom;
+    mapWrapEl.scrollTo({
+      left: Math.max(0, (beforeCenterX * ratio) - (mapWrapEl.clientWidth / 2)),
+      top: Math.max(0, (beforeCenterY * ratio) - (mapWrapEl.clientHeight / 2)),
+      behavior: "auto",
+    });
+    saveSettings();
+  }
+
+  function panMapViewport(deltaX, deltaY) {
+    mapWrapEl?.scrollBy({ left: deltaX, top: deltaY, behavior: "smooth" });
+  }
+
+  function centerMapViewport() {
+    if (!mapWrapEl) return;
+    mapWrapEl.scrollTo({
+      left: Math.max(0, (mapWrapEl.scrollWidth - mapWrapEl.clientWidth) / 2),
+      top: Math.max(0, (mapWrapEl.scrollHeight - mapWrapEl.clientHeight) / 2),
+      behavior: "smooth",
+    });
+  }
+
+  function resetMapViewport() {
+    state.mapZoom = 1;
+    applyMapZoom();
+    mapWrapEl?.scrollTo({ left: 0, top: 0, behavior: "smooth" });
+    saveSettings();
   }
 
   function renderMinimap(layout, visible, visibleIds, selectedId) {
@@ -1984,8 +2246,9 @@
     const typeStyles = getTypeStylesTheme();
     const positions = layout.positions;
     mapEl.setAttribute("viewBox", `0 0 ${layout.width} ${layout.height}`);
-    mapEl.style.width = `${layout.width}px`;
-    mapEl.style.height = `${layout.height}px`;
+    state.lastMapLayout = layout;
+    mapEl.style.width = `${Math.round(layout.width * state.mapZoom)}px`;
+    mapEl.style.height = `${Math.round(layout.height * state.mapZoom)}px`;
     mapEl.innerHTML = "";
     const titleLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
     if (state.mapMode === "grid") {
@@ -2129,6 +2392,7 @@
     });
     mapEl.appendChild(nodeLayer);
     renderMinimap(layout, visible, visibleIds, selectedId);
+    applyMapZoom();
 
     if (state.mapMode === "grid") {
       mapModeNoteEl.textContent = "欄式視圖：類型由上往下，橫向拖移看完整列";
@@ -2673,11 +2937,57 @@
     }
   }
 
+  function setupMapDragPan() {
+    if (!mapWrapEl) return;
+    let dragState = null;
+    mapWrapEl.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) return;
+      if (event.target?.closest?.("button, a, input, select, textarea")) return;
+      dragState = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        scrollLeft: mapWrapEl.scrollLeft,
+        scrollTop: mapWrapEl.scrollTop,
+        moved: false,
+      };
+      mapWrapEl.setPointerCapture?.(event.pointerId);
+    });
+    mapWrapEl.addEventListener("pointermove", (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
+      const deltaX = event.clientX - dragState.startX;
+      const deltaY = event.clientY - dragState.startY;
+      if (!dragState.moved && Math.hypot(deltaX, deltaY) < 4) return;
+      dragState.moved = true;
+      state.suppressNextMapClick = true;
+      mapWrapEl.classList.add("is-dragging");
+      mapWrapEl.scrollLeft = dragState.scrollLeft - deltaX;
+      mapWrapEl.scrollTop = dragState.scrollTop - deltaY;
+      event.preventDefault();
+    });
+    const finishDrag = (event) => {
+      if (!dragState || dragState.pointerId !== event.pointerId) return;
+      mapWrapEl.releasePointerCapture?.(event.pointerId);
+      mapWrapEl.classList.remove("is-dragging");
+      dragState = null;
+    };
+    mapWrapEl.addEventListener("pointerup", finishDrag);
+    mapWrapEl.addEventListener("pointercancel", finishDrag);
+    mapWrapEl.addEventListener("click", (event) => {
+      if (!state.suppressNextMapClick) return;
+      event.preventDefault();
+      event.stopPropagation();
+      state.suppressNextMapClick = false;
+    }, true);
+  }
+
   function setupControls() {
     loadSettings();
     applySettingsToControls();
     initializeGovernanceSelectors();
     if (governanceOutputPathEl) governanceOutputPathEl.value = defaultGovernanceOutputPath();
+    setGovernanceInputDefaults();
+    mastheadToggleEl?.addEventListener("click", () => { toggleMastheadCompact(); });
     workspaceTabs.forEach((button) => {
       button.addEventListener("click", () => {
         setWorkspacePage(button.dataset.workspaceTab || "browse");
@@ -2700,7 +3010,19 @@
     });
     mapWrapEl?.addEventListener("scroll", () => {
       scheduleMinimapViewportUpdate();
+      syncMastheadCompactState();
     }, { passive: true });
+    setupMapDragPan();
+    const panStepX = () => Math.max(120, mapWrapEl?.clientWidth ? mapWrapEl.clientWidth * 0.34 : 160);
+    const panStepY = () => Math.max(80, mapWrapEl?.clientHeight ? mapWrapEl.clientHeight * 0.34 : 120);
+    mapPanLeftEl?.addEventListener("click", () => { panMapViewport(-panStepX(), 0); });
+    mapPanRightEl?.addEventListener("click", () => { panMapViewport(panStepX(), 0); });
+    mapPanUpEl?.addEventListener("click", () => { panMapViewport(0, -panStepY()); });
+    mapPanDownEl?.addEventListener("click", () => { panMapViewport(0, panStepY()); });
+    mapZoomInEl?.addEventListener("click", () => { setMapZoom(state.mapZoom + 0.08); });
+    mapZoomOutEl?.addEventListener("click", () => { setMapZoom(state.mapZoom - 0.08); });
+    mapFitEl?.addEventListener("click", () => { centerMapViewport(); });
+    mapResetEl?.addEventListener("click", () => { resetMapViewport(); });
     mapMinimapFrameEl?.addEventListener("click", (event) => {
       jumpMapViewportFromMinimap(event.clientX, event.clientY);
     });
@@ -2840,6 +3162,16 @@
     });
     updateModeEl?.addEventListener("change", () => { state.updateMode = updateModeEl.value; saveSettings(); scheduleRefreshTimer(); updateStatusCard(); });
     [intervalDaysEl, intervalHoursEl, intervalMinutesEl].forEach((input) => input?.addEventListener("change", rememberIntervalInputs));
+    [governanceAnalysisPathEl, governanceGlobalPathEl, governanceWorkspacePathEl, governanceRepoPathEl].forEach((input) => {
+      input?.addEventListener("change", rememberGovernanceSettings);
+      input?.addEventListener("blur", rememberGovernanceSettings);
+    });
+    governanceFunnelEl?.addEventListener("click", (event) => {
+      const button = event.target?.closest?.("[data-governance-layer]");
+      if (!button) return;
+      state.activeGovernanceLayer = button.dataset.governanceLayer || "runtime";
+      renderGovernanceFunnel(resolveGovernanceInPage());
+    });
     linkRepoEl?.addEventListener("click", async () => {
       try { await connectRepoDirectory(); }
       catch (error) { updateStatusCard(error instanceof Error ? error.message : String(error)); }

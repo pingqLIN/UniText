@@ -72,8 +72,11 @@ class ProjectMapOutputTests(unittest.TestCase):
         self.assertIn("window.AGENT_GOVERNANCE_POLICY = null;", share_html)
         self.assertIn('id="link-repo"', interactive_html)
         self.assertNotIn('id="link-repo"', share_html)
+        self.assertNotIn('id="workspace-tab-governance"', share_html)
+        self.assertNotIn('id="workspace-panel-governance"', share_html)
         self.assertNotIn('id="maintenance-controls"', share_html)
         self.assertNotIn('class="governance-panel"', share_html)
+        self.assertNotIn('id="governance-write"', share_html)
 
         self.assertFalse(handoff["surface_contract"]["share_safe"]["browser_scan"])
         self.assertFalse(handoff["surface_contract"]["share_safe"]["governance_resolver"])

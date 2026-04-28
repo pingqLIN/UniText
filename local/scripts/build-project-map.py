@@ -4,11 +4,18 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.governance_sources import build_governance_sources
 
 
 REPO_MARKERS = [
@@ -43,7 +50,6 @@ STRUCTURAL_EDGE_KINDS = {"contains"}
 LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 HEADING_PATTERN = re.compile(r"^#\s+(.+)$", re.MULTILINE)
 SECTION_HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
-LIST_ITEM_PATTERN = re.compile(r"^(?:-|\d+\.)\s+(.+)$")
 
 
 @dataclass(frozen=True)
@@ -131,64 +137,6 @@ def label_for_core_doc(relative: str, text: str) -> str:
     if relative == "README.md":
         return "README"
     return extract_title(text, Path(relative).stem)
-
-
-def extract_section_rules(text: str) -> list[dict[str, object]]:
-    lines = text.replace("\r\n", "\n").split("\n")
-    sections: list[dict[str, object]] = []
-    current_heading = "Document"
-    current_items: list[str] = []
-    for raw_line in lines:
-        line = raw_line.rstrip()
-        heading_match = SECTION_HEADING_PATTERN.match(line)
-        if heading_match:
-            if current_items:
-                sections.append({"heading": current_heading, "items": current_items[:]})
-            current_heading = heading_match.group(2).strip()
-            current_items = []
-            continue
-        item_match = LIST_ITEM_PATTERN.match(line.strip())
-        if item_match:
-            current_items.append(item_match.group(1).strip())
-    if current_items:
-        sections.append({"heading": current_heading, "items": current_items[:]})
-    return sections
-
-
-def build_governance_sources(repo_root: Path) -> dict[str, object]:
-    source_candidates = [
-        ("workspace", repo_root.parent / "AGENTS.md", 1),
-        ("repo", repo_root / "AGENTS.md", 2),
-    ]
-    sources: list[dict[str, object]] = []
-    effective_rules: list[dict[str, object]] = []
-    for scope, path, precedence in source_candidates:
-        if not path.exists():
-            continue
-        text = read_text(path)
-        sections = extract_section_rules(text)
-        sources.append({
-            "scope": scope,
-            "path": str(path),
-            "precedence": precedence,
-            "sections": sections,
-        })
-        for section in sections:
-            for index, item in enumerate(section["items"], start=1):
-                effective_rules.append({
-                    "precedence": precedence,
-                    "scope": scope,
-                    "source_path": str(path),
-                    "section": section["heading"],
-                    "rule_index": index,
-                    "rule": item,
-                })
-    effective_rules.sort(key=lambda item: (item["precedence"], item["source_path"], item["section"], item["rule_index"]))
-    return {
-        "hierarchy_note": "Runtime/system/developer/global-home instructions still sit above file-based AGENTS. The page-level governance view evaluates the file-based portion using workspace overlay first, then repo-local rules.",
-        "sources": sources,
-        "effective_file_rules": effective_rules,
-    }
 
 
 def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, str]]:
@@ -540,10 +488,10 @@ def build_page_copy(page_mode: str) -> dict[str, str]:
 
 
 def strip_share_safe_blocks(html: str) -> str:
+    share_hide_block_pattern = re.compile(r"\s*<!-- share-hide:start -->.*?<!-- share-hide:end -->\s*", re.DOTALL)
+    html = share_hide_block_pattern.sub("\n", html)
     operator_only_patterns = [
         re.compile(r"\s*<article\b(?=[^>]*\bid=\"export-card\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</article>\s*", re.DOTALL),
-        re.compile(r"\s*<section\b(?=[^>]*\bid=\"maintenance-controls\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</section>\s*", re.DOTALL),
-        re.compile(r"\s*<section\b(?=[^>]*\bclass=\"[^\"]*\bgovernance-panel\b[^\"]*\")(?=[^>]*\bdata-share-hide\b)[^>]*>.*?</section>\s*", re.DOTALL),
     ]
     for pattern in operator_only_patterns:
         html = pattern.sub("\n", html)

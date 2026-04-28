@@ -219,6 +219,11 @@
       --map-node-active-stroke: #006b94;
     }
 
+    :root[data-text-scale="xs"],
+    body[data-text-scale="xs"] {
+      --ui-font-scale: 0.84;
+    }
+
     :root[data-text-scale="sm"],
     body[data-text-scale="sm"] {
       --ui-font-scale: 0.92;
@@ -226,7 +231,12 @@
 
     :root[data-text-scale="lg"],
     body[data-text-scale="lg"] {
-      --ui-font-scale: 1.08;
+      --ui-font-scale: 1.12;
+    }
+
+    :root[data-text-scale="xl"],
+    body[data-text-scale="xl"] {
+      --ui-font-scale: 1.24;
     }
 
     * { box-sizing: border-box; }
@@ -330,6 +340,11 @@
       border-radius: 16px;
       background:
         linear-gradient(180deg, var(--surface-main-top) 0%, var(--panel-muted) 100%);
+    }
+
+    .masthead-toggle {
+      justify-self: start;
+      min-height: 34px;
     }
 
     .aside-kicker {
@@ -526,6 +541,10 @@
     body.masthead-compact .masthead-aside,
     body.masthead-compact .control-band.primary .band-copy {
       display: none;
+    }
+
+    body.masthead-compact .masthead-toggle {
+      display: inline-flex;
     }
 
     body.masthead-compact .summary {
@@ -827,32 +846,8 @@
       grid-template-columns: minmax(320px, 0.94fr) minmax(420px, 1.16fr);
     }
 
-    .workspace-preview-rail {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
-    }
-
-    .workspace-preview-card {
-      display: grid;
-      gap: 6px;
-      align-content: start;
-      min-height: 84px;
-      padding: 10px 12px;
-      text-align: left;
-      cursor: pointer;
-    }
-
-    .workspace-preview-card p {
-      margin: 0;
-      font-size: 0.78rem;
-      font-weight: 600;
-      line-height: 1.48;
-      color: color-mix(in srgb, var(--ink-soft) 82%, var(--ink) 18%);
-    }
-
     .workspace-tab.active .workspace-tab-step,
-    .workspace-preview-card.active .workspace-preview-index {
+    .workspace-tab:focus-visible .workspace-tab-step {
       border-color: rgba(36, 107, 115, 0.34);
       background: linear-gradient(180deg, rgba(36, 107, 115, 0.2) 0%, rgba(36, 107, 115, 0.12) 100%);
       color: var(--ink);
@@ -1294,6 +1289,96 @@
       font-size: 0.78rem;
     }
 
+    .governance-settings {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      background: var(--surface-card-soft);
+    }
+
+    .governance-settings h3,
+    .governance-funnel h3 {
+      margin: 0;
+      font-family: var(--display-font);
+      font-size: 1.12rem;
+      line-height: 1.08;
+    }
+
+    .governance-source-status {
+      display: grid;
+      gap: 8px;
+    }
+
+    .governance-source-card {
+      display: grid;
+      gap: 5px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-card);
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .governance-source-card strong {
+      color: var(--ink);
+      font-size: 0.84rem;
+    }
+
+    .governance-source-card code {
+      overflow-wrap: anywhere;
+      font-family: "Consolas", "SFMono-Regular", "Menlo", monospace;
+      font-size: 0.76rem;
+    }
+
+    .governance-funnel {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, var(--surface-main-top) 0%, var(--surface-card-soft) 100%);
+    }
+
+    .governance-funnel-layers {
+      display: grid;
+      gap: 8px;
+    }
+
+    .governance-funnel-layer {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(184, 194, 209, 0.82);
+      background: linear-gradient(90deg, rgba(36, 107, 115, 0.08), rgba(210, 166, 75, 0.12));
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+      text-align: left;
+      padding: 9px 12px;
+    }
+
+    .governance-funnel-layer.active {
+      border-color: rgba(36, 107, 115, 0.55);
+      box-shadow: inset 0 0 0 1px rgba(36, 107, 115, 0.16);
+    }
+
+    .governance-layer-detail {
+      min-height: 92px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-card);
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
     .layout {
       display: grid;
       grid-template-columns: 320px minmax(640px, 1fr) 360px;
@@ -1459,6 +1544,27 @@
         radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.12) 0%, transparent 48%),
         linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(32, 45, 64, 0.08) 100%);
       pointer-events: none;
+    }
+
+    .map-wrap.is-dragging {
+      cursor: grabbing;
+      scroll-behavior: auto;
+      user-select: none;
+    }
+
+    .map-viewport-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .map-zoom-label {
+      min-width: 46px;
+      color: var(--ink-faint);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-align: center;
     }
 
     #map,
@@ -2021,13 +2127,13 @@
           <p class="lede">__HEADER_DESCRIPTION__</p>
           <div class="summary" id="summary"></div>
           <p class="summary-hint">下方這排快速帶入鍵可直接把類型或診斷條件送進主要巡覽控制，省去手動重新選。</p>
+          <button type="button" class="mini-action secondary masthead-toggle" id="masthead-toggle" aria-expanded="true">收合上方說明</button>
         </section>
         <aside class="masthead-aside">
           <span class="aside-kicker">操作重點</span>
           <h2 class="aside-title">先掌握目前執行面，再回查正式來源，最後整理成可交接結果。</h2>
           <p class="aside-copy">這個頁面主要服務維護者與治理操作者。先看 `runtime/*` 目前對外呈現的執行面，再沿著對應關係回到 `registry/*` 的正式定義，最後檢查診斷資訊與治理層疊解析。</p>
-          <p class="legend-copy">這排快速帶入鍵也可直接帶入主要巡覽控制，方便先切到代理、執行面、失效引用或孤立資源。</p>
-          <div class="legend" id="masthead-quick-filters" aria-label="上方快速帶入"></div>
+          <p class="legend-copy">快速篩選保留在左側主說明區，這裡只保留導覽入口，避免同一組控制在畫面上出現兩次。</p>
           <div class="aside-actions">
             <button type="button" class="mini-action secondary" id="tour-start">互動導覽</button>
             <span class="aside-hint">第一次進來可直接走一遍，之後也能隨時重開。</span>
@@ -2080,9 +2186,11 @@
             <div class="control-group" data-share-hide>
               <label id="text-scale-label">字級縮放</label>
               <div class="tone-switch" role="radiogroup" aria-labelledby="text-scale-label" aria-describedby="text-scale-note">
+                <button type="button" class="tone-option" data-text-scale-option="xs" role="radio" aria-checked="false" tabindex="-1">極小</button>
                 <button type="button" class="tone-option" data-text-scale-option="sm" role="radio" aria-checked="false" tabindex="-1">緊湊</button>
                 <button type="button" class="tone-option active" data-text-scale-option="md" role="radio" aria-checked="true" tabindex="0">標準</button>
                 <button type="button" class="tone-option" data-text-scale-option="lg" role="radio" aria-checked="false" tabindex="-1">放大</button>
+                <button type="button" class="tone-option" data-text-scale-option="xl" role="radio" aria-checked="false" tabindex="-1">極大</button>
               </div>
               <span class="control-note" id="text-scale-note">整頁文字會同步縮放；上方控制與地圖標籤都會一起調整。</span>
             </div>
@@ -2115,11 +2223,13 @@
               <strong>診斷與交付</strong>
               <small>健康度、分享輸出、交接摘要</small>
             </button>
+            <!-- share-hide:start -->
             <button type="button" class="workspace-tab" id="workspace-tab-governance" data-workspace-tab="governance" role="tab" aria-controls="workspace-panel-governance" aria-selected="false">
               <span class="workspace-tab-step">03</span>
               <strong>維護與治理</strong>
               <small>更新策略、治理解析、報告寫出</small>
             </button>
+            <!-- share-hide:end -->
           </div>
 
           <div class="workspace-stepper">
@@ -2144,10 +2254,21 @@
             <section class="panel map-panel">
               <div class="panel-head">
                 <h2>地圖檢視</h2>
-                <div class="panel-head-actions">
-                  <div class="mini-note" id="map-mode-note"></div>
-                  <button type="button" class="mini-action secondary map-minimap-toggle" id="map-minimap-toggle" hidden>隱藏縮圖</button>
-                </div>
+                  <div class="panel-head-actions">
+                    <div class="mini-note" id="map-mode-note"></div>
+                    <div class="map-viewport-controls" aria-label="地圖 viewport 手動控制">
+                      <button type="button" class="mini-action secondary" id="map-pan-left">←</button>
+                      <button type="button" class="mini-action secondary" id="map-pan-up">↑</button>
+                      <button type="button" class="mini-action secondary" id="map-pan-down">↓</button>
+                      <button type="button" class="mini-action secondary" id="map-pan-right">→</button>
+                      <button type="button" class="mini-action secondary" id="map-zoom-out">−</button>
+                      <span class="map-zoom-label" id="map-zoom-label">100%</span>
+                      <button type="button" class="mini-action secondary" id="map-zoom-in">＋</button>
+                      <button type="button" class="mini-action secondary" id="map-fit">置中</button>
+                      <button type="button" class="mini-action secondary" id="map-reset">重設</button>
+                    </div>
+                    <button type="button" class="mini-action secondary map-minimap-toggle" id="map-minimap-toggle" hidden>隱藏縮圖</button>
+                  </div>
               </div>
               <div class="map-caption" id="map-caption"></div>
               <div class="map-stage" id="map-stage">
@@ -2188,6 +2309,7 @@
           </div>
         </section>
 
+        <!-- share-hide:start -->
         <section class="workspace-page" id="workspace-panel-governance" data-workspace-page-panel="governance" role="tabpanel" aria-labelledby="workspace-tab-governance" hidden>
           <div class="workspace-page-grid governance-grid">
             <section class="control-band secondary" id="maintenance-controls" data-share-hide>
@@ -2253,6 +2375,40 @@
                   <input id="governance-output-path" type="text" />
                 </div>
               </div>
+              <section class="governance-settings" aria-label="治理功能設定">
+                <h3>功能設定與關鍵解析檔案</h3>
+                <p class="aside-copy">專案內檔案可由產生器控管；專案外部檔案保留手動指向欄位，但靜態頁面只記錄路徑，不會直接讀取家目錄或其他外部內容。</p>
+                <div class="control-grid">
+                  <div class="control-group">
+                    <label for="governance-analysis-path">任意操作路徑</label>
+                    <input id="governance-analysis-path" type="text" placeholder="例如 Q:\\UniText 或 Q:\\Projects\\demo" />
+                  </div>
+                  <div class="control-group">
+                    <label for="governance-global-path">global-home AGENTS</label>
+                    <input id="governance-global-path" type="text" />
+                  </div>
+                  <div class="control-group">
+                    <label for="governance-workspace-path">workspace AGENTS</label>
+                    <input id="governance-workspace-path" type="text" />
+                  </div>
+                  <div class="control-group">
+                    <label for="governance-repo-path">repo-local AGENTS</label>
+                    <input id="governance-repo-path" type="text" />
+                  </div>
+                </div>
+                <div class="governance-source-status" id="governance-source-status"></div>
+              </section>
+              <section class="governance-funnel" aria-label="治理漏斗互動說明">
+                <h3>Agents 指令層疊漏斗</h3>
+                <div class="governance-funnel-layers" id="governance-funnel">
+                  <button type="button" class="governance-funnel-layer active" data-governance-layer="runtime">01 Runtime / Platform / System</button>
+                  <button type="button" class="governance-funnel-layer" data-governance-layer="global-home">02 Global Home AGENTS</button>
+                  <button type="button" class="governance-funnel-layer" data-governance-layer="workspace">03 Workspace AGENTS</button>
+                  <button type="button" class="governance-funnel-layer" data-governance-layer="repo">04 Repo-local AGENTS</button>
+                  <button type="button" class="governance-funnel-layer" data-governance-layer="request">05 Current User Request</button>
+                </div>
+                <div class="governance-layer-detail" id="governance-layer-detail"></div>
+              </section>
               <div class="card-actions">
                 <button type="button" class="mini-action" id="governance-resolve">解析治理</button>
                 <button type="button" class="mini-action secondary" id="governance-write">寫出治理報告</button>
@@ -2262,25 +2418,9 @@
             </section>
           </div>
         </section>
+        <!-- share-hide:end -->
       </div>
 
-      <div class="workspace-preview-rail" aria-label="其他工作區預覽">
-        <button type="button" class="workspace-preview-card active" data-workspace-preview="browse">
-          <span class="workspace-preview-index">01 / 主頁</span>
-          <strong>主巡覽</strong>
-          <p>長時間停留在這裡讀節點清單、地圖關係與右側細節。</p>
-        </button>
-        <button type="button" class="workspace-preview-card" data-workspace-preview="ops">
-          <span class="workspace-preview-index">02 / 診斷頁</span>
-          <strong>診斷與交付</strong>
-          <p>先看健康度，再決定是否需要分享輸出或複製交接摘要。</p>
-        </button>
-        <button type="button" class="workspace-preview-card" data-workspace-preview="governance">
-          <span class="workspace-preview-index">03 / 治理頁</span>
-          <strong>維護與治理</strong>
-          <p>把更新策略與治理解析留在獨立頁，只有需要時才切入。</p>
-        </button>
-      </div>
     </section>
   </div>
 
