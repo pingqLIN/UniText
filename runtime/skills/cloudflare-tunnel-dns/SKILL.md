@@ -38,6 +38,12 @@ source_of_truth: registry/skills/cloudflare-tunnel-dns/SKILL.md
 - Hostname -> local port mapping
 - `/health` and `/mcp` routing
 
+## Change Guardrails
+
+- Before adding a new tunnel, hostname, or ingress rule, capture the health of existing active tunnels and their public health endpoints.
+- After adding or starting a new tunnel, re-run the same health checks for the pre-existing tunnels and compare results before treating the change as successful.
+- Do not trade one working tunnel for another without calling out the regression and the exact service, config file, and hostname affected.
+
 ## References
 
 - [workspace baseline](../../../registry/skills/cloudflare-governance/references/current-baseline.md)

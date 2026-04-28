@@ -42,7 +42,7 @@ For a simple static site, an acceptable Windows pattern is:
 ```powershell
 Start-Process -FilePath 'python.exe' `
   -ArgumentList '-m','http.server','43173','--bind','127.0.0.1' `
-  -WorkingDirectory 'Q:\Projects\Tracing-Paper-System' `
+  -WorkingDirectory 'Q:\Projects\<project>\' `
   -WindowStyle Hidden -PassThru
 ```
 
@@ -97,7 +97,7 @@ Use:
 
 ```powershell
 cloudflared.exe tunnel create `
-  --credentials-file 'Q:\Projects\Tracing-Paper-System\.runtime\tracing-paper-system-tunnel.json' `
+  --credentials-file 'Q:\Projects\<project>\.runtime\<project>-tunnel.json' `
   tracing-paper-system
 ```
 
@@ -121,7 +121,7 @@ Example:
 
 ```yaml
 tunnel: <tunnel-id>
-credentials-file: Q:\Projects\Tracing-Paper-System\.runtime\tracing-paper-system-tunnel.json
+credentials-file: Q:\Projects\<project>\.runtime\<project>-tunnel.json
 
 ingress:
   - hostname: tracing-paper.colorgeek.co
@@ -135,7 +135,7 @@ Use:
 
 ```powershell
 Start-Process -FilePath 'cloudflared.exe' `
-  -ArgumentList 'tunnel','--config','Q:\Projects\Tracing-Paper-System\.runtime\cloudflared.tracing-paper.yml','--no-autoupdate','--logfile','Q:\Projects\Tracing-Paper-System\.runtime\cloudflared.named.log','--loglevel','info','run' `
+  -ArgumentList 'tunnel','--config','Q:\Projects\<project>\.runtime\cloudflared.<project>.yml','--no-autoupdate','--logfile','Q:\Projects\<project>\.runtime\cloudflared.named.log','--loglevel','info','run' `
   -WindowStyle Hidden -PassThru
 ```
 

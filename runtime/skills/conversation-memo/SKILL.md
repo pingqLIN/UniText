@@ -44,7 +44,7 @@ Before summarizing, preserve the full discussion transcript.
 
 Default raw archive root:
 
-- `C:\Users\miles\.agents\.little_talks`
+- `C:\Users\<user>\.agents\.little_talks`
 
 Unless the user explicitly names a better location, keep using that root for complete raw discussion storage.
 

@@ -32,6 +32,9 @@ REPO_MARKERS = [
 
 FRONTMATTER_PATTERN = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
 LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+MANAGED_RUNTIME_PATHS = ("catalog.json", "skills", "agents", "workflow")
+PAYLOAD_RUNTIME_DIRS = {"skills", "agents", "workflow"}
+DIFF_SAMPLE_LIMIT = 25
 
 
 @dataclass(frozen=True)
@@ -107,16 +110,27 @@ def repo_relative(path: Path, repo_root: Path) -> str:
 
 
 def runtime_projection_display_path(runtime_file: Path, repo_root: Path) -> str:
-    relative_parts = Path(repo_relative(runtime_file, repo_root)).parts
+    return repo_relative(runtime_projection_logical_path(runtime_file, repo_root), repo_root)
+
+
+def runtime_projection_logical_path(path: Path, repo_root: Path) -> Path:
+    relative_parts = Path(repo_relative(path, repo_root)).parts
     if "runtime" in relative_parts:
         runtime_index = relative_parts.index("runtime")
-        display_parts = list(relative_parts[runtime_index + 1 :])
-        if display_parts and display_parts[0].startswith(".runtime-dryrun-"):
-            display_parts = display_parts[1:]
-        display_path = Path("runtime") / Path(*display_parts)
-    else:
-        display_path = Path("runtime") / Path(*relative_parts)
-    return display_path.as_posix()
+        logical_parts = list(relative_parts[runtime_index + 1 :])
+        if logical_parts and logical_parts[0].startswith(".runtime-dryrun-"):
+            logical_parts = logical_parts[1:]
+        return repo_root / "runtime" / Path(*logical_parts)
+    return path
+
+
+def logical_runtime_projection_target(path: Path, repo_root: Path) -> Path:
+    runtime_root = repo_root / "runtime"
+    try:
+        path.relative_to(runtime_root)
+    except ValueError:
+        return path
+    return runtime_projection_logical_path(path, repo_root)
 
 
 def rewrite_relative_links(
@@ -128,6 +142,8 @@ def rewrite_relative_links(
     source_root: Path | None = None,
     runtime_root: Path | None = None,
 ) -> str:
+    logical_wrapper_dir = runtime_projection_logical_path(wrapper_dir, repo_root)
+
     def replace(match: re.Match[str]) -> str:
         label = match.group(1)
         raw_target = match.group(2).strip()
@@ -163,7 +179,8 @@ def rewrite_relative_links(
         else:
             runtime_resolved = resolved
 
-        replacement = Path(os.path.relpath(runtime_resolved, wrapper_dir)).as_posix()
+        logical_target = logical_runtime_projection_target(runtime_resolved, repo_root)
+        replacement = Path(os.path.relpath(logical_target, logical_wrapper_dir)).as_posix()
         return f"[{label}]({replacement}{anchor_suffix})"
 
     return LINK_PATTERN.sub(replace, text)
@@ -248,7 +265,7 @@ def slug_tags(text: str) -> list[str]:
 
 def write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content.rstrip() + "\n", encoding="utf-8")
+    path.write_text(content.rstrip() + "\n", encoding="utf-8", newline="\n")
 
 
 def project_markdown_tree(
@@ -504,6 +521,105 @@ def write_catalog(repo_root: Path, runtime_root: Path, entries: list[RuntimeEntr
     write_text(runtime_root / "catalog.json", json.dumps(catalog, indent=2, ensure_ascii=False))
 
 
+def managed_runtime_files(root: Path) -> dict[str, Path]:
+    files: dict[str, Path] = {}
+    for managed_path in MANAGED_RUNTIME_PATHS:
+        candidate = root / managed_path
+        if candidate.is_file():
+            files[managed_path] = candidate
+            continue
+        if not candidate.is_dir():
+            continue
+        for file_path in sorted(candidate.rglob("*")):
+            if not file_path.is_file():
+                continue
+            relative = file_path.relative_to(root)
+            if any(part.startswith(".") for part in relative.parts):
+                continue
+            files[relative.as_posix()] = file_path
+    return files
+
+
+def is_payload_runtime_path(relative_path: str) -> bool:
+    first_part = Path(relative_path).parts[0]
+    return first_part in PAYLOAD_RUNTIME_DIRS
+
+
+def summarize_paths(paths: list[str]) -> dict[str, object]:
+    return {
+        "count": len(paths),
+        "sample": paths[:DIFF_SAMPLE_LIMIT],
+    }
+
+
+def normalize_line_endings(raw: bytes) -> bytes:
+    return raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def compare_runtime_trees(generated_root: Path, tracked_runtime_root: Path) -> dict[str, object]:
+    generated_files = managed_runtime_files(generated_root)
+    tracked_files = managed_runtime_files(tracked_runtime_root)
+    all_paths = sorted(set(generated_files) | set(tracked_files))
+
+    added: list[str] = []
+    changed: list[str] = []
+    line_ending_only: list[str] = []
+    content_changed: list[str] = []
+    removed: list[str] = []
+    for relative_path in all_paths:
+        generated_file = generated_files.get(relative_path)
+        tracked_file = tracked_files.get(relative_path)
+        if generated_file is None:
+            removed.append(relative_path)
+            continue
+        if tracked_file is None:
+            added.append(relative_path)
+            continue
+        generated_bytes = generated_file.read_bytes()
+        tracked_bytes = tracked_file.read_bytes()
+        if generated_bytes != tracked_bytes:
+            changed.append(relative_path)
+            if normalize_line_endings(generated_bytes) == normalize_line_endings(tracked_bytes):
+                line_ending_only.append(relative_path)
+            else:
+                content_changed.append(relative_path)
+
+    payload_paths = [path for path in added + changed + removed if is_payload_runtime_path(path)]
+    payload_content_paths = [path for path in added + content_changed + removed if is_payload_runtime_path(path)]
+    payload_line_ending_paths = [path for path in line_ending_only if is_payload_runtime_path(path)]
+    catalog_paths = [path for path in added + changed + removed if path == "catalog.json"]
+    blocking_payload_paths = payload_content_paths
+    routine_write_allowed = not blocking_payload_paths
+
+    return {
+        "compared_against": str(tracked_runtime_root),
+        "managed_paths": list(MANAGED_RUNTIME_PATHS),
+        "status": "clean" if not added and not changed and not removed else "drift",
+        "generated_file_count": len(generated_files),
+        "tracked_file_count": len(tracked_files),
+        "added_by_generator": summarize_paths(added),
+        "changed_by_generator": summarize_paths(changed),
+        "content_changed_by_generator": summarize_paths(content_changed),
+        "line_ending_only_drift": summarize_paths(line_ending_only),
+        "stale_tracked_runtime_files": summarize_paths(removed),
+        "payload_drift": summarize_paths(payload_paths),
+        "blocking_payload_drift": summarize_paths(blocking_payload_paths),
+        "payload_content_drift": summarize_paths(payload_content_paths),
+        "payload_line_ending_only_drift": summarize_paths(payload_line_ending_paths),
+        "catalog_drift": summarize_paths(catalog_paths),
+        "write_gate": {
+            "strategy": "no-payload-content-drift",
+            "routine_write_allowed": routine_write_allowed,
+            "requires_review": not routine_write_allowed,
+            "reason": (
+                "managed payload files have added, removed, or content-level drift that still requires review"
+                if not routine_write_allowed
+                else "only line-ending-only drift or catalog-only drift remains in managed runtime files"
+            ),
+        },
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the tracked runtime layer for consumer agents.")
     parser.add_argument("--write", action="store_true", help="Write the runtime layer into the repository.")
@@ -538,15 +654,6 @@ def main() -> int:
                 )
             )
             return 1
-        print(
-            json.dumps(
-                {
-                    "info": "Using repository-relative output-dir for dry-run/build output.",
-                },
-                indent=2,
-                ensure_ascii=False,
-            )
-        )
     integration_manifest, integration_surfaces = load_integration_surfaces(repo_root)
 
     if not args.write:
@@ -575,6 +682,7 @@ def main() -> int:
                 "runtime_root": str(runtime_root),
                 "integration_surfaces_manifest": str(integration_manifest),
                 "dry_run": True,
+                "output_dir_scope": "repository-relative",
                 "actions": [
                     "rebuild runtime/skills from registry/skills",
                     "rebuild runtime/agents from registry/agents",
@@ -586,6 +694,7 @@ def main() -> int:
                 "agents": len([entry for entry in entries if entry.resource_type == "agent"]),
                 "workflow": len([entry for entry in entries if entry.resource_type == "workflow"]),
                 "catalog_entries": len(entries),
+                "diff_summary": compare_runtime_trees(runtime_root, repo_root / "runtime"),
             }
             print(json.dumps(summary, indent=2, ensure_ascii=False))
             return 0

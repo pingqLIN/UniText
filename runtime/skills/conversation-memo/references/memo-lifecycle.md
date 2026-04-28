@@ -16,7 +16,7 @@ For memo-worthy discussions, preserve the full raw conversation before summarizi
 
 Default raw archive root:
 
-- `C:\Users\miles\.agents\.little_talks`
+- `C:\Users\<user>\.agents\.little_talks`
 
 Suggested filename:
 
