@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Variant B · Product Console</title>
+  <style>
+    :root {
+      --bg: #151714;
+      --panel: #1f211d;
+      --panel-2: #26291f;
+      --ink: #f4efe4;
+      --muted: #aaa394;
+      --line: #3d4236;
+      --accent: #d6a34a;
+      --teal: #5fb3a9;
+      --red: #d96f45;
+      --mono: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+      --sans: "Aptos", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, rgba(214,163,74,.08) 1px, transparent 1px),
+        linear-gradient(180deg, #11130f, var(--bg));
+      background-size: 26px 26px, auto;
+      color: var(--ink);
+      font-family: var(--sans);
+    }
+    .shell {
+      width: min(1520px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 18px 0;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: stretch;
+      margin-bottom: 14px;
+    }
+    .brand, .status, .actions, .panel, .source {
+      border: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 92%, #000);
+    }
+    .brand {
+      padding: 16px;
+      border-radius: 18px;
+    }
+    .brand small, .label, .metric-label {
+      color: var(--accent);
+      font: 850 11px/1.2 var(--mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 8px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 34px;
+      line-height: .92;
+      letter-spacing: -.055em;
+    }
+    .status {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .metric {
+      padding: 14px 16px;
+      border-right: 1px solid var(--line);
+    }
+    .metric:last-child { border-right: 0; }
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font: 850 24px/1 var(--mono);
+    }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(2, 90px);
+      gap: 8px;
+      align-content: center;
+      padding: 10px;
+      border-radius: 18px;
+    }
+    button {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #2b2e24;
+      color: var(--ink);
+      font-weight: 850;
+    }
+    button.primary { background: var(--accent); color: #1d1608; border-color: var(--accent); }
+    .workspace {
+      display: grid;
+      grid-template-columns: 72px 320px minmax(560px, 1fr) 360px;
+      gap: 12px;
+      height: calc(100vh - 132px);
+      min-height: 620px;
+    }
+    .rail {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #10120f;
+    }
+    .rail button {
+      height: 58px;
+      padding: 6px;
+      font: 900 12px/1 var(--mono);
+    }
+    .rail button.active {
+      background: var(--teal);
+      color: #071513;
+      border-color: var(--teal);
+    }
+    .panel {
+      min-height: 0;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+    .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 58px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #181a16;
+    }
+    .head h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 22px;
+      letter-spacing: -.04em;
+    }
+    .list, .detail, .sources {
+      height: calc(100% - 58px);
+      overflow: auto;
+      padding: 12px;
+    }
+    .node {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      color: var(--muted);
+    }
+    .node strong { color: var(--ink); }
+    .node.active {
+      border-color: color-mix(in srgb, var(--teal) 54%, var(--line));
+      background: rgba(95, 179, 169, .1);
+    }
+    .map {
+      position: relative;
+      height: calc(100% - 58px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(95,179,169,.13), transparent 36%),
+        #131510;
+    }
+    .map::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(214,163,74,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(214,163,74,.08) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    .cluster {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #20231b;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.03) inset;
+      font: 850 13px/1.2 var(--mono);
+    }
+    .c1 { width: 170px; height: 170px; left: 42%; top: 31%; border-color: var(--teal); color: var(--teal); }
+    .c2 { width: 122px; height: 122px; left: 18%; top: 22%; color: var(--accent); }
+    .c3 { width: 128px; height: 128px; right: 16%; top: 20%; color: var(--ink); }
+    .c4 { width: 112px; height: 112px; left: 24%; bottom: 16%; color: var(--red); }
+    .edge {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(214,163,74,.52), transparent);
+      transform-origin: left center;
+    }
+    .e1 { width: 280px; left: 30%; top: 40%; transform: rotate(9deg); }
+    .e2 { width: 330px; left: 39%; top: 60%; transform: rotate(-23deg); }
+    .viewport {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      display: flex;
+      gap: 7px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(24,26,22,.9);
+    }
+    .source {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+    .source code {
+      color: var(--muted);
+      font-family: var(--mono);
+      overflow-wrap: anywhere;
+    }
+    .tag {
+      display: inline-flex;
+      width: max-content;
+      padding: 4px 7px;
+      border-radius: 8px;
+      background: rgba(214,163,74,.12);
+      color: var(--accent);
+      font: 850 11px/1 var(--mono);
+    }
+    @media (max-width: 1120px) {
+      .topbar, .workspace, .status { grid-template-columns: 1fr; height: auto; }
+      .panel { min-height: 360px; }
+      .rail { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="topbar">
+      <div class="brand">
+        <small>Variant B · recommended</small>
+        <h1>Runtime Governance Console</h1>
+      </div>
+      <div class="status">
+        <div class="metric"><span class="metric-label">nodes</span><strong>71</strong></div>
+        <div class="metric"><span class="metric-label">edges</span><strong>115</strong></div>
+        <div class="metric"><span class="metric-label">skills</span><strong>54</strong></div>
+        <div class="metric"><span class="metric-label">broken</span><strong>40</strong></div>
+        <div class="metric"><span class="metric-label">sources</span><strong>3</strong></div>
+      </div>
+      <div class="actions">
+        <button>Export</button>
+        <button class="primary">Resolve</button>
+      </div>
+    </section>
+    <section class="workspace">
+      <nav class="rail" aria-label="primary navigation">
+        <button class="active">01<br>Map</button>
+        <button>02<br>Ops</button>
+        <button>03<br>Gov</button>
+      </nav>
+      <aside class="panel">
+        <div class="head"><h2>Focus Queue</h2><span class="label">scan first</span></div>
+        <div class="list">
+          <div class="node active"><strong>global-home AGENTS</strong><span>外部來源 · local-process · applicable</span></div>
+          <div class="node"><strong>workspace AGENTS</strong><span>Q:\AGENTS.md · overlay</span></div>
+          <div class="node"><strong>repo-local AGENTS</strong><span>Q:\UniText\AGENTS.md · project policy</span></div>
+          <div class="node"><strong>manual path</strong><span>unreadable until explicit handle</span></div>
+        </div>
+      </aside>
+      <section class="panel">
+        <div class="head"><h2>Map Viewport</h2><span class="label">drag to pan</span></div>
+        <div class="map">
+          <div class="edge e1"></div>
+          <div class="edge e2"></div>
+          <div class="cluster c1">runtime<br>surface</div>
+          <div class="cluster c2">registry</div>
+          <div class="cluster c3">skills</div>
+          <div class="cluster c4">governance</div>
+          <div class="viewport"><button>←</button><button>↑</button><button>↓</button><button>→</button><button>−</button><button>100%</button><button>＋</button></div>
+        </div>
+      </section>
+      <aside class="panel">
+        <div class="head"><h2>Source Status</h2><span class="label">evidence</span></div>
+        <div class="sources">
+          <div class="source"><span class="tag">effective</span><strong>global-home</strong><code>C:\Users\...\ .codex\AGENTS.md</code></div>
+          <div class="source"><span class="tag">overlay</span><strong>workspace</strong><code>Q:\AGENTS.md</code></div>
+          <div class="source"><span class="tag">project</span><strong>repo-local</strong><code>Q:\UniText\AGENTS.md</code></div>
+          <div class="source"><span class="tag">guardrail</span><strong>manual override</strong><p>Manual paths do not reuse stale bundled rules until content is loaded.</p></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>

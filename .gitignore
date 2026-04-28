@@ -21,6 +21,10 @@ ops/review-package/
 ops/template-package/
 ops/rebuild-project/
 ops/project-map/
+!ops/project-map/
+ops/project-map/*
+!ops/project-map/design-variants/
+!ops/project-map/design-variants/**
 ops/agent-governance/
 ops/git-bundles/
 ops/reports/

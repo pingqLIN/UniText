@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Variant A · Original Polish</title>
+  <style>
+    :root {
+      --bg: #f7f1e7;
+      --panel: #fffaf1;
+      --panel-soft: #f0e6d7;
+      --ink: #1d1a15;
+      --muted: #675f54;
+      --line: #d8cbbb;
+      --accent: #176b66;
+      --amber: #b7791f;
+      --danger: #a14f2b;
+      --radius: 18px;
+      --shadow: 0 10px 28px rgba(32, 25, 15, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(90deg, rgba(23, 107, 102, .08) 1px, transparent 1px),
+        linear-gradient(180deg, #fbf6ed, var(--bg));
+      background-size: 32px 32px, auto;
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+    }
+    .shell {
+      width: min(1480px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+    .masthead {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+      gap: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(255, 250, 241, .92);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow, .label {
+      color: var(--accent);
+      font: 850 11px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 8px 0 10px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(42px, 5.4vw, 76px);
+      line-height: .9;
+      letter-spacing: -.06em;
+    }
+    p { margin: 0; color: var(--muted); line-height: 1.62; }
+    .quick {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .chip {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 750;
+    }
+    .chip b { color: var(--amber); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .aside {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel-soft);
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .tab {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+    }
+    .tab.active {
+      border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+      background: #ecf4ef;
+    }
+    .tab strong { display: block; margin-bottom: 4px; }
+    .tab span { color: var(--muted); font-size: 12px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(560px, 1fr) 340px;
+      gap: 14px;
+      height: min(720px, calc(100vh - 252px));
+      min-height: 520px;
+    }
+    .panel {
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 250, 241, .94);
+      box-shadow: var(--shadow);
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .panel-head h2 { margin: 0; font: 800 18px/1.1 Georgia, serif; letter-spacing: -.02em; }
+    .list, .detail { padding: 12px; overflow: auto; height: calc(100% - 55px); }
+    .node {
+      display: grid;
+      gap: 3px;
+      padding: 11px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+    }
+    .node.active { border-color: var(--accent); background: #eef6f2; }
+    .node small, .meta { color: var(--muted); font: 650 12px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .map {
+      position: relative;
+      height: calc(100% - 55px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 34%, rgba(23, 107, 102, .1), transparent 32%),
+        linear-gradient(180deg, #f8efe1, #efe2cf);
+    }
+    .map-grid {
+      position: absolute;
+      inset: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      grid-auto-rows: 76px;
+      gap: 12px;
+      align-content: start;
+    }
+    .map-node {
+      padding: 11px;
+      border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+      border-radius: 14px;
+      background: rgba(255,255,255,.68);
+      box-shadow: 0 3px 10px rgba(28, 22, 14, .07);
+    }
+    .map-node.hot { background: #fff4df; border-color: var(--amber); }
+    .viewport {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      display: flex;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: rgba(255, 250, 241, .92);
+    }
+    button {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-weight: 800;
+    }
+    .rule {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fffdf7;
+    }
+    .rule + .rule { margin-top: 10px; }
+    @media (max-width: 1050px) {
+      .masthead, .layout, .tabs { grid-template-columns: 1fr; height: auto; }
+      .layout { min-height: 0; }
+      .panel { min-height: 320px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <section>
+        <div class="eyebrow">Variant A · Original Polish</div>
+        <h1>專案地圖</h1>
+        <p>保留現有 project-map 架構，只把層級拉清楚：快速篩選只出現一次，治理入口不搶主視覺，map viewport 控制維持在地圖附近。</p>
+        <div class="quick">
+          <span class="chip">代理註冊 <b>1</b></span>
+          <span class="chip">根目錄 <b>5</b></span>
+          <span class="chip">文件 <b>9</b></span>
+          <span class="chip">技能註冊 <b>54</b></span>
+          <span class="chip">失效引用 <b>40</b></span>
+        </div>
+      </section>
+      <aside class="aside">
+        <div class="label">Operator focus</div>
+        <strong>先巡覽，再解析，最後交付。</strong>
+        <p>這版只做微調：更高對比、更少重複、更明確的 action hierarchy。適合直接回填正式 UI。</p>
+      </aside>
+    </header>
+    <nav class="tabs" aria-label="workspace tabs">
+      <div class="tab active"><strong>01 主巡覽</strong><span>節點、地圖、細節</span></div>
+      <div class="tab"><strong>02 診斷與交付</strong><span>健康度、分享輸出</span></div>
+      <div class="tab"><strong>03 維護與治理</strong><span>路徑、漏斗、報告</span></div>
+    </nav>
+    <section class="layout">
+      <aside class="panel">
+        <div class="panel-head"><h2>節點清單</h2><span class="meta">71 nodes</span></div>
+        <div class="list">
+          <div class="node active"><strong>runtime/catalog.json</strong><small>runtime · catalog_entry</small></div>
+          <div class="node"><strong>registry/skills</strong><small>directory · canonical-root</small></div>
+          <div class="node"><strong>AGENTS.md</strong><small>agent · repo-local</small></div>
+          <div class="node"><strong>project-map-runtime.js</strong><small>runtime · browser resolver</small></div>
+        </div>
+      </aside>
+      <section class="panel">
+        <div class="panel-head"><h2>地圖檢視</h2><span class="meta">drag + viewport</span></div>
+        <div class="map">
+          <div class="map-grid">
+            <div class="map-node hot"><strong>Runtime</strong><p>current surface</p></div>
+            <div class="map-node"><strong>Registry</strong><p>source truth</p></div>
+            <div class="map-node"><strong>Skills</strong><p>54 entries</p></div>
+            <div class="map-node"><strong>MCP</strong><p>1 seed</p></div>
+            <div class="map-node"><strong>Agents</strong><p>registration</p></div>
+            <div class="map-node hot"><strong>Governance</strong><p>layer resolver</p></div>
+          </div>
+          <div class="viewport"><button>←</button><button>↑</button><button>↓</button><button>→</button><button>100%</button></div>
+        </div>
+      </section>
+      <aside class="panel">
+        <div class="panel-head"><h2>治理摘要</h2><span class="meta">3 sources</span></div>
+        <div class="detail">
+          <div class="rule"><strong>global-home</strong><p>專案外部來源，只顯示狀態與手動路徑，不在 share-safe 外洩。</p></div>
+          <div class="rule"><strong>workspace</strong><p>依任意操作路徑判定是否適用，否則標為 evidence only。</p></div>
+          <div class="rule"><strong>repo-local</strong><p>目前 project-map 最可控規則來源。</p></div>
+        </div>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
