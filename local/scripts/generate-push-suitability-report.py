@@ -244,6 +244,7 @@ def format_markdown(payload: dict[str, Any]) -> str:
         f"- Ahead commits: `{ahead if ahead is not None else 'unknown'}`",
         f"- Behind commits: `{behind if behind is not None else 'unknown'}`",
         f"- Working tree clean: `{str(publishability['working_tree_clean']).lower()}`",
+        "- Note: commit distance is captured at report generation time. If this report is committed afterward, the actual local ahead count increases by that report commit.",
         "",
         "## Verification Summary",
         "",
