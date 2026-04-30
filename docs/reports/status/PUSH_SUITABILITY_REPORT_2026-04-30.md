@@ -6,11 +6,11 @@
 ## Current Repo State
 
 - Repo: `Q:\UniText`
-- Branch status: `## main...origin/main [ahead 72]`
+- Branch status: `## main...origin/main [ahead 76]`
 - Upstream tracking: `origin/main`
 - Upstream configured: `true`
 - Upstream resolved: `true`
-- Ahead commits: `72`
+- Ahead commits: `76`
 - Behind commits: `0`
 - Working tree clean: `true`
 
@@ -24,15 +24,15 @@
 
 ## Recent Commits
 
+- `f086400 Update readme quality loop handoff`
+- `eaa447d Add readme quality skill`
+- `2127a6f Split project map UI into standalone project`
+- `18dcdd0 Add current push suitability report`
 - `10ecdee Remove local paths from audit orchestrator docs`
-- `77f16d5 Document on-demand tool hooks`
-- `fbacfa0 Update shared skill baseline`
-- `5bb5fc0 Register external audit orchestrator skill`
-- `22f7367 Add project map design variants`
 
 ## Recommendations
 
-- Review the local `72`-commit batch against `origin/main` before any push discussion.
+- Review the local `76`-commit batch against `origin/main` before any push discussion.
 - Structurally ready for push review if the user explicitly grants push permission.
 
 ## Publish Boundary
