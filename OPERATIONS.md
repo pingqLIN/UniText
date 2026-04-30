@@ -58,6 +58,20 @@ delivery 只能由明確 trigger 啟動：
 - `adopt`
 - `repair`
 
+## 4.1 Tool Documentation Hook Rules
+
+工具入口可以按需啟用，但相關文檔必須保持可發現。這條規則用來避免兩個極端：一邊是不必要地預設掛載所有 MCP，另一邊是移除預設掛載後讓 agent 找不到工具用途與啟動方式。
+
+最低要求：
+
+- `INDEX.md` 應提供工具與 adapter 文件導覽
+- `RUNTIME.md` 應維持 consumer agent 的預設讀取入口
+- `registry/mcp/*/README.md` 應說明 MCP 的工具清單、適用情境、非適用情境與啟動指引
+- `docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md` 應承接 machine-local wiring 與 adoption 流程
+- `local/scripts/bootstrap.py` 與 `local/scripts/verify-bootstrap.py` 應保留為實際 delivery / verify 入口
+
+`unitext_registry` 的預設策略是 on-demand：不建議為一般 session 預設常駐，但必須能從 `INDEX.md`、`OPERATIONS.md`、MCP README 與 adoption plan 追到啟用方式。
+
 ## 5. Safety Rules
 
 ### Dry-Run First

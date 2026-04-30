@@ -18,6 +18,18 @@
 - `server.py`
   - read-only MCP server，提供 registry summary、entry listing、core doc / registry file read
 
+## Documentation Hooks
+
+這個 MCP 不需要預設掛載，但它必須和 UniText 的工具文件保持緊密連結：
+
+- discovery 入口：[../../../INDEX.md](../../../INDEX.md)
+- delivery / adapter 規則：[../../../OPERATIONS.md](../../../OPERATIONS.md)
+- runtime consumer 入口：[../../../RUNTIME.md](../../../RUNTIME.md)
+- 既有環境 adoption plan：[../../../docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](../../../docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md)
+- bootstrap / verify tools：[../../../local/scripts/bootstrap.py](../../../local/scripts/bootstrap.py), [../../../local/scripts/verify-bootstrap.py](../../../local/scripts/verify-bootstrap.py)
+
+agent 若需要 registry 盤點，應先讀 `INDEX.md` 的 tool hook 導覽；只有在需要標準 MCP tool call 介面時，才啟用本 server。
+
 ## Why It Exists
 
 - 給 registry 一個非空的 MCP entry
