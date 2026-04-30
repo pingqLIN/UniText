@@ -119,6 +119,18 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
+### Tool And Adapter Documentation Hooks
+
+UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一般 agent 應先用本文件與 `runtime/` 建立 discovery context；只有需要標準 MCP tool surface 時，才臨時啟用 `/registry/mcp/claude-project-mcp-seed`。
+
+| Need | Start here | Related tool surface |
+|---|---|---|
+| runtime consumer context | [RUNTIME.md](RUNTIME.md) | `runtime/`, `runtime/catalog.json` |
+| delivery / adapter rules | [OPERATIONS.md](OPERATIONS.md) | `local/scripts/bootstrap.py`, `local/scripts/verify-bootstrap.py` |
+| existing-machine adoption | [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) | Codex / Claude / Copilot local wiring |
+| MCP registry read-only tools | [registry/mcp/claude-project-mcp-seed/README.md](registry/mcp/claude-project-mcp-seed/README.md) | `registry_summary`, `list_registry_entries`, `read_registry_file` |
+| project map generation | [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md) | `local/scripts/build-project-map.py` |
+
 ### Review Shortlist Skills
 
 | `id` | Tier | `canonical_location` | `status` |
@@ -156,6 +168,8 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
 | `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
 | `external-audit-orchestrator` | Workspace | `/registry/skills/external-audit-orchestrator` | `active` |
+| `microsoft-foundry` | Workspace | `/registry/skills/microsoft-foundry` | `active` |
+| `impeccable` | Workspace | `/registry/skills/impeccable` | `active` |
 
 ### Workflow
 

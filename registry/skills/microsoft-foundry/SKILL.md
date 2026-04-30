@@ -4,35 +4,31 @@ description: "Deploy, evaluate, and manage Foundry agents end-to-end: Docker bui
 license: MIT
 metadata:
   author: Microsoft
-  version: "1.0.10"
+  version: "1.1.5"
 ---
 
 # Microsoft Foundry Skill
 
 This skill helps developers work with Microsoft Foundry resources, covering model discovery and deployment, complete dev lifecycle of AI agent, evaluation workflows, and troubleshooting.
 
-## Prerequisites
+## Pre-Execution Requirements
 
-This skill depends on Azure AI Foundry access plus the relevant Azure / Foundry MCP tools or equivalent CLI access.
-
-- Before running a workflow, confirm the required Azure / Foundry tools are available and authenticated.
-- Treat tool names such as `agent_get`, `prompt_optimize`, `agent_invoke`, and `model_deployment_get` as external Azure / Foundry MCP capabilities, not repo-local tools provided by UniText.
-- If the required external tools, credentials, subscription access, quota, or project permissions are missing, stop and tell the user exactly what is missing before continuing.
+> **MANDATORY: Before executing ANY workflow, you MUST first call the Azure MCP `foundry` tool and inspect the available Foundry MCP tools and related parameters.** Treat this initial `foundry` call as a discovery/help step. For this skill, Azure MCP `foundry` is the required entry point for Foundry-related MCP operations.
 
 ## Sub-Skills
 
-> **MANDATORY: Before executing ANY workflow, you MUST read the corresponding sub-skill document.** Do not call MCP tools for a workflow without reading its skill document. This applies even if you already know the MCP tool parameters — the skill document contains required workflow steps, pre-checks, and validation logic that must be followed. This rule applies on every new user message that triggers a different workflow, even if the skill is already loaded.
+> **MANDATORY: Before executing ANY workflow-specific steps, you MUST read the corresponding sub-skill document.** Do not call workflow-specific MCP tools for a workflow without reading its skill document. This applies even if you already know the MCP tool parameters — the skill document contains required workflow steps, pre-checks, and validation logic that must be followed. This rule applies on every new user message that triggers a different workflow, even if the skill is already loaded.
 
 This skill includes specialized sub-skills for specific workflows. **Use these instead of the main skill when they match your task:**
 
 | Sub-Skill | When to Use | Reference |
 |-----------|-------------|-----------|
-| **deploy** | Containerize, build, push to ACR, create/update/start/stop/clone agent deployments | [deploy](foundry-agent/deploy/deploy.md) |
+| **deploy** | Containerize, build, push to ACR, create/update/clone agent deployments | [deploy](foundry-agent/deploy/deploy.md) |
 | **invoke** | Send messages to an agent, single or multi-turn conversations | [invoke](foundry-agent/invoke/invoke.md) |
 | **observe** | Evaluate agent quality, run batch evals, analyze failures, optimize prompts, improve agent instructions, compare versions, and set up CI/CD monitoring | [observe](foundry-agent/observe/observe.md) |
 | **trace** | Query traces, analyze latency/failures, correlate eval results to specific responses via App Insights `customEvents` | [trace](foundry-agent/trace/trace.md) |
-| **troubleshoot** | View container logs, query telemetry, diagnose failures | [troubleshoot](foundry-agent/troubleshoot/troubleshoot.md) |
-| **create** | Create new hosted agent applications. Supports Microsoft Agent Framework, LangGraph, or custom frameworks in Python or C#. Downloads starter samples from foundry-samples repo. | [create](foundry-agent/create/create.md) |
+| **troubleshoot** | View hosted agent logs, query telemetry, diagnose failures | [troubleshoot](foundry-agent/troubleshoot/troubleshoot.md) |
+| **create** | Create new hosted agent applications. Supports Microsoft Agent Framework, LangGraph, or custom frameworks in Python or C#, across `responses` or `invocations` protocols. | [create](foundry-agent/create/create.md) |
 | **eval-datasets** | Harvest production traces into evaluation datasets, manage dataset versions and splits, track evaluation metrics over time, detect regressions, and maintain full lineage from trace to deployment. Use for: create dataset from traces, dataset versioning, evaluation trending, regression detection, dataset comparison, eval lineage. | [eval-datasets](foundry-agent/eval-datasets/eval-datasets.md) |
 | **project/create** | Creating a new Azure AI Foundry project for hosting agents and models. Use when onboarding to Foundry or setting up new infrastructure. | [project/create/create-foundry-project.md](project/create/create-foundry-project.md) |
 | **resource/create** | Creating Azure AI Services multi-service resource (Foundry resource) using Azure CLI. Use when manually provisioning AI Services resources with granular control. | [resource/create/create-foundry-resource.md](resource/create/create-foundry-resource.md) |
@@ -60,7 +56,6 @@ Match user intent to the correct workflow. Read each sub-skill in order before e
 | Evaluate and optimize agent (full loop) | observe |
 | Troubleshoot an agent issue | invoke → troubleshoot |
 | Fix a broken agent (troubleshoot + redeploy) | invoke → troubleshoot → apply fixes → deploy → invoke |
-| Start/stop agent container | deploy |
 
 ## Agent: .foundry Workspace Standard
 
@@ -128,7 +123,7 @@ If create/deploy is initializing a new `.foundry` workspace and metadata fields 
 
 ### Step 5: Collect Missing Values
 
-Ask the user directly **only for values not resolved** from the user's message, session context, metadata, or azd bootstrap. Keep questions short and limited to the missing values. Common values skills may need:
+Use the `ask_user` or `askQuestions` tool **only for values not resolved** from the user's message, session context, metadata, or azd bootstrap. Common values skills may need:
 - **Agent root** — Target folder containing `.foundry/agent-metadata.yaml`
 - **Environment** — `dev`, `prod`, or another environment key from metadata
 - **Project endpoint** — AI Foundry project endpoint URL
@@ -145,20 +140,19 @@ All agent skills support two agent types:
 | **Prompt** | `"prompt"` | LLM-based agents backed by a model deployment |
 | **Hosted** | `"hosted"` | Container-based agents running custom code |
 
-Use the external `agent_get` Azure / Foundry MCP tool to determine an agent's type when needed.
+Use `agent_get` MCP tool to determine an agent's type when needed.
 
 ## Tool Usage Conventions
 
-- Ask the user directly whenever collecting information that cannot be resolved from repo context, session context, metadata, or prior answers
-- Delegate long-running or independent sub-tasks only when subagents are actually available and the write scope is clearly separated; otherwise keep the work local
-- Prefer Azure / Foundry MCP tools when available; otherwise fall back to Azure CLI only when it is safe and appropriate
+- Use the `ask_user` or `askQuestions` tool whenever collecting information from the user
+- Use the `task` or `runSubagent` tool to delegate long-running or independent sub-tasks (e.g., env var scanning, status polling, Dockerfile generation)
+- Prefer Azure MCP tools over direct CLI commands when available
 - Reference official Microsoft documentation URLs instead of embedding CLI command syntax
 
 ## Additional Resources
 
 - [Foundry Hosted Agents](https://learn.microsoft.com/azure/ai-foundry/agents/concepts/hosted-agents?view=foundry)
 - [Foundry Agent Runtime Components](https://learn.microsoft.com/azure/ai-foundry/agents/concepts/runtime-components?view=foundry)
-- [Foundry Samples](https://github.com/azure-ai-foundry/foundry-samples)
 
 ## SDK Quick Reference
 
