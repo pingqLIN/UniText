@@ -117,7 +117,7 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
 
-目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
+Project Map UI 的可維護 source 已切到 [web/project-map-ui](web/project-map-ui/README.md)。目前仍可使用 `python local/scripts/build-project-map.py` 相容入口，或直接使用 `python web/project-map-ui/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
 
 ### Tool And Adapter Documentation Hooks
 
@@ -129,7 +129,7 @@ UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一
 | delivery / adapter rules | [OPERATIONS.md](OPERATIONS.md) | `local/scripts/bootstrap.py`, `local/scripts/verify-bootstrap.py` |
 | existing-machine adoption | [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) | Codex / Claude / Copilot local wiring |
 | MCP registry read-only tools | [registry/mcp/claude-project-mcp-seed/README.md](registry/mcp/claude-project-mcp-seed/README.md) | `registry_summary`, `list_registry_entries`, `read_registry_file` |
-| project map generation | [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md) | `local/scripts/build-project-map.py` |
+| project map generation | [web/project-map-ui/README.md](web/project-map-ui/README.md) | `web/project-map-ui/build-project-map.py` (`local/scripts/build-project-map.py` remains a wrapper) |
 
 ### Review Shortlist Skills
 

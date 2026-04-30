@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "local" / "scripts" / "build-project-map.py"
+PROJECT_SCRIPT_PATH = REPO_ROOT / "web" / "project-map-ui" / "build-project-map.py"
 
 
 def run_command(args):
@@ -22,6 +23,15 @@ def run_command(args):
 
 
 class ProjectMapOutputTests(unittest.TestCase):
+    def test_project_entrypoint_writes_artifacts(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            result = run_command([sys.executable, str(PROJECT_SCRIPT_PATH), "--output-dir", temp_dir])
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            summary = json.loads(result.stdout)
+
+            self.assertEqual(Path(summary["html_path"]), Path(temp_dir) / "site" / "project-map.html")
+            self.assertTrue((Path(temp_dir) / "site" / "project-map-share.html").is_file())
+
     def test_cli_writes_self_contained_interactive_share_and_handoff_artifacts(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             result = run_command([sys.executable, str(SCRIPT_PATH), "--output-dir", temp_dir])

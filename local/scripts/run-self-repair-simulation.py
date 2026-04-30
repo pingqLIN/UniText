@@ -194,17 +194,9 @@ def build_workspace_sensitive_fixture(target_root: Path) -> None:
         "registry/README.md",
         "registry/skills/conversation-memo/SKILL.md",
         "registry/skills/conversation-memo/references/memo-lifecycle.md",
-        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/credential-auth-errors.md",
-        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/vm-agent-not-responding.md",
-        "registry/skills/azure-deploy/references/recipes/azcli/verify.md",
-        "registry/skills/azure-deploy/references/recipes/azd/verify.md",
-        "registry/skills/azure-deploy/references/recipes/bicep/verify.md",
-        "registry/skills/azure-deploy/references/recipes/cicd/verify.md",
-        "registry/skills/azure-deploy/references/recipes/terraform/verify.md",
-        "registry/skills/azure-diagnostics/SKILL.md",
-        "registry/skills/azure-diagnostics/aks-troubleshooting/aks-troubleshooting.md",
-        "registry/skills/azure-diagnostics/aks-troubleshooting/networking.md",
-        "registry/skills/azure-diagnostics/references/container-apps/README.md",
+        "registry/skills/microsoft-foundry/SKILL.md",
+        "registry/skills/impeccable/SKILL.md",
+        "registry/skills/external-audit-orchestrator/SKILL.md",
     }
 
     for relative_path in sorted(fixture_paths):

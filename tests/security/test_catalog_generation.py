@@ -24,12 +24,11 @@ def get_powershell_executable():
 
 
 class CatalogGenerationTests(unittest.TestCase):
-    def test_catalog_exclusions_marks_microsoft_foundry_as_non_catalog_surface(self):
+    def test_microsoft_foundry_is_cataloged_in_current_baseline(self):
         policy = REPO_ROOT / "registry" / "catalog-exclusions.json"
         payload = json.loads(policy.read_text(encoding="utf-8"))
-        entry = payload["skills"]["microsoft-foundry"]
-        self.assertIn(entry["status"], {"stray", "excluded"})
-        self.assertIn("excluded", entry["reason"].lower())
+        self.assertNotIn("microsoft-foundry", payload.get("skills", {}))
+        self.assertTrue((REPO_ROOT / "registry" / "skills" / "microsoft-foundry" / "SKILL.md").is_file())
 
     def test_generate_index_entries_uses_explicit_root(self):
         powershell = get_powershell_executable()
@@ -74,7 +73,7 @@ class CatalogGenerationTests(unittest.TestCase):
             repo_root = Path(temp_dir) / "repo"
             skills_root = repo_root / "registry" / "skills"
             included_root = skills_root / "demo-skill"
-            excluded_root = skills_root / "microsoft-foundry"
+            excluded_root = skills_root / "demo-excluded"
             included_root.mkdir(parents=True)
             excluded_root.mkdir(parents=True)
             (included_root / "SKILL.md").write_text(
@@ -94,7 +93,7 @@ class CatalogGenerationTests(unittest.TestCase):
                 textwrap.dedent(
                     """\
                     ---
-                    name: microsoft-foundry
+                    name: demo-excluded
                     description: Stray item
                     ---
 
@@ -109,7 +108,7 @@ class CatalogGenerationTests(unittest.TestCase):
                 json.dumps(
                     {
                         "skills": {
-                            "microsoft-foundry": {
+                            "demo-excluded": {
                                 "status": "stray",
                                 "reason": "Excluded from official catalog",
                             }
@@ -126,7 +125,7 @@ class CatalogGenerationTests(unittest.TestCase):
         payload = json.loads(result.stdout)
         ids = {entry["id"] for entry in payload}
         self.assertIn("demo-skill", ids)
-        self.assertNotIn("microsoft-foundry", ids)
+        self.assertNotIn("demo-excluded", ids)
 
 
 if __name__ == "__main__":

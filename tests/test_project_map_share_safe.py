@@ -6,8 +6,8 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = REPO_ROOT / "local" / "scripts" / "build-project-map.py"
-RUNTIME_PATH = REPO_ROOT / "local" / "scripts" / "project-map-runtime.js"
+MODULE_PATH = REPO_ROOT / "web" / "project-map-ui" / "build-project-map.py"
+RUNTIME_PATH = REPO_ROOT / "web" / "project-map-ui" / "project-map-runtime.js"
 
 
 def load_builder_module():

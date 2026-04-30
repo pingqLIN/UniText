@@ -37,11 +37,11 @@
 - `tests/test_runtime_bundle_hidden_entries.py`
   - 驗證 `runtime/skills/.system/` 這類 hidden local overlays 不會被當成 runtime baseline 同步或 verify 要求
 - `tests/test_project_map_baseline.py`
-  - 驗證 project map 與 governance baseline 所需的核心資產仍存在
+  - 驗證 project map 獨立 UI source、legacy wrapper 與 governance baseline 所需的核心資產仍存在
 - `tests/test_project_map_share_safe.py`
   - 驗證 interactive / share-safe project-map surface contract、handoff contract，以及頁內 refresh 後 static artifacts 的 stale 提醒
 - `tests/test_project_map_outputs.py`
-  - 驗證 `build-project-map.py --output-dir` 可產出 self-contained interactive / share-safe / handoff artifacts，且分享版不帶 operator-only controls
+  - 驗證 `web/project-map-ui/build-project-map.py --output-dir` 與 legacy wrapper 可產出 self-contained interactive / share-safe / handoff artifacts，且分享版不帶 operator-only controls
 - `tests/test_project_map_browser_smoke.py`
   - 使用 Playwright / Chromium 開啟 generated interactive 與 share-safe project-map HTML，驗證頁面可渲染且沒有 console 或 page errors；若本機沒有 Playwright 或 Chromium，測試會明確 skip
 
@@ -79,7 +79,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 - minimum registry inventory integrity
 - isolated `bootstrap -> verify` smoke coverage for local runtime wiring
 - hidden local runtime overlay handling for materialized Codex bundles
-- current project map / governance entry surfaces
+- current project map / governance entry surfaces, including the standalone `web/project-map-ui` source boundary and legacy wrapper
 - interactive vs. share-safe project-map contract and handoff metadata
 - generated project-map artifact output contract before browser execution
 - generated project-map browser rendering smoke for interactive and share-safe HTML
@@ -101,7 +101,7 @@ py -3 -m unittest tests.security.test_hardening tests.security.test_rebuild_firs
 下一波應優先補回的測試：
 
 1. 真實 home-dir / live config 邊界下的 `bootstrap.py` / `verify-bootstrap.py` 驗證
-2. `build-project-map.py` 的 Playwright screenshot / Lighthouse 檢查
+2. `web/project-map-ui/build-project-map.py` 的 Playwright screenshot / Lighthouse 檢查
 3. template / rebuild live adoption smoke against real CLI config
 4. boundary / metadata rule validation 的 cross-script integration cases
 

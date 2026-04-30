@@ -4,9 +4,10 @@ Date: `2026-04-28`
 Scope: project-map interactive UI, governance resolver, and local-only governance reports.
 Primary files:
 
-- `local/scripts/build-project-map.py`
-- `local/scripts/project-map-runtime.js`
-- `local/scripts/project-map-template.html`
+- `web/project-map-ui/build-project-map.py`
+- `web/project-map-ui/project-map-runtime.js`
+- `web/project-map-ui/project-map-template.html`
+- `local/scripts/build-project-map.py` compatibility wrapper
 - `local/scripts/resolve-agent-governance.py`
 - `local/config/agent-governance-layers.json`
 - `docs/project-map/DESIGN.md`
@@ -46,7 +47,7 @@ The UI already has a governance panel, but it is mostly a resolver form. It does
    The interactive page may show native paths and governance controls. The share-safe page must continue removing native repo paths, governance source details, write controls, and browser scan capability.
 
 4. Keep Python and browser resolver behavior aligned.
-   Changes to source precedence or output shape must be mirrored between `resolve-agent-governance.py`, `build-project-map.py`, and `project-map-runtime.js`.
+   Changes to source precedence or output shape must be mirrored between `resolve-agent-governance.py`, `web/project-map-ui/build-project-map.py`, and `web/project-map-ui/project-map-runtime.js`.
 
 ## Required Architecture
 
@@ -55,8 +56,8 @@ The UI already has a governance panel, but it is mostly a resolver form. It does
 All resolver surfaces must use one shared output contract:
 
 - Python CLI: `local/scripts/resolve-agent-governance.py`
-- Python generator payload: `local/scripts/build-project-map.py`
-- Browser resolver: `local/scripts/project-map-runtime.js`
+- Python generator payload: `web/project-map-ui/build-project-map.py`
+- Browser resolver: `web/project-map-ui/project-map-runtime.js`
 
 The resolution output must contain:
 
@@ -284,9 +285,9 @@ The map, list, detail, and compact panels should continue fitting text without o
 
 Minimum checks:
 
-- `python -m py_compile local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py`
-- `node --check local/scripts/project-map-runtime.js`
-- `python local/scripts/build-project-map.py`
+- `python -m py_compile web/project-map-ui/build-project-map.py local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py`
+- `node --check web/project-map-ui/project-map-runtime.js`
+- `python web/project-map-ui/build-project-map.py`
 - project-map output contains governance source status for global-home, workspace, and repo
 - share-safe output does not expose native paths or governance write controls
 - UI can resolve governance without writing

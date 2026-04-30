@@ -36,10 +36,8 @@ class RegistryInventoryTests(unittest.TestCase):
             "cloudflare",
             "cloudflare-governance",
             "microsoft-foundry",
-            "azure-prepare",
-            "azure-validate",
-            "azure-cost",
-            "azure-resource-lookup",
+            "impeccable",
+            "external-audit-orchestrator",
             "entra-app-registration",
         }
         actual = {path.name for path in visible_skill_dirs()}
@@ -47,7 +45,7 @@ class RegistryInventoryTests(unittest.TestCase):
 
     def test_skill_inventory_has_not_collapsed_below_current_baseline(self):
         actual = visible_skill_dirs()
-        self.assertGreaterEqual(len(actual), 44)
+        self.assertGreaterEqual(len(actual), 35)
 
     def test_skill_inventory_excludes_hidden_directories(self):
         actual = {path.name for path in visible_skill_dirs()}

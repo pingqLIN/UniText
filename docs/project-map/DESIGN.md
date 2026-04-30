@@ -1,6 +1,6 @@
 # Project Map Console Design Notes
 
-> Scope: `local/scripts/project-map-template.html`, `local/scripts/project-map-runtime.js`, and the generated project-map pages.
+> Scope: `web/project-map-ui/project-map-template.html`, `web/project-map-ui/project-map-runtime.js`, and the generated project-map pages. `local/scripts/build-project-map.py` is only a compatibility wrapper.
 
 ## Intent
 
@@ -20,7 +20,7 @@ Current visual controls:
 
 - Color tone: `mono`, `muted`, `vivid`
 - Theme: `light`, `dark`
-- Text scale: `sm`, `md`, `lg`
+- Text scale: `xs`, `sm`, `md`, `lg`, `xl`
 
 These variants must not change layout structure, component order, or interaction semantics.
 
