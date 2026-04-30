@@ -6,13 +6,14 @@
 ## Current Repo State
 
 - Repo: `Q:\UniText`
-- Branch status: `## main...origin/main [ahead 79]`
+- Branch status: `## main...origin/main [ahead 82]`
 - Upstream tracking: `origin/main`
 - Upstream configured: `true`
 - Upstream resolved: `true`
-- Ahead commits: `79`
+- Ahead commits: `82`
 - Behind commits: `0`
 - Working tree clean: `true`
+- Note: commit distance is captured at report generation time. If this report is committed afterward, the actual local ahead count increases by that report commit.
 
 ## Verification Summary
 
@@ -24,15 +25,15 @@
 
 ## Recent Commits
 
+- `998aeb7 Clarify push suitability report timing`
+- `5aae0c9 Refresh release hygiene classification`
+- `5459cd1 Refresh push suitability after release gates`
 - `46351a4 Expand template package release surface`
 - `0da8b28 Record template release gate`
-- `a6873ea Update push suitability report`
-- `f086400 Update readme quality loop handoff`
-- `eaa447d Add readme quality skill`
 
 ## Recommendations
 
-- Review the local `79`-commit batch against `origin/main` before any push discussion.
+- Review the local `82`-commit batch against `origin/main` before any push discussion.
 - Structurally ready for push review if the user explicitly grants push permission.
 
 ## Publish Boundary
