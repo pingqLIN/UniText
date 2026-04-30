@@ -12,6 +12,7 @@ RELEASE_SCOPE_EXACT = {
     ".gitignore",
     "LICENSE",
     "README.md",
+    "README.zh-TW.md",
     "INDEX.md",
     "VISION.md",
     "RESOURCE_SPEC.md",
@@ -33,6 +34,7 @@ RELEASE_SCOPE_PREFIXES = (
     "local/scripts/",
     "local/docs/",
     "tests/",
+    "web/project-map-ui/",
     "template/examples/local/",
     "FINAL_RELEASE_DEVELOPMENT_PLAN_",
     "RELEASE_EVIDENCE_",
@@ -81,16 +83,16 @@ def collect_git_status(repo_root: Path) -> list[Entry]:
 def read_catalog_exclusions(repo_root: Path) -> set[str]:
     path = repo_root / "registry" / "catalog-exclusions.json"
     if not path.exists():
-        return {"microsoft-foundry"}
+        return set()
     body = json.loads(path.read_text(encoding="utf-8"))
     skills = body.get("skills", {})
     if not isinstance(skills, dict):
-        return {"microsoft-foundry"}
-    return set(skills.keys()) or {"microsoft-foundry"}
+        return set()
+    return set(skills.keys())
 
 
 def classify_path(path: str, excluded_skills: set[str] | None = None) -> tuple[str, str]:
-    excluded_skills = {"microsoft-foundry"} if excluded_skills is None else excluded_skills
+    excluded_skills = set() if excluded_skills is None else excluded_skills
     if path in RELEASE_SCOPE_EXACT or any(path.startswith(prefix) for prefix in RELEASE_SCOPE_PREFIXES):
         return "release_scope", "belongs to the current release workstream"
     if path == ".mcp.json":
