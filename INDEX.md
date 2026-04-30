@@ -170,6 +170,7 @@ UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一
 | `external-audit-orchestrator` | Workspace | `/registry/skills/external-audit-orchestrator` | `active` |
 | `microsoft-foundry` | Workspace | `/registry/skills/microsoft-foundry` | `active` |
 | `impeccable` | Workspace | `/registry/skills/impeccable` | `active` |
+| `readme-quality` | Workspace | `/registry/skills/readme-quality` | `active` |
 
 ### Workflow
 

@@ -1108,6 +1108,43 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "readme-quality",
+      "type": "skill",
+      "runtime_path": "runtime/skills/readme-quality/SKILL.md",
+      "source_of_truth": "registry/skills/readme-quality/SKILL.md",
+      "canonical_location": "/registry/skills/readme-quality",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/readme-quality/SKILL.md",
+      "intent_tags": [
+        "readme-quality",
+        "readme",
+        "quality",
+        "skill",
+        "produces",
+        "or",
+        "improves",
+        "md"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "skill-creator",
       "type": "skill",
       "runtime_path": "runtime/skills/skill-creator/SKILL.md",

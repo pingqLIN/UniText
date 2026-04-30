@@ -16,8 +16,8 @@ Use this mode when you want an external reviewer path that is session-based, tra
 
 This mode explicitly reuses ideas from:
 
-- `Q:\Projects\tb2-claude-subagent-workflow\README.md`
-- `Q:\Projects\tb2-claude-subagent-workflow\docs\platform-baseline-matrix.md`
+- `<tb2-project-root>\README.md`
+- `<tb2-project-root>\docs\platform-baseline-matrix.md`
 
 If this mode is selected, cite those paths in the final audit report.
 

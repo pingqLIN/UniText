@@ -42,7 +42,7 @@ Only write files when `-Apply` is explicitly provided.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\export-tb2-audit-request.ps1 `
-  -SkillRoot Q:\Projects\audit-agent-skill\skill\external-audit-orchestrator `
+  -SkillRoot <skill-root>\external-audit-orchestrator `
   -TargetProject <repo-path> `
   -AuditPacketPath <repo-path>\audit-packet.md
 ```
@@ -51,7 +51,7 @@ Apply only after review:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\export-tb2-audit-request.ps1 `
-  -SkillRoot Q:\Projects\audit-agent-skill\skill\external-audit-orchestrator `
+  -SkillRoot <skill-root>\external-audit-orchestrator `
   -TargetProject <repo-path> `
   -AuditPacketPath <repo-path>\audit-packet.md `
   -Apply
@@ -61,7 +61,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\export-tb2-audit-r
 
 If this mode is selected, cite:
 
-- `Q:\Projects\tb2-claude-subagent-workflow\README.md`
-- `Q:\Projects\tb2-claude-subagent-workflow\docs\platform-baseline-matrix.md`
+- `<tb2-project-root>\README.md`
+- `<tb2-project-root>\docs\platform-baseline-matrix.md`
 
 The TB2 mode is explicitly derived from those local references.

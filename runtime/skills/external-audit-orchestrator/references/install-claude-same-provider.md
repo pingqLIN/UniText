@@ -38,7 +38,7 @@ Only write files when `-Apply` is explicitly provided.
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\export-claude-reviewer-bundle.ps1 `
-  -SkillRoot Q:\Projects\audit-agent-skill\skill\external-audit-orchestrator `
+  -SkillRoot <skill-root>\external-audit-orchestrator `
   -TargetProject <repo-path>
 ```
 
@@ -46,7 +46,7 @@ Apply only after review:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\export-claude-reviewer-bundle.ps1 `
-  -SkillRoot Q:\Projects\audit-agent-skill\skill\external-audit-orchestrator `
+  -SkillRoot <skill-root>\external-audit-orchestrator `
   -TargetProject <repo-path> `
   -Apply
 ```
