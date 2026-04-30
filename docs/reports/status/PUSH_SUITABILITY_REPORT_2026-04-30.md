@@ -1,0 +1,41 @@
+# UniText Push Suitability Report — 2026-04-30
+
+> Scope: local push-readiness signals only.
+> Publication: local-only until explicitly approved by the user.
+
+## Current Repo State
+
+- Repo: `Q:\UniText`
+- Branch status: `## main...origin/main [ahead 72]`
+- Upstream tracking: `origin/main`
+- Upstream configured: `true`
+- Upstream resolved: `true`
+- Ahead commits: `72`
+- Behind commits: `0`
+- Working tree clean: `true`
+
+## Verification Summary
+
+- `verify-bootstrap.py`: `ok = true`
+- `verify-workspace-boundaries.py`: `ok = true`
+- `get-publishability-report.py`: `structurally_publishable_if_permission_is_granted = true`
+- Boundary path violations: `0`
+- Boundary content violations: `0`
+
+## Recent Commits
+
+- `10ecdee Remove local paths from audit orchestrator docs`
+- `77f16d5 Document on-demand tool hooks`
+- `fbacfa0 Update shared skill baseline`
+- `5bb5fc0 Register external audit orchestrator skill`
+- `22f7367 Add project map design variants`
+
+## Recommendations
+
+- Review the local `72`-commit batch against `origin/main` before any push discussion.
+- Structurally ready for push review if the user explicitly grants push permission.
+
+## Publish Boundary
+
+- This report does not grant publish or push permission.
+- Even if structurally publishable, pushing still requires explicit user approval under the repo no-publish rule.
