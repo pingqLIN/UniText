@@ -22,6 +22,8 @@ $required = @(
   ".claude\\settings.json",
   "local\\config\\integration-surfaces.json",
   "README.md",
+  "README.zh-TW.md",
+  "LICENSE",
   "INDEX.md",
   "VISION.md",
   "RESOURCE_SPEC.md",
@@ -65,7 +67,14 @@ $required = @(
   "local\\scripts\\verify-workspace-boundaries.py",
   "local\\scripts\\get-publishability-report.ps1",
   "local\\scripts\\get-publishability-report.py",
-  "local\\scripts\\get-document-placement-recommendation.ps1"
+  "local\\scripts\\get-document-placement-recommendation.ps1",
+  "local\\scripts\\build-project-map.py",
+  "local\\scripts\\project-map-runtime.js",
+  "local\\scripts\\project-map-template.html",
+  "web\\project-map-ui\\README.md",
+  "web\\project-map-ui\\build-project-map.py",
+  "web\\project-map-ui\\project-map-runtime.js",
+  "web\\project-map-ui\\project-map-template.html"
 )
 
 $forbidden = @(

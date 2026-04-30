@@ -6,9 +6,9 @@
   "repo_root": "Q:\\UniText",
   "branch": "main",
   "starting_status": "main...origin/main ahead 74 with uncommitted readme-quality adoption",
-  "active_batch": "continue formal pre-release hardening after template package verification",
-  "last_completed_checkpoint": "template package export/verify and push suitability refresh completed after f086400",
-  "next_intended_action": "commit stage 2 release-gate report, then inspect remaining release docs and stale package metadata",
+  "active_batch": "continue formal pre-release hardening after template package source expansion",
+  "last_completed_checkpoint": "template package includes README.zh-TW, LICENSE, and web/project-map-ui source; verified at template_20260430_211651",
+  "next_intended_action": "commit stage 3 template package update, then run full regression and refresh push suitability once clean",
   "guardrails": [
     "do not push or upload without explicit permission",
     "do not rebind user-level runtime config just to satisfy a feature-worktree check",

@@ -28,6 +28,8 @@
 
 - 核心文件
   - `README.md`
+  - `README.zh-TW.md`
+  - `LICENSE`
   - `INDEX.md`
   - `VISION.md`
   - `RESOURCE_SPEC.md`
@@ -71,6 +73,11 @@
   - `local/scripts/lib/workspace-sensitive-metadata.ps1`
   - `local/scripts/verify-workspace-boundaries.ps1`
   - `local/scripts/get-publishability-report.ps1`
+- project map UI source
+  - `local/scripts/build-project-map.py`
+  - `local/scripts/project-map-runtime.js`
+  - `local/scripts/project-map-template.html`
+  - `web/project-map-ui/`
 - release metadata
 - `manifest.json`
 - `release.json`
@@ -173,7 +180,7 @@ python local/scripts/create-git-bundle.py
 
 ## 6. Current Interpretation
 
-截至 2026-03-24，`UniText` 已具備：
+截至 2026-04-30，`UniText` 已具備：
 
 - 外部審查 package
 - reviewer-facing entry docs

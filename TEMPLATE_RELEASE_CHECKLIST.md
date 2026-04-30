@@ -5,6 +5,8 @@
 ## 1. Docs
 
 - [ ] `README.md` 沒有依賴作者個人背景才能理解
+- [ ] `README.zh-TW.md` 與 `README.md` 的主要導覽連結一致
+- [ ] `LICENSE` 存在，且 README license link 可解析
 - [ ] `INDEX.md` 可作為 discovery 入口
 - [ ] `PROJECT_MODES.md` 清楚區分 template 與 authoring workspace
 - [ ] `SECRET_HANDLING_GUIDELINES.md` 已定義 secret 邊界且不含真實 credential
@@ -52,6 +54,7 @@
 - [ ] 未宣稱 Copilot 已完成跨平台驗證，除非真的有對應平台的 bootstrap / verify 實測證據
 - [ ] package 內含 `manifest.json`
 - [ ] package 內含 `release.json`
+- [ ] package 內含 `web/project-map-ui/`，避免 README 或 INDEX 的 project-map link 失效
 
 ## 5. Release Call
 
