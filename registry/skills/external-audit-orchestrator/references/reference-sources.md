@@ -50,13 +50,13 @@ Repeat these citations in user-facing audit outputs when they materially affect 
 
 ## Local cross-project references
 
-1. `Q:\Projects\tb2-claude-subagent-workflow\README.md`
+1. `<tb2-project-root>\README.md`
    - Why used: TB2 runtime capabilities, `codex_relay`, and built-in profile inventory
 
-2. `Q:\Projects\tb2-claude-subagent-workflow\docs\platform-baseline-matrix.md`
+2. `<tb2-project-root>\docs\platform-baseline-matrix.md`
    - Why used: current validation status for `claude`, `codex`, and `copilot` profiles
 
-3. Local Codex skill library under `C:\Users\miles\.codex\skills\`
+3. Local Codex skill library under `<local-codex-skills-dir>`
    - Why used: adjacent skills that this orchestrator can compose with, especially:
      - `security-best-practices`
      - `security-threat-model`

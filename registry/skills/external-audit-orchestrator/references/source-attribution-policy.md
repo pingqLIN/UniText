@@ -21,7 +21,7 @@ Use flat bullets:
 
 ## Good examples
 
-- `local-project`: `Q:\Projects\tb2-claude-subagent-workflow\README.md` - reused TB2 runtime command shape for external audit routing
+- `local-project`: `<tb2-project-root>\README.md` - reused TB2 runtime command shape for external audit routing
 - `official-doc`: `https://code.claude.com/docs/en/sub-agents` - used project subagent placement and read-only reviewer pattern
 
 ## Bad examples
