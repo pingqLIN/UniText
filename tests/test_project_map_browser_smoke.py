@@ -51,6 +51,19 @@ class ProjectMapBrowserSmokeTests(unittest.TestCase):
                         self.assertEqual(page.title(), "UniText 執行面專案地圖")
                         self.assertGreater(page.locator("svg").count(), 0)
                         self.assertIn("UniText", page.locator("body").inner_text(timeout=5000))
+                        node_locator = page.locator("#map [data-map-node]")
+                        self.assertGreater(node_locator.count(), 1)
+                        target_node_id = node_locator.nth(1).get_attribute("data-map-node")
+                        self.assertIsNotNone(target_node_id)
+                        node_locator.nth(1).click()
+                        page.wait_for_function(
+                            """nodeId => {
+                                const node = document.querySelector(`#map [data-map-node="${CSS.escape(nodeId)}"]`);
+                                const rect = node?.querySelector("rect");
+                                return rect?.getAttribute("stroke-width") === "2.1";
+                            }""",
+                            arg=target_node_id,
+                        )
                         self.assertEqual(errors, [], f"{path_key} browser errors: {errors}")
                         page.close()
                 finally:

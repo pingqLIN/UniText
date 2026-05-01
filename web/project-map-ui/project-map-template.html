@@ -81,6 +81,8 @@
       --tour-ring-backdrop: rgba(15, 23, 35, 0.34);
       --tour-ring-bg: linear-gradient(180deg, rgba(247, 250, 252, 0.24) 0%, rgba(232, 238, 244, 0.16) 100%);
       --tour-ring-shadow: 0 14px 30px rgba(8, 15, 26, 0.18);
+      --tour-entry-glow: rgba(23, 107, 102, 0.2);
+      --tour-entry-glow-strong: rgba(23, 107, 102, 0.34);
       --display-font: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Noto Serif TC", serif;
       --body-font: "Aptos", "Segoe UI", "Noto Sans TC", "PingFang TC", sans-serif;
       --text-body: 1rem;
@@ -142,6 +144,8 @@
       --tour-ring-backdrop: rgba(5, 9, 15, 0.46);
       --tour-ring-bg: linear-gradient(180deg, rgba(172, 214, 219, 0.14) 0%, rgba(98, 140, 152, 0.1) 100%);
       --tour-ring-shadow: 0 18px 34px rgba(3, 8, 14, 0.32);
+      --tour-entry-glow: rgba(117, 198, 195, 0.22);
+      --tour-entry-glow-strong: rgba(117, 198, 195, 0.38);
     }
 
     :root[data-visual-tone="mono"],
@@ -336,6 +340,7 @@
     }
 
     .masthead-aside {
+      position: relative;
       display: grid;
       gap: 10px;
       padding: 14px 14px 12px;
@@ -343,6 +348,37 @@
       border-radius: 16px;
       background:
         linear-gradient(180deg, var(--surface-main-top) 0%, var(--panel-muted) 100%);
+      transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+    }
+
+    .masthead-aside::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: 22px;
+      border: 1px solid transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    body.tour-entry-cue .masthead-aside,
+    body.tour-active .masthead-aside {
+      border-color: rgba(23, 107, 102, 0.36);
+      box-shadow:
+        0 12px 26px rgba(32, 25, 15, 0.07),
+        0 0 0 1px var(--tour-entry-glow),
+        0 0 32px var(--tour-entry-glow);
+    }
+
+    body.tour-entry-cue .masthead-aside::after,
+    body.tour-active .masthead-aside::after {
+      opacity: 1;
+      border-color: var(--tour-entry-glow-strong);
+      box-shadow: 0 0 24px var(--tour-entry-glow);
     }
 
     .masthead-toggle {
@@ -490,6 +526,19 @@
       color: var(--ink-faint);
       font-size: 0.8rem;
       line-height: 1.5;
+    }
+
+    .tour-cta-cue {
+      display: none;
+      margin-top: -2px;
+      color: var(--accent-strong);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    body.tour-entry-cue .tour-cta-cue {
+      display: block;
     }
 
     .control-deck {
@@ -2141,6 +2190,7 @@
             <button type="button" class="mini-action secondary" id="tour-start">互動導覽</button>
             <span class="aside-hint">第一次進來可直接走一遍，之後也能隨時重開。</span>
           </div>
+          <span class="tour-cta-cue" id="tour-cta-cue" aria-live="polite">第一次開啟可先點「互動導覽」，快速知道這張圖該從哪裡看。</span>
         </aside>
       </div>
 

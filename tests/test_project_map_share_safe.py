@@ -8,6 +8,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = REPO_ROOT / "web" / "project-map-ui" / "build-project-map.py"
 RUNTIME_PATH = REPO_ROOT / "web" / "project-map-ui" / "project-map-runtime.js"
+TEMPLATE_PATH = REPO_ROOT / "web" / "project-map-ui" / "project-map-template.html"
 
 
 def load_builder_module():
@@ -101,6 +102,18 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn("manual-path-only", runtime_source)
         self.assertIn("Configured source is manual, unreadable, or path-mismatched", runtime_source)
         self.assertIn("unverified_path_classification", runtime_source)
+
+    def test_tour_first_visit_prompts_without_auto_opening_and_highlights_operation_focus(self):
+        runtime_source = RUNTIME_PATH.read_text(encoding="utf-8")
+        template_source = TEMPLATE_PATH.read_text(encoding="utf-8")
+
+        self.assertIn('selector: ".masthead-aside"', runtime_source)
+        self.assertIn("syncTourEntryCue", runtime_source)
+        self.assertIn('document.body.classList.toggle("tour-entry-cue", shouldPrompt)', runtime_source)
+        self.assertNotIn("if (!state.tourOpen) startTour();", runtime_source)
+        self.assertIn("tour-cta-cue", template_source)
+        self.assertIn("body.tour-active .masthead-aside", template_source)
+        self.assertIn("--tour-entry-glow", template_source)
 
     def test_handoff_payload_describes_surface_contract(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)

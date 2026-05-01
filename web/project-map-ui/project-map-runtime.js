@@ -183,6 +183,7 @@
   const workspaceNextEl = document.getElementById("workspace-next");
   const workspacePageNoteEl = document.getElementById("workspace-page-note");
   const tourStartEl = document.getElementById("tour-start");
+  const tourCtaCueEl = document.getElementById("tour-cta-cue");
   const tourLayerEl = document.getElementById("tour-layer");
   const tourBackdropEl = document.getElementById("tour-backdrop");
   const tourSpotlightEl = document.getElementById("tour-spotlight");
@@ -483,7 +484,16 @@
     } catch {
       // Ignore storage failures and keep the tour manually accessible.
     }
+    document.body.classList.remove("tour-entry-cue");
+    if (tourCtaCueEl) tourCtaCueEl.hidden = true;
     if (tourStartEl) tourStartEl.textContent = "重新導覽";
+  }
+
+  function syncTourEntryCue() {
+    const shouldPrompt = !hasSeenTour() && !state.tourOpen;
+    document.body.classList.toggle("tour-entry-cue", shouldPrompt);
+    if (tourCtaCueEl) tourCtaCueEl.hidden = !shouldPrompt;
+    if (tourStartEl) tourStartEl.textContent = hasSeenTour() ? "重新導覽" : "開始導覽";
   }
 
   function isElementVisible(element) {
@@ -496,13 +506,13 @@
   function getTourSteps() {
     const baseSteps = [
       {
-        id: "overview",
-        selector: ".masthead",
+        id: "operation-focus",
+        selector: ".masthead-aside",
         page: "browse",
-        title: "先用執行面優先的方式看整張圖",
+        title: "先從操作重點建立閱讀順序",
         body: [
-          "本控制台不單純是從 `registry/*` 開始依序閱讀的工具，而是先協助你掌握 `runtime/*` 目前實際作用在操作面的狀態。",
-          "建議讀法是先掃過首頁摘要與主控制區，再看節點清單、地圖檢視、節點細節三區如何互相對照。",
+          "這個區塊是整張圖的閱讀入口：先掌握 `runtime/*` 目前實際作用在操作面的狀態，再沿著對應關係回查 `registry/*` 的正式來源。",
+          "第一次開啟時，這裡會提示你點選導覽；導覽進行中也會保留輕微光暈，讓注意力回到這個操作順序。",
         ],
         meta: ["如果你是第一次接手，先走完這份導覽，再開始自由巡覽，理解成本會低很多。"],
       },
@@ -732,6 +742,8 @@
     const preferredIndex = startStepId ? state.tourSteps.findIndex((step) => step.id === startStepId) : 0;
     state.tourStepIndex = preferredIndex >= 0 ? preferredIndex : 0;
     state.tourOpen = true;
+    document.body.classList.remove("tour-entry-cue");
+    if (tourCtaCueEl) tourCtaCueEl.hidden = true;
     document.body.classList.add("tour-active");
     const initialStep = getCurrentTourStep();
     if (initialStep?.page) {
@@ -752,6 +764,7 @@
     document.body.classList.remove("tour-active");
     syncMastheadCompactState();
     if (markSeen) markTourSeen();
+    else syncTourEntryCue();
   }
 
   function moveTour(delta) {
@@ -768,12 +781,12 @@
 
   function maybeStartTourOnFirstVisit() {
     if (hasSeenTour() || state.tourAutoStarted) {
-      if (tourStartEl && hasSeenTour()) tourStartEl.textContent = "重新導覽";
+      syncTourEntryCue();
       return;
     }
     state.tourAutoStarted = true;
     window.setTimeout(() => {
-      if (!state.tourOpen) startTour();
+      syncTourEntryCue();
     }, 720);
   }
 
@@ -2344,6 +2357,10 @@
       const active = node.id === selectedId;
       const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
       group.style.cursor = "pointer";
+      group.dataset.mapNode = node.id;
+      group.setAttribute("role", "button");
+      group.setAttribute("tabindex", "0");
+      group.setAttribute("aria-label", `選取 ${node.label}`);
       const typeStyle = typeStyles[node.type] || typeStyles.directory;
 
       const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -2384,7 +2401,16 @@
       sub.textContent = node.status || "active";
       group.appendChild(sub);
 
-      group.addEventListener("click", () => {
+      group.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        state.suppressNextMapClick = false;
+        state.selectedId = node.id;
+        render();
+      });
+      group.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
         state.selectedId = node.id;
         render();
       });
@@ -2943,6 +2969,7 @@
     mapWrapEl.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) return;
       if (event.target?.closest?.("button, a, input, select, textarea")) return;
+      if (event.target?.closest?.("[data-map-node]")) return;
       dragState = {
         pointerId: event.pointerId,
         startX: event.clientX,
