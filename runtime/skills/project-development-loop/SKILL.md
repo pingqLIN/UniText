@@ -29,7 +29,6 @@ If the invocation does not include a clear duration, cutoff, or end time, treat 
 
 - assume the user wants project maintenance first
 - audit the repo for unfinished implementation items, partial tasks, documented TODOs, blocked follow-ups, and drift between code and docs
-- if this is the first use in a freshly opened project terminal or session and the user has not named a concrete task yet, treat the startup audit as a potential briefing gate before execution
 - implement the highest-value unfinished item that is justified by repo evidence
 - if no unfinished development item is found, pivot into optimization and maintenance work such as hardening, tests, docs completion, onboarding cleanup, and operational polish
 - prefer finishing existing intent over inventing new branch features
@@ -121,7 +120,6 @@ Read [references/scheduled-automation.md](references/scheduled-automation.md) wh
 - Do not delegate or spawn subagents unless the active environment and user request explicitly allow delegation. If delegation is not authorized, still perform the evaluation and state the recommended structure.
 - Prefer direct execution when the next task is obvious and bounded. Write a plan first when the work is broad, risky, or has multiple plausible branches.
 - Treat review as a real gate, not a ceremonial recap. Look for regressions, missing tests, incomplete edge cases, and plan drift.
-- In Pattern A startup use, offer the progress-briefing gate exactly once per fresh session before execution begins.
 - In Pattern B and Pattern C, prefer tasks with clean stop points and summarize progress at every phase boundary.
 - In Pattern B, bias toward throughput over comfort. Keep momentum high until the time boundary.
 - In Pattern A and Pattern C, prefer existing unfinished work, optimization, and documentation completion over speculative new features.
@@ -151,33 +149,7 @@ Produce a concise progress snapshot covering:
 - confidence level of the audit
 
 Read [references/templates.md](references/templates.md) when you need a reusable progress snapshot format.
-Immediately follow the snapshot with the startup briefing gate when it applies; otherwise follow it with the next action instead of waiting for permission.
-
-### 1A. Optional startup briefing gate
-
-Use this gate only when all of the following are true:
-
-- the skill invocation is happening at the start of a freshly opened project terminal or session
-- the user has not yet named a concrete task, bug, feature, or file target
-- the run is Pattern A rather than Pattern B or Pattern C
-
-Behavior:
-
-- after the startup audit, ask whether the user wants a project progress briefing before execution continues
-- when the host supports an interactive terminal prompt, run `scripts/startup-briefing-countdown.ps1 -RepoRoot <repo-root>` to render a terminal-style countdown bar for 60 seconds and enforce the once-per-fresh-terminal gate
-- the prompt should be phrased as `Do you want a project progress briefing? Y/N`
-- if the helper returns `skip`, the same repo has already consumed this startup gate in the current terminal lineage, so continue immediately without asking again
-- if the user answers `Y`, provide a concise progress briefing derived from the audit, then continue into normal task selection
-- if the user answers `N`, skip the extra briefing and continue immediately
-- if the countdown reaches 60 seconds without input, continue automatically with the normal next action
-- record the gate outcome so the same terminal lineage does not ask again for the same repo
-- do not ask this question repeatedly in the same fresh session unless the user explicitly reopens the loop from a new startup context
-
-Fallback rules:
-
-- if the environment is non-interactive or timed terminal input is unavailable, do not stall waiting for chat input
-- if the helper returns `noninteractive`, note briefly that the countdown prompt was unavailable, treat the startup gate as consumed for that terminal lineage, and continue with the normal next action
-- do not upgrade this startup gate into a blocking confirmation loop
+Immediately follow the snapshot with the next action instead of waiting for permission.
 
 ### 2. Decide plan-first vs dispatch-first
 
