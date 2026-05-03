@@ -40,6 +40,28 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         )
         self.assertNotIn("governance", share_payload)
 
+    def test_project_map_ui_contract_defines_io_policy_and_share_safe_rules(self):
+        payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
+        contract = payload["meta"]["project_map_ui_contract"]
+
+        self.assertEqual(contract["input_root_argument"], "--repo-root")
+        self.assertEqual(contract["default_output_root"], "ops/project-map")
+        self.assertEqual(contract["governance_policy_argument"], "--governance-policy")
+        self.assertEqual(
+            contract["default_governance_policy"],
+            "local/config/agent-governance-layers.json",
+        )
+        rule_keys = {rule["key"] for rule in contract["share_safe_stripping_rules"]}
+        self.assertEqual(
+            rule_keys,
+            {
+                "native_repo_paths",
+                "governance_sources",
+                "write_controls",
+                "operator_panels",
+            },
+        )
+
     def test_interactive_payload_includes_global_workspace_and_repo_sources(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
         sources = payload["governance"]["sources"]
@@ -123,6 +145,10 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["browser_scan"])
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["governance_resolver"])
         self.assertFalse(handoff_payload["surface_contract"]["share_safe"]["native_repo_paths"])
+        self.assertEqual(
+            handoff_payload["project_map_ui_contract"]["default_output_root"],
+            "ops/project-map",
+        )
         self.assertIn("native repo path", handoff_payload["handoff_notes"][1])
         self.assertNotIn("C:\\Users\\miles", rendered_handoff)
         self.assertNotIn(".codex\\AGENTS.md", rendered_handoff)

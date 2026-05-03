@@ -19,6 +19,7 @@ for import_path in (PROJECT_DIR, LEGACY_SCRIPT_DIR):
         sys.path.insert(0, str(import_path))
 
 from lib.governance_sources import build_governance_sources
+from project_map_contract import PROJECT_MAP_UI_CONTRACT
 
 
 REPO_MARKERS = [
@@ -443,6 +444,7 @@ def build_payload(repo_root: Path) -> dict[str, object]:
             "source_root": "/",
             "repo_root_native": str(repo_root),
             "version": 3,
+            "project_map_ui_contract": PROJECT_MAP_UI_CONTRACT.as_dict(),
         },
         "counts": dict(sorted(counts.items())),
         "diagnostics": diagnostics,
@@ -505,7 +507,7 @@ def render_html(payload: dict[str, object], page_mode: str = "interactive") -> s
     repo_root = get_repo_root()
     template_path = PROJECT_DIR / "project-map-template.html"
     runtime_path = PROJECT_DIR / "project-map-runtime.js"
-    governance_policy_path = repo_root / "local" / "config" / "agent-governance-layers.json"
+    governance_policy_path = PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
     governance_policy = json.loads(read_text(governance_policy_path)) if page_mode == "interactive" else None
@@ -563,6 +565,7 @@ def build_handoff_payload(payload: dict[str, object]) -> dict[str, object]:
                 **build_page_capabilities("share-safe"),
             },
         },
+        "project_map_ui_contract": payload["meta"]["project_map_ui_contract"],
         "summary": {
             "node_total": sum(int(value) for value in counts.values()),
             "edge_total": len(payload.get("edges", [])),
@@ -660,7 +663,7 @@ def main() -> int:
 
     repo_root = Path(args.repo_root).resolve()
     validate_repo_root(repo_root)
-    output_dir = Path(args.output_dir).resolve() if args.output_dir else repo_root / "ops" / "project-map"
+    output_dir = Path(args.output_dir).resolve() if args.output_dir else PROJECT_MAP_UI_CONTRACT.default_output_path(repo_root)
 
     payload = build_payload(repo_root)
     json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(payload, output_dir)

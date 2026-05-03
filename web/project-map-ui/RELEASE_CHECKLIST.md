@@ -4,6 +4,7 @@ Use this checklist before promoting Project Map UI changes into a formal release
 
 - Confirm `git status --short --branch` is clean before starting.
 - Confirm source changes are under `web/project-map-ui/`, with only compatibility glue under `local/scripts/`.
+- Confirm `CONTRACT.md`, `project_map_contract.py`, generated payload metadata, and tests agree on input root, output root, governance policy path, and share-safe stripping rules.
 - Run Python syntax checks for the generator, compatibility wrapper, and governance resolver.
 - Run `node --check web/project-map-ui/project-map-runtime.js`.
 - Run the project-map unit and browser smoke tests.

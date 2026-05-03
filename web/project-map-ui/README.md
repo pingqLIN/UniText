@@ -4,6 +4,8 @@
 
 The project owns:
 
+- `CONTRACT.md` - human-readable source/input/output/share-safe boundary
+- `project_map_contract.py` - machine-readable contract used by the generator
 - `build-project-map.py` - static artifact generator
 - `project-map-template.html` - self-contained HTML shell
 - `project-map-runtime.js` - browser runtime for navigation, governance inspection, refresh, and map controls
@@ -25,6 +27,8 @@ This writes:
 - `ops/project-map/site/project-map-share.html`
 - `ops/project-map/site/project-map-handoff.md`
 - `ops/project-map/site/project-map-handoff.json`
+
+The default input/output/policy contract is documented in `CONTRACT.md` and emitted into the generated payload metadata.
 
 ## Compatibility Entry Point
 

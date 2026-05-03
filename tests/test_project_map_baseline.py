@@ -11,6 +11,8 @@ class ProjectMapBaselineTests(unittest.TestCase):
             REPO_ROOT / "web" / "project-map-ui" / "build-project-map.py",
             REPO_ROOT / "web" / "project-map-ui" / "project-map-runtime.js",
             REPO_ROOT / "web" / "project-map-ui" / "project-map-template.html",
+            REPO_ROOT / "web" / "project-map-ui" / "project_map_contract.py",
+            REPO_ROOT / "web" / "project-map-ui" / "CONTRACT.md",
             REPO_ROOT / "web" / "project-map-ui" / "README.md",
             REPO_ROOT / "web" / "project-map-ui" / "RELEASE_CHECKLIST.md",
         ]
