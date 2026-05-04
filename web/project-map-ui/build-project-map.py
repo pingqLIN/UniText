@@ -503,14 +503,27 @@ def strip_share_safe_blocks(html: str) -> str:
     return html
 
 
-def render_html(payload: dict[str, object], page_mode: str = "interactive") -> str:
+def resolve_governance_policy_path(repo_root: Path, policy_path: str | Path | None = None) -> Path:
+    if policy_path is None:
+        return PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
+    path = Path(policy_path)
+    if not path.is_absolute():
+        path = repo_root / path
+    return path.resolve()
+
+
+def render_html(
+    payload: dict[str, object],
+    page_mode: str = "interactive",
+    governance_policy_path: Path | None = None,
+) -> str:
     repo_root = get_repo_root()
     template_path = PROJECT_DIR / "project-map-template.html"
     runtime_path = PROJECT_DIR / "project-map-runtime.js"
-    governance_policy_path = PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
+    resolved_governance_policy_path = governance_policy_path or PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
-    governance_policy = json.loads(read_text(governance_policy_path)) if page_mode == "interactive" else None
+    governance_policy = json.loads(read_text(resolved_governance_policy_path)) if page_mode == "interactive" else None
     page_payload = build_page_payload(payload, page_mode)
     page_copy = build_page_copy(page_mode)
     replacements = {
@@ -634,7 +647,11 @@ def render_handoff_markdown(payload: dict[str, object]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, Path, Path, Path, Path]:
+def write_outputs(
+    payload: dict[str, object],
+    output_root: Path,
+    governance_policy_path: Path | None = None,
+) -> tuple[Path, Path, Path, Path, Path]:
     output_root.mkdir(parents=True, exist_ok=True)
     site_dir = output_root / "site"
     site_dir.mkdir(parents=True, exist_ok=True)
@@ -645,8 +662,8 @@ def write_outputs(payload: dict[str, object], output_root: Path) -> tuple[Path, 
     handoff_json_path = site_dir / "project-map-handoff.json"
     handoff_md_path = site_dir / "project-map-handoff.md"
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    html_path.write_text(render_html(payload, page_mode="interactive"), encoding="utf-8")
-    share_html_path.write_text(render_html(payload, page_mode="share-safe"), encoding="utf-8")
+    html_path.write_text(render_html(payload, page_mode="interactive", governance_policy_path=governance_policy_path), encoding="utf-8")
+    share_html_path.write_text(render_html(payload, page_mode="share-safe", governance_policy_path=governance_policy_path), encoding="utf-8")
     handoff_json_path.write_text(json.dumps(build_handoff_payload(payload), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     handoff_md_path.write_text(render_handoff_markdown(payload), encoding="utf-8")
     return json_path, html_path, share_html_path, handoff_json_path, handoff_md_path
@@ -659,14 +676,23 @@ def main() -> int:
     )
     parser.add_argument("--repo-root", default=str(default_repo_root))
     parser.add_argument("--output-dir", default=None)
+    parser.add_argument(
+        "--governance-policy",
+        default=None,
+        help=(
+            "Structured governance policy JSON for the interactive resolver. "
+            "Relative paths are resolved from --repo-root."
+        ),
+    )
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve()
     validate_repo_root(repo_root)
     output_dir = Path(args.output_dir).resolve() if args.output_dir else PROJECT_MAP_UI_CONTRACT.default_output_path(repo_root)
+    governance_policy_path = resolve_governance_policy_path(repo_root, args.governance_policy)
 
     payload = build_payload(repo_root)
-    json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(payload, output_dir)
+    json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(payload, output_dir, governance_policy_path)
 
     summary = {
       "generated_at": payload["meta"]["generated_at"],
