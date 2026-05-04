@@ -79,6 +79,26 @@ class ProjectMapOutputTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("missing recognized governance markers", result.stdout + result.stderr)
 
+    def test_project_entrypoint_rejects_explicit_missing_governance_policy(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = Path(temp_dir) / "governance-root"
+            temp_root.mkdir()
+            (temp_root / "AGENTS.md").write_text("# AGENTS.md\n", encoding="utf-8")
+
+            result = run_command([
+                sys.executable,
+                str(PROJECT_SCRIPT_PATH),
+                "--repo-root",
+                str(temp_root),
+                "--output-dir",
+                str(Path(temp_dir) / "out"),
+                "--governance-policy",
+                "missing-policy.json",
+            ])
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("governance policy file does not exist", result.stdout + result.stderr)
+
     def test_cli_writes_self_contained_interactive_share_and_handoff_artifacts(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             result = run_command([sys.executable, str(SCRIPT_PATH), "--output-dir", temp_dir])

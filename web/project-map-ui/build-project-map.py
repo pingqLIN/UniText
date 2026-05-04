@@ -551,9 +551,11 @@ def resolve_governance_policy_path(repo_root: Path, policy_path: str | Path | No
     return path.resolve()
 
 
-def load_governance_policy(governance_policy_path: Path) -> dict[str, object]:
+def load_governance_policy(governance_policy_path: Path, allow_missing: bool = False) -> dict[str, object]:
     if governance_policy_path.exists():
         return json.loads(read_text(governance_policy_path))
+    if not allow_missing:
+        raise SystemExit(f"governance policy file does not exist: {governance_policy_path}")
     return {
         "meta": {
             "policy_loaded": False,
@@ -569,6 +571,7 @@ def render_html(
     payload: dict[str, object],
     page_mode: str = "interactive",
     governance_policy_path: Path | None = None,
+    allow_missing_governance_policy: bool = False,
 ) -> str:
     repo_root = get_repo_root()
     template_path = PROJECT_DIR / "project-map-template.html"
@@ -576,7 +579,10 @@ def render_html(
     resolved_governance_policy_path = governance_policy_path or PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
-    governance_policy = load_governance_policy(resolved_governance_policy_path) if page_mode == "interactive" else None
+    governance_policy = load_governance_policy(
+        resolved_governance_policy_path,
+        allow_missing=allow_missing_governance_policy,
+    ) if page_mode == "interactive" else None
     page_payload = build_page_payload(payload, page_mode)
     page_copy = build_page_copy(page_mode)
     replacements = {
@@ -704,6 +710,7 @@ def write_outputs(
     payload: dict[str, object],
     output_root: Path,
     governance_policy_path: Path | None = None,
+    allow_missing_governance_policy: bool = False,
 ) -> tuple[Path, Path, Path, Path, Path]:
     output_root.mkdir(parents=True, exist_ok=True)
     site_dir = output_root / "site"
@@ -715,8 +722,18 @@ def write_outputs(
     handoff_json_path = site_dir / "project-map-handoff.json"
     handoff_md_path = site_dir / "project-map-handoff.md"
     json_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    html_path.write_text(render_html(payload, page_mode="interactive", governance_policy_path=governance_policy_path), encoding="utf-8")
-    share_html_path.write_text(render_html(payload, page_mode="share-safe", governance_policy_path=governance_policy_path), encoding="utf-8")
+    html_path.write_text(render_html(
+        payload,
+        page_mode="interactive",
+        governance_policy_path=governance_policy_path,
+        allow_missing_governance_policy=allow_missing_governance_policy,
+    ), encoding="utf-8")
+    share_html_path.write_text(render_html(
+        payload,
+        page_mode="share-safe",
+        governance_policy_path=governance_policy_path,
+        allow_missing_governance_policy=allow_missing_governance_policy,
+    ), encoding="utf-8")
     handoff_json_path.write_text(json.dumps(build_handoff_payload(payload), indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     handoff_md_path.write_text(render_handoff_markdown(payload), encoding="utf-8")
     return json_path, html_path, share_html_path, handoff_json_path, handoff_md_path
@@ -743,9 +760,15 @@ def main() -> int:
     validate_repo_root(repo_root)
     output_dir = Path(args.output_dir).resolve() if args.output_dir else PROJECT_MAP_UI_CONTRACT.default_output_path(repo_root)
     governance_policy_path = resolve_governance_policy_path(repo_root, args.governance_policy)
+    allow_missing_governance_policy = args.governance_policy is None
 
     payload = build_payload(repo_root)
-    json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(payload, output_dir, governance_policy_path)
+    json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(
+        payload,
+        output_dir,
+        governance_policy_path,
+        allow_missing_governance_policy=allow_missing_governance_policy,
+    )
 
     summary = {
       "generated_at": payload["meta"]["generated_at"],
