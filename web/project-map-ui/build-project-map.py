@@ -551,6 +551,20 @@ def resolve_governance_policy_path(repo_root: Path, policy_path: str | Path | No
     return path.resolve()
 
 
+def load_governance_policy(governance_policy_path: Path) -> dict[str, object]:
+    if governance_policy_path.exists():
+        return json.loads(read_text(governance_policy_path))
+    return {
+        "meta": {
+            "policy_loaded": False,
+            "policy_path": str(governance_policy_path),
+            "unresolved_reason": "governance policy file does not exist",
+            "precedence": [],
+        },
+        "layers": [],
+    }
+
+
 def render_html(
     payload: dict[str, object],
     page_mode: str = "interactive",
@@ -562,7 +576,7 @@ def render_html(
     resolved_governance_policy_path = governance_policy_path or PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
     template = read_text(template_path)
     runtime_source = read_text(runtime_path).replace("</", "<\\/")
-    governance_policy = json.loads(read_text(resolved_governance_policy_path)) if page_mode == "interactive" else None
+    governance_policy = load_governance_policy(resolved_governance_policy_path) if page_mode == "interactive" else None
     page_payload = build_page_payload(payload, page_mode)
     page_copy = build_page_copy(page_mode)
     replacements = {

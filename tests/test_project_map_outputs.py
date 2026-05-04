@@ -36,13 +36,9 @@ class ProjectMapOutputTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_root = Path(temp_dir) / "governance-root"
             output_root = Path(temp_dir) / "out"
-            (temp_root / "local" / "config").mkdir(parents=True)
+            temp_root.mkdir()
             (temp_root / "README.md").write_text("# Demo Governance Root\n", encoding="utf-8")
             (temp_root / "AGENTS.md").write_text("# AGENTS.md\n\n- Keep changes local.\n", encoding="utf-8")
-            (temp_root / "local" / "config" / "agent-governance-layers.json").write_text(
-                json.dumps({"meta": {"precedence": []}, "layers": []}) + "\n",
-                encoding="utf-8",
-            )
 
             result = run_command([
                 sys.executable,
@@ -56,12 +52,14 @@ class ProjectMapOutputTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             summary = json.loads(result.stdout)
             payload = json.loads((output_root / "project-map.json").read_text(encoding="utf-8"))
+            interactive_html = (output_root / "site" / "project-map.html").read_text(encoding="utf-8")
             validation = payload["meta"]["root_validation"]
 
             self.assertEqual(Path(summary["repo_root"]), temp_root.resolve())
             self.assertTrue(validation["valid"])
             self.assertIn("AGENTS.md", validation["governance_markers_present"])
             self.assertEqual(payload["governance"]["path_classification"]["scope_hint"], "repo")
+            self.assertIn('"policy_loaded": false', interactive_html)
             self.assertGreaterEqual(summary["node_count"], 2)
 
     def test_project_entrypoint_rejects_root_without_governance_markers(self):
