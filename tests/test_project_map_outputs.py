@@ -85,19 +85,21 @@ class ProjectMapOutputTests(unittest.TestCase):
             temp_root.mkdir()
             (temp_root / "AGENTS.md").write_text("# AGENTS.md\n", encoding="utf-8")
 
+            output_dir = Path(temp_dir) / "out"
             result = run_command([
                 sys.executable,
                 str(PROJECT_SCRIPT_PATH),
                 "--repo-root",
                 str(temp_root),
                 "--output-dir",
-                str(Path(temp_dir) / "out"),
+                str(output_dir),
                 "--governance-policy",
                 "missing-policy.json",
             ])
 
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("governance policy file does not exist", result.stdout + result.stderr)
+            self.assertFalse(output_dir.exists())
 
     def test_cli_writes_self_contained_interactive_share_and_handoff_artifacts(self):
         with tempfile.TemporaryDirectory() as temp_dir:

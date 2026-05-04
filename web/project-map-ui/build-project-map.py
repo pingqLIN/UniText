@@ -567,6 +567,12 @@ def load_governance_policy(governance_policy_path: Path, allow_missing: bool = F
     }
 
 
+def validate_governance_policy_path(governance_policy_path: Path, allow_missing: bool) -> None:
+    if allow_missing or governance_policy_path.exists():
+        return
+    raise SystemExit(f"governance policy file does not exist: {governance_policy_path}")
+
+
 def render_html(
     payload: dict[str, object],
     page_mode: str = "interactive",
@@ -761,6 +767,7 @@ def main() -> int:
     output_dir = Path(args.output_dir).resolve() if args.output_dir else PROJECT_MAP_UI_CONTRACT.default_output_path(repo_root)
     governance_policy_path = resolve_governance_policy_path(repo_root, args.governance_policy)
     allow_missing_governance_policy = args.governance_policy is None
+    validate_governance_policy_path(governance_policy_path, allow_missing_governance_policy)
 
     payload = build_payload(repo_root)
     json_path, html_path, share_html_path, handoff_json_path, handoff_md_path = write_outputs(
