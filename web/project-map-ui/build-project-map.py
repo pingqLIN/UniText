@@ -29,6 +29,16 @@ REPO_MARKERS = [
     Path("registry") / "mcp",
 ]
 
+GOVERNANCE_ROOT_MARKERS = [
+    Path("AGENTS.md"),
+    Path("local") / "config" / "agent-governance-layers.json",
+    Path("runtime") / "catalog.json",
+    Path("registry") / "skills",
+    Path("registry") / "mcp",
+    Path("registry") / "agents",
+    Path("registry") / "workflow",
+]
+
 CORE_DOCS = [
     "README.md",
     "INDEX.md",
@@ -89,11 +99,28 @@ def get_repo_root() -> Path:
     return REPO_ROOT
 
 
-def validate_repo_root(repo_root: Path) -> None:
-    missing = [str(marker) for marker in REPO_MARKERS if not (repo_root / marker).exists()]
-    if missing:
-        joined = ", ".join(missing)
-        raise SystemExit(f"repo root is missing required markers: {joined}")
+def inspect_governance_root(repo_root: Path) -> dict[str, object]:
+    legacy_present = [marker.as_posix() for marker in REPO_MARKERS if (repo_root / marker).exists()]
+    legacy_missing = [marker.as_posix() for marker in REPO_MARKERS if not (repo_root / marker).exists()]
+    governance_present = [marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS if (repo_root / marker).exists()]
+    governance_missing = [marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS if not (repo_root / marker).exists()]
+    return {
+        "root": str(repo_root),
+        "valid": bool(governance_present),
+        "validation_mode": "governance-root-marker",
+        "legacy_unitext_markers_present": legacy_present,
+        "legacy_unitext_markers_missing": legacy_missing,
+        "governance_markers_present": governance_present,
+        "governance_markers_missing": governance_missing,
+    }
+
+
+def validate_repo_root(repo_root: Path) -> dict[str, object]:
+    validation = inspect_governance_root(repo_root)
+    if not validation["valid"]:
+        joined = ", ".join(marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS)
+        raise SystemExit(f"governance root is missing recognized governance markers: {joined}")
+    return validation
 
 
 def read_text(path: Path) -> str:
@@ -167,6 +194,8 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
     )
 
     for relative, label, logical_path in ROOT_DIRECTORIES:
+        if not (repo_root / relative).exists():
+            continue
         register(
             Node(
                 node_id=node_id_for("dir", relative),
@@ -199,93 +228,97 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
 
     skills_root = repo_root / "registry" / "skills"
-    for skill_dir in sorted(path for path in skills_root.iterdir() if is_public_registry_dir(path)):
-        skill_file = skill_dir / "SKILL.md"
-        if not skill_file.exists():
-            continue
-        text = read_text(skill_file)
-        frontmatter = parse_frontmatter(text)
-        skill_name = frontmatter.get("name", skill_dir.name)
-        register(
-            Node(
-                node_id=node_id_for("skill", skill_name),
-                node_type="skill",
-                label=skill_name,
-                path=repo_path(repo_root, skill_dir),
-                logical_path=repo_path(repo_root, skill_dir),
-                status="active",
-                description=frontmatter.get("description"),
-                source_path=repo_path(repo_root, skill_file),
+    if skills_root.exists():
+        for skill_dir in sorted(path for path in skills_root.iterdir() if is_public_registry_dir(path)):
+            skill_file = skill_dir / "SKILL.md"
+            if not skill_file.exists():
+                continue
+            text = read_text(skill_file)
+            frontmatter = parse_frontmatter(text)
+            skill_name = frontmatter.get("name", skill_dir.name)
+            register(
+                Node(
+                    node_id=node_id_for("skill", skill_name),
+                    node_type="skill",
+                    label=skill_name,
+                    path=repo_path(repo_root, skill_dir),
+                    logical_path=repo_path(repo_root, skill_dir),
+                    status="active",
+                    description=frontmatter.get("description"),
+                    source_path=repo_path(repo_root, skill_file),
+                )
             )
-        )
 
     mcp_root = repo_root / "registry" / "mcp"
-    for mcp_dir in sorted(path for path in mcp_root.iterdir() if is_public_registry_dir(path)):
-        definition_file = mcp_dir / "definition.json"
-        if not definition_file.exists():
-            continue
-        definition = json.loads(read_text(definition_file))
-        servers = definition.get("mcpServers", {})
-        server_id = mcp_dir.name
-        notes = None
-        if isinstance(servers, dict) and servers:
-            first_key = next(iter(servers))
-            server_id = str(first_key)
-            first_server = servers[first_key]
-            if isinstance(first_server, dict):
-                notes = first_server.get("notes")
-        register(
-            Node(
-                node_id=node_id_for("mcp", server_id),
-                node_type="mcp",
-                label=server_id,
-                path=repo_path(repo_root, mcp_dir),
-                logical_path=repo_path(repo_root, mcp_dir),
-                status="active-baseline",
-                description=notes,
-                source_path=repo_path(repo_root, definition_file),
+    if mcp_root.exists():
+        for mcp_dir in sorted(path for path in mcp_root.iterdir() if is_public_registry_dir(path)):
+            definition_file = mcp_dir / "definition.json"
+            if not definition_file.exists():
+                continue
+            definition = json.loads(read_text(definition_file))
+            servers = definition.get("mcpServers", {})
+            server_id = mcp_dir.name
+            notes = None
+            if isinstance(servers, dict) and servers:
+                first_key = next(iter(servers))
+                server_id = str(first_key)
+                first_server = servers[first_key]
+                if isinstance(first_server, dict):
+                    notes = first_server.get("notes")
+            register(
+                Node(
+                    node_id=node_id_for("mcp", server_id),
+                    node_type="mcp",
+                    label=server_id,
+                    path=repo_path(repo_root, mcp_dir),
+                    logical_path=repo_path(repo_root, mcp_dir),
+                    status="active-baseline",
+                    description=notes,
+                    source_path=repo_path(repo_root, definition_file),
+                )
             )
-        )
 
     agents_root = repo_root / "registry" / "agents"
-    for agent_dir in sorted(path for path in agents_root.iterdir() if is_public_registry_dir(path)):
-        agent_file = agent_dir / "AGENT.md"
-        if not agent_file.exists():
-            continue
-        text = read_text(agent_file)
-        register(
-            Node(
-                node_id=node_id_for("agent", agent_dir.name),
-                node_type="agent",
-                label=agent_dir.name,
-                path=repo_path(repo_root, agent_dir),
-                logical_path=repo_path(repo_root, agent_dir),
-                status="active",
-                description=extract_title(text, agent_dir.name),
-                source_path=repo_path(repo_root, agent_file),
+    if agents_root.exists():
+        for agent_dir in sorted(path for path in agents_root.iterdir() if is_public_registry_dir(path)):
+            agent_file = agent_dir / "AGENT.md"
+            if not agent_file.exists():
+                continue
+            text = read_text(agent_file)
+            register(
+                Node(
+                    node_id=node_id_for("agent", agent_dir.name),
+                    node_type="agent",
+                    label=agent_dir.name,
+                    path=repo_path(repo_root, agent_dir),
+                    logical_path=repo_path(repo_root, agent_dir),
+                    status="active",
+                    description=extract_title(text, agent_dir.name),
+                    source_path=repo_path(repo_root, agent_file),
+                )
             )
-        )
 
     workflow_root = repo_root / "registry" / "workflow"
-    for workflow_dir in sorted(path for path in workflow_root.iterdir() if is_public_registry_dir(path)):
-        workflow_file = workflow_dir / "WORKFLOW.md"
-        if not workflow_file.exists():
-            workflow_file = workflow_dir / "README.md"
-        if not workflow_file.exists():
-            continue
-        text = read_text(workflow_file)
-        register(
-            Node(
-                node_id=node_id_for("workflow", workflow_dir.name),
-                node_type="workflow",
-                label=workflow_dir.name,
-                path=repo_path(repo_root, workflow_dir),
-                logical_path=repo_path(repo_root, workflow_dir),
-                status="draft",
-                description=extract_title(text, workflow_dir.name),
-                source_path=repo_path(repo_root, workflow_file),
+    if workflow_root.exists():
+        for workflow_dir in sorted(path for path in workflow_root.iterdir() if is_public_registry_dir(path)):
+            workflow_file = workflow_dir / "WORKFLOW.md"
+            if not workflow_file.exists():
+                workflow_file = workflow_dir / "README.md"
+            if not workflow_file.exists():
+                continue
+            text = read_text(workflow_file)
+            register(
+                Node(
+                    node_id=node_id_for("workflow", workflow_dir.name),
+                    node_type="workflow",
+                    label=workflow_dir.name,
+                    path=repo_path(repo_root, workflow_dir),
+                    logical_path=repo_path(repo_root, workflow_dir),
+                    status="draft",
+                    description=extract_title(text, workflow_dir.name),
+                    source_path=repo_path(repo_root, workflow_file),
+                )
             )
-        )
 
     return nodes, path_to_node_id, logical_to_node_id
 
@@ -431,6 +464,7 @@ def build_diagnostics(nodes: Iterable[Node], edges: Iterable[dict[str, str]], br
 
 
 def build_payload(repo_root: Path) -> dict[str, object]:
+    root_validation = validate_repo_root(repo_root)
     nodes, path_to_node_id, logical_to_node_id = build_nodes(repo_root)
     edges, broken_references = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id)
     diagnostics = build_diagnostics(nodes, edges, broken_references)
@@ -443,6 +477,8 @@ def build_payload(repo_root: Path) -> dict[str, object]:
             "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "source_root": "/",
             "repo_root_native": str(repo_root),
+            "governance_root_native": str(repo_root),
+            "root_validation": root_validation,
             "version": 3,
             "project_map_ui_contract": PROJECT_MAP_UI_CONTRACT.as_dict(),
         },
@@ -470,6 +506,9 @@ def build_page_payload(payload: dict[str, object], page_mode: str) -> dict[str, 
     page_payload["meta"]["page_mode"] = page_mode
     if page_mode == "share-safe":
         page_payload["meta"].pop("repo_root_native", None)
+        page_payload["meta"].pop("governance_root_native", None)
+        if isinstance(page_payload["meta"].get("root_validation"), dict):
+            page_payload["meta"]["root_validation"].pop("root", None)
         page_payload.pop("governance", None)
     return page_payload
 

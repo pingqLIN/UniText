@@ -32,6 +32,55 @@ class ProjectMapOutputTests(unittest.TestCase):
             self.assertEqual(Path(summary["html_path"]), Path(temp_dir) / "site" / "project-map.html")
             self.assertTrue((Path(temp_dir) / "site" / "project-map-share.html").is_file())
 
+    def test_project_entrypoint_accepts_non_unitext_governance_root_with_markers(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = Path(temp_dir) / "governance-root"
+            output_root = Path(temp_dir) / "out"
+            (temp_root / "local" / "config").mkdir(parents=True)
+            (temp_root / "README.md").write_text("# Demo Governance Root\n", encoding="utf-8")
+            (temp_root / "AGENTS.md").write_text("# AGENTS.md\n\n- Keep changes local.\n", encoding="utf-8")
+            (temp_root / "local" / "config" / "agent-governance-layers.json").write_text(
+                json.dumps({"meta": {"precedence": []}, "layers": []}) + "\n",
+                encoding="utf-8",
+            )
+
+            result = run_command([
+                sys.executable,
+                str(PROJECT_SCRIPT_PATH),
+                "--repo-root",
+                str(temp_root),
+                "--output-dir",
+                str(output_root),
+            ])
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            summary = json.loads(result.stdout)
+            payload = json.loads((output_root / "project-map.json").read_text(encoding="utf-8"))
+            validation = payload["meta"]["root_validation"]
+
+            self.assertEqual(Path(summary["repo_root"]), temp_root.resolve())
+            self.assertTrue(validation["valid"])
+            self.assertIn("AGENTS.md", validation["governance_markers_present"])
+            self.assertEqual(payload["governance"]["path_classification"]["scope_hint"], "repo")
+            self.assertGreaterEqual(summary["node_count"], 2)
+
+    def test_project_entrypoint_rejects_root_without_governance_markers(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_root = Path(temp_dir) / "not-governance"
+            temp_root.mkdir()
+
+            result = run_command([
+                sys.executable,
+                str(PROJECT_SCRIPT_PATH),
+                "--repo-root",
+                str(temp_root),
+                "--output-dir",
+                str(Path(temp_dir) / "out"),
+            ])
+
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("missing recognized governance markers", result.stdout + result.stderr)
+
     def test_cli_writes_self_contained_interactive_share_and_handoff_artifacts(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             result = run_command([sys.executable, str(SCRIPT_PATH), "--output-dir", temp_dir])
