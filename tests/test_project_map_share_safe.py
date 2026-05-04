@@ -143,6 +143,9 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn("inspectRootMarkers", runtime_source)
         self.assertIn("selectRootAdapter", runtime_source)
         self.assertIn("scanAdapter.core_docs", runtime_source)
+        self.assertIn('adapter.adapter_id === "unitext" && inspection.present.length', runtime_source)
+        self.assertIn('adapter.adapter_id === "governance-folder"', runtime_source)
+        self.assertIn('adapter.adapter_id === "unitext" || adapter.adapter_id === "governance-folder"', runtime_source)
         self.assertIn("缺少治理 root marker", runtime_source)
         self.assertNotIn("缺少 repo marker", runtime_source)
 

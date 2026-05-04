@@ -2619,7 +2619,21 @@
       }
     }
 
+    const governanceAdapter = adapters.find((adapter) => adapter.adapter_id === "governance-folder");
+    const governanceCheck = governanceAdapter ? checks[governanceAdapter.adapter_id] : null;
+    if (governanceAdapter && governanceCheck?.markers_present?.length) {
+      return {
+        adapter: governanceAdapter,
+        inspection: {
+          present: governanceCheck.markers_present,
+          missing: governanceCheck.markers_missing,
+        },
+        checks,
+      };
+    }
+
     for (const adapter of adapters) {
+      if (adapter.adapter_id === "unitext" || adapter.adapter_id === "governance-folder") continue;
       const check = checks[adapter.adapter_id];
       if (check?.markers_present?.length) {
         return {
