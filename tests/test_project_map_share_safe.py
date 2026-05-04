@@ -62,6 +62,21 @@ class ProjectMapShareSafeTests(unittest.TestCase):
             },
         )
 
+    def test_project_map_adapter_metadata_selects_unitext_for_repo(self):
+        payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
+        adapter = payload["meta"]["project_map_adapter"]
+        available_adapters = {
+            item["adapter_id"] for item in payload["meta"]["project_map_adapters"]
+        }
+
+        self.assertEqual(adapter["adapter_id"], "unitext")
+        self.assertIn("README.md", adapter["root_markers"])
+        self.assertIn("governance-folder", available_adapters)
+        self.assertEqual(
+            payload["meta"]["root_validation"]["selected_adapter"],
+            "unitext",
+        )
+
     def test_interactive_payload_includes_global_workspace_and_repo_sources(self):
         payload = BUILD_PROJECT_MAP.build_payload(REPO_ROOT)
         sources = payload["governance"]["sources"]
@@ -124,6 +139,12 @@ class ProjectMapShareSafeTests(unittest.TestCase):
         self.assertIn("manual-path-only", runtime_source)
         self.assertIn("Configured source is manual, unreadable, or path-mismatched", runtime_source)
         self.assertIn("unverified_path_classification", runtime_source)
+        self.assertIn("ACTIVE_PROJECT_MAP_ADAPTER", runtime_source)
+        self.assertIn("inspectRootMarkers", runtime_source)
+        self.assertIn("selectRootAdapter", runtime_source)
+        self.assertIn("scanAdapter.core_docs", runtime_source)
+        self.assertIn("缺少治理 root marker", runtime_source)
+        self.assertNotIn("缺少 repo marker", runtime_source)
 
     def test_tour_first_visit_prompts_without_auto_opening_and_highlights_operation_focus(self):
         runtime_source = RUNTIME_PATH.read_text(encoding="utf-8")

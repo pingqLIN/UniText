@@ -5,6 +5,7 @@
 The project owns:
 
 - `CONTRACT.md` - human-readable source/input/output/share-safe boundary
+- `project_map_adapters.py` - root adapters for UniText, other project folders, and governance research folders
 - `project_map_contract.py` - machine-readable contract used by the generator
 - `build-project-map.py` - static artifact generator
 - `project-map-template.html` - self-contained HTML shell
@@ -30,6 +31,15 @@ This writes:
 
 The default input/output/policy contract is documented in `CONTRACT.md` and emitted into the generated payload metadata.
 
+## Root Adapters
+
+`--repo-root` is now treated as an arbitrary governance root. The generator selects a `project_map_adapters.py` adapter from root markers:
+
+- `unitext` for the full UniText repository shape.
+- `governance-folder` for AGENTS-led project folders or future governance research folders.
+
+Generated interactive HTML receives the active adapter configuration, so browser refresh uses the same marker, document, and registry-directory contract as the Python builder.
+
 ## Compatibility Entry Point
 
 Existing automation may still call:
@@ -45,7 +55,7 @@ That wrapper delegates to this project entrypoint. Do not add new Project Map UI
 Run the fast release gate before committing UI changes:
 
 ```powershell
-python -m py_compile web/project-map-ui/build-project-map.py local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py
+python -m py_compile web/project-map-ui/build-project-map.py web/project-map-ui/project_map_adapters.py web/project-map-ui/project_map_contract.py local/scripts/build-project-map.py local/scripts/resolve-agent-governance.py
 node --check web/project-map-ui/project-map-runtime.js
 python -m unittest tests.test_project_map_baseline tests.test_project_map_outputs tests.test_project_map_share_safe tests.test_project_map_browser_smoke
 python web/project-map-ui/build-project-map.py --output-dir ops/project-map

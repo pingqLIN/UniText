@@ -54,12 +54,17 @@ class ProjectMapOutputTests(unittest.TestCase):
             payload = json.loads((output_root / "project-map.json").read_text(encoding="utf-8"))
             interactive_html = (output_root / "site" / "project-map.html").read_text(encoding="utf-8")
             validation = payload["meta"]["root_validation"]
+            adapter = payload["meta"]["project_map_adapter"]
 
             self.assertEqual(Path(summary["repo_root"]), temp_root.resolve())
             self.assertTrue(validation["valid"])
+            self.assertEqual(validation["selected_adapter"], "governance-folder")
+            self.assertEqual(adapter["adapter_id"], "governance-folder")
+            self.assertIn("AGENTS.md", adapter["root_markers"])
             self.assertIn("AGENTS.md", validation["governance_markers_present"])
             self.assertEqual(payload["governance"]["path_classification"]["scope_hint"], "repo")
             self.assertIn('"policy_loaded": false', interactive_html)
+            self.assertIn('"adapter_id": "governance-folder"', interactive_html)
             self.assertGreaterEqual(summary["node_count"], 2)
 
     def test_project_entrypoint_rejects_root_without_governance_markers(self):

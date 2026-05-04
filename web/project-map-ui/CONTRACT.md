@@ -5,9 +5,11 @@ This file defines the standalone boundary for `web/project-map-ui`.
 ## Inputs
 
 - `--repo-root`: the governance source folder to scan.
-  - Current adapter: UniText repository root.
+  - Current adapters:
+    - `unitext`: UniText repository root with full registry and core document expectations.
+    - `governance-folder`: generic governance/project/research folder validated by AGENTS, governance policy, runtime catalog, or registry markers.
   - Required role: provide project documents, registry directories, governance sources, and runtime metadata used to build map nodes and governance evidence.
-  - Planned extension: allow alternate project folders or governance research folders through adapters instead of hardcoded UniText assumptions.
+  - Adapter rule: folder-specific markers, core docs, and registry directories are defined in `project_map_adapters.py`, not in UI control flow.
 
 ## Outputs
 
@@ -38,4 +40,4 @@ Share-safe output must strip these operator-only surfaces:
 
 ## Implementation Rule
 
-`project_map_contract.py` is the machine-readable contract source. Keep this document, the generator payload, and tests aligned when the contract changes.
+`project_map_contract.py` is the machine-readable I/O contract source. `project_map_adapters.py` is the machine-readable root adapter source. Keep this document, the generator payload, and tests aligned when either contract surface changes.

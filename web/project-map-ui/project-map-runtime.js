@@ -1,7 +1,14 @@
 (() => {
   const INITIAL_DATA = window.PROJECT_MAP_BOOTSTRAP;
   const PAGE_MODE = window.PROJECT_MAP_PAGE_MODE || "interactive";
-  const { TYPE_ORDER, CORE_DOCS, ROOT_DIRECTORIES, REPO_MARKERS } = window.PROJECT_MAP_CONSTANTS;
+  const {
+    TYPE_ORDER,
+    CORE_DOCS,
+    ROOT_DIRECTORIES,
+    REPO_MARKERS,
+    PROJECT_MAP_ADAPTERS,
+    ACTIVE_PROJECT_MAP_ADAPTER,
+  } = window.PROJECT_MAP_CONSTANTS;
   const TYPE_LABELS = {
     doc: "文件",
     directory: "根目錄",
@@ -2571,13 +2578,76 @@
     return names.sort((a, b) => a.localeCompare(b));
   }
 
-  async function scanRepo(rootHandle) {
-    for (const marker of REPO_MARKERS) {
-      const exists = marker.endsWith("/skills") || marker.endsWith("/mcp") || marker.endsWith("/agents") || marker.endsWith("/workflow")
-        ? await pathExists(rootHandle, marker, "directory")
-        : await pathExists(rootHandle, marker, "file");
-      if (!exists) throw new Error(`選取的資料夾缺少 repo marker: ${marker}`);
+  function markerKind(relativePath) {
+    return relativePath.endsWith("/skills")
+      || relativePath.endsWith("/mcp")
+      || relativePath.endsWith("/agents")
+      || relativePath.endsWith("/workflow")
+      ? "directory"
+      : "file";
+  }
+
+  async function inspectRootMarkers(rootHandle, markers) {
+    const present = [];
+    const missing = [];
+    for (const marker of markers) {
+      const exists = await pathExists(rootHandle, marker, markerKind(marker));
+      if (exists) present.push(marker);
+      else missing.push(marker);
     }
+    return { present, missing };
+  }
+
+  async function selectRootAdapter(rootHandle) {
+    const fallbackAdapter = ACTIVE_PROJECT_MAP_ADAPTER || {
+      adapter_id: "legacy",
+      root_markers: REPO_MARKERS,
+      core_docs: CORE_DOCS,
+      root_directories: ROOT_DIRECTORIES,
+    };
+    const adapters = PROJECT_MAP_ADAPTERS?.length ? PROJECT_MAP_ADAPTERS : [fallbackAdapter];
+    const checks = {};
+
+    for (const adapter of adapters) {
+      const inspection = await inspectRootMarkers(rootHandle, adapter.root_markers || []);
+      checks[adapter.adapter_id] = {
+        markers_present: inspection.present,
+        markers_missing: inspection.missing,
+      };
+      if (adapter.adapter_id === "unitext" && inspection.present.length === (adapter.root_markers || []).length) {
+        return { adapter, inspection, checks };
+      }
+    }
+
+    for (const adapter of adapters) {
+      const check = checks[adapter.adapter_id];
+      if (check?.markers_present?.length) {
+        return {
+          adapter,
+          inspection: {
+            present: check.markers_present,
+            missing: check.markers_missing,
+          },
+          checks,
+        };
+      }
+    }
+
+    return { adapter: null, inspection: { present: [], missing: [] }, checks };
+  }
+
+  async function scanRepo(rootHandle) {
+    const adapterSelection = await selectRootAdapter(rootHandle);
+    const scanAdapter = adapterSelection.adapter;
+    const markerInspection = adapterSelection.inspection;
+    if (!scanAdapter) {
+      const markerChoices = (PROJECT_MAP_ADAPTERS || [])
+        .flatMap((adapter) => adapter.root_markers || [])
+        .join(", ");
+      throw new Error(`選取的資料夾缺少治理 root marker: ${markerChoices || REPO_MARKERS.join(", ")}`);
+    }
+    const scanCoreDocs = scanAdapter.core_docs || CORE_DOCS;
+    const scanRootDirectories = scanAdapter.root_directories || ROOT_DIRECTORIES;
 
     const nodes = [];
     const pathToNodeId = new Map();
@@ -2593,7 +2663,8 @@
     }
 
     register({ id: "repo:root", type: "directory", label: "專案根目錄", path: "/", logical_path: "/", status: "repo-root", description: "專案根目錄" });
-    ROOT_DIRECTORIES.forEach(([relative, label, logicalPath]) => {
+    for (const [relative, label, logicalPath] of scanRootDirectories) {
+      if (!(await pathExists(rootHandle, relative, "directory"))) continue;
       register({
         id: nodeIdFor("dir", relative),
         type: "directory",
@@ -2604,9 +2675,9 @@
         description: `${label}根目錄`,
         source_path: `/${relative}`,
       });
-    });
+    }
 
-    for (const relative of CORE_DOCS) {
+    for (const relative of scanCoreDocs) {
       if (!(await pathExists(rootHandle, relative, "file"))) continue;
       const text = await readTextFromRepo(rootHandle, relative);
       register({
@@ -2656,79 +2727,87 @@
       }
     }
 
-    for (const skillName of await listChildDirectories(rootHandle, "registry/skills")) {
-      const skillPath = `registry/skills/${skillName}/SKILL.md`;
-      if (!(await pathExists(rootHandle, skillPath, "file"))) continue;
-      const text = await readTextFromRepo(rootHandle, skillPath);
-      const frontmatter = parseFrontmatter(text);
-      const label = frontmatter.name || skillName;
-      register({
-        id: nodeIdFor("skill", label),
-        type: "skill",
-        label,
-        path: `/registry/skills/${skillName}`,
-        logical_path: `/registry/skills/${skillName}`,
-        status: "active",
-        description: frontmatter.description || null,
-        source_path: `/${skillPath}`,
-      });
-    }
-
-    for (const mcpDir of await listChildDirectories(rootHandle, "registry/mcp")) {
-      const definitionPath = `registry/mcp/${mcpDir}/definition.json`;
-      if (!(await pathExists(rootHandle, definitionPath, "file"))) continue;
-      const definition = JSON.parse(await readTextFromRepo(rootHandle, definitionPath));
-      let serverId = mcpDir;
-      let notes = null;
-      const servers = definition.mcpServers || {};
-      const firstKey = Object.keys(servers)[0];
-      if (firstKey) {
-        serverId = firstKey;
-        notes = servers[firstKey]?.notes || null;
+    if (await pathExists(rootHandle, "registry/skills", "directory")) {
+      for (const skillName of await listChildDirectories(rootHandle, "registry/skills")) {
+        const skillPath = `registry/skills/${skillName}/SKILL.md`;
+        if (!(await pathExists(rootHandle, skillPath, "file"))) continue;
+        const text = await readTextFromRepo(rootHandle, skillPath);
+        const frontmatter = parseFrontmatter(text);
+        const label = frontmatter.name || skillName;
+        register({
+          id: nodeIdFor("skill", label),
+          type: "skill",
+          label,
+          path: `/registry/skills/${skillName}`,
+          logical_path: `/registry/skills/${skillName}`,
+          status: "active",
+          description: frontmatter.description || null,
+          source_path: `/${skillPath}`,
+        });
       }
-      register({
-        id: nodeIdFor("mcp", serverId),
-        type: "mcp",
-        label: serverId,
-        path: `/registry/mcp/${mcpDir}`,
-        logical_path: `/registry/mcp/${mcpDir}`,
-        status: "active-baseline",
-        description: notes,
-        source_path: `/${definitionPath}`,
-      });
     }
 
-    for (const agentDir of await listChildDirectories(rootHandle, "registry/agents")) {
-      const agentPath = `registry/agents/${agentDir}/AGENT.md`;
-      if (!(await pathExists(rootHandle, agentPath, "file"))) continue;
-      const text = await readTextFromRepo(rootHandle, agentPath);
-      register({
-        id: nodeIdFor("agent", agentDir),
-        type: "agent",
-        label: agentDir,
-        path: `/registry/agents/${agentDir}`,
-        logical_path: `/registry/agents/${agentDir}`,
-        status: "active",
-        description: extractTitle(text, agentDir),
-        source_path: `/${agentPath}`,
-      });
+    if (await pathExists(rootHandle, "registry/mcp", "directory")) {
+      for (const mcpDir of await listChildDirectories(rootHandle, "registry/mcp")) {
+        const definitionPath = `registry/mcp/${mcpDir}/definition.json`;
+        if (!(await pathExists(rootHandle, definitionPath, "file"))) continue;
+        const definition = JSON.parse(await readTextFromRepo(rootHandle, definitionPath));
+        let serverId = mcpDir;
+        let notes = null;
+        const servers = definition.mcpServers || {};
+        const firstKey = Object.keys(servers)[0];
+        if (firstKey) {
+          serverId = firstKey;
+          notes = servers[firstKey]?.notes || null;
+        }
+        register({
+          id: nodeIdFor("mcp", serverId),
+          type: "mcp",
+          label: serverId,
+          path: `/registry/mcp/${mcpDir}`,
+          logical_path: `/registry/mcp/${mcpDir}`,
+          status: "active-baseline",
+          description: notes,
+          source_path: `/${definitionPath}`,
+        });
+      }
     }
 
-    for (const workflowDir of await listChildDirectories(rootHandle, "registry/workflow")) {
-      let workflowFile = `registry/workflow/${workflowDir}/WORKFLOW.md`;
-      if (!(await pathExists(rootHandle, workflowFile, "file"))) workflowFile = `registry/workflow/${workflowDir}/README.md`;
-      if (!(await pathExists(rootHandle, workflowFile, "file"))) continue;
-      const text = await readTextFromRepo(rootHandle, workflowFile);
-      register({
-        id: nodeIdFor("workflow", workflowDir),
-        type: "workflow",
-        label: workflowDir,
-        path: `/registry/workflow/${workflowDir}`,
-        logical_path: `/registry/workflow/${workflowDir}`,
-        status: "draft",
-        description: extractTitle(text, workflowDir),
-        source_path: `/${workflowFile}`,
-      });
+    if (await pathExists(rootHandle, "registry/agents", "directory")) {
+      for (const agentDir of await listChildDirectories(rootHandle, "registry/agents")) {
+        const agentPath = `registry/agents/${agentDir}/AGENT.md`;
+        if (!(await pathExists(rootHandle, agentPath, "file"))) continue;
+        const text = await readTextFromRepo(rootHandle, agentPath);
+        register({
+          id: nodeIdFor("agent", agentDir),
+          type: "agent",
+          label: agentDir,
+          path: `/registry/agents/${agentDir}`,
+          logical_path: `/registry/agents/${agentDir}`,
+          status: "active",
+          description: extractTitle(text, agentDir),
+          source_path: `/${agentPath}`,
+        });
+      }
+    }
+
+    if (await pathExists(rootHandle, "registry/workflow", "directory")) {
+      for (const workflowDir of await listChildDirectories(rootHandle, "registry/workflow")) {
+        let workflowFile = `registry/workflow/${workflowDir}/WORKFLOW.md`;
+        if (!(await pathExists(rootHandle, workflowFile, "file"))) workflowFile = `registry/workflow/${workflowDir}/README.md`;
+        if (!(await pathExists(rootHandle, workflowFile, "file"))) continue;
+        const text = await readTextFromRepo(rootHandle, workflowFile);
+        register({
+          id: nodeIdFor("workflow", workflowDir),
+          type: "workflow",
+          label: workflowDir,
+          path: `/registry/workflow/${workflowDir}`,
+          logical_path: `/registry/workflow/${workflowDir}`,
+          status: "draft",
+          description: extractTitle(text, workflowDir),
+          source_path: `/${workflowFile}`,
+        });
+      }
     }
 
     const edges = [];
@@ -2759,14 +2838,18 @@
     });
 
     const markdownSources = [];
-    for (const relative of CORE_DOCS) if (await pathExists(rootHandle, relative, "file")) markdownSources.push(relative);
-    for (const agentDir of await listChildDirectories(rootHandle, "registry/agents")) {
-      const relative = `registry/agents/${agentDir}/AGENT.md`;
-      if (await pathExists(rootHandle, relative, "file")) markdownSources.push(relative);
-    }
-    for (const workflowDir of await listChildDirectories(rootHandle, "registry/workflow")) {
-      for (const relative of [`registry/workflow/${workflowDir}/README.md`, `registry/workflow/${workflowDir}/WORKFLOW.md`]) {
+    for (const relative of scanCoreDocs) if (await pathExists(rootHandle, relative, "file")) markdownSources.push(relative);
+    if (await pathExists(rootHandle, "registry/agents", "directory")) {
+      for (const agentDir of await listChildDirectories(rootHandle, "registry/agents")) {
+        const relative = `registry/agents/${agentDir}/AGENT.md`;
         if (await pathExists(rootHandle, relative, "file")) markdownSources.push(relative);
+      }
+    }
+    if (await pathExists(rootHandle, "registry/workflow", "directory")) {
+      for (const workflowDir of await listChildDirectories(rootHandle, "registry/workflow")) {
+        for (const relative of [`registry/workflow/${workflowDir}/README.md`, `registry/workflow/${workflowDir}/WORKFLOW.md`]) {
+          if (await pathExists(rootHandle, relative, "file")) markdownSources.push(relative);
+        }
       }
     }
 
@@ -2851,7 +2934,21 @@
       };
     });
     return {
-      meta: { generated_at: new Date().toISOString(), source_root: "/", version: 2 },
+      meta: {
+        generated_at: new Date().toISOString(),
+        source_root: "/",
+        version: 3,
+        project_map_adapter: scanAdapter,
+        project_map_adapters: PROJECT_MAP_ADAPTERS || [],
+        root_validation: {
+          valid: true,
+          validation_mode: "project-map-adapter-marker",
+          selected_adapter: scanAdapter.adapter_id || null,
+          adapter_checks: adapterSelection.checks,
+          governance_markers_present: markerInspection.present,
+          governance_markers_missing: markerInspection.missing,
+        },
+      },
       counts,
       diagnostics: {
         broken_reference_count: brokenReferences.length,

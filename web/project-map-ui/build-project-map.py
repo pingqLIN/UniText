@@ -19,44 +19,21 @@ for import_path in (PROJECT_DIR, LEGACY_SCRIPT_DIR):
         sys.path.insert(0, str(import_path))
 
 from lib.governance_sources import build_governance_sources
+from project_map_adapters import (
+    GOVERNANCE_FOLDER_ADAPTER,
+    PROJECT_MAP_ADAPTERS,
+    UNITEXT_ADAPTER,
+    ProjectMapAdapter,
+    project_map_adapters_as_dicts,
+    select_project_map_adapter,
+)
 from project_map_contract import PROJECT_MAP_UI_CONTRACT
 
 
-REPO_MARKERS = [
-    Path("README.md"),
-    Path("INDEX.md"),
-    Path("registry") / "skills",
-    Path("registry") / "mcp",
-]
-
-GOVERNANCE_ROOT_MARKERS = [
-    Path("AGENTS.md"),
-    Path("local") / "config" / "agent-governance-layers.json",
-    Path("runtime") / "catalog.json",
-    Path("registry") / "skills",
-    Path("registry") / "mcp",
-    Path("registry") / "agents",
-    Path("registry") / "workflow",
-]
-
-CORE_DOCS = [
-    "README.md",
-    "INDEX.md",
-    "VISION.md",
-    "RESOURCE_SPEC.md",
-    "OPERATIONS.md",
-    "PROJECT_MODES.md",
-    "DOCUMENT_PLACEMENT_POLICY.md",
-    "WORKSPACE_SENSITIVE_METADATA_RULES.md",
-    "docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md",
-]
-
-ROOT_DIRECTORIES = [
-    ("registry/skills", "skills", "/registry/skills"),
-    ("registry/mcp", "mcp", "/registry/mcp"),
-    ("registry/agents", "agents", "/registry/agents"),
-    ("registry/workflow", "workflow", "/registry/workflow"),
-]
+REPO_MARKERS = list(UNITEXT_ADAPTER.root_markers)
+GOVERNANCE_ROOT_MARKERS = list(GOVERNANCE_FOLDER_ADAPTER.root_markers)
+CORE_DOCS = list(UNITEXT_ADAPTER.core_docs)
+ROOT_DIRECTORIES = list(UNITEXT_ADAPTER.root_directories)
 
 TYPE_ORDER = ["doc", "directory", "skill", "mcp", "agent", "workflow"]
 STRUCTURAL_EDGE_KINDS = {"contains"}
@@ -99,15 +76,25 @@ def get_repo_root() -> Path:
     return REPO_ROOT
 
 
-def inspect_governance_root(repo_root: Path) -> dict[str, object]:
-    legacy_present = [marker.as_posix() for marker in REPO_MARKERS if (repo_root / marker).exists()]
-    legacy_missing = [marker.as_posix() for marker in REPO_MARKERS if not (repo_root / marker).exists()]
-    governance_present = [marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS if (repo_root / marker).exists()]
-    governance_missing = [marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS if not (repo_root / marker).exists()]
+def inspect_governance_root(repo_root: Path, adapter: ProjectMapAdapter | None = None) -> dict[str, object]:
+    selected_adapter = adapter or select_project_map_adapter(repo_root)
+    legacy_present = UNITEXT_ADAPTER.markers_present(repo_root)
+    legacy_missing = UNITEXT_ADAPTER.markers_missing(repo_root)
+    governance_present = GOVERNANCE_FOLDER_ADAPTER.markers_present(repo_root)
+    governance_missing = GOVERNANCE_FOLDER_ADAPTER.markers_missing(repo_root)
+    adapter_checks = {
+        candidate.adapter_id: {
+            "markers_present": candidate.markers_present(repo_root),
+            "markers_missing": candidate.markers_missing(repo_root),
+        }
+        for candidate in PROJECT_MAP_ADAPTERS
+    }
     return {
         "root": str(repo_root),
-        "valid": bool(governance_present),
-        "validation_mode": "governance-root-marker",
+        "valid": selected_adapter is not None,
+        "validation_mode": "project-map-adapter-marker",
+        "selected_adapter": selected_adapter.adapter_id if selected_adapter else None,
+        "adapter_checks": adapter_checks,
         "legacy_unitext_markers_present": legacy_present,
         "legacy_unitext_markers_missing": legacy_missing,
         "governance_markers_present": governance_present,
@@ -115,8 +102,8 @@ def inspect_governance_root(repo_root: Path) -> dict[str, object]:
     }
 
 
-def validate_repo_root(repo_root: Path) -> dict[str, object]:
-    validation = inspect_governance_root(repo_root)
+def validate_repo_root(repo_root: Path, adapter: ProjectMapAdapter | None = None) -> dict[str, object]:
+    validation = inspect_governance_root(repo_root, adapter)
     if not validation["valid"]:
         joined = ", ".join(marker.as_posix() for marker in GOVERNANCE_ROOT_MARKERS)
         raise SystemExit(f"governance root is missing recognized governance markers: {joined}")
@@ -170,7 +157,10 @@ def label_for_core_doc(relative: str, text: str) -> str:
     return extract_title(text, Path(relative).stem)
 
 
-def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, str]]:
+def build_nodes(
+    repo_root: Path,
+    adapter: ProjectMapAdapter = UNITEXT_ADAPTER,
+) -> tuple[list[Node], dict[str, str], dict[str, str]]:
     nodes: list[Node] = []
     path_to_node_id: dict[str, str] = {}
     logical_to_node_id: dict[str, str] = {}
@@ -193,7 +183,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
         )
     )
 
-    for relative, label, logical_path in ROOT_DIRECTORIES:
+    for relative, label, logical_path in adapter.root_directories:
         if not (repo_root / relative).exists():
             continue
         register(
@@ -209,7 +199,7 @@ def build_nodes(repo_root: Path) -> tuple[list[Node], dict[str, str], dict[str, 
             )
         )
 
-    for relative in CORE_DOCS:
+    for relative in adapter.core_docs:
         path = repo_root / relative
         if not path.exists():
             continue
@@ -328,6 +318,7 @@ def build_edges(
     nodes: Iterable[Node],
     path_to_node_id: dict[str, str],
     logical_to_node_id: dict[str, str],
+    adapter: ProjectMapAdapter = UNITEXT_ADAPTER,
 ) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
     edges: list[dict[str, str]] = []
     broken_references: list[dict[str, str]] = []
@@ -359,7 +350,7 @@ def build_edges(
 
     markdown_sources = [
         repo_root / relative
-        for relative in CORE_DOCS
+        for relative in adapter.core_docs
         if (repo_root / relative).exists()
     ]
     markdown_sources.extend((repo_root / "registry" / "agents").glob("*/AGENT.md"))
@@ -464,9 +455,12 @@ def build_diagnostics(nodes: Iterable[Node], edges: Iterable[dict[str, str]], br
 
 
 def build_payload(repo_root: Path) -> dict[str, object]:
-    root_validation = validate_repo_root(repo_root)
-    nodes, path_to_node_id, logical_to_node_id = build_nodes(repo_root)
-    edges, broken_references = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id)
+    adapter = select_project_map_adapter(repo_root)
+    root_validation = validate_repo_root(repo_root, adapter)
+    if adapter is None:
+        raise SystemExit("governance root is missing a selectable project map adapter")
+    nodes, path_to_node_id, logical_to_node_id = build_nodes(repo_root, adapter)
+    edges, broken_references = build_edges(repo_root, nodes, path_to_node_id, logical_to_node_id, adapter)
     diagnostics = build_diagnostics(nodes, edges, broken_references)
     governance = build_governance_sources(repo_root)
     counts = defaultdict(int)
@@ -481,6 +475,8 @@ def build_payload(repo_root: Path) -> dict[str, object]:
             "root_validation": root_validation,
             "version": 3,
             "project_map_ui_contract": PROJECT_MAP_UI_CONTRACT.as_dict(),
+            "project_map_adapter": adapter.as_dict(),
+            "project_map_adapters": project_map_adapters_as_dicts(),
         },
         "counts": dict(sorted(counts.items())),
         "diagnostics": diagnostics,
@@ -542,6 +538,13 @@ def strip_share_safe_blocks(html: str) -> str:
     return html
 
 
+def get_payload_adapter_config(payload: dict[str, object]) -> dict[str, object]:
+    meta = payload.get("meta", {})
+    if isinstance(meta, dict) and isinstance(meta.get("project_map_adapter"), dict):
+        return meta["project_map_adapter"]
+    return UNITEXT_ADAPTER.as_dict()
+
+
 def resolve_governance_policy_path(repo_root: Path, policy_path: str | Path | None = None) -> Path:
     if policy_path is None:
         return PROJECT_MAP_UI_CONTRACT.default_governance_policy_path(repo_root)
@@ -589,6 +592,7 @@ def render_html(
         resolved_governance_policy_path,
         allow_missing=allow_missing_governance_policy,
     ) if page_mode == "interactive" else None
+    adapter_config = get_payload_adapter_config(payload)
     page_payload = build_page_payload(payload, page_mode)
     page_copy = build_page_copy(page_mode)
     replacements = {
@@ -600,9 +604,11 @@ def render_html(
         "__ASIDE_TITLE__": page_copy["aside_title"],
         "__ASIDE_COPY__": page_copy["aside_copy"],
         "__TYPE_ORDER__": json.dumps(TYPE_ORDER, ensure_ascii=False),
-        "__CORE_DOCS__": json.dumps(CORE_DOCS, ensure_ascii=False),
-        "__ROOT_DIRECTORIES__": json.dumps(ROOT_DIRECTORIES, ensure_ascii=False),
-        "__REPO_MARKERS__": json.dumps([marker.as_posix() for marker in REPO_MARKERS], ensure_ascii=False),
+        "__CORE_DOCS__": json.dumps(adapter_config["core_docs"], ensure_ascii=False),
+        "__ROOT_DIRECTORIES__": json.dumps(adapter_config["root_directories"], ensure_ascii=False),
+        "__REPO_MARKERS__": json.dumps(adapter_config["root_markers"], ensure_ascii=False),
+        "__PROJECT_MAP_ADAPTERS__": json.dumps(project_map_adapters_as_dicts(), ensure_ascii=False),
+        "__ACTIVE_PROJECT_MAP_ADAPTER__": json.dumps(adapter_config, ensure_ascii=False),
         "__GOVERNANCE_POLICY__": json.dumps(governance_policy, ensure_ascii=False).replace("</", "<\\/"),
         "__RUNTIME_SOURCE__": runtime_source,
     }
