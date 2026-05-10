@@ -2,6 +2,8 @@
 
 Every completed audit should be normalized into this report structure.
 
+Reviewer output should be JSON-first when the reviewer path supports it. Markdown reviewer output remains a fallback for manual or legacy paths.
+
 ## Audit Report
 
 ### Audit Mode
@@ -16,6 +18,16 @@ State one:
 ### Scope
 
 State the reviewed scope exactly.
+
+### Reviewer Status
+
+For multi-reviewer runs, list each reviewer:
+
+- reviewer id
+- role
+- status
+- request id when available
+- result path when available
 
 ### Reference Inputs
 
@@ -53,3 +65,4 @@ State one:
 ### Next Action
 
 One short paragraph with the exact next operational step.
+

@@ -24,14 +24,24 @@ Review checklist:
 - cross-project adaptation risk
 
 Output format:
-- Critical
-- Warning
-- Suggestion
+
+Return a single JSON object. Do not wrap it in Markdown fences.
+
+Required fields:
+- reviewer_id
+- verdict
+- findings
+- assumptions
+- reference_inputs_used
+- confidence
+- requires_rerun
 
 Each finding should include:
+- severity
 - title
 - location
 - risk
 - recommended action
 
 If the audit packet includes external or cross-project references, acknowledge them under `Reference Inputs Used`.
+

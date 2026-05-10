@@ -2,6 +2,15 @@
 
 Use this mode when you want an external reviewer path that is session-based, traceable, and reusable across providers.
 
+## Supported states
+
+This skill currently supports `tb2-template-export`.
+
+- `tb2-template-export`: build audit packets and reviewer request JSON artifacts.
+- `tb2-live-review`: run the reviewer through TB2 runtime tools. This requires TB2 runtime MCP tools such as `workstream_create`, `reviewer_send`, `reviewer_wait`, and `reviewer_read`; do not assume this state is available from this skill alone.
+
+If only template export is available, stop at the request artifacts and report that no live reviewer execution occurred.
+
 ## Cross-project reference
 
 This mode explicitly reuses ideas from:
@@ -29,10 +38,16 @@ So treat TB2 `claude` and `codex` reviewer flows as templates until the user val
 ## Procedure
 
 1. build the audit packet
-2. adapt it into the TB2 request JSON
-3. route through `connect/send/read/disconnect` or higher-level relay shape
-4. preserve transcript output
-5. normalize transcript findings into the standard report format
+2. adapt it into one or three TB2 reviewer request JSON files
+3. hand the request artifacts to TB2 live tooling only when those tools are available
+4. preserve redacted runtime transcript metadata in TB2, not in this skill
+5. normalize structured reviewer results into the standard report format
+
+## Template-only boundary
+
+Generated request JSON is an execution handoff artifact. It is not evidence that the reviewer ran.
+
+The default request uses `packet_path` and `packet_sha256` rather than embedding the full audit packet in the prompt. Embedded packet transport should be explicit operator opt-in because audit packets can contain diffs, local paths, and other sensitive project context.
 
 ## Recommended asset
 
@@ -49,3 +64,4 @@ Use [../scripts/export-tb2-audit-request.ps1](../scripts/export-tb2-audit-reques
 ## Not preferred for v0.1
 
 Do not make this the default v0.1 execution path until real reviewer profile validation exists for the intended provider CLI.
+

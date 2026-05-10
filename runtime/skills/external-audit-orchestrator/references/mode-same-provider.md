@@ -49,15 +49,30 @@ Before invoking the reviewer:
 1. build the audit packet
 2. include `Reference Inputs`
 3. explicitly request read-only review
-4. ask for severity-ordered findings
+4. ask for JSON-first reviewer output
+5. treat invalid JSON as an invalid or partial review, not a successful audit
 
 ## Suggested operating shape
 
 1. main agent implements change
 2. reviewer agent receives packet
-3. reviewer returns severity-ordered findings
+3. reviewer returns the expected reviewer result JSON
 4. main agent fixes or rejects findings
 5. rerun reviewer if any warning-or-higher issue was addressed
+
+## Expected reviewer result
+
+The reviewer should return a JSON object with:
+
+- `reviewer_id`
+- `verdict`
+- `findings`
+- `assumptions`
+- `reference_inputs_used`
+- `confidence`
+- `requires_rerun`
+
+Use Markdown only for human-readable summaries inside JSON string fields. If the reviewer cannot complete the review, record the failure outside the reviewer result as a wrapper with `status` set to `timeout`, `invalid`, or `failed`.
 
 ## Attribution note
 

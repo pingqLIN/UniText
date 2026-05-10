@@ -30,6 +30,7 @@ Read [references/reference-sources.md](references/reference-sources.md) if you n
 Read [references/source-attribution-policy.md](references/source-attribution-policy.md) before producing any final audit report.
 Read [references/install-claude-same-provider.md](references/install-claude-same-provider.md) when the chosen mode is Claude Code same-provider audit.
 Read [references/install-tb2-template.md](references/install-tb2-template.md) when the chosen mode is TB2 template export.
+Read [references/tb2-orchestrator-scope-development-plan.md](references/tb2-orchestrator-scope-development-plan.md) when changing the TB2 request/export/normalization contract.
 
 ## Audit modes
 
@@ -62,7 +63,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
    - Same-provider if the user wants the most stable v0.1 path
    - Web if the user wants visible human-supervised review
    - CLI/MCP if the user already has an external toolchain
-   - TB2 if the goal is traceable external process orchestration
+   - TB2 template export if the goal is traceable external process orchestration and live TB2 reviewer tools are handled outside this skill
 
 4. Run the audit as read-only unless the user explicitly asked for auto-fix.
 
@@ -107,4 +108,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 
 - Prefer same-provider or web-manual mode first.
 - Treat TB2 `claude` and `codex` profiles as reusable templates, not fully proven production reviewers, until the user validates those profiles in their real runtime.
+- Treat TB2 mode in this skill as request artifact export unless live TB2 reviewer tools are explicitly available in the runtime.
+- Do not treat exported TB2 request JSON as evidence that a reviewer ran.
 - Do not hide source provenance. If another project materially influenced the audit, cite it every time.
+

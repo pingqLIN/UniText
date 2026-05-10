@@ -1392,6 +1392,33 @@
       "consumer_scope": "runtime-first",
       "hot_path": false,
       "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "heartbeat-protocol",
+      "type": "workflow",
+      "runtime_path": "runtime/workflow/heartbeat-protocol/WORKFLOW.md",
+      "source_of_truth": "registry/workflow/heartbeat-protocol/WORKFLOW.md",
+      "canonical_location": "/registry/workflow/heartbeat-protocol",
+      "status": null,
+      "supported_clis": [],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model.",
+      "available_surfaces": [
+        "runtime-read-model"
+      ],
+      "entrypoint": "runtime/workflow/heartbeat-protocol/WORKFLOW.md",
+      "intent_tags": [
+        "heartbeat",
+        "protocol",
+        "workflow",
+        "purpose",
+        "the",
+        "gives",
+        "tools",
+        "shared"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
     }
   ]
 }
