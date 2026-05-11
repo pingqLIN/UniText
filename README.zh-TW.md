@@ -6,7 +6,7 @@
 
 ![Status](https://img.shields.io/badge/status-active_baseline-brightgreen) ![Runtime](https://img.shields.io/badge/runtime-Python_3%20%7C%20PowerShell_5%2B-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-UniText 把 AI agent 資源維持在一個受治理的 source of truth：skills、MCP definitions、agent personas、workflow templates、runtime projections，以及本機 delivery wiring。`registry/` 保持平台無關，`runtime/` 提供 consumer agents 低噪音讀取模型，`local/` 腳本再把 runtime surface 接到真實 CLI target，而且不會默默 publish 或覆寫機器狀態。
+UniText 把 AI agent 資源維持在一個受治理的 source of truth：skills、MCP definitions、agent personas、workflow templates、runtime projections，以及本機 delivery wiring。`registry/` 保持平台無關，`runtime/` 提供 consumer agents 低噪音讀取模型，`local/` 腳本再把 read model 接到真實 CLI target，而且不會默默 publish 或覆寫機器狀態。
 
 ---
 
@@ -15,18 +15,18 @@ UniText 把 AI agent 資源維持在一個受治理的 source of truth：skills�
 | 需求 | UniText surface |
 |---|---|
 | 定義共享資源 | `registry/` — canonical skill、MCP、agent、workflow definitions |
-| 給 agent 穩定 startup path | `runtime/` — tracked runtime read model 與 projected skill entrypoints |
+| 給 agents 穩定 startup path | `runtime/` — tracked runtime read model 與 projected skill entrypoints |
 | 對接這台機器 | `local/` — scripts、config manifests、本機操作筆記 |
 | 保留 audit history | `ops/` — generated reports、review packages、backups、evidence bundles |
-| 匯出乾淨 starter | `template/` 加上 rebuild scripts — 不含 live workspace metadata 的可共享 skeleton |
+| 匯出乾淨 starter | `template/` 加上 rebuild scripts — 不含 live workspace metadata 的可共享 project skeleton |
 
 UniText 以 local-first AI tooling governance 為核心。即使 remote 已存在，或報告顯示 shared surfaces 在結構上可 publish，任何 publish、push、upload 都仍需要使用者明確授權。
 
 ---
 
-## Features
+## 功能
 
-| Feature | Description |
+| 功能 | 說明 |
 |---|---|
 | **Registry-first resources** | Canonical skills、MCP definitions、agents、workflows — 先有穩定 identity 再 delivery |
 | **Runtime-first consumer model** | `RUNTIME.md`、`runtime/START.md`、`runtime/ROUTES.md`、`runtime/catalog.json` — 給 agents 的低噪音 startup path |
@@ -59,7 +59,7 @@ flowchart TD
 | Layer | Role | Rule |
 |---|---|---|
 | `registry/` | Canonical authoring source | Shared resources 經 review 後才進入這裡 |
-| `runtime/` | Consumer-agent read model | 從 registry 生成；agent 先讀 runtime 再回 source docs |
+| `runtime/` | Consumer-agent read model | 從 registry 生成；agents 先讀這層，再回 source docs |
 | `local/` | Machine-local wiring | 絕對路徑、本機 config、operational state 放這裡 |
 | `ops/` | Operational artifacts | Generated reports 與 packages 預設留本機，除非使用者明確批准 |
 | `template/` | Starter examples | 未來專案的 clean bootstrap material |
@@ -125,7 +125,7 @@ runtime/catalog.json
 
 ---
 
-## Resource Catalog
+## 資源目錄
 
 | Type | Canonical root | Runtime projection | Purpose |
 |---|---|---|---|
@@ -138,7 +138,7 @@ Review-facing catalog 會刻意小於完整 inventory。Human discovery 先看 [
 
 ---
 
-## Safety Model
+## 安全模型
 
 | Boundary | Policy |
 |---|---|
@@ -195,9 +195,9 @@ python -m unittest tests.security.test_workspace_sensitive_metadata tests.securi
 
 ---
 
-## AI-Assisted Development
+## AI 輔助開發
 
-This project was developed with AI assistance.
+本專案在開發過程中使用 AI 協作。
 
 | Model | Role |
 |---|---|
@@ -205,12 +205,10 @@ This project was developed with AI assistance.
 | Claude Code | Prior architecture exploration、skill workflow design、review and planning support |
 | Gemini CLI | Cross-CLI compatibility target and adjacent review surface |
 
-> ⚠️ **Disclaimer:** While the author has made every effort to review and validate
-> the AI-generated code, no guarantee can be made regarding its correctness, security,
-> or fitness for any particular purpose. Use at your own risk.
+> ⚠️ **Disclaimer:** 作者已盡力 review 與 validate AI 生成的程式碼，但不保證其正確性、安全性，或對特定用途的適用性。請自行評估風險後使用。
 
 ---
 
-## License
+## 授權
 
 [MIT License](LICENSE)

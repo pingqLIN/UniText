@@ -184,6 +184,16 @@ UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一
 | `supported_clis` | `claude` |
 | `delivery_guidance` | Use workflow adapter or project-local plan mapping depending on CLI capability. |
 
+| Field | Value |
+|---|---|
+| `id` | `heartbeat-protocol` |
+| `type` | `workflow` |
+| `canonical_location` | `/registry/workflow/heartbeat-protocol` |
+| `status` | `draft` |
+| `source_of_truth` | `/registry/workflow/heartbeat-protocol/WORKFLOW.md` |
+| `supported_clis` | `undocumented` |
+| `delivery_guidance` | Use as sanitized shared workflow guidance only; live heartbeat state belongs to the producing tool or local adapter. |
+
 ### MCP
 
 | Field | Value |

@@ -77,6 +77,32 @@ These rules apply to **every project type** without exception.
 - **Platform-labeled sections** when OS-specific: `### Linux / macOS`, `### Windows`.
 - **Never write "This project is..."** — open with the thing itself, not a meta-statement.
 
+### Private data boundary
+
+README files are public or team-shareable documentation. They must not absorb private AI collaboration material.
+
+Keep these local-only folders out of Git and out of README content:
+
+```text
+ai-private/
+  memo/
+  decisions-private/
+  credentials-notes/
+  environment/
+
+ai-discussion/
+  sessions/
+  handoffs/
+  context-packs/
+
+local/
+  logs/
+  cache/
+  diagnostics/
+```
+
+README may mention that local/private notes are ignored, but must not include prompt transcripts, handoff bodies, context packs, secret hints, raw host paths, account/deployment details, unpublished roadmap, or private strategy notes.
+
 ### AI-Assisted Development boilerplate
 
 Every README ends with this section before License:
@@ -125,6 +151,8 @@ Before delivering, verify:
 - [ ] No "This project is..." opener
 - [ ] No trailing redundant sections not in template
 - [ ] zh-TW companion README also generated
+- [ ] README does not include private AI discussion, memo content, context packs, secret hints, raw host paths, account/deployment details, or unpublished roadmap/timeline
+- [ ] New-project docs recommend ignored `ai-private/`, `ai-discussion/`, and `local/` folders instead of committing private collaboration notes
 
 ---
 
