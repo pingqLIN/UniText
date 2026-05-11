@@ -11,6 +11,16 @@ This skill currently supports `tb2-template-export`.
 
 If only template export is available, stop at the request artifacts and report that no live reviewer execution occurred.
 
+## No-TB2 Runtime Fallback
+
+When the active system does not expose TB2 live reviewer tools, keep the audit moving through a supported non-TB2 path:
+
+1. Build the audit packet.
+2. Optionally export TB2 request artifacts as a future handoff record.
+3. Run `same-provider-subagent` when a local Codex or Claude reviewer path is available.
+4. Use `external-web` as the visible human-supervised fallback when no local subagent path is available.
+5. Normalize the report only after raw reviewer output exists; do not treat exported request JSON as a completed review.
+
 ## Cross-project reference
 
 This mode explicitly reuses ideas from:

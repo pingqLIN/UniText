@@ -156,6 +156,50 @@ class RuntimeLayerDiffSummaryTests(unittest.TestCase):
         self.assertTrue(summary["write_gate"]["routine_write_allowed"])
         self.assertFalse(summary["write_gate"]["requires_review"])
 
+    def test_compare_runtime_trees_ignores_local_metadata_files(self):
+        builder = load_runtime_builder_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            generated = root / "generated"
+            tracked = root / "tracked"
+            (generated / "skills" / "env").mkdir(parents=True)
+            (tracked / "skills" / "env").mkdir(parents=True)
+
+            (generated / "skills" / "env" / "SKILL.md").write_text("# Env\n", encoding="utf-8")
+            (tracked / "skills" / "env" / "SKILL.md").write_text("# Env\n", encoding="utf-8")
+            (tracked / "skills" / "env" / "desktop.ini").write_text("metadata\n", encoding="utf-8")
+            (tracked / "skills" / "env" / "debug.log").write_text("debug\n", encoding="utf-8")
+
+            summary = builder.compare_runtime_trees(generated, tracked)
+
+        self.assertEqual(summary["status"], "clean")
+        self.assertEqual(summary["stale_tracked_runtime_files"]["count"], 0)
+        self.assertEqual(summary["payload_drift"]["count"], 0)
+        self.assertTrue(summary["write_gate"]["routine_write_allowed"])
+        self.assertFalse(summary["write_gate"]["requires_review"])
+
+    def test_compare_runtime_trees_ignores_source_command_skill_overlays(self):
+        builder = load_runtime_builder_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            generated = root / "generated"
+            tracked = root / "tracked"
+            (generated / "skills" / "env").mkdir(parents=True)
+            (tracked / "skills" / "env").mkdir(parents=True)
+            (tracked / "skills" / "source-command-zh").mkdir(parents=True)
+
+            (generated / "skills" / "env" / "SKILL.md").write_text("# Env\n", encoding="utf-8")
+            (tracked / "skills" / "env" / "SKILL.md").write_text("# Env\n", encoding="utf-8")
+            (tracked / "skills" / "source-command-zh" / "SKILL.md").write_text("# Local\n", encoding="utf-8")
+
+            summary = builder.compare_runtime_trees(generated, tracked)
+
+        self.assertEqual(summary["status"], "clean")
+        self.assertEqual(summary["stale_tracked_runtime_files"]["count"], 0)
+        self.assertEqual(summary["payload_drift"]["count"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

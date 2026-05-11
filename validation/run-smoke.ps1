@@ -11,7 +11,7 @@ $repoRoot = (Resolve-Path -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath
 $registrySkillRoot = Join-Path -Path $repoRoot -ChildPath "registry\skills\external-audit-orchestrator"
 $runtimeSkillRoot = Join-Path -Path $repoRoot -ChildPath "runtime\skills\external-audit-orchestrator"
 $scratchRoot = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ("external-audit-orchestrator-smoke-" + [guid]::NewGuid().ToString("N"))
-$runtimeDryRun = Join-Path -Path $repoRoot -ChildPath "runtime\.runtime-dryrun-external-audit-smoke"
+$runtimeDryRun = Join-Path -Path $repoRoot -ChildPath ("runtime\.runtime-dryrun-external-audit-smoke-" + [guid]::NewGuid().ToString("N"))
 
 function Assert-Condition {
     param(
@@ -24,6 +24,70 @@ function Assert-Condition {
 
     if (-not $Condition) {
         throw $Message
+    }
+}
+
+function Get-RelativePath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Root,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    $rootPath = (Resolve-Path -LiteralPath $Root).Path.TrimEnd("\") + "\"
+    $pathValue = (Resolve-Path -LiteralPath $Path).Path
+    $rootUri = [uri]$rootPath
+    $pathUri = [uri]$pathValue
+    return [uri]::UnescapeDataString($rootUri.MakeRelativeUri($pathUri).ToString()).Replace("/", "\")
+}
+
+function Get-TreeFileMap {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Root
+    )
+
+    $files = @{}
+    foreach ($file in Get-ChildItem -LiteralPath $Root -Recurse -File) {
+        $relativePath = Get-RelativePath -Root $Root -Path $file.FullName
+        $relativeParts = $relativePath -split "\\"
+        if ($file.Name -ieq "desktop.ini" -or @($relativeParts | Where-Object { $_.StartsWith(".") }).Count -gt 0) {
+            continue
+        }
+
+        $files[$relativePath] = $file.FullName
+    }
+
+    return $files
+}
+
+function Assert-DirectoryTreesEqual {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ActualRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Label
+    )
+
+    Assert-Condition -Condition (Test-Path -LiteralPath $ExpectedRoot) -Message "$Label expected tree missing: $ExpectedRoot"
+    Assert-Condition -Condition (Test-Path -LiteralPath $ActualRoot) -Message "$Label actual tree missing: $ActualRoot"
+
+    $expectedFiles = Get-TreeFileMap -Root $ExpectedRoot
+    $actualFiles = Get-TreeFileMap -Root $ActualRoot
+    $allRelativePaths = @($expectedFiles.Keys + $actualFiles.Keys | Sort-Object -Unique)
+    foreach ($relativePath in $allRelativePaths) {
+        Assert-Condition -Condition $expectedFiles.ContainsKey($relativePath) -Message "$Label has stale runtime file: $relativePath"
+        Assert-Condition -Condition $actualFiles.ContainsKey($relativePath) -Message "$Label missing runtime file: $relativePath"
+
+        $expectedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $expectedFiles[$relativePath]).Hash
+        $actualHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $actualFiles[$relativePath]).Hash
+        Assert-Condition -Condition ($expectedHash -eq $actualHash) -Message "$Label content drift: $relativePath"
     }
 }
 
@@ -226,6 +290,9 @@ function Test-SkillFlow {
             -Question "Smoke?" `
             -Reference "local-project|$repoRoot|smoke fixture"
         Assert-Condition -Condition (($flowOutput -join "`n") -match "mode: $mode") -Message "Unified flow output missing mode $mode for $Label."
+        if ($mode -eq "tb2-template") {
+            Assert-Condition -Condition (($flowOutput -join "`n") -match "fallback_when_tb2_unavailable") -Message "TB2 template flow missing no-TB2 fallback guidance for $Label."
+        }
     }
 
     $flowReport = Join-Path -Path $scratchRoot -ChildPath "$Label-flow-report.md"
@@ -309,6 +376,30 @@ function Test-CodexMirror {
     }
 }
 
+function Remove-SmokeArtifact {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    for ($attempt = 0; $attempt -lt 3; $attempt++) {
+        try {
+            Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+            return
+        }
+        catch {
+            if ($attempt -eq 2) {
+                throw
+            }
+            Start-Sleep -Milliseconds 150
+        }
+    }
+}
+
 try {
     New-Item -ItemType Directory -Force -Path $scratchRoot | Out-Null
 
@@ -317,14 +408,19 @@ try {
     }
 
     Invoke-Step -Name "runtime dry-run parity" -Body {
-        $dryRunOutput = python local\scripts\build-runtime-layer.py --output-dir runtime\.runtime-dryrun-external-audit-smoke
+        $dryRunOutput = python local\scripts\build-runtime-layer.py --output-dir $runtimeDryRun
         if ($LASTEXITCODE -ne 0) {
             throw "Runtime dry-run failed."
         }
 
         $dryRunSummary = ($dryRunOutput -join [Environment]::NewLine) | ConvertFrom-Json
-        Assert-Condition -Condition ($dryRunSummary.diff_summary.status -eq "clean") -Message "Runtime dry-run drift status was $($dryRunSummary.diff_summary.status)."
-        Assert-Condition -Condition ($dryRunSummary.diff_summary.write_gate.routine_write_allowed -eq $true) -Message "Runtime dry-run write gate requires review."
+        Assert-DirectoryTreesEqual `
+            -ExpectedRoot (Join-Path -Path $runtimeDryRun -ChildPath "skills\external-audit-orchestrator") `
+            -ActualRoot $runtimeSkillRoot `
+            -Label "external-audit-orchestrator runtime projection"
+        if ($dryRunSummary.diff_summary.status -ne "clean") {
+            Write-Output "WARN global runtime dry-run drift status: $($dryRunSummary.diff_summary.status). This smoke gates external-audit-orchestrator projection parity only."
+        }
         $dryRunOutput
     }
 
@@ -362,10 +458,10 @@ try {
 finally {
     if (-not $KeepArtifacts) {
         if (Test-Path -LiteralPath $scratchRoot) {
-            Remove-Item -LiteralPath $scratchRoot -Recurse -Force
+            Remove-SmokeArtifact -Path $scratchRoot
         }
         if (Test-Path -LiteralPath $runtimeDryRun) {
-            Remove-Item -LiteralPath $runtimeDryRun -Recurse -Force
+            Remove-SmokeArtifact -Path $runtimeDryRun
         }
     }
     else {

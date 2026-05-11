@@ -18,6 +18,12 @@ Run from the repository root:
 .\validation\run-smoke.ps1
 ```
 
+For portable or CI environments where `C:\Users\miles\.codex` is not available, run:
+
+```powershell
+.\validation\run-smoke.ps1 -SkipCodexMirror
+```
+
 The smoke test must pass before release. It covers:
 
 - PowerShell parser checks for all skill scripts.
@@ -68,3 +74,5 @@ Generated packages are written under `dist/`, which is ignored by Git.
 - `external-web`: allowed as a visible, human-supervised operator path.
 - `external-cli-mcp`: document-only unless a concrete target toolchain is supplied.
 - `tb2-template`: template-only until the specific provider profile is validated in the real TB2 runtime.
+
+If the release target does not have TB2 live reviewer tools, use `same-provider-subagent` as the default review fallback. If no local subagent path exists, use `external-web` and normalize the saved raw reviewer output before acceptance.

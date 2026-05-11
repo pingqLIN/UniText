@@ -129,6 +129,7 @@ switch ($Mode) {
         $flowSummary += ($exportOutput | ForEach-Object { "  $_" })
         $flowSummary += "- operator_step: TB2 live reviewer execution was not performed by this skill"
         $flowSummary += "- operator_step: use TB2 runtime reviewer tools when available, then save results under .audit\\tb2\\results"
+        $flowSummary += "- fallback_when_tb2_unavailable: rerun with -Mode same-provider-subagent for local subagent review; if that is unavailable, use -Mode external-web and save raw reviewer output for normalization"
     }
     "external-web" {
         $flowSummary += "- export: none"
