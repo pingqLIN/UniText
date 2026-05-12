@@ -1,0 +1,101 @@
+{
+  "type": "object",
+  "properties": {
+    "summary": {
+      "type": "string"
+    },
+    "critical": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "warning": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "suggestion": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reference_inputs_used": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "local-project",
+              "local-skill",
+              "official-doc",
+              "external-repo",
+              "article",
+              "public-url",
+              "other"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["kind", "target", "reason"],
+        "additionalProperties": false
+      }
+    },
+    "disposition": {
+      "type": "string",
+      "enum": ["accept", "fix-and-rerun", "escalate-to-human", "archive-only"]
+    },
+    "next_action": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "summary",
+    "critical",
+    "warning",
+    "suggestion",
+    "assumptions",
+    "reference_inputs_used",
+    "disposition",
+    "next_action"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "risk": {
+          "type": "string"
+        },
+        "recommended_action": {
+          "type": "string"
+        }
+      },
+      "required": ["title", "location", "risk", "recommended_action"],
+      "additionalProperties": false
+    }
+  }
+}

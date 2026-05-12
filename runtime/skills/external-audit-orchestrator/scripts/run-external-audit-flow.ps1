@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$TargetProject,
 
-    [ValidateSet("same-provider-subagent", "external-web", "external-cli-mcp", "tb2-template")]
+    [ValidateSet("same-provider-subagent", "external-web", "external-cli-mcp", "codex-exec", "tb2-template")]
     [string]$Mode = "same-provider-subagent",
 
     [ValidateSet("WorkingTree", "Staged", "CommitRange", "Path", "Manual")]
@@ -25,6 +25,9 @@ param(
     [string]$PacketPath,
 
     [string]$RawReviewPath,
+
+    [ValidateSet("", "Y", "N", "O")]
+    [string]$StartupGateAnswer = "",
 
     [string]$ReportPath,
 
@@ -45,9 +48,10 @@ $resolvedTargetProject = (Resolve-Path -LiteralPath $TargetProject).Path
 $buildScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\build-audit-packet.ps1"
 $normalizeScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\normalize-audit-report.ps1"
 $claudeExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-claude-reviewer-bundle.ps1"
+$codexExecExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-codex-exec-request.ps1"
 $tb2ExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-tb2-audit-request.ps1"
 
-foreach ($requiredScript in @($buildScript, $normalizeScript, $claudeExportScript, $tb2ExportScript)) {
+foreach ($requiredScript in @($buildScript, $normalizeScript, $claudeExportScript, $codexExecExportScript, $tb2ExportScript)) {
     if (-not (Test-Path -LiteralPath $requiredScript)) {
         throw "Missing required script: $requiredScript"
     }
@@ -130,6 +134,23 @@ switch ($Mode) {
         $flowSummary += "- operator_step: TB2 live reviewer execution was not performed by this skill"
         $flowSummary += "- operator_step: use TB2 runtime reviewer tools when available, then save results under .audit\\tb2\\results"
         $flowSummary += "- fallback_when_tb2_unavailable: rerun with -Mode same-provider-subagent for local subagent review; if that is unavailable, use -Mode external-web and save raw reviewer output for normalization"
+    }
+    "codex-exec" {
+        $exportSplat = @{
+            SkillRoot = $resolvedSkillRoot
+            TargetProject = $resolvedTargetProject
+            AuditPacketPath = $packetPath
+            StartupGateAnswer = $StartupGateAnswer
+        }
+
+        if ($Apply) {
+            $exportSplat["Apply"] = $true
+        }
+
+        $exportOutput = & $codexExecExportScript @exportSplat
+        $flowSummary += "- export: codex exec request"
+        $flowSummary += ($exportOutput | ForEach-Object { "  $_" })
+        $flowSummary += "- operator_step: Codex exec reviewer execution was not performed by this export unless the generated runner is invoked separately"
     }
     "external-web" {
         $flowSummary += "- export: none"

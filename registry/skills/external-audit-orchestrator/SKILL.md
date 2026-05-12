@@ -31,6 +31,7 @@ Read [references/reference-sources.md](references/reference-sources.md) if you n
 Read [references/source-attribution-policy.md](references/source-attribution-policy.md) before producing any final audit report.
 Read [references/install-claude-same-provider.md](references/install-claude-same-provider.md) when the chosen mode is Claude Code same-provider audit.
 Read [references/install-tb2-template.md](references/install-tb2-template.md) when the chosen mode is TB2 template export.
+Read [references/mode-codex-exec.md](references/mode-codex-exec.md) when the chosen mode is Codex non-interactive audit.
 Read [references/tb2-orchestrator-scope-development-plan.md](references/tb2-orchestrator-scope-development-plan.md) when changing the TB2 request/export/normalization contract.
 
 ## Audit modes
@@ -43,6 +44,8 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   Use [references/mode-web-manual.md](references/mode-web-manual.md)
 - External CLI or MCP audit:
   Use [references/mode-cli-mcp.md](references/mode-cli-mcp.md)
+- Codex non-interactive audit:
+  Use [references/mode-codex-exec.md](references/mode-codex-exec.md)
 - TB2 audit template:
   Use [references/mode-tb2.md](references/mode-tb2.md)
 
@@ -62,6 +65,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 
 3. Choose the review path.
    - Same-provider if the user wants the most stable v0.1 path
+   - Codex exec if the reviewer should be Codex in a scripted or CI-style workflow
    - Web if the user wants visible human-supervised review
    - CLI/MCP if the user already has an external toolchain
    - TB2 template export if the goal is traceable external process orchestration and live TB2 reviewer tools are handled outside this skill
@@ -87,6 +91,8 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   [assets/claude/settings.audit.json](assets/claude/settings.audit.json)
 - Audit report template:
   [assets/report/external-audit-report.template.md](assets/report/external-audit-report.template.md)
+- Codex exec audit report schema:
+  [assets/codex/audit-report.schema.json](assets/codex/audit-report.schema.json)
 - Web prompt template:
   [assets/web/external-audit-request.md](assets/web/external-audit-request.md)
 - TB2 request template:
@@ -96,10 +102,14 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 
 - Packet builder:
   [scripts/build-audit-packet.ps1](scripts/build-audit-packet.ps1)
+- TB2 execution evidence adapter:
+  [scripts/convert-tb2-execution-evidence.ps1](scripts/convert-tb2-execution-evidence.ps1)
 - Claude bundle exporter:
   [scripts/export-claude-reviewer-bundle.ps1](scripts/export-claude-reviewer-bundle.ps1)
 - Audit report normalizer:
   [scripts/normalize-audit-report.ps1](scripts/normalize-audit-report.ps1)
+- Codex exec request exporter:
+  [scripts/export-codex-exec-request.ps1](scripts/export-codex-exec-request.ps1)
 - TB2 request exporter:
   [scripts/export-tb2-audit-request.ps1](scripts/export-tb2-audit-request.ps1)
 - Unified flow runner:
@@ -108,6 +118,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 ## v0.1 guardrails
 
 - Prefer same-provider or web-manual mode first.
+- Prefer `codex-exec` over TB2 `codex` when the reviewer should be Codex and the operator wants non-interactive automation.
 - Treat TB2 `claude` and `codex` profiles as reusable templates, not fully proven production reviewers, until the user validates those profiles in their real runtime.
 - Treat TB2 mode in this skill as request artifact export unless live TB2 reviewer tools are explicitly available in the runtime.
 - Do not treat exported TB2 request JSON as evidence that a reviewer ran.
