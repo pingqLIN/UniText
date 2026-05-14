@@ -68,7 +68,7 @@
 
 目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-04-30`，目前 authoring tree 內的 `registry/skills/` 共有 `55` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-05-15`，目前 authoring tree 內的 `registry/skills/` 共有 `35` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 
@@ -167,7 +167,6 @@ UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
 | `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
-| `external-audit-orchestrator` | Workspace | `/registry/skills/external-audit-orchestrator` | `active` |
 | `microsoft-foundry` | Workspace | `/registry/skills/microsoft-foundry` | `active` |
 | `impeccable` | Workspace | `/registry/skills/impeccable` | `active` |
 | `readme-quality` | Workspace | `/registry/skills/readme-quality` | `active` |

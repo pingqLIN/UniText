@@ -37,7 +37,6 @@ class RegistryInventoryTests(unittest.TestCase):
             "cloudflare-governance",
             "microsoft-foundry",
             "impeccable",
-            "external-audit-orchestrator",
             "entra-app-registration",
         }
         actual = {path.name for path in visible_skill_dirs()}

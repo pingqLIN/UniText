@@ -664,43 +664,6 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
-      "id": "external-audit-orchestrator",
-      "type": "skill",
-      "runtime_path": "runtime/skills/external-audit-orchestrator/SKILL.md",
-      "source_of_truth": "registry/skills/external-audit-orchestrator/SKILL.md",
-      "canonical_location": "/registry/skills/external-audit-orchestrator",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/external-audit-orchestrator/SKILL.md",
-      "intent_tags": [
-        "external-audit-orchestrator",
-        "standardize",
-        "development-time",
-        "external",
-        "audit",
-        "workflows",
-        "use",
-        "when"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
       "id": "frontend-design",
       "type": "skill",
       "runtime_path": "runtime/skills/frontend-design/SKILL.md",

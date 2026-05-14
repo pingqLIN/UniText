@@ -196,7 +196,6 @@ def build_workspace_sensitive_fixture(target_root: Path) -> None:
         "registry/skills/conversation-memo/references/memo-lifecycle.md",
         "registry/skills/microsoft-foundry/SKILL.md",
         "registry/skills/impeccable/SKILL.md",
-        "registry/skills/external-audit-orchestrator/SKILL.md",
     }
 
     for relative_path in sorted(fixture_paths):
