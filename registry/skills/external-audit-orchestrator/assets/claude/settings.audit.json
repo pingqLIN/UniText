@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "code-reviewer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -Command \"Write-Host '[audit] code-reviewer finished; verify findings were normalized into the main report.'\""
+          }
+        ]
+      }
+    ]
+  }
+}

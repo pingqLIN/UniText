@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Bootstrap Architect"
+  short_description: "Bootstrap projects by type and architecture."
+  default_prompt: "Use $project-bootstrap-architect to choose the right project type, storage model, and starter layout for a new project."

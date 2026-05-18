@@ -1,0 +1,24 @@
+{
+  "skill_name": "system-screenshot",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "幫我截目前桌面畫面，存成 PNG，並回報檔案路徑與畫面是否空白。",
+      "expected_output": "Uses the bundled Windows capture script or an equivalent system screenshot route, saves a PNG, and reports path plus basic visual validation.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "針對目前 localhost runtime app 做截圖驗證，確認畫面不是 blank，並指出 UI 有沒有重疊或缺圖。",
+      "expected_output": "Chooses a browser/runtime screenshot path before desktop capture, captures or inspects the page, and reports visual findings.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我有一個 Figma node URL，幫我截那個 node 的畫面，不要截整個桌面。",
+      "expected_output": "Uses the Figma screenshot tool by extracting file key and node id instead of using the Windows desktop fallback.",
+      "files": []
+    }
+  ]
+}
+

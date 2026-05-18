@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>__EXTENSION_NAME__</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+
+      main {
+        padding: 16px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      p {
+        margin: 0 0 12px;
+        line-height: 1.5;
+      }
+
+      button {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: #2563eb;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      #status {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #334155;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>__EXTENSION_NAME__</h1>
+      <p>__EXTENSION_DESCRIPTION__</p>
+      <button id="save" type="button">Save starter preference</button>
+      <div id="status">No preference saved yet.</div>
+    </main>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

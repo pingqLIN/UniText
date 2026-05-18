@@ -1,0 +1,4 @@
+interface:
+  display_name: Google Cloud Service Adoption
+  short_description: Alias for Google Cloud and GCP adoption
+  default_prompt: Route Google Cloud and GCP setup or governance work into the gcp-service-adoption workflow.

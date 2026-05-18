@@ -1,0 +1,7 @@
+{
+  "name": "codex_relay",
+  "arguments": {
+    "disconnect": true,
+    "prompt": "Read-only engineering audit. Review the packet below. Return findings ordered as Critical, Warning, Suggestion. Acknowledge any Reference Inputs that materially influence the review.\n\n{{AUDIT_PACKET}}"
+  }
+}
