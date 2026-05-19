@@ -1,20 +1,22 @@
 ---
 name: project-development-loop
-description: "Reusable autonomous workflow for existing codebases: audit repo state from code and docs, identify goal, in-progress, done, blocked, and optimization items, decide whether to execute immediately or plan first, evaluate reviewer or worker execution shape, review completed work, write short stage reports, optionally log milestones, and repeat until no meaningful maintenance work remains. Supports three invocation styles: default maintenance mode, explicit time-boxed execution, and overnight bounded maintenance. Use for ongoing project orchestration, repo progress audits, task dispatch, development planning, reviewed execution loops, and continuous improvement. Do not use for greenfield bootstrap; use a project bootstrap skill instead."
+description: "Autonomous repo-maintenance loop for existing codebases only when the user explicitly invokes `$project-development-loop`/`project-development-loop`, asks for a time-boxed or overnight development loop, or clearly requests continuous repo execution through audit, implementation, review, reporting, and repeat. Do not use for one-off repo status reports, simple code review, normal bug fixes, planning-only tasks, skill editing, greenfield bootstrap, or requests that merely mention progress, audit, next steps, or development plans without asking to keep executing."
 ---
 
 # Project Development Loop
 
 ## Overview
 
-Use this skill to run the same disciplined delivery loop every time a development project is opened.
+Use this skill only after an explicit invocation or a clearly continuous development-loop request for an existing codebase.
+A normal repo question, status audit, plan draft, bug fix, review, or skill-editing request is not enough to enter this loop by itself.
 Always operate in YOLO-style autonomy: start from evidence, not assumptions; audit the repo; choose the next work; execute, delegate, review, and report with minimal waiting; and repeat until there is no justified work left.
-The user does not need to say `YOLO`, `yolo`, or any related trigger phrase. Invoking this skill already means autonomous execution unless a higher-priority instruction explicitly forces checkpoints.
+Once this skill is intentionally in scope, the user does not need to say `YOLO`, `yolo`, or any related trigger phrase. Invoking this skill already means autonomous execution unless a higher-priority instruction explicitly forces checkpoints.
 This skill starts from existing project artifacts. It is not the right entry point for greenfield project bootstrap.
 
 ## Invocation Interpretation
 
 Interpret the user's wording with these rules. Do not ask them to specify a profile name.
+Before applying the patterns, verify that the skill was intentionally invoked. A clear invocation means explicit `$project-development-loop` / `project-development-loop`, or wording that combines repo development with keep-working, autonomous continuation, a duration, a deadline, sleep, or overnight execution. If the user only asks for a status report, code review, development plan, one bounded fix, or skill metadata cleanup, handle that task normally and do not start the loop.
 
 ### Pattern A: no explicit time
 
