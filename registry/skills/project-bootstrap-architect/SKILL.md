@@ -14,6 +14,15 @@ Do not use this skill for an already-active codebase that needs audit, maintenan
 
 ## Workflow
 
+### 0. Check planning and governance entrypoints
+
+Before choosing templates, check whether the user asked for a written plan, plan mode, review gate, skill selection, or local service/port governance.
+
+- If the user asked for a plan before execution, use `plan-first-execution` for the plan template and review gate.
+- If the task involves skill creation or consolidation, read [references/skill-entrypoints.md](./references/skill-entrypoints.md).
+- If the project needs implementation-support skills, read [references/development-skill-selection.md](./references/development-skill-selection.md).
+- If the project will start localhost services, read [references/local-port-registry.md](./references/local-port-registry.md).
+
 ### 1. Confirm the bootstrap target
 
 Start by identifying these inputs from the user's request and the creation target only.
@@ -98,6 +107,7 @@ Separate these concerns clearly:
 After type and storage are known, choose the repository shape.
 Read [references/repo-layouts.md](./references/repo-layouts.md) for the matching archetype.
 Read [references/toolchain-selection.md](./references/toolchain-selection.md) to choose framework, package manager, test stack, linting, and scaffold template defaults.
+For local web apps, service APIs, MCP servers, browser bridges, daemons, or worker dashboards, read [references/local-port-registry.md](./references/local-port-registry.md) before assigning dev-server ports.
 
 Decide:
 
@@ -109,6 +119,8 @@ Decide:
 - lint and format tools
 - environment variable files
 - docs expected at repo start
+- local port block and registry path, when localhost services are involved
+- development-support skills, when the project needs AI-agent workflow support
 
 Prefer the smallest layout that still leaves a clear path for growth.
 
@@ -123,7 +135,10 @@ For a new project, output these items in order unless the user asked for a diffe
 5. key architecture decisions
 6. initial file and folder scaffold
 7. config files to create
-8. next implementation step
+8. local port allocation, if needed
+9. recommended development/support skills, if needed
+10. review gate, if planning or governance was requested
+11. next implementation step
 
 When the user wants code immediately, create the scaffold after presenting the decision summary.
 
@@ -148,5 +163,8 @@ When the user wants code immediately, create the scaffold after presenting the d
 - Read [references/storage-patterns.md](./references/storage-patterns.md) after the archetype is known.
 - Read [references/toolchain-selection.md](./references/toolchain-selection.md) before choosing framework and starter stack defaults.
 - Read [references/repo-layouts.md](./references/repo-layouts.md) last to produce the file/config scaffold.
+- Read [references/skill-entrypoints.md](./references/skill-entrypoints.md) when the task includes skill creation, installation, duplicate skill entries, or skill consolidation.
+- Read [references/development-skill-selection.md](./references/development-skill-selection.md) when the project should start with a recommended skill set.
+- Read [references/local-port-registry.md](./references/local-port-registry.md) when localhost ports or long-running local services are involved.
 
 Load only the relevant sections for the selected project type.

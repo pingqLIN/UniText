@@ -68,7 +68,7 @@
 
 目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-05-18`，目前 authoring tree 內的 `registry/skills/` 共有 `77` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-05-19`，目前 authoring tree 內的 `registry/skills/` 共有 `78` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 

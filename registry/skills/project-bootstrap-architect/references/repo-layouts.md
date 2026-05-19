@@ -41,7 +41,27 @@ Default monorepo layout when backend or shared packages are first-class:
 
 ## Browser extension
 
-Default:
+Default MV3 project layout:
+
+- `src/background/`
+- `src/content/`
+- `src/popup/` or `src/sidepanel/`
+- `src/options/`
+- `src/shared/`
+- `assets/`
+- `scripts/`
+- `tools/`
+- `manifest.json`
+- `extension/`
+- `extension/manifest.json`
+- `extension/_locales/en/`
+- `extension/_locales/zh_TW/`
+
+Use this split when the repo has source, build tooling, local proxies, smoke tests, or imported upstream artifacts. Treat `/extension` as the loadable unpacked Chrome extension package and keep repo-root source/tooling outside it.
+
+The repo-root `manifest.json` may be the source manifest used by the build script; the generated or copied `extension/manifest.json` is the browser-loadable manifest.
+
+Minimal flat layout, only for tiny no-build extensions:
 
 - `src/background/`
 - `src/content/`
