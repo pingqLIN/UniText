@@ -47,6 +47,7 @@ UniText 同時是：
 | live operational checklist | `local/docs/*_LIVE.md` | No | No | 必須 ignore |
 | authoring plans / drafts / review notes | `local/docs/authoring/` | No | No | 必須 ignore |
 | generated audit trail / export output / drift report | `ops/` | No | No | 屬於 state，不是 canonical source |
+| generated resolver / report output | `ops/<tool-or-domain>/` | No | No | 例如 `agent-governance-resolution.md` 與 `agent-governance-resolution.json` 不應寫在 repo root |
 
 ## 4. Naming Rules
 
@@ -118,6 +119,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document
 - 把 live Cloudflare baseline 放到 `registry/.../references/`
 - 把 strategy / review plan 放到 root
 - 把 export output 或 audit evidence 當成 canonical reference
+- 把 generated resolver / report output 放在 repo root，例如 `agent-governance-resolution.md` 或 `agent-governance-resolution.json`
 - 把 machine-specific path 直接寫進 shared governance docs
 
 ## 10. Review Gate
@@ -127,6 +129,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document
 - 它是不是在描述 shared truth，而不是 live workspace state
 - 它若被 push，是否仍符合 `NO_PUBLISH_POLICY.md` 與 template-safe 預期
 - 它是否需要一個 sanitized/live pair，而不是單檔同時承載兩者
+- 若它是 tracked root shared doc，是否已納入 `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的 `shared_surface_scope`，或是否有明確記錄的例外理由
 
 ## 11. Related Docs
 
