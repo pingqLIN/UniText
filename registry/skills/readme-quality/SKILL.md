@@ -77,6 +77,35 @@ These rules apply to **every project type** without exception.
 - **Platform-labeled sections** when OS-specific: `### Linux / macOS`, `### Windows`.
 - **Never write "This project is..."** — open with the thing itself, not a meta-statement.
 
+### Mermaid diagram rules
+
+- Prefer Mermaid for compact architecture/workflow diagrams when the target renderer supports it; use ASCII when the audience or platform cannot reliably render Mermaid.
+- Keep diagrams readable before styling them: short node labels, details in prose/tables, and no raw paths, URLs, or long command lines inside nodes.
+- For large workflow maps, split by concern when possible. If a single diagram is still necessary, prefer `flowchart LR` for pipelines, reduce `flowchart.nodeSpacing` / `rankSpacing`, and use `curve: linear`.
+- Use Mermaid frontmatter `config` for per-diagram configuration. Avoid new `%%{init: ...}%%` directives because Mermaid deprecated directives in favor of frontmatter.
+- For complex flowcharts, try `layout: elk` with conservative ELK options such as `nodePlacementStrategy: LINEAR_SEGMENTS`; fall back to `layout: dagre` when the renderer does not support ELK.
+- Do not rely on SVG stretch controls as the primary fix for an unreadable diagram. Fix the graph structure and layout first, then use viewer zoom/fit controls for inspection.
+
+Recommended large-flowchart starting point:
+
+```mermaid
+---
+config:
+  layout: elk
+  htmlLabels: true
+  flowchart:
+    nodeSpacing: 35
+    rankSpacing: 55
+    curve: linear
+    diagramPadding: 8
+  elk:
+    mergeEdges: false
+    nodePlacementStrategy: LINEAR_SEGMENTS
+---
+flowchart LR
+  A["Short label"] --> B["Next step"]
+```
+
 ### Private data boundary
 
 README files are public or team-shareable documentation. They must not absorb private AI collaboration material.

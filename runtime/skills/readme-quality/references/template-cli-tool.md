@@ -161,6 +161,7 @@ usage: [command] [options] {subcommands}
 - **Prose intro paragraph** — 2–4 sentences of flowing prose before jumping into features. The only template type that uses prose instead of a table for the opening.
 - **Platform-split Quick Start** — always split by OS/backend if the tool supports multiple. Use `### Linux / macOS` and `### Windows` headers.
 - **Mermaid or ASCII diagrams** — Architecture section expects a diagram in a code block. Mermaid preferred if supported; ASCII fallback.
+- **Large Mermaid diagrams** — Keep graph structure readable first. For big workflow maps, split by concern when possible; otherwise use Mermaid frontmatter `config`, prefer `flowchart LR`, try `layout: elk`, keep `nodeSpacing` / `rankSpacing` tight, and use `curve: linear`. Avoid new `%%{init: ...}%%` directives.
 - **API reference tables** — if the tool has an HTTP/RPC interface, document every endpoint with the full parameter table and example curl.
 - **State diagrams for workflows** — Human intervention, approval flows, state machines: always use a diagram (mermaid stateDiagram-v2 or ASCII state diagram).
 - **AI-Assisted section** — table format with Model | Role columns. List specific roles like "Primary architect and implementation".
