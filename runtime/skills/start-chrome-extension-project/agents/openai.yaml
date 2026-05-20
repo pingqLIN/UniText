@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start Chrome Extension Project"
+  short_description: "Scaffold a secure Chrome extension starter"
+  default_prompt: "Use $start-chrome-extension-project to scaffold a new Chrome extension project with required files, folders, and audit docs."

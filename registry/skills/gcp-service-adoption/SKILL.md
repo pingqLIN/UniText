@@ -3,6 +3,7 @@ name: gcp-service-adoption
 description: Use for Google, Google Cloud, or GCP capability adoption work. Evaluate whether a requested feature should use a Google Cloud managed service, determine whether an existing Google Cloud or GCP project can host it or a new project is warranted, identify required API/IAM/networking/observability setup, and define rollout tracking including cost estimates, budgets, and budget alerts.
 metadata:
   short-description: Google Cloud and GCP service adoption
+  runtime_support_files: true
 ---
 
 # GCP Service Adoption

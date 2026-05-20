@@ -4,9 +4,9 @@ Use this file when several local repositories need different Google Cloud capabi
 
 This reference captures a concrete three-project portfolio:
 
-- `Q:\Projects\xiaohundan-i18n-hub`
-- `Q:\Projects\taste`
-- `Q:\Projects\codex-calendar-todo`
+- `<windows-project-root>\xiaohundan-i18n-hub`
+- `<windows-project-root>\taste`
+- `<windows-project-root>\codex-calendar-todo`
 
 ## Portfolio decision
 
@@ -86,7 +86,7 @@ After creating the key, open Google Cloud Console and apply restrictions:
 
 ### App-side mapping
 
-Set these in `Q:\Projects\xiaohundan-i18n-hub\.env`:
+Set these in `<windows-project-root>\xiaohundan-i18n-hub\.env`:
 
 ```env
 GOOGLE_TRANSLATE_API_KEY=<generated-api-key>
@@ -162,7 +162,7 @@ Fill the generated OAuth values into Supabase, not directly into the Next.js app
   - `Client ID`
   - `Client Secret`
 
-Then ensure `Q:\Projects\taste\.env.local` or hosted env contains the expected Supabase settings:
+Then ensure `<windows-project-root>\taste\.env.local` or hosted env contains the expected Supabase settings:
 
 ```env
 NEXT_PUBLIC_SITE_URL=http://localhost:3010
@@ -230,7 +230,7 @@ If a hosted version is added later, add a second production callback instead of 
 
 ### App-side mapping
 
-Set these in `Q:\Projects\codex-calendar-todo\.env.local`:
+Set these in `<windows-project-root>\codex-calendar-todo\.env.local`:
 
 ```env
 GOOGLE_CLIENT_ID=<generated-client-id>

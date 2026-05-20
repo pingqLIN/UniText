@@ -1,6 +1,8 @@
 ---
 name: terminal-layout-three-pane
 description: Arrange the current Windows desktop into a three-pane layout based on the terminal's working directory. Use when the user asks for 1/4 File Explorer on the left, 1/2 code editor in the center, and 1/4 terminal on the right, with Explorer opened to the terminal folder.
+metadata:
+  runtime_support_files: true
 ---
 
 # Terminal Layout Three Pane
@@ -14,13 +16,13 @@ Use the current terminal directory by default: `-TargetPath (Get-Location).Path`
 2. Run the three-pane script.
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\ADMIN_miles\.codex\skills\terminal-layout-three-pane\scripts\apply-three-pane-layout.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\terminal-layout-three-pane\scripts\apply-three-pane-layout.ps1"
 ```
 
 If you need to force a specific monitor, pass `-MonitorIndex` (0-based):
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\ADMIN_miles\.codex\skills\terminal-layout-three-pane\scripts\apply-three-pane-layout.ps1" -MonitorIndex 1
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\terminal-layout-three-pane\scripts\apply-three-pane-layout.ps1" -MonitorIndex 1
 ```
 
 3. Verify final arrangement.
@@ -28,4 +30,4 @@ Explorer fills the left quarter, editor fills the center half, and terminal fill
 
 ## Script
 
-Use [scripts/apply-three-pane-layout.ps1](C:\Users\ADMIN_miles\.codex\skills\terminal-layout-three-pane\scripts\apply-three-pane-layout.ps1) for the actual automation.
+Use [scripts/apply-three-pane-layout.ps1](scripts/apply-three-pane-layout.ps1) for the actual automation.

@@ -1,6 +1,8 @@
 ---
 name: cloudflare-governance
 description: Use as the default entrypoint for broad Cloudflare requests when the user has not already named a narrower specialist. Covers Cloudflare governance, family-wide audit, WARP and Zero Trust device policy triage, tunnel and DNS review, Access and MCP auth review, edge security review, API credential discovery, and local runtime correlation. Do not use for deep specialist procedures when the request is already clearly about one narrow area.
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/cloudflare-governance/SKILL.md
 ---

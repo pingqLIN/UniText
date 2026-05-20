@@ -1,13 +1,13 @@
 # Codex Permission Notes
 
 This note records operator-facing permission issues observed while validating
-`external-audit-orchestrator` v0.1.4 from `Q:\Projects\audit-agent-skill`.
+`external-audit-orchestrator` v0.1.4 from `<windows-project-root>\audit-agent-skill`.
 
 ## 2026-05-03 Codex exec external review
 
 Context:
 
-- Target repo: `Q:\Projects\audit-agent-skill`
+- Target repo: `<windows-project-root>\audit-agent-skill`
 - Commit under review: `9fd3b0b Release external audit skill v0.1.4`
 - Intended reviewer path: three read-only `codex exec` review runs
 - Output folder: `validation\scratch\external-review-20260503-172515`
@@ -17,7 +17,7 @@ Observed issues:
 - The interactive PowerShell `codex` command can be a function wrapper, not the
   executable itself. In that case, short CLI options such as `-o` may be parsed
   by PowerShell as ambiguous PowerShell parameters before they reach Codex.
-- Running `C:\Users\miles\AppData\Roaming\npm\codex.cmd exec` inside the default
+- Running `%APPDATA%\npm\codex.cmd exec` inside the default
   sandbox failed with `存取被拒。 (os error 5)`.
 - `codex exec` printed `WARNING: proceeding, even though we could not update PATH:
   存取被拒。 (os error 5)` before failing in the sandboxed attempt.
@@ -30,7 +30,7 @@ Observed issues:
 Recommended operator procedure:
 
 1. Prefer the real executable path when scripting Codex:
-   `C:\Users\miles\AppData\Roaming\npm\codex.cmd`.
+   `%APPDATA%\npm\codex.cmd`.
 2. Avoid relying on the interactive `codex` PowerShell function wrapper for
    non-interactive reviewer runs.
 3. Keep reviewer runs explicitly read-only:

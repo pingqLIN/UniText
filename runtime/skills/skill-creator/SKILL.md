@@ -2,6 +2,8 @@
 name: skill-creator
 description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
 license: Complete terms in LICENSE.txt
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/skill-creator/SKILL.md
 ---

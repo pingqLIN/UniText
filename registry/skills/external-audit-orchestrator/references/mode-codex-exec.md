@@ -14,7 +14,7 @@ If this mode is selected, cite the relevant sources in the final audit report:
 
 - `https://developers.openai.com/codex/noninteractive`
 - `https://developers.openai.com/codex/cli/reference`
-- `Q:\Projects\tb2-claude-subagent-workflow\docs\platform-baseline-matrix.md`
+- `<windows-project-root>\tb2-claude-subagent-workflow\docs\platform-baseline-matrix.md`
 
 ## Procedure
 

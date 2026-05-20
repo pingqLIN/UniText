@@ -1,6 +1,8 @@
 ---
 name: supabase-hosted-admin-oauth
 description: Verify and prepare hosted Supabase admin OAuth flows before real sign-in testing. Use when a repo has a protected `/admin` route backed by Supabase Auth or Google OAuth, when local and hosted Supabase environments may be confused, when the CLI token exists under a nonstandard env var such as `SPB_Access_Token`, or when Codex needs to fetch hosted API keys, populate hosted env files, run repo preflight checks, and determine whether real Google sign-in validation is actually ready.
+metadata:
+  runtime_support_files: true
 ---
 
 # Supabase Hosted Admin OAuth

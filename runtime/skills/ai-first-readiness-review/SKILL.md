@@ -1,6 +1,8 @@
 ---
 name: ai-first-readiness-review
 description: Review existing projects, workflows, runbooks, and operational procedures for AI-first readiness. Use when future operators are expected to be primarily AI agents, or when auditing a system for faster agent understanding, better document discovery, safer tool operation, vendor-neutral abstraction layers, and sufficient human-AI-process communication.
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/ai-first-readiness-review/SKILL.md
 ---

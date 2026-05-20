@@ -107,18 +107,45 @@ def validate_repo_root(repo_root: Path) -> None:
         raise SystemExit(f"repo root is missing required markers: {', '.join(missing)}")
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
+def parse_scalar(value: str) -> str | bool:
+    value = value.strip().strip("'").strip('"')
+    if value.lower() in {"true", "yes", "on"}:
+        return True
+    if value.lower() in {"false", "no", "off"}:
+        return False
+    return value
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, object], str]:
     match = FRONTMATTER_PATTERN.match(text)
     if not match:
         return {}, text
 
-    fields: dict[str, str] = {}
+    fields: dict[str, object] = {}
+    current_mapping_key: str | None = None
     for raw_line in match.group(1).splitlines():
+        if not raw_line.strip() or ":" not in raw_line:
+            continue
+
+        is_nested = raw_line[:1].isspace()
         line = raw_line.strip()
+        if is_nested and current_mapping_key:
+            nested = fields.get(current_mapping_key)
+            if isinstance(nested, dict):
+                key, raw_value = line.split(":", 1)
+                nested[key.strip()] = parse_scalar(raw_value)
+            continue
+
         if not line or ":" not in line:
             continue
         key, raw_value = line.split(":", 1)
-        fields[key.strip()] = raw_value.strip().strip("'").strip('"')
+        key = key.strip()
+        if raw_value.strip():
+            fields[key] = parse_scalar(raw_value)
+            current_mapping_key = None
+        else:
+            fields[key] = {}
+            current_mapping_key = key
     return fields, text[match.end() :]
 
 
@@ -410,23 +437,42 @@ def canonical_location_for(resource_type: str, resource_id: str) -> str:
 
 
 def metadata_from_frontmatter(
-    frontmatter: dict[str, str],
+    frontmatter: dict[str, object],
     *,
     resource_type: str,
     matched_surfaces: list[object],
 ) -> tuple[str | None, list[str], str]:
-    status = frontmatter.get("status") or None
+    status_raw = frontmatter.get("status")
+    status = status_raw if isinstance(status_raw, str) and status_raw else None
     supported_clis_raw = frontmatter.get("supported_clis", "")
     if supported_clis_raw:
-        supported_clis = [item.strip() for item in supported_clis_raw.split(",") if item.strip()]
+        supported_clis = [item.strip() for item in str(supported_clis_raw).split(",") if item.strip()]
     else:
         supported_clis = cli_ids_for_resource_type(matched_surfaces, resource_type)
-    delivery_guidance = frontmatter.get("delivery_guidance") or default_delivery_guidance(resource_type, matched_surfaces)
+    delivery_guidance_raw = frontmatter.get("delivery_guidance")
+    delivery_guidance = (
+        delivery_guidance_raw
+        if isinstance(delivery_guidance_raw, str) and delivery_guidance_raw
+        else default_delivery_guidance(resource_type, matched_surfaces)
+    )
     return status, supported_clis, delivery_guidance
 
 
-def frontmatter_bool(frontmatter: dict[str, str], key: str) -> bool:
-    return frontmatter.get(key, "").strip().lower() in {"1", "true", "yes", "on"}
+def frontmatter_bool(frontmatter: dict[str, object], key: str) -> bool:
+    value = frontmatter.get(key, "")
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.strip().lower() in {"1", "true", "yes", "on"}:
+        return True
+
+    metadata = frontmatter.get("metadata")
+    if isinstance(metadata, dict):
+        metadata_value = metadata.get(key, "")
+        if isinstance(metadata_value, bool):
+            return metadata_value
+        if isinstance(metadata_value, str):
+            return metadata_value.strip().lower() in {"1", "true", "yes", "on"}
+    return False
 
 
 def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:

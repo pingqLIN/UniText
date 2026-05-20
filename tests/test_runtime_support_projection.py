@@ -99,6 +99,40 @@ class RuntimeSupportProjectionTests(unittest.TestCase):
             self.assertIn("runtime_projection: true", guide_content)
             self.assertIn("[Config](../assets/nested/config.json)", guide_content)
 
+    def test_skill_support_projection_accepts_metadata_runtime_support_files(self):
+        builder = load_runtime_builder_module()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo = Path(temp_dir)
+            skill = repo / "registry" / "skills" / "demo-skill"
+            (skill / "scripts").mkdir(parents=True)
+
+            (skill / "SKILL.md").write_text(
+                "\n".join(
+                    [
+                        "---",
+                        "name: demo-skill",
+                        "description: Demo skill.",
+                        "metadata:",
+                        "  runtime_support_files: true",
+                        "  status: metadata-only",
+                        "---",
+                        "# Demo",
+                        "",
+                        "[Script](scripts/run.ps1)",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            (skill / "scripts" / "run.ps1").write_text("Write-Output 'ok'\n", encoding="utf-8")
+
+            runtime = repo / "runtime"
+            entries = builder.build_skill_wrappers(repo, runtime, [])
+
+            runtime_skill = runtime / "skills" / "demo-skill"
+            self.assertTrue((runtime_skill / "scripts" / "run.ps1").is_file())
+            self.assertIsNone(entries[0].status)
+
     def test_runtime_markdown_relative_links_resolve_to_projected_files(self):
         builder = load_runtime_builder_module()
 

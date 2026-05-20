@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Development Loop"
+  short_description: "Run an explicitly requested autonomous repo maintenance loop"
+  default_prompt: "Use $project-development-loop to audit the current existing-codebase repo, execute the next justified maintenance work, review outcomes, and keep looping until the requested milestone, deadline, or overnight handoff boundary."

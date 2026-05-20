@@ -1,0 +1,4 @@
+interface:
+  display_name: "Book Image Renamer"
+  short_description: "OCR book photos and build safe rename plans."
+  default_prompt: "Use $book-image-renamer to identify book images, verify metadata, and prepare a safe rename plan."

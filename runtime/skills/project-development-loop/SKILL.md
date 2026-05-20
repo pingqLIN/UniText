@@ -1,6 +1,8 @@
 ---
 name: project-development-loop
 description: "Autonomous repo-maintenance loop for existing codebases only when the user explicitly invokes `$project-development-loop`/`project-development-loop`, asks for a time-boxed or overnight development loop, or clearly requests continuous repo execution through audit, implementation, review, reporting, and repeat. Do not use for one-off repo status reports, simple code review, normal bug fixes, planning-only tasks, skill editing, greenfield bootstrap, or requests that merely mention progress, audit, next steps, or development plans without asking to keep executing."
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/project-development-loop/SKILL.md
 ---

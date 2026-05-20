@@ -3,6 +3,7 @@ name: claude-design-playbook
 description: "Use when the user wants Claude Design or `DESIGN.md` workflow help: pick an aesthetic family, derive a `DESIGN.md` from a live brand or screenshots, audit a site against a target `DESIGN.md`, or remix two design systems into one coherent third system."
 metadata:
   short-description: Claude Design and DESIGN.md workflows
+  runtime_support_files: true
 ---
 
 # Claude Design Playbook

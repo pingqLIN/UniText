@@ -1,0 +1,114 @@
+{
+  "upstream_repository": "https://github.com/rohitg00/awesome-claude-design",
+  "upstream_commit": "HEAD",
+  "included_items": [
+    {
+      "source": "design-md/warm/claude.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Warm Editorial family seed and Claude-specific reference anchor."
+    },
+    {
+      "source": "design-md/editorial/linear.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Editorial Minimalism family seed and Linear-specific reference anchor."
+    },
+    {
+      "source": "design-md/terminal/ollama.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Terminal-Core sample for command-line and infra-adjacent products."
+    },
+    {
+      "source": "design-md/data-dense/clickhouse.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Data-Dense Pro sample for dashboards and dense product surfaces."
+    },
+    {
+      "source": "design-md/cinematic/runway.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Cinematic Dark sample for media-heavy and creator-facing products."
+    },
+    {
+      "source": "design-md/playful/figma.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Playful Color sample for consumer-friendly and colorful products."
+    },
+    {
+      "source": "design-md/glass/arc.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Glass / Soft-Futurism sample for premium soft-gradient interfaces."
+    },
+    {
+      "source": "design-md/brutalist/the-verge.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Neon Brutalist sample for statement-first editorial or campaign pages."
+    },
+    {
+      "source": "design-md/indie/granola.md",
+      "target": "references/families.md",
+      "route": "family-picker",
+      "reason": "Cult / Indie reference for non-enterprise warm software aesthetics."
+    },
+    {
+      "source": "design-md/remix/linear-x-claude.md",
+      "target": "references/workflow-notes.md",
+      "route": "remix-two-brands",
+      "reason": "Concrete remix example for token arbitration."
+    },
+    {
+      "source": "prompts/family-picker.md",
+      "target": "references/prompt-packs.md",
+      "route": "family-picker",
+      "reason": "Source prompt adapted into a concise family selection workflow."
+    },
+    {
+      "source": "prompts/brand-to-design-md.md",
+      "target": "references/prompt-packs.md",
+      "route": "brand-to-design-md",
+      "reason": "Source prompt adapted into a DESIGN.md extraction workflow."
+    },
+    {
+      "source": "prompts/audit-live-site.md",
+      "target": "references/prompt-packs.md",
+      "route": "audit-live-site-against-design-md",
+      "reason": "Source prompt adapted into a site-versus-system audit workflow."
+    },
+    {
+      "source": "prompts/remix-two-brands.md",
+      "target": "references/prompt-packs.md",
+      "route": "remix-two-brands",
+      "reason": "Source prompt adapted into a two-brand remix workflow."
+    }
+  ],
+  "excluded_topics": [
+    {
+      "topic": "Launch timeline and market reaction",
+      "reason": "News and stock commentary do not improve Claude Design execution quality."
+    },
+    {
+      "topic": "X signal and community takes",
+      "reason": "Social proof is not needed for family selection, DESIGN.md creation, audit, or remix."
+    },
+    {
+      "topic": "Video teardowns",
+      "reason": "Long-form creator commentary is too indirect for a compact skill reference set."
+    },
+    {
+      "topic": "Generic anti-slop doctrine",
+      "reason": "This overlaps with existing frontend-design guidance and is preserved only as a bridge note."
+    }
+  ],
+  "route_summary": {
+    "family-picker": "Choose one visual family from product traits, audience, and courage/trust tradeoffs.",
+    "brand-to-design-md": "Turn a live site or screenshot set into a verified nine-section DESIGN.md.",
+    "audit-live-site-against-design-md": "Compare a rendered site against a target system and produce an evidence-backed punch list.",
+    "remix-two-brands": "Arbitrate between two systems and emit a coherent third DESIGN.md."
+  }
+}

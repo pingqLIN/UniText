@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI-First Readiness Review"
+  short_description: "Audit projects and workflows for AI-first readiness"
+  default_prompt: "Use $ai-first-readiness-review to assess this project or process for AI-first readiness and recommend concrete improvements."

@@ -1,6 +1,8 @@
 ---
 name: obsidian-index-adapter
 description: Create guarded Obsidian index notes from completed memo outputs. Use when a raw archive and summary memo already exist and the user wants an Obsidian index card, topic note, or project memo note that points back to those sources. Do not use for first-pass conversation capture, freeform vault writing, or formal document authoring.
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/obsidian-index-adapter/SKILL.md
 ---

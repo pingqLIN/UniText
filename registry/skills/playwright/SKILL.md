@@ -1,6 +1,8 @@
 ---
 name: "playwright"
 description: "Use when the task requires automating a real browser from the terminal (navigation, form filling, snapshots, screenshots, data extraction, UI-flow debugging) via `playwright-cli` or the bundled wrapper script."
+metadata:
+  runtime_support_files: true
 ---
 
 
@@ -66,8 +68,8 @@ When the user wants Playwright to control an authenticated browser session, do n
 
 For headed Chrome work that needs a persisted profile, follow the Browser skill profile governance:
 
-- Use `C:\Users\miles\.codex\plugins\cache\openai-bundled\browser-use\0.1.0-alpha1\skills\browser\profile-01` as the primary writable Chrome `--user-data-dir`.
-- Use `C:\Users\miles\.codex\plugins\cache\openai-bundled\browser-use\0.1.0-alpha1\skills\browser\profile-02` only as a readable backup or recovery source.
+- Use `$env:USERPROFILE\.codex\plugins\cache\openai-bundled\browser-use\0.1.0-alpha1\skills\browser\profile-01` as the primary writable Chrome `--user-data-dir`.
+- Use `$env:USERPROFILE\.codex\plugins\cache\openai-bundled\browser-use\0.1.0-alpha1\skills\browser\profile-02` only as a readable backup or recovery source.
 - Do not launch Chrome directly against `profile-02` for ordinary Playwright work, do not modify it, and do not copy state back into it unless the user explicitly asks.
 - If `profile-01` is missing or unusable, first restore or copy a fresh writable profile from `profile-02` or the original source paths, then operate on that writable copy.
 - If neither bundled profile can be used or restored, choose or create a context-appropriate writable profile and state that fallback briefly to the user.

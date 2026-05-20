@@ -1,6 +1,8 @@
 ---
 name: start-chrome-extension-project
 description: Scaffold a new Chrome extension project starter with a Manifest V3 baseline, TypeScript build setup, required folders, and built-in audit documentation. Use when Codex needs to start a Chrome extension from scratch, prepare a secure extension repo skeleton, or add permission, privacy, and release review documents before implementation.
+metadata:
+  runtime_support_files: true
 ---
 
 # Start Chrome Extension Project
@@ -35,7 +37,7 @@ Run:
 
 ```powershell
 python scripts/scaffold_chrome_extension.py `
-  --target "Q:\Projects\my-extension" `
+  --target "<windows-project-root>\my-extension" `
   --name "My Extension" `
   --description "Describe the extension clearly"
 ```

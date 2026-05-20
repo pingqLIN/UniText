@@ -3,6 +3,7 @@ name: google-cloud-service-adoption
 description: Alias entrypoint for Google Cloud and GCP service adoption work. Use when the user triggers $google-cloud-service-adoption or asks about Google Cloud projects, GCP services, Google APIs, Google OAuth, Google billing, or related Google platform setup that should route into the gcp-service-adoption workflow.
 metadata:
   short-description: Alias for Google Cloud and GCP adoption
+  runtime_support_files: true
 ---
 
 # Google Cloud Service Adoption Alias

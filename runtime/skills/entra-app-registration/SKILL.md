@@ -5,6 +5,7 @@ license: MIT
 metadata:
   author: Microsoft
   version: "1.0.1"
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/entra-app-registration/SKILL.md
 ---

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan-First Execution"
+  short_description: "Plan templates and review gates before execution."
+  default_prompt: "Use $plan-first-execution to draft an executable plan with the right review gate before implementation."

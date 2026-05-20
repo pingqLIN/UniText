@@ -1,6 +1,8 @@
 ---
 name: cloudflare-zerotrust-device
 description: Use when the request is specifically about Cloudflare WARP, Zero Trust device behavior, split tunnel vs full tunnel interpretation, Windows and WSL traffic path through WARP, or Cloudflare API credential verification. Trigger for tasks like "why is WARP connected but warp=off", "check full-tunnel vs split-tunnel", "compare WARP org to Cloudflare account", "verify CF_API_TOKEN or Global API Key", or "test Cloudflare Tunnel API access". Do not use for tunnel ingress, DNS routing, Access OAuth, or zone-edge security unless the issue is explicitly a local WARP/device incident.
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/cloudflare-zerotrust-device/SKILL.md
 ---

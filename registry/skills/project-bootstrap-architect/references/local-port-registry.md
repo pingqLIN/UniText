@@ -34,7 +34,7 @@ Example: if the project base is `31740`, frontend is `31740`, API is `31741`, an
 Use two layers:
 
 - Repo-tracked intent: `ops/local-ports.json`
-- Machine-local allocation ledger: `Q:\Projects\.local-port-registry.json`
+- Machine-local allocation ledger: `<windows-project-root>\.local-port-registry.json`
 
 If the central ledger does not exist, create it only after showing a dry-run summary. In public or portable templates, document the ledger path as optional local operator state.
 

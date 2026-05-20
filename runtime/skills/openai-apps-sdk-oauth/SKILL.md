@@ -3,6 +3,7 @@ name: openai-apps-sdk-oauth
 description: Use when building a website, MCP server, or ChatGPT app that needs OpenAI Apps SDK custom auth with OAuth 2.1. Covers protected-resource metadata, per-tool securitySchemes, WWW-Authenticate challenges, token verification, and rollout checks for user-linked tools.
 metadata:
   short-description: Build Apps SDK OAuth 2.1 flows
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/openai-apps-sdk-oauth/SKILL.md
 ---

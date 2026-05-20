@@ -1,0 +1,4 @@
+interface:
+  display_name: "Supabase Hosted Admin OAuth"
+  short_description: "Verify hosted Supabase admin OAuth readiness and env setup."
+  default_prompt: "Use this skill to verify hosted Supabase admin OAuth configuration, map CLI access tokens, populate hosted env files, and run repo preflight checks before real sign-in validation."

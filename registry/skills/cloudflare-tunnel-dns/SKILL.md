@@ -1,6 +1,8 @@
 ---
 name: cloudflare-tunnel-dns
 description: Use when the request is specifically about Cloudflare Tunnel inventory, DNS hostnames, ingress routing, credentials files, or health endpoints for this workspace. Do not use for local WARP behavior, Access OAuth, or zone-edge security review unless the incident clearly spans those layers.
+metadata:
+  runtime_support_files: true
 ---
 
 # Cloudflare Tunnel DNS

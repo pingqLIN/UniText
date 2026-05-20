@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenAI Apps SDK OAuth"
+  short_description: "Implement custom OAuth 2.1 auth for MCP-backed ChatGPT apps"
+  default_prompt: "Use $openai-apps-sdk-oauth to design or implement OpenAI Apps SDK custom auth with OAuth 2.1 for this website, MCP server, or ChatGPT app."

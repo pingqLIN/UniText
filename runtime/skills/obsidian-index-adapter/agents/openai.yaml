@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Index Adapter"
+  short_description: "Create guarded Obsidian index notes from memos"
+  default_prompt: "Use $obsidian-index-adapter to turn an existing memo into a guarded Obsidian index note."

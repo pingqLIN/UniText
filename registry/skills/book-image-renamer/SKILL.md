@@ -1,6 +1,8 @@
 ---
 name: book-image-renamer
 description: "Identify book photos, extract visible metadata with local OCR, use a local multimodal model to correct OCR ambiguity, and build safe rename plans in the format 原書作者-書名-出版社-年分_ISBN. Use when Codex needs to process folders of book-cover images, distinguish single-book vs multi-book shots, prepare dry-run rename plans, or apply verified book-image renames without directly trusting raw OCR."
+metadata:
+  runtime_support_files: true
 ---
 
 # Book Image Renamer
@@ -16,7 +18,7 @@ Use this skill when the folder contains mixed images and only some of them are b
 1. Run a scan first:
 
 ```powershell
-python C:\Users\miles\.codex\skills\book-image-renamer\scripts\book_image_renamer.py scan "<folder>" --output book_rename_scan.json
+python "$env:USERPROFILE\.codex\skills\book-image-renamer\scripts\book_image_renamer.py" scan "<folder>" --output book_rename_scan.json
 ```
 
 2. Review `book_rename_scan.json`.
@@ -24,14 +26,14 @@ python C:\Users\miles\.codex\skills\book-image-renamer\scripts\book_image_rename
 4. Build a rename plan:
 
 ```powershell
-python C:\Users\miles\.codex\skills\book-image-renamer\scripts\book_image_renamer.py plan book_rename_scan.json metadata.json --output book_rename_plan.json
+python "$env:USERPROFILE\.codex\skills\book-image-renamer\scripts\book_image_renamer.py" plan book_rename_scan.json metadata.json --output book_rename_plan.json
 ```
 
 5. Inspect `book_rename_plan.json`.
 6. Apply only from the plan:
 
 ```powershell
-python C:\Users\miles\.codex\skills\book-image-renamer\scripts\book_image_renamer.py apply book_rename_plan.json --output book_rename_applied.json
+python "$env:USERPROFILE\.codex\skills\book-image-renamer\scripts\book_image_renamer.py" apply book_rename_plan.json --output book_rename_applied.json
 ```
 
 ## Current Pipeline

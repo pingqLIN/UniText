@@ -1,6 +1,8 @@
 ---
 name: codex-context-budget-audit
 description: Audit Codex initial-context budget and token overhead from a specific workdir or Codex home. Use when the user asks to inspect, compare, reduce, or visualize initial prompt/token usage from skills, plugins, MCP servers, memories, AGENTS.md, or runtime configuration. Includes a CLI that reports phase-separated estimates and an ASCII prompt-composition chart.
+metadata:
+  runtime_support_files: true
 ---
 
 # Codex Context Budget Audit
@@ -11,18 +13,18 @@ Use this skill when the task is about measuring or comparing Codex startup/conte
 
 1. Identify the execution location.
    - Use the user's requested path as `--workdir`.
-   - Default Codex home is `C:\Users\miles\.codex` unless the user provides another path.
+   - Default Codex home is `$env:USERPROFILE\.codex` unless the user provides another path.
 2. Run the bundled CLI first:
 
 ```powershell
-python C:\Users\miles\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py --workdir Q:\Projects
+python "$env:USERPROFILE\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py" --workdir <windows-project-root>
 ```
 
 3. If comparing runs, save a baseline JSON and compare a later run:
 
 ```powershell
-python C:\Users\miles\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py --workdir Q:\Projects --json-out Q:\tmp\codex-context-before.json
-python C:\Users\miles\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py --workdir Q:\Projects --baseline Q:\tmp\codex-context-before.json
+python "$env:USERPROFILE\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py" --workdir <windows-project-root> --json-out <temp>\codex-context-before.json
+python "$env:USERPROFILE\.codex\skills\codex-context-budget-audit\scripts\context_budget_audit.py" --workdir <windows-project-root> --baseline <temp>\codex-context-before.json
 ```
 
 4. Report the result by phase:

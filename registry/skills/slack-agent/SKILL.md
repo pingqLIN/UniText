@@ -1,6 +1,8 @@
 ---
 name: slack-agent
 description: Use when working on Slack agent/bot code, Chat SDK applications, Bolt for JavaScript projects, or projects using @chat-adapter/slack or @slack/bolt. Provides development patterns, testing requirements, and quality standards.
+metadata:
+  runtime_support_files: true
 ---
 
 # Slack Agent Development Skill

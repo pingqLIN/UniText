@@ -2,6 +2,8 @@
 name: frontend-design
 description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications; when they want critique, polish, or hardening passes for an existing frontend; or when they reference impeccable or impeccable.style as the desired design bar. Generates creative, polished code and UI design that avoids generic AI aesthetics and repetitive AI UI patterns.
 license: Complete terms in LICENSE.txt
+metadata:
+  runtime_support_files: true
 ---
 
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details, critique discipline, and creative choices.

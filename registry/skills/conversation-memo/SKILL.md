@@ -1,6 +1,8 @@
 ---
 name: conversation-memo
 description: Archive complete agent conversations and derive structured memo outputs for strategy discussions, architecture debates, execution-direction sessions, or other discussions that should be preserved before turning into formal artifacts. Use when the user wants to save a full discussion, extract the key points into a memo, or identify what formal outputs should come next. Do not use for writing the final formal document itself unless the user explicitly asks for that separate step.
+metadata:
+  runtime_support_files: true
 ---
 
 # Conversation Memo

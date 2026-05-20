@@ -1,6 +1,8 @@
 ---
 name: cloudflare-named-tunnel-publish
 description: "Use when the user wants to temporarily expose a localhost web app or static site on their own Cloudflare hostname using a named tunnel, especially for requests such as 掛在我的網域下, 暫時對外公開, named tunnel, local site publish, localhost to public URL, or quick-tunnel-to-custom-domain conversion. Do not use for quick tunnels, WARP-only issues, Access OAuth, Workers app deployment, or broad Cloudflare governance unless the task clearly spans those layers."
+metadata:
+  runtime_support_files: true
 runtime_projection: true
 source_of_truth: registry/skills/cloudflare-named-tunnel-publish/SKILL.md
 ---

@@ -1,6 +1,8 @@
 ---
 name: plan-first-execution
 description: Use when the user asks to write a plan before doing work, start in plan mode, produce an implementation plan, define review gates, choose review strength, or decide how a plan should be checked before execution.
+metadata:
+  runtime_support_files: true
 ---
 
 # Plan-First Execution

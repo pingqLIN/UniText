@@ -1,6 +1,8 @@
 ---
 name: system-screenshot
 description: Capture and verify screenshots of runtime apps, browser apps, Figma nodes, and the Windows desktop or individual desktop application windows. Use this skill whenever the user asks to take a screenshot, capture the screen, inspect a UI visually, verify that a local app/runtime app rendered correctly, screenshot an app connector view, or capture the desktop/window state, even if they do not mention this skill by name.
+metadata:
+  runtime_support_files: true
 ---
 
 # System Screenshot
@@ -27,19 +29,19 @@ Use this skill to choose the least invasive screenshot path that matches the tar
 Use the bundled script when the request is about the physical desktop or a native app window:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\miles\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Desktop
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Desktop
 ```
 
 Capture a specific visible window by title:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\miles\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Window -WindowTitle "Notepad"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Window -WindowTitle "Notepad"
 ```
 
 Capture a specific visible window by process name:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\miles\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Window -ProcessName "notepad"
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\.codex\skills\system-screenshot\scripts\capture_windows_screen.ps1" -Mode Window -ProcessName "notepad"
 ```
 
 The script prints JSON containing `outputPath`, `mode`, `width`, `height`, and target metadata. Use that JSON as the capture record.
@@ -52,4 +54,3 @@ After capture:
 2. Check that the target is not blank, offscreen, occluded, or the wrong window.
 3. If the screenshot is for UI validation, mention concrete visible issues such as clipping, overlap, blank content, missing assets, or wrong viewport.
 4. If the first capture is wrong because focus changed, retry once after activating or asking the user to foreground the target.
-

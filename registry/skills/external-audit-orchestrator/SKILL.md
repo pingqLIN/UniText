@@ -1,6 +1,8 @@
 ---
 name: external-audit-orchestrator
 description: Standardize development-time external audit workflows. Use when a project requires another agent or external AI service to audit changes before acceptance, or when the user wants a fixed procedure for preparing audit packets, routing reviews to Claude/Codex/web/CLI/TB2 paths, and preserving explicit source attribution for cross-project references.
+metadata:
+  runtime_support_files: true
 ---
 
 # External Audit Orchestrator

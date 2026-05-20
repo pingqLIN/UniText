@@ -5,6 +5,7 @@ license: MIT
 metadata:
   author: Microsoft
   version: "1.1.5"
+  runtime_support_files: true
 ---
 
 # Microsoft Foundry Skill

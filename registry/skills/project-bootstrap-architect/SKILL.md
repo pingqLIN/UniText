@@ -1,6 +1,8 @@
 ---
 name: project-bootstrap-architect
 description: "Bootstrap new greenfield projects by choosing the right project type, storage model, repo layout, and architecture template before implementation starts. Use when Codex needs to create a new project from scratch, scaffold an initial repo, decide between app types such as CLI, web app, browser extension, service API, desktop helper, or library, and produce the starting file/config structure for that choice."
+metadata:
+  runtime_support_files: true
 ---
 
 # Project Bootstrap Architect

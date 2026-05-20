@@ -1,6 +1,8 @@
 ---
 name: ai-runtime-governor
 description: Unified governance for local AI tools and developer runtimes. Use this skill to inventory installed AI Models/CLI/IDE, map Skill/MCP/Rules/Agent settings and storage paths, run backup+audit, and apply single or global path/config changes with rollback records.
+metadata:
+  runtime_support_files: true
 ---
 
 # AI Runtime Governor
