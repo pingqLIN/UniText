@@ -8,6 +8,9 @@ recovered_*/
 desktop.ini
 **/__pycache__/
 runtime/skills/.system/
+runtime/skills/source-command*/
+runtime/.runtime-dryrun-*/
+.tmp.codex-test/
 ops/history/backup_*/
 ops/history/bootstrap_*/
 ops/history/drift_*/
