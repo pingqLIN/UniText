@@ -55,6 +55,9 @@
   const TEXT_SCALE_FACTORS = { xs: 0.84, sm: 0.92, md: 1, lg: 1.12, xl: 1.24 };
   const SETTINGS_KEY = "unitext-project-map-settings-v2";
   const TOUR_STORAGE_KEY = "unitext-project-map-tour-v1";
+  const PANEL_FOCUS_COOLDOWN_MS = 700;
+  const TEMP_PANEL_AUTO_COMPACT = true;
+  const TEMP_TOUR_ENTRY_CUE = false;
   const HANDLE_DB_NAME = "unitext-project-map-db";
   const HANDLE_STORE = "handles";
   const HANDLE_KEY = "repo-root";
@@ -64,17 +67,17 @@
     {
       id: "browse",
       label: "主巡覽",
-      note: "聚焦節點清單、地圖與細節，保留最短閱讀主線。",
+      note: "節點清單、地圖與細節。",
     },
     {
       id: "ops",
       label: "診斷與交付",
-      note: "集中查看健康度、分享輸出與交接摘要。",
+      note: "健康度、分享輸出與交接摘要。",
     },
     {
       id: "governance",
       label: "維護與治理",
-      note: "把更新策略、治理解析與報告寫出拆到獨立工作頁。",
+      note: "更新策略、治理解析與報告寫出。",
     },
   ];
   const WORKSPACE_PAGE_IDS = new Set(WORKSPACE_PAGES.map((page) => page.id));
@@ -107,9 +110,13 @@
     browserCanScan: PAGE_MODE === "interactive" && typeof window.showDirectoryPicker === "function" && typeof indexedDB !== "undefined",
     workspacePage: "browse",
     workspaceEngaged: false,
+    panelFocus: TEMP_PANEL_AUTO_COMPACT ? "masthead" : "all",
     mastheadCompact: false,
+    workspaceCompact: TEMP_PANEL_AUTO_COMPACT,
     autoCollapsedLatch: false,
     mastheadManualOpen: false,
+    lastPanelFocusAt: -PANEL_FOCUS_COOLDOWN_MS,
+    panelManualFocusUntil: 0,
     mapZoom: 1,
     governanceAnalysisPath: "",
     governanceSourceOverrides: {},
@@ -130,6 +137,7 @@
   const mastheadEl = document.querySelector(".masthead");
   const mastheadToggleEl = document.getElementById("masthead-toggle");
   const workspaceShellEl = document.querySelector(".workspace-shell");
+  const workspaceToggleEl = document.getElementById("workspace-toggle");
   const sidebarEl = document.getElementById("sidebar");
   const detailEl = document.getElementById("detail");
   const mapEl = document.getElementById("map");
@@ -155,6 +163,9 @@
   const visualToneOptionEls = Array.from(document.querySelectorAll("[data-visual-tone-option]"));
   const visualThemeOptionEls = Array.from(document.querySelectorAll("[data-visual-theme-option]"));
   const textScaleOptionEls = Array.from(document.querySelectorAll("[data-text-scale-option]"));
+  const visualToneSliderEl = document.querySelector("[data-visual-tone-slider]");
+  const visualThemeSliderEl = document.querySelector("[data-visual-theme-slider]");
+  const textScaleSliderEl = document.querySelector("[data-text-scale-slider]");
   const updateModeEl = document.getElementById("update-mode");
   const intervalDaysEl = document.getElementById("interval-days");
   const intervalHoursEl = document.getElementById("interval-hours");
@@ -228,6 +239,22 @@
     const normalized = String(value || "").trim();
     return TEXT_SCALES.has(normalized) ? normalized : "";
   };
+  const visualToneLabel = (tone) => ({
+    mono: "結構灰",
+    muted: "柔霧色",
+    vivid: "高彩度",
+  }[tone] || tone);
+  const visualThemeLabel = (theme) => ({
+    light: "日間",
+    dark: "夜間",
+  }[theme] || theme);
+  const textScaleLabel = (scale) => ({
+    xs: "極小",
+    sm: "緊湊",
+    md: "標準",
+    lg: "放大",
+    xl: "極大",
+  }[scale] || scale);
   const getTypeStylesTheme = () => ({
     doc: {
       fill: cssVar("--type-doc-fill", TYPE_STYLE_FALLBACKS.doc.fill),
@@ -284,33 +311,103 @@
     return copied;
   }
 
-  function syncMastheadCompactState() {
+  function syncPanelCompactClasses() {
     if (!mastheadEl || !workspaceShellEl) return;
-    const workspaceTop = workspaceShellEl.getBoundingClientRect().top;
-    if (!state.autoCollapsedLatch && window.scrollY < 8 && workspaceTop > 148 && (!mapWrapEl || (mapWrapEl.scrollLeft <= 12 && mapWrapEl.scrollTop <= 12))) {
-      state.workspaceEngaged = false;
+    if (!TEMP_PANEL_AUTO_COMPACT || state.tourOpen) {
+      state.panelFocus = "all";
+      state.mastheadCompact = false;
+      state.workspaceCompact = false;
+      state.autoCollapsedLatch = false;
+      state.mastheadManualOpen = true;
+      document.body.classList.remove("masthead-compact", "workspace-compact");
+      if (mastheadToggleEl) {
+        mastheadToggleEl.setAttribute("aria-expanded", "true");
+        mastheadToggleEl.textContent = "上方說明已展開";
+      }
+      if (workspaceToggleEl) {
+        workspaceToggleEl.setAttribute("aria-expanded", "true");
+        workspaceToggleEl.textContent = "工作區已展開";
+      }
+      return;
     }
     const tourTargetInMasthead = Boolean(state.tourOpen && state.activeTourTarget && mastheadEl.contains(state.activeTourTarget));
-    const baseCompact = state.workspaceEngaged || window.scrollY > 18 || workspaceTop <= 116 || (mapWrapEl && (mapWrapEl.scrollLeft > 12 || mapWrapEl.scrollTop > 12));
-    if (baseCompact && !state.mastheadManualOpen && !tourTargetInMasthead) {
-      state.autoCollapsedLatch = true;
-      state.mastheadManualOpen = false;
-    }
-    const shouldCompact = state.autoCollapsedLatch && !state.mastheadManualOpen && !tourTargetInMasthead;
-    state.mastheadCompact = shouldCompact;
-    document.body.classList.toggle("masthead-compact", shouldCompact);
+    const tourTargetInWorkspace = Boolean(state.tourOpen && state.activeTourTarget && workspaceShellEl.contains(state.activeTourTarget));
+    const activeFocus = tourTargetInMasthead ? "masthead" : tourTargetInWorkspace ? "workspace" : state.panelFocus;
+    const shouldCompactMasthead = activeFocus !== "masthead";
+    const shouldCompactWorkspace = activeFocus !== "workspace";
+    state.mastheadCompact = shouldCompactMasthead;
+    state.workspaceCompact = shouldCompactWorkspace;
+    state.autoCollapsedLatch = shouldCompactMasthead;
+    state.mastheadManualOpen = activeFocus === "masthead";
+    document.body.classList.toggle("masthead-compact", shouldCompactMasthead);
+    document.body.classList.toggle("workspace-compact", shouldCompactWorkspace);
     if (mastheadToggleEl) {
-      mastheadToggleEl.setAttribute("aria-expanded", shouldCompact ? "false" : "true");
-      mastheadToggleEl.textContent = shouldCompact ? "展開上方說明" : "收合上方說明";
+      mastheadToggleEl.setAttribute("aria-expanded", shouldCompactMasthead ? "false" : "true");
+      mastheadToggleEl.textContent = shouldCompactMasthead ? "展開上方說明" : "收合上方說明";
+    }
+    if (workspaceToggleEl) {
+      workspaceToggleEl.setAttribute("aria-expanded", shouldCompactWorkspace ? "false" : "true");
+      workspaceToggleEl.textContent = shouldCompactWorkspace ? "展開工作區" : "縮小工作區";
     }
   }
 
+  function requestPanelFocus(nextFocus, { force = false, manual = false } = {}) {
+    if (!TEMP_PANEL_AUTO_COMPACT || state.tourOpen) {
+      syncPanelCompactClasses();
+      return false;
+    }
+    if (!["masthead", "workspace"].includes(nextFocus)) return false;
+    if (state.panelFocus === nextFocus) {
+      syncPanelCompactClasses();
+      return true;
+    }
+    const now = performance.now();
+    if (!force && now - state.lastPanelFocusAt < PANEL_FOCUS_COOLDOWN_MS) {
+      return false;
+    }
+    state.panelFocus = nextFocus;
+    state.lastPanelFocusAt = now;
+    if (manual) {
+      state.panelManualFocusUntil = now + PANEL_FOCUS_COOLDOWN_MS;
+    }
+    syncPanelCompactClasses();
+    return true;
+  }
+
+  function inferPanelFocusFromViewport() {
+    const workspaceTop = workspaceShellEl.getBoundingClientRect().top;
+    const mapMoved = Boolean(mapWrapEl && (mapWrapEl.scrollLeft > 12 || mapWrapEl.scrollTop > 12));
+    if (!state.autoCollapsedLatch && window.scrollY < 8 && workspaceTop > 148 && (!mapWrapEl || (mapWrapEl.scrollLeft <= 12 && mapWrapEl.scrollTop <= 12))) {
+      state.workspaceEngaged = false;
+    }
+    if (window.scrollY < 8 && !state.workspaceEngaged) {
+      return "masthead";
+    }
+    if (state.workspaceEngaged || window.scrollY > 24 || workspaceTop <= window.innerHeight * 0.62 || mapMoved) {
+      return "workspace";
+    }
+    return "masthead";
+  }
+
+  function syncMastheadCompactState({ force = false } = {}) {
+    if (!mastheadEl || !workspaceShellEl) return;
+    if (!TEMP_PANEL_AUTO_COMPACT || state.tourOpen) {
+      syncPanelCompactClasses();
+      return;
+    }
+    if (!force && performance.now() < state.panelManualFocusUntil) {
+      syncPanelCompactClasses();
+      return;
+    }
+    requestPanelFocus(inferPanelFocusFromViewport(), { force });
+  }
+
   function toggleMastheadCompact() {
-    const shouldOpen = state.mastheadCompact;
-    state.autoCollapsedLatch = !shouldOpen;
-    state.mastheadManualOpen = shouldOpen;
-    state.mastheadCompact = !shouldOpen;
-    syncMastheadCompactState();
+    requestPanelFocus(state.panelFocus === "masthead" ? "workspace" : "masthead", { manual: true });
+  }
+
+  function toggleWorkspaceCompact() {
+    requestPanelFocus(state.panelFocus === "workspace" ? "masthead" : "workspace", { manual: true });
   }
 
   function getMinimapMetrics() {
@@ -497,7 +594,7 @@
   }
 
   function syncTourEntryCue() {
-    const shouldPrompt = !hasSeenTour() && !state.tourOpen;
+    const shouldPrompt = TEMP_TOUR_ENTRY_CUE && !hasSeenTour() && !state.tourOpen;
     document.body.classList.toggle("tour-entry-cue", shouldPrompt);
     if (tourCtaCueEl) tourCtaCueEl.hidden = !shouldPrompt;
     if (tourStartEl) tourStartEl.textContent = hasSeenTour() ? "重新導覽" : "開始導覽";
@@ -516,40 +613,40 @@
         id: "operation-focus",
         selector: ".masthead-aside",
         page: "browse",
-        title: "先從操作重點建立閱讀順序",
+        title: "操作重點",
         body: [
-          "這個區塊是整張圖的閱讀入口：先掌握 `runtime/*` 目前實際作用在操作面的狀態，再沿著對應關係回查 `registry/*` 的正式來源。",
-          "第一次開啟時，這裡會提示你點選導覽；導覽進行中也會保留輕微光暈，讓注意力回到這個操作順序。",
+          "`runtime/*` 顯示目前執行面投影，`registry/*` 保留正式來源定義。",
+          "依序檢查現行投影、來源對應、診斷狀態與交接輸出。",
         ],
-        meta: ["如果你是第一次接手，先走完這份導覽，再開始自由巡覽，理解成本會低很多。"],
+        meta: ["導覽模式會保持上方說明與工作區同時展開。"],
       },
       {
         id: "search",
         selector: "#search",
         page: "browse",
-        title: "用搜尋先縮小問題範圍",
+        title: "搜尋節點",
         body: [
           "搜尋會同時比對節點名稱、描述與路徑。你可以直接打 `runtime/skills`、`catalog`、`governance` 這類關鍵詞。",
-          "當你只知道執行面的名稱，卻還不確定正式來源在哪裡時，先搜 `runtime/*` 名稱，再沿著對應關係往下追最有效。",
+          "只知道執行面名稱時，先搜尋 `runtime/*`，再沿著對應關係回查來源。",
         ],
-        meta: ["搜尋是最快的入口，尤其適合交接、排錯，或比對某個技能、代理、流程是否已經投影到執行面。"],
+        meta: ["適用於交接、排錯，以及比對技能、代理、流程是否已投影到執行面。"],
       },
       {
         id: "primary-controls",
         selector: ".control-band.primary",
         page: "browse",
-        title: "先篩類型，再決定地圖視角",
+        title: "篩選與視角",
         body: [
           "類型篩選可以把視野先縮成執行面、技能註冊、文件等單一層面。",
           "地圖視角決定你是用欄式閱讀結構，還是用圓形閱讀關聯。欄式適合盤點，圓形適合追單點關係。",
         ],
-        meta: ["實務上，先切到執行面，再逐步加回註冊類型，最容易看出目前投影結果與正式來源之間是否有落差。"],
+        meta: ["先看執行面，再加回註冊類型，可檢查投影結果與正式來源是否一致。"],
       },
       {
         id: "sidebar",
         selector: "#sidebar",
         page: "browse",
-        title: "左欄是可快速切換的節點清單",
+        title: "節點清單",
         body: [
           "這裡會列出目前符合搜尋與篩選條件的節點，適合快速切換檢查不同的執行面投影或核心文件。",
           "清單與地圖是同步的，從左欄進入通常比直接在地圖上找點更快。",
@@ -560,10 +657,10 @@
         id: "map",
         selector: "#map-wrap",
         page: "browse",
-        title: "中間地圖負責回答『它和誰相連』",
+        title: "關聯地圖",
         body: [
           "地圖會把 `contains`、`catalog_entry`、`maps_to`、`references` 這些關係畫出來，讓你知道執行面節點是從哪裡投影而來。",
-          "你可以把它當成拓樸圖，而不是文件目錄。真正的價值是追關係，而不是只看清單。",
+          "它是資源拓樸，不是文件目錄；重點在追查節點之間的關係。",
         ],
         meta: ["若你想確認某個執行面技能是否真的對回正式來源，請特別看「正式來源對應」與「目錄對應」這兩種邊。"],
       },
@@ -571,45 +668,45 @@
         id: "detail",
         selector: "#detail",
         page: "browse",
-        title: "右欄細節面板負責回答『這個點到底代表什麼』",
+        title: "節點細節",
         body: [
-          "選到任何節點後，右欄會給你描述、路徑、來源與相關邊。這裡是整理交接前最後確認語義的地方。",
+          "選到任何節點後，右欄會顯示描述、路徑、來源與相關邊。",
           "如果你要寫報告或交接，先在這裡確認路徑、類型、連結對象都合理，再輸出內容。",
         ],
-        meta: ["這一欄適合做最終驗證，避免只憑名稱就誤判某個執行面節點真正對應的正式來源。"],
+        meta: ["輸出交接前，先確認路徑、類型與連結對象。"],
       },
       {
         id: "operations",
         selector: ".operations-grid",
         page: "ops",
-        title: "操作區塊用來看健康度與交付結果",
+        title: "診斷與交付",
         body: [
-          "診斷檢查會提示目前地圖是否有缺漏、漂移或結構異常。交付輸出則提供交接相關輸出，方便你把當前理解轉成可交付結果。",
+          "診斷檢查會提示目前地圖是否有缺漏、漂移或結構異常。交付輸出提供分享頁與交接摘要。",
           "日常巡覽時先看診斷檢查，有明顯落差再回去查 `runtime/*` 與 `registry/*` 的對映。",
         ],
-        meta: ["如果你只是要快速熟悉專案，先把診斷檢查看過一次，就能知道整張圖是否值得信任。"],
+        meta: ["診斷數字可判斷目前地圖是否適合作為交接依據。"],
       },
       {
         id: "maintenance",
         selector: "#maintenance-controls",
         page: "governance",
-        title: "互動版可以直接重掃專案並更新對照結果",
+        title: "維護控制",
         body: [
           "維護控制只在互動版顯示。這裡可以連結本機專案目錄、設定自動更新模式，或立即重新掃描目前工作樹。",
-          "當你改了 `runtime/catalog.json`、`registry/*` 文件或治理相關檔案，這一區就是重新同步畫面的入口。",
+          "修改 `runtime/catalog.json`、`registry/*` 文件或治理檔案後，可從這裡重新同步資料。",
         ],
-        meta: ["這一區是維護工具，不是主要閱讀入口。先理解結構，再決定是否需要重掃。"],
+        meta: ["重掃只更新目前瀏覽器資料；交付前仍需重新生成靜態輸出。"],
       },
       {
         id: "governance",
         selector: ".governance-panel",
         page: "governance",
-        title: "治理解析區塊負責把理解轉成可交接報告",
+        title: "治理解析",
         body: [
           "治理層疊解析會依目前模型、環境與設定組合出實際生效的治理結果，並能把結果寫回專案目錄內指定位置。",
-          "當你要交接控制台、確認指令層疊，或追查某個規則到底從哪一層來，最後再看這裡。",
+          "用於交接控制台、確認指令層疊，或追查規則來源層級。",
         ],
-        meta: ["這是從『看懂』轉到『可交付』的最後一步，所以放在導覽尾端。"],
+        meta: ["解析結果可寫回專案目錄內指定位置。"],
       },
     ];
 
@@ -824,6 +921,16 @@
     if (state.tourOpen) updateTourLayout();
     syncMastheadCompactState();
   }, { passive: true, capture: true });
+  window.addEventListener("wheel", (event) => {
+    if (Math.abs(event.deltaY) < 12) return;
+    if (event.deltaY > 0) {
+      requestPanelFocus("workspace");
+      return;
+    }
+    if (window.scrollY < 180) {
+      requestPanelFocus("masthead");
+    }
+  }, { passive: true });
   document.addEventListener("keydown", handleTourKeydown);
 
   function normalizeWindowsPath(pathText) {
@@ -902,7 +1009,7 @@
       return { path: analysisPath, scope_hint: "repo", note: "路徑落在目前 repo 內，global-home、workspace、repo-local 皆可作為檔案治理候選。", verified: false, unverified_path_classification: true };
     }
     if (workspaceRoot && isPathWithin(analysisPath, workspaceRoot)) {
-      return { path: analysisPath, scope_hint: "workspace", note: "路徑落在工作區層級但不一定落在目前 repo 內，repo-local 規則只作為目前頁面的 evidence，不應推定適用。", verified: false, unverified_path_classification: true };
+      return { path: analysisPath, scope_hint: "workspace", note: "路徑落在工作區層級但不一定落在目前 repo 內；repo-local 規則只作為 evidence，不推定適用。", verified: false, unverified_path_classification: true };
     }
     return { path: analysisPath, scope_hint: "external", note: "路徑不在目前 repo/workspace 判定範圍內，只能保留 global-home 與手動來源路徑作為可檢查候選。", verified: false, unverified_path_classification: true };
   }
@@ -934,7 +1041,7 @@
         applies_to_path: applies,
         evidence_only: !applies,
         unresolved_reason: manualExternal
-          ? "手動外部路徑只記錄指向；靜態頁面不直接讀取專案外內容。"
+          ? "手動外部路徑只記錄指向；靜態輸出不讀取專案外內容。"
           : source.unresolved_reason,
       };
     });
@@ -1065,8 +1172,8 @@
       effective_hard_rules: effectiveHardRules,
       operational_guidance: operationalGuidance,
       instruction_evaluation: [
-        "來自 runtime、system、developer 與全域家目錄的指令仍屬於更高優先層級，無法直接從這張靜態頁面完整檢查。",
-        "在檔案層級範圍內，頁面會優先採用結構化治理規則檔；若缺少結構化來源，才退回工作區與 repo-local AGENTS 的文字解析。",
+        "來自 runtime、system、developer 與全域家目錄的指令仍屬於更高優先層級，靜態輸出只呈現檔案層級證據。",
+        "檔案層級優先採用結構化治理規則檔；缺少結構化來源時，才退回工作區與 repo-local AGENTS 的文字解析。",
         `目前納入檔案層級檢查的來源數量：${agentsSources.filter((source) => source.applies_to_path).length}`,
       ],
     };
@@ -1348,6 +1455,10 @@
       button.setAttribute("aria-checked", isActive ? "true" : "false");
       button.tabIndex = isActive ? 0 : -1;
     });
+    if (visualToneSliderEl) {
+      visualToneSliderEl.value = String(Math.max(0, VISUAL_TONE_ORDER.indexOf(state.visualTone)));
+      visualToneSliderEl.setAttribute("aria-valuetext", visualToneLabel(state.visualTone));
+    }
   }
 
   function applyVisualTheme() {
@@ -1361,6 +1472,10 @@
       button.setAttribute("aria-checked", isActive ? "true" : "false");
       button.tabIndex = isActive ? 0 : -1;
     });
+    if (visualThemeSliderEl) {
+      visualThemeSliderEl.value = String(Math.max(0, VISUAL_THEME_ORDER.indexOf(state.visualTheme)));
+      visualThemeSliderEl.setAttribute("aria-valuetext", visualThemeLabel(state.visualTheme));
+    }
   }
 
   function applyTextScale() {
@@ -1374,6 +1489,10 @@
       button.setAttribute("aria-checked", isActive ? "true" : "false");
       button.tabIndex = isActive ? 0 : -1;
     });
+    if (textScaleSliderEl) {
+      textScaleSliderEl.value = String(Math.max(0, TEXT_SCALE_ORDER.indexOf(state.textScale)));
+      textScaleSliderEl.setAttribute("aria-valuetext", textScaleLabel(state.textScale));
+    }
   }
 
   function setVisualTone(nextTone, options = {}) {
@@ -1381,7 +1500,7 @@
     if (nextTone === state.visualTone) {
       if (options.focus) {
         const activeButton = visualToneOptionEls.find((button) => (button.dataset.visualToneOption || "") === nextTone);
-        activeButton?.focus();
+        (visualToneSliderEl || activeButton)?.focus();
       }
       return;
     }
@@ -1390,7 +1509,7 @@
     render();
     if (options.focus) {
       const activeButton = visualToneOptionEls.find((button) => (button.dataset.visualToneOption || "") === nextTone);
-      activeButton?.focus();
+      (visualToneSliderEl || activeButton)?.focus();
     }
   }
 
@@ -1399,7 +1518,7 @@
     if (nextTheme === state.visualTheme) {
       if (options.focus) {
         const activeButton = visualThemeOptionEls.find((button) => (button.dataset.visualThemeOption || "") === nextTheme);
-        activeButton?.focus();
+        (visualThemeSliderEl || activeButton)?.focus();
       }
       return;
     }
@@ -1408,7 +1527,7 @@
     render();
     if (options.focus) {
       const activeButton = visualThemeOptionEls.find((button) => (button.dataset.visualThemeOption || "") === nextTheme);
-      activeButton?.focus();
+      (visualThemeSliderEl || activeButton)?.focus();
     }
   }
 
@@ -1417,7 +1536,7 @@
     if (nextScale === state.textScale) {
       if (options.focus) {
         const activeButton = textScaleOptionEls.find((button) => (button.dataset.textScaleOption || "") === nextScale);
-        activeButton?.focus();
+        (textScaleSliderEl || activeButton)?.focus();
       }
       return;
     }
@@ -1426,7 +1545,7 @@
     render();
     if (options.focus) {
       const activeButton = textScaleOptionEls.find((button) => (button.dataset.textScaleOption || "") === nextScale);
-      activeButton?.focus();
+      (textScaleSliderEl || activeButton)?.focus();
     }
   }
 
@@ -1664,7 +1783,7 @@
       "<strong>預先帶入來源</strong>",
       `模型 / 工作環境 / 指令配置的選項來自 <code>local/config/agent-governance-layers.json</code> 的 <code>layers.match</code>。`,
       `目前帶入：模型 <code>${escapeHtml(models.join(" / ") || "gpt-5.4")}</code>；環境 <code>${escapeHtml(environments.join(" / ") || "codex-local-dev")}</code>；指令配置 <code>${escapeHtml(instructionProfiles.join(" / ") || "mapping")}</code>。`,
-      `檔案治理來源優先讀取 <code>${escapeHtml(definitionPath)}</code>；目前映射到 ${escapeHtml(sourceTargets)}。若結構化規則檔不存在，才退回 workspace / repo 的 <code>AGENTS.md</code> 文字解析。`,
+      `檔案治理來源優先讀取 <code>${escapeHtml(definitionPath)}</code>；目前映射到 ${escapeHtml(sourceTargets)}。缺少結構化規則檔時，改讀 workspace / repo 的 <code>AGENTS.md</code>。`,
     ].join("<br>");
   }
 
@@ -1676,8 +1795,8 @@
     const modeLabel = { manual: "手動更新", "on-open": "開啟網頁時自動更新", interval: "定時更新" }[state.updateMode];
     const strategyNote = {
       manual: "不做背景掃描，只有按下「立即更新」才重新解析；執行開銷最低。",
-      "on-open": "每次開啟頁面時做一次掃描，能降低資料過期風險，但會增加進頁時間。",
-      interval: "頁面開啟期間依頻率重掃；資料較新，但會持續產生檔案 I/O 與重新繪圖成本。",
+      "on-open": "開啟時掃描一次，降低資料過期風險，但會增加載入時間。",
+      interval: "開啟期間依頻率重掃；資料較新，但會持續產生檔案 I/O 與重新繪圖成本。",
     }[state.updateMode];
     const repoText = state.repoHandleName ? `已連結：${state.repoHandleName}` : "尚未連結專案根目錄";
     const intervalText = state.updateMode === "interval" ? `；頻率：${describeInterval()}` : "";
@@ -1708,7 +1827,7 @@
       <div><strong>目錄授權</strong>：${repoText}</div>
       <div><strong>最近更新</strong>：${formatTimestamp(state.lastUpdatedAt)}；來源：${state.lastRefreshSource}；耗時：${formatDuration(state.lastRefreshDurationMs)}</div>
       <div><strong>策略評估</strong>：${strategyNote}</div>
-      <div><strong>執行限制</strong>：${supportText} 定時更新只會在頁面保持開啟時生效，不會在頁面關閉時常駐執行。</div>
+      <div><strong>執行限制</strong>：${supportText} 定時更新只在目前分頁開啟時生效，不會常駐執行。</div>
       ${errorText ? `<div><strong>最近錯誤</strong>：${escapeHtml(errorText)}</div>` : ""}
     `;
     syncActionButtons();
@@ -1728,7 +1847,7 @@
       "# UniText 專案地圖交接摘要",
       "",
       `- 產生時間：${state.lastUpdatedAt || DATA.meta?.generated_at || "未知"}`,
-      `- 頁面模式：${PAGE_MODE}`,
+      `- 輸出模式：${PAGE_MODE}`,
       `- 節點數量：${Object.values(counts).reduce((sum, value) => sum + Number(value || 0), 0)}`,
       `- 關聯數量：${(DATA.edges || []).length}`,
       `- 失效引用：${diagnostics.broken_reference_count || 0}`,
@@ -1761,11 +1880,42 @@
     const brokenCount = diagnostics.broken_reference_count || 0;
     const orphanCount = diagnostics.orphan_node_count || 0;
     const brokenSources = getBrokenSources();
+    const diagnosticRows = [
+      {
+        level: brokenCount ? "WARN" : "INFO",
+        tone: brokenCount ? "warn" : "",
+        message: brokenCount
+          ? `${brokenCount} 個引用尚未映射，優先檢查失效來源清單。`
+          : "引用關係目前沒有明顯缺口。",
+      },
+      {
+        level: orphanCount ? "WARN" : "INFO",
+        tone: orphanCount ? "warn" : "",
+        message: orphanCount
+          ? `${orphanCount} 個孤立資源未連回主要圖譜。`
+          : "孤立資源檢查目前正常。",
+      },
+      {
+        level: state.lastRefreshState === "error" ? "ERR" : "SYS_OK",
+        tone: state.lastRefreshState === "error" ? "error" : "",
+        message: `${state.lastRefreshMessage || "目前顯示的是最近一次靜態產出的 MAP。"} 最近更新：${formatTimestamp(state.lastUpdatedAt)}。`,
+      },
+    ];
     const activeFilterLabel = state.diagnosticsFilter === "orphan"
       ? "目前只顯示孤立資源"
       : state.diagnosticsFilter === "broken-source"
         ? "目前只顯示失效引用來源"
         : "目前顯示全部節點";
+    const diagnosticLogMarkup = `
+      <div class="diagnostic-ledger" aria-label="診斷事件摘要">
+        ${diagnosticRows.map((row) => `
+          <div class="diagnostic-row ${row.tone}">
+            <span class="diagnostic-level">${row.level}</span>
+            <span class="diagnostic-message">${escapeHtml(row.message)}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
     const sourceMarkup = brokenSources.length
       ? `
         <div class="section-title" style="margin-top:12px;">失效來源下鑽檢查</div>
@@ -1784,8 +1934,9 @@
       <span class="card-title">診斷檢查</span>
       <div><strong>失效引用</strong>：${brokenCount}</div>
       <div><strong>孤立資源</strong>：${orphanCount}</div>
-      <div class="edge-visibility">先看這兩個數字，就能快速判斷目前執行面與正式來源的對應是否有明顯落差。</div>
+      <div class="edge-visibility">這兩個數字可判斷執行面與正式來源的對應是否有明顯落差。</div>
       <div class="edge-visibility">${activeFilterLabel}</div>
+      ${diagnosticLogMarkup}
       <div class="card-actions">
         <button type="button" class="mini-action secondary" id="filter-broken-sources" ${brokenCount ? "" : "disabled"}>只看失效來源</button>
         <button type="button" class="mini-action secondary" id="filter-orphans" ${orphanCount ? "" : "disabled"}>只看孤立資源</button>
@@ -1814,7 +1965,7 @@
     exportCardEl.innerHTML = `
       <span class="card-title">交付輸出</span>
       <div><strong>分享用輸出</strong>：可直接打開唯讀分享版快照。</div>
-      <div class="edge-visibility">這是治理檢查的最後一步：把目前狀態轉成可交付的分享頁與交接檔，而不是把操作者介面直接丟給下一位。</div>
+      <div class="edge-visibility">分享頁與交接檔保留目前狀態、診斷數字與主要來源資訊。</div>
       ${staticArtifactNote}
       <div class="card-actions">
         <a class="mini-action" href="${shareHref}" target="_blank" rel="noopener noreferrer">開啟分享版</a>
@@ -1905,15 +2056,17 @@
     const incoming = relatedAll.filter((edge) => edge.to === selected.id);
     const brokenSource = getBrokenSources().find((item) => item.source_id === selected.id) || null;
     const detailParts = [
-      `<h3>${selected.label}</h3>`,
-      `<p>${selected.description || "沒有額外描述。"}</p>`,
+      `<div class="detail-kicker">${TYPE_LABELS[selected.type] || escapeHtml(selected.type)} / Inspector</div>`,
+      `<h3>${escapeHtml(selected.label)}</h3>`,
+      `<p>${escapeHtml(selected.description || "沒有額外描述。")}</p>`,
+      `<div class="detail-urn">${escapeHtml(selected.id)}</div>`,
       '<div class="meta">',
-      `<div class="meta-row"><strong>資源類型</strong>${TYPE_LABELS[selected.type] || selected.type}</div>`,
-      `<div class="meta-row"><strong>路徑</strong>${selected.path}</div>`,
+      `<div class="meta-row"><strong>資源類型</strong>${TYPE_LABELS[selected.type] || escapeHtml(selected.type)}</div>`,
+      `<div class="meta-row"><strong>路徑</strong>${escapeHtml(selected.path)}</div>`,
     ];
-    if (selected.logical_path) detailParts.push(`<div class="meta-row"><strong>邏輯路徑</strong>${selected.logical_path}</div>`);
-    if (selected.status) detailParts.push(`<div class="meta-row"><strong>狀態</strong>${selected.status}</div>`);
-    if (selected.source_path) detailParts.push(`<div class="meta-row"><strong>來源檔案</strong>${selected.source_path}</div>`);
+    if (selected.logical_path) detailParts.push(`<div class="meta-row"><strong>邏輯路徑</strong>${escapeHtml(selected.logical_path)}</div>`);
+    if (selected.status) detailParts.push(`<div class="meta-row"><strong>狀態</strong>${escapeHtml(selected.status)}</div>`);
+    if (selected.source_path) detailParts.push(`<div class="meta-row"><strong>來源檔案</strong>${escapeHtml(selected.source_path)}</div>`);
     detailParts.push("</div>");
 
     function pushEdgeSection(title, list, mode) {
@@ -1924,10 +2077,10 @@
         const peerId = mode === "outgoing" ? edge.to : edge.from;
         const peer = nodeById.get(peerId);
         if (!peer) return;
-        const directionText = mode === "outgoing" ? `${selected.label} → ${peer.label}` : `${peer.label} → ${selected.label}`;
+        const directionText = mode === "outgoing" ? `${selected.label} -> ${peer.label}` : `${peer.label} -> ${selected.label}`;
         const visible = visibleIds.has(peer.id);
         const visibilityText = visible ? "目前可見於地圖與節點清單" : "目前被搜尋或類型篩選隱藏";
-        detailParts.push(`<button type="button" class="edge-item edge-jump" data-peer-id="${escapeHtml(peer.id)}"><strong>${EDGE_LABELS[edge.kind] || edge.kind}</strong><div class="edge-direction">${directionText}</div><div>${peer.path}</div><div class="edge-visibility">${visibilityText}；點擊可跳轉</div></button>`);
+        detailParts.push(`<button type="button" class="edge-item edge-jump" data-peer-id="${escapeHtml(peer.id)}"><strong>${EDGE_LABELS[edge.kind] || escapeHtml(edge.kind)}</strong><div class="edge-direction">${escapeHtml(directionText)}</div><div>${escapeHtml(peer.path)}</div><div class="edge-visibility">${visibilityText}；點擊可跳轉</div></button>`);
       });
       detailParts.push("</div>");
     }
@@ -2429,7 +2582,7 @@
 
     if (state.mapMode === "grid") {
       mapModeNoteEl.textContent = "欄式視圖：類型由上往下，橫向拖移看完整列";
-      mapCaptionEl.textContent = "欄式視圖改成由上往下排列資源類型，同列節點沿水平方向展開，方便保留較大的節點尺寸並用左右拖移讀完整列。";
+      mapCaptionEl.textContent = "欄式視圖依資源類型分列；同列節點可左右拖移查看。";
     } else {
       mapModeNoteEl.textContent = "圓形視圖：以所選節點為圓心向外展開";
       mapCaptionEl.textContent = "第一圈優先呈現直接關聯節點，其中最有價值的是執行面投影與正式來源之間的對應。";
@@ -2988,7 +3141,7 @@
     await saveRepoHandle(handle);
     state.repoHandle = handle;
     state.repoHandleName = handle.name;
-    setRefreshState("success", `已連結 ${handle.name}，之後可直接從頁面更新。`);
+    setRefreshState("success", `已連結 ${handle.name}，可直接更新目前資料。`);
     updateStatusCard();
   }
 
@@ -3126,26 +3279,45 @@
     if (governanceOutputPathEl) governanceOutputPathEl.value = defaultGovernanceOutputPath();
     setGovernanceInputDefaults();
     mastheadToggleEl?.addEventListener("click", () => { toggleMastheadCompact(); });
+    workspaceToggleEl?.addEventListener("click", () => { toggleWorkspaceCompact(); });
     workspaceTabs.forEach((button) => {
       button.addEventListener("click", () => {
+        state.workspaceEngaged = true;
+        requestPanelFocus("workspace");
         setWorkspacePage(button.dataset.workspaceTab || "browse");
       });
     });
     workspacePreviewCards.forEach((button) => {
       button.addEventListener("click", () => {
+        state.workspaceEngaged = true;
+        requestPanelFocus("workspace");
         setWorkspacePage(button.dataset.workspacePreview || "browse");
       });
     });
-    workspacePrevEl?.addEventListener("click", () => { moveWorkspacePage(-1); });
-    workspaceNextEl?.addEventListener("click", () => { moveWorkspacePage(1); });
-    workspaceShellEl?.addEventListener("pointerdown", () => {
+    workspacePrevEl?.addEventListener("click", () => {
       state.workspaceEngaged = true;
-      syncMastheadCompactState();
+      requestPanelFocus("workspace");
+      moveWorkspacePage(-1);
+    });
+    workspaceNextEl?.addEventListener("click", () => {
+      state.workspaceEngaged = true;
+      requestPanelFocus("workspace");
+      moveWorkspacePage(1);
+    });
+    workspaceShellEl?.addEventListener("pointerdown", (event) => {
+      if (event.target?.closest?.("#workspace-toggle")) return;
+      state.workspaceEngaged = true;
+      requestPanelFocus("workspace");
     }, { passive: true });
     workspaceShellEl?.addEventListener("focusin", () => {
       state.workspaceEngaged = true;
-      syncMastheadCompactState();
+      requestPanelFocus("workspace");
     });
+    workspaceShellEl?.addEventListener("wheel", (event) => {
+      if (Math.abs(event.deltaY) < 12) return;
+      state.workspaceEngaged = true;
+      requestPanelFocus(event.deltaY < 0 && window.scrollY < 180 ? "masthead" : "workspace");
+    }, { passive: true });
     mapWrapEl?.addEventListener("scroll", () => {
       scheduleMinimapViewportUpdate();
       syncMastheadCompactState();
@@ -3190,6 +3362,21 @@
     searchEl.addEventListener("input", () => { state.search = searchEl.value.trim().toLowerCase(); render(); });
     typeFilterEl.addEventListener("change", () => { state.type = typeFilterEl.value; render(); });
     mapModeEl.addEventListener("change", () => { state.mapMode = mapModeEl.value; saveSettings(); render(); });
+    visualToneSliderEl?.addEventListener("input", () => {
+      const nextTone = VISUAL_TONE_ORDER[Number(visualToneSliderEl.value)] || state.visualTone;
+      setVisualTone(nextTone);
+      saveSettings();
+    });
+    visualThemeSliderEl?.addEventListener("input", () => {
+      const nextTheme = VISUAL_THEME_ORDER[Number(visualThemeSliderEl.value)] || state.visualTheme;
+      setVisualTheme(nextTheme);
+      saveSettings();
+    });
+    textScaleSliderEl?.addEventListener("input", () => {
+      const nextScale = TEXT_SCALE_ORDER[Number(textScaleSliderEl.value)] || state.textScale;
+      setTextScale(nextScale);
+      saveSettings();
+    });
     visualToneOptionEls.forEach((button) => {
       button.addEventListener("click", () => {
         const nextTone = button.dataset.visualToneOption || "";
