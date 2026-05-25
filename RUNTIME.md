@@ -25,5 +25,6 @@
 - [README.md](README.md) 給 human orientation。
 - [INDEX.md](INDEX.md) 給 human discovery 與 catalog。
 - [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) 給既有工作環境接入與新資源 lane 選擇。
+- [docs/operations/skill-runtime-codex-duplication.SOP.md](docs/operations/skill-runtime-codex-duplication.SOP.md) 給同名 skill 在 UniText runtime 與 Codex local bundle 雙曝光時的處理程序。
 - [docs/architecture/runtime-transition-inventory.md](docs/architecture/runtime-transition-inventory.md) 給 runtime reset 盤點與歷史入口。
 - 如果 runtime surface 缺資料，再從 `runtime/` 指到對應 canonical doc。
