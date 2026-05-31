@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GeminiDesignCriticReview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "risk_score",
+    "issues",
+    "improvement_prompt"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise"
+      ]
+    },
+    "risk_score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "category",
+          "description"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "uiux",
+              "visual",
+              "responsive",
+              "accessibility",
+              "imagery",
+              "asset_provenance",
+              "brand",
+              "privacy",
+              "verification",
+              "operability"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "improvement_prompt": {
+      "type": "string"
+    }
+  }
+}

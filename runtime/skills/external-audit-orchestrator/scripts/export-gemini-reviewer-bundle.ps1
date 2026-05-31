@@ -16,6 +16,8 @@ param(
 
     [string]$CriticModel = "gemini-3.1-pro",
 
+    [string]$DesignCriticModel = "gemini-3.1-pro",
+
     [int]$MaxReviewRounds = 3,
 
     [switch]$Apply
@@ -59,9 +61,11 @@ $resolvedTargetProject = (Resolve-Path -LiteralPath $TargetProject).Path
 $sourceAgentsDirectory = Join-Path -Path $resolvedSkillRoot -ChildPath "assets\gemini"
 $sourceArchitect = Join-Path -Path $sourceAgentsDirectory -ChildPath "plan-architect.md"
 $sourceCritic = Join-Path -Path $sourceAgentsDirectory -ChildPath "plan-critic.md"
+$sourceDesignCritic = Join-Path -Path $sourceAgentsDirectory -ChildPath "design-critic.md"
 $sourceSchema = Join-Path -Path $sourceAgentsDirectory -ChildPath "plan-critic.schema.json"
+$sourceDesignSchema = Join-Path -Path $sourceAgentsDirectory -ChildPath "design-critic.schema.json"
 
-foreach ($requiredPath in @($sourceArchitect, $sourceCritic, $sourceSchema)) {
+foreach ($requiredPath in @($sourceArchitect, $sourceCritic, $sourceDesignCritic, $sourceSchema, $sourceDesignSchema)) {
     if (-not (Test-Path -LiteralPath $requiredPath)) {
         throw "Missing Gemini reviewer asset: $requiredPath"
     }
@@ -82,7 +86,9 @@ $targetGeminiDirectory = Join-Path -Path $resolvedTargetProject -ChildPath ".gem
 $targetAgentsDirectory = Join-Path -Path $targetGeminiDirectory -ChildPath "agents"
 $targetArchitect = Join-Path -Path $targetAgentsDirectory -ChildPath "external-plan-architect.md"
 $targetCritic = Join-Path -Path $targetAgentsDirectory -ChildPath "external-plan-critic.md"
+$targetDesignCritic = Join-Path -Path $targetAgentsDirectory -ChildPath "external-design-critic.md"
 $targetSchema = Join-Path -Path $resolvedOutputDirectory -ChildPath "plan-critic.schema.json"
+$targetDesignSchema = Join-Path -Path $resolvedOutputDirectory -ChildPath "design-critic.schema.json"
 $runnerPath = Join-Path -Path $resolvedOutputDirectory -ChildPath "run-gemini-plan-review.ps1"
 $rawArchitectPath = Join-Path -Path $resolvedOutputDirectory -ChildPath "plan-architect.raw.txt"
 $rawCriticPath = Join-Path -Path $resolvedOutputDirectory -ChildPath "plan-critic.raw.json"
@@ -240,8 +246,10 @@ $plan = @(
     "- target_agents_directory: $targetAgentsDirectory",
     "- target_architect: $targetArchitect",
     "- target_critic: $targetCritic",
+    "- target_design_critic: $targetDesignCritic",
     "- output_directory: $resolvedOutputDirectory",
     "- schema_path: $targetSchema",
+    "- design_schema_path: $targetDesignSchema",
     "- runner_path: $runnerPath",
     "- raw_architect: $rawArchitectPath",
     "- raw_critic: $rawCriticPath",
@@ -250,6 +258,7 @@ $plan = @(
 "- gemini_command: $GeminiCommand",
 "- architect_model: $ArchitectModel",
 "- critic_model: $CriticModel",
+"- design_critic_model: $DesignCriticModel",
 "- max_review_rounds: $MaxReviewRounds",
     "- mode: $modeLabel",
     "- operator_step: run /agents reload and /agents list in Gemini CLI to confirm discovery",
@@ -268,11 +277,15 @@ New-Item -ItemType Directory -Force -Path $targetAgentsDirectory | Out-Null
 New-Item -ItemType Directory -Force -Path $resolvedOutputDirectory | Out-Null
 $architectText = Get-Content -LiteralPath $sourceArchitect -Raw
 $criticText = Get-Content -LiteralPath $sourceCritic -Raw
+$designCriticText = Get-Content -LiteralPath $sourceDesignCritic -Raw
 $architectText = Set-AgentFrontmatterValue -Text $architectText -Key "model" -Value $ArchitectModel
 $criticText = Set-AgentFrontmatterValue -Text $criticText -Key "model" -Value $CriticModel
+$designCriticText = Set-AgentFrontmatterValue -Text $designCriticText -Key "model" -Value $DesignCriticModel
 [System.IO.File]::WriteAllText($targetArchitect, $architectText, [System.Text.Encoding]::UTF8)
 [System.IO.File]::WriteAllText($targetCritic, $criticText, [System.Text.Encoding]::UTF8)
+[System.IO.File]::WriteAllText($targetDesignCritic, $designCriticText, [System.Text.Encoding]::UTF8)
 Copy-Item -LiteralPath $sourceSchema -Destination $targetSchema -Force
+Copy-Item -LiteralPath $sourceDesignSchema -Destination $targetDesignSchema -Force
 if (-not [string]::IsNullOrWhiteSpace($resolvedAuditPacketPath)) {
     Copy-Item -LiteralPath $resolvedAuditPacketPath -Destination (Join-Path -Path $resolvedOutputDirectory -ChildPath "audit-packet.md") -Force
 }

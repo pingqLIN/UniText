@@ -160,6 +160,8 @@ $requiredPaths = @(
     "assets\gemini\plan-architect.md",
     "assets\gemini\plan-critic.md",
     "assets\gemini\plan-critic.schema.json",
+    "assets\gemini\design-critic.md",
+    "assets\gemini\design-critic.schema.json",
     "assets\tb2\tb2-audit-request.template.json",
     "assets\claude\code-reviewer.md",
     "assets\report\external-audit-report.template.md",

@@ -16,6 +16,7 @@ Default model route:
 
 - `external_plan_architect`: Gemini 3.1 Flash-class model for fast planning drafts.
 - `external_plan_critic`: Gemini 3.1 Pro-class model for stricter feasibility and edge-case review.
+- `external_design_critic`: Gemini 3.1 Pro-class model for UI/UX, visual, imagery, and asset review.
 
 Treat the exact model ids as operator-configurable. The bundled exporter defaults to `gemini-3.1-flash` and `gemini-3.1-pro`, but callers should override them when the installed Gemini CLI exposes different names.
 
@@ -54,8 +55,11 @@ When using headless mode for automation, capture raw stdout and stderr as audit 
 
 - `external_plan_architect`: actor agent that drafts a software implementation plan only.
 - `external_plan_critic`: critic agent that reviews a plan as a senior system architect and returns strict JSON.
+- `external_design_critic`: critic agent that reviews UI/UX, visual hierarchy, responsive behavior, accessibility, design imagery, and asset provenance as strict JSON.
 
 The critic is intentionally read-only. It must not edit files, run migrations, stage changes, commit, push, or auto-fix.
+
+Use the design critic when the audit packet includes design direction, frontend screens, screenshots, mockups, generated-image prompts, illustration choices, design-system changes, landing-page composition, or product imagery. It is not a replacement for browser verification; use it to catch design risks before or alongside screenshot-based checks.
 
 ## Actor-critic loop
 
@@ -82,10 +86,26 @@ The critic must return only one JSON object:
 
 If any concern exists, `status` must be `revise`, `risk_score` must reflect the severity, `issues` must describe each concern, and `improvement_prompt` must be directly reusable as the next prompt for the plan author.
 
+## Design critic JSON
+
+The design critic must return only one JSON object:
+
+```json
+{
+  "status": "pass",
+  "risk_score": 1,
+  "issues": [],
+  "improvement_prompt": ""
+}
+```
+
+Allowed design issue categories are `uiux`, `visual`, `responsive`, `accessibility`, `imagery`, `asset_provenance`, `brand`, `privacy`, `verification`, and `operability`.
+
 ## Guardrails
 
 - Keep Gemini agents read-only unless the user explicitly asks for implementation.
 - Use Flash for the actor and Pro for the critic by default; do not silently downgrade the critic model without recording it in the flow output.
+- Route design-facing packets to `external_design_critic` when UI/UX, design images, illustration assets, or visual design acceptance matters.
 - Use temperature `0.1` to `0.2` for the critic so JSON stays stable while still allowing edge-case reasoning.
 - Preserve the raw Gemini output before normalizing reports.
 - Always include Gemini CLI documentation and any copied or adapted prompt template in `Reference Inputs`.

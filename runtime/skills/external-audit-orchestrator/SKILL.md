@@ -110,6 +110,10 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   [assets/gemini/plan-critic.md](assets/gemini/plan-critic.md)
 - Gemini plan critic JSON schema:
   [assets/gemini/plan-critic.schema.json](assets/gemini/plan-critic.schema.json)
+- Gemini design critic subagent template:
+  [assets/gemini/design-critic.md](assets/gemini/design-critic.md)
+- Gemini design critic JSON schema:
+  [assets/gemini/design-critic.schema.json](assets/gemini/design-critic.schema.json)
 - Web prompt template:
   [assets/web/external-audit-request.md](assets/web/external-audit-request.md)
 - TB2 request template:

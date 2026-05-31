@@ -34,6 +34,8 @@ param(
 
     [string]$GeminiCriticModel = "gemini-3.1-pro",
 
+    [string]$GeminiDesignCriticModel = "gemini-3.1-pro",
+
     [int]$GeminiMaxReviewRounds = 3,
 
     [ValidateSet("", "Y", "N", "O")]
@@ -123,6 +125,7 @@ switch ($Mode) {
             GeminiCommand = $GeminiCommand
             ArchitectModel = $GeminiArchitectModel
             CriticModel = $GeminiCriticModel
+            DesignCriticModel = $GeminiDesignCriticModel
             MaxReviewRounds = $GeminiMaxReviewRounds
         }
 
