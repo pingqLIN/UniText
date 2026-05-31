@@ -151,16 +151,21 @@ $requiredPaths = @(
     "SKILL.md",
     "references\audit-packet-format.md",
     "references\mode-codex-exec.md",
+    "references\mode-gemini-cli.md",
     "references\mode-same-provider.md",
     "references\mode-tb2.md",
     "references\report-format.md",
     "references\source-attribution-policy.md",
     "assets\codex\audit-report.schema.json",
+    "assets\gemini\plan-architect.md",
+    "assets\gemini\plan-critic.md",
+    "assets\gemini\plan-critic.schema.json",
     "assets\tb2\tb2-audit-request.template.json",
     "assets\claude\code-reviewer.md",
     "assets\report\external-audit-report.template.md",
     "scripts\build-audit-packet.ps1",
     "scripts\export-codex-exec-request.ps1",
+    "scripts\export-gemini-reviewer-bundle.ps1",
     "scripts\export-tb2-audit-request.ps1",
     "scripts\normalize-audit-report.ps1",
     "scripts\run-external-audit-flow.ps1"
@@ -172,6 +177,7 @@ $packetPath = Join-Path -Path $resolvedScratchRoot -ChildPath "audit-packet.md"
 $targetProject = $resolvedScratchRoot
 $buildScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\build-audit-packet.ps1"
 $codexExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-codex-exec-request.ps1"
+$geminiExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-gemini-reviewer-bundle.ps1"
 $tb2ExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-tb2-audit-request.ps1"
 
 Invoke-Step -Name "build-audit-packet:dry-run" -Script {
@@ -192,6 +198,14 @@ Invoke-Step -Name "export-codex-exec-request:dry-run" -Script {
         -TargetProject $targetProject `
         -AuditPacketPath $packetPath `
         -OutputDirectory (Join-Path -Path $resolvedScratchRoot -ChildPath "codex-export")
+}
+
+Invoke-Step -Name "export-gemini-reviewer-bundle:dry-run" -Script {
+    & $geminiExportScript `
+        -SkillRoot $resolvedSkillRoot `
+        -TargetProject $targetProject `
+        -AuditPacketPath $packetPath `
+        -OutputDirectory (Join-Path -Path $resolvedScratchRoot -ChildPath "gemini-export")
 }
 
 Invoke-Step -Name "export-tb2-audit-request:dry-run" -Script {
@@ -220,9 +234,19 @@ else {
     Add-Result -Name "cli:claude:path" -Status "warn" -Detail "not found"
 }
 
+$geminiPath = Get-FirstCommandPath -CommandName "gemini"
+if ($geminiPath) {
+    Add-Result -Name "cli:gemini:path" -Status "pass" -Detail "found" -Evidence $geminiPath
+    Invoke-ExternalWithTimeout -Name "cli:gemini:version" -FilePath $geminiPath -ArgumentList @("--version") -TimeoutSeconds 10
+}
+else {
+    Add-Result -Name "cli:gemini:path" -Status "warn" -Detail "not found"
+}
+
 if ($SkipLive) {
     Add-Result -Name "live:codex-exec:minimal" -Status "skip" -Detail "SkipLive set"
     Add-Result -Name "live:claude-print:minimal" -Status "skip" -Detail "SkipLive set"
+    Add-Result -Name "live:gemini-headless:minimal" -Status "skip" -Detail "SkipLive set"
 }
 else {
     if ($codexPath) {
@@ -246,6 +270,17 @@ else {
     }
     else {
         Add-Result -Name "live:claude-print:minimal" -Status "skip" -Detail "claude not found"
+    }
+
+    if ($geminiPath) {
+        Invoke-ExternalWithTimeout `
+            -Name "live:gemini-headless:minimal" `
+            -FilePath $geminiPath `
+            -ArgumentList @("-p", "OK", "--output-format", "json") `
+            -TimeoutSeconds $LiveTimeoutSeconds
+    }
+    else {
+        Add-Result -Name "live:gemini-headless:minimal" -Status "skip" -Detail "gemini not found"
     }
 }
 

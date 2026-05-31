@@ -33,6 +33,7 @@ Read [references/source-attribution-policy.md](references/source-attribution-pol
 Read [references/install-claude-same-provider.md](references/install-claude-same-provider.md) when the chosen mode is Claude Code same-provider audit.
 Read [references/install-tb2-template.md](references/install-tb2-template.md) when the chosen mode is TB2 template export.
 Read [references/mode-codex-exec.md](references/mode-codex-exec.md) when the chosen mode is Codex non-interactive audit.
+Read [references/mode-gemini-cli.md](references/mode-gemini-cli.md) when the chosen mode is Gemini CLI subagent or headless audit.
 
 ## Audit modes
 
@@ -44,6 +45,8 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   Use [references/mode-web-manual.md](references/mode-web-manual.md)
 - External CLI or MCP audit:
   Use [references/mode-cli-mcp.md](references/mode-cli-mcp.md)
+- Gemini CLI actor-critic audit:
+  Use [references/mode-gemini-cli.md](references/mode-gemini-cli.md)
 - Codex non-interactive audit:
   Use [references/mode-codex-exec.md](references/mode-codex-exec.md)
 - TB2 audit template:
@@ -66,6 +69,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 3. Choose the review path.
    - Same-provider if the user wants the most stable v0.1 path
    - Codex exec if the reviewer should be Codex in a scripted or CI-style workflow
+   - Gemini CLI if the reviewer should run as Gemini subagents or a headless actor-critic loop
    - Web if the user wants visible human-supervised review
    - CLI/MCP if the user already has an external toolchain
    - TB2 if the goal is traceable external process orchestration
@@ -93,6 +97,12 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   [assets/report/external-audit-report.template.md](assets/report/external-audit-report.template.md)
 - Codex exec audit report schema:
   [assets/codex/audit-report.schema.json](assets/codex/audit-report.schema.json)
+- Gemini plan architect subagent template:
+  [assets/gemini/plan-architect.md](assets/gemini/plan-architect.md)
+- Gemini plan critic subagent template:
+  [assets/gemini/plan-critic.md](assets/gemini/plan-critic.md)
+- Gemini plan critic JSON schema:
+  [assets/gemini/plan-critic.schema.json](assets/gemini/plan-critic.schema.json)
 - Web prompt template:
   [assets/web/external-audit-request.md](assets/web/external-audit-request.md)
 - TB2 request template:
@@ -110,6 +120,8 @@ Choose one mode only unless the user explicitly wants comparison across multiple
   [scripts/normalize-audit-report.ps1](scripts/normalize-audit-report.ps1)
 - Codex exec request exporter:
   [scripts/export-codex-exec-request.ps1](scripts/export-codex-exec-request.ps1)
+- Gemini reviewer bundle exporter:
+  [scripts/export-gemini-reviewer-bundle.ps1](scripts/export-gemini-reviewer-bundle.ps1)
 - TB2 request exporter:
   [scripts/export-tb2-audit-request.ps1](scripts/export-tb2-audit-request.ps1)
 - Unified flow runner:
@@ -118,6 +130,7 @@ Choose one mode only unless the user explicitly wants comparison across multiple
 ## v0.1 guardrails
 
 - Prefer same-provider or web-manual mode first.
+- Treat Gemini CLI mode as an external CLI/MCP variant until the target machine has authenticated Gemini CLI and the generated `.gemini/agents` bundle has been listed with `/agents list`.
 - Prefer `codex-exec` over TB2 `codex` when the reviewer should be Codex and the operator wants non-interactive automation.
 - Treat TB2 `claude` and `codex` profiles as reusable templates, not fully proven production reviewers, until the user validates those profiles in their real runtime.
 - Do not hide source provenance. If another project materially influenced the audit, cite it every time.

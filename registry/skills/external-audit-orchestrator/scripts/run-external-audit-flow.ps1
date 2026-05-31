@@ -6,7 +6,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$TargetProject,
 
-    [ValidateSet("same-provider-subagent", "external-web", "external-cli-mcp", "codex-exec", "tb2-template")]
+    [ValidateSet("same-provider-subagent", "external-web", "external-cli-mcp", "gemini-cli", "codex-exec", "tb2-template")]
     [string]$Mode = "same-provider-subagent",
 
     [ValidateSet("WorkingTree", "Staged", "CommitRange", "Path", "Manual")]
@@ -28,6 +28,14 @@ param(
 
     [string]$ReportPath,
 
+    [string]$GeminiCommand = "gemini",
+
+    [string]$GeminiArchitectModel = "gemini-3.1-flash",
+
+    [string]$GeminiCriticModel = "gemini-3.1-pro",
+
+    [int]$GeminiMaxReviewRounds = 3,
+
     [ValidateSet("", "Y", "N", "O")]
     [string]$StartupGateAnswer = "",
 
@@ -48,10 +56,11 @@ $resolvedTargetProject = (Resolve-Path -LiteralPath $TargetProject).Path
 $buildScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\build-audit-packet.ps1"
 $normalizeScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\normalize-audit-report.ps1"
 $claudeExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-claude-reviewer-bundle.ps1"
+$geminiExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-gemini-reviewer-bundle.ps1"
 $codexExecExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-codex-exec-request.ps1"
 $tb2ExportScript = Join-Path -Path $resolvedSkillRoot -ChildPath "scripts\export-tb2-audit-request.ps1"
 
-foreach ($requiredScript in @($buildScript, $normalizeScript, $claudeExportScript, $codexExecExportScript, $tb2ExportScript)) {
+foreach ($requiredScript in @($buildScript, $normalizeScript, $claudeExportScript, $geminiExportScript, $codexExecExportScript, $tb2ExportScript)) {
     if (-not (Test-Path -LiteralPath $requiredScript)) {
         throw "Missing required script: $requiredScript"
     }
@@ -111,6 +120,10 @@ switch ($Mode) {
             SkillRoot = $resolvedSkillRoot
             TargetProject = $resolvedTargetProject
             AuditPacketPath = $packetPath
+            GeminiCommand = $GeminiCommand
+            ArchitectModel = $GeminiArchitectModel
+            CriticModel = $GeminiCriticModel
+            MaxReviewRounds = $GeminiMaxReviewRounds
         }
 
         if ($Apply) {
@@ -135,6 +148,21 @@ switch ($Mode) {
 
         $exportOutput = & $codexExecExportScript @exportSplat
         $flowSummary += "- export: codex exec request"
+        $flowSummary += ($exportOutput | ForEach-Object { "  $_" })
+    }
+    "gemini-cli" {
+        $exportSplat = @{
+            SkillRoot = $resolvedSkillRoot
+            TargetProject = $resolvedTargetProject
+            AuditPacketPath = $packetPath
+        }
+
+        if ($Apply) {
+            $exportSplat["Apply"] = $true
+        }
+
+        $exportOutput = & $geminiExportScript @exportSplat
+        $flowSummary += "- export: gemini reviewer bundle"
         $flowSummary += ($exportOutput | ForEach-Object { "  $_" })
     }
     "external-web" {

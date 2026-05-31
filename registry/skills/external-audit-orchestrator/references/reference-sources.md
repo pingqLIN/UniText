@@ -36,6 +36,18 @@ Repeat these citations in user-facing audit outputs when they materially affect 
    - `https://skills.sh/docs`
    - Why used: leaderboard semantics and ranking caveat
 
+6. Gemini CLI command reference
+   - `https://geminicli.com/docs/reference/commands/`
+   - Why used: `/agents` management commands and CLI command behavior for Gemini reviewer installation guidance
+
+7. Gemini CLI subagents documentation
+   - `https://geminicli.com/docs/core/subagents/`
+   - Why used: project-level `.gemini/agents/*.md` placement, subagent frontmatter schema, temperature, tool isolation, and custom subagent behavior
+
+8. Gemini CLI headless mode reference
+   - `https://geminicli.com/docs/cli/headless/`
+   - Why used: `gemini -p` and `--output-format json` automation pattern for actor-critic review loops
+
 ## Referenced public skill examples
 
 1. CodeRabbit `code-review`
