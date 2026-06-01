@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/rbac/rbac.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/rbac/rbac.md`
-> Source of truth: `registry/skills/microsoft-foundry/rbac/rbac.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Microsoft Foundry RBAC Management
 
 Reference for managing RBAC for Microsoft Foundry resources: user permissions, managed identity configuration, and service principal setup for CI/CD.

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/resource/create/references/troubleshooting.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/resource/create/references/troubleshooting.md`
-> Source of truth: `registry/skills/microsoft-foundry/resource/create/references/troubleshooting.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Troubleshooting: Create Foundry Resource
 
 ## Resource Creation Failures

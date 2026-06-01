@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/references/capacity-planning.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/references/capacity-planning.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/references/capacity-planning.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Capacity Planning Guide
 
 Comprehensive guide for planning Azure AI Foundry capacity, including cost analysis, model selection, and workload calculations.

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/trace/references/kql-templates.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/trace/references/kql-templates.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/trace/references/kql-templates.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # KQL Templates — GenAI Trace Query Reference
 
 Ready-to-use KQL templates for querying GenAI OpenTelemetry traces in Application Insights.

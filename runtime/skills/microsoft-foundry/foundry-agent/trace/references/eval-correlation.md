@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/trace/references/eval-correlation.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/trace/references/eval-correlation.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/trace/references/eval-correlation.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Eval Correlation — Find Evaluation Results by Response or Conversation ID
 
 Look up evaluation scores for a specific agent response using App Insights.

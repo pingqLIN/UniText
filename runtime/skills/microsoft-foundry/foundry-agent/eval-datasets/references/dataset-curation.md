@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-curation.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-curation.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-curation.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Dataset Curation — Human-in-the-Loop Review
 
 Review, annotate, and approve harvested trace candidates before including them in evaluation datasets. This ensures dataset quality by adding a human review gate between raw trace extraction and finalized test cases.

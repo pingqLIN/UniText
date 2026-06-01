@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/models/deploy-model/customize/references/customize-workflow.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/models/deploy-model/customize/references/customize-workflow.md`
-> Source of truth: `registry/skills/microsoft-foundry/models/deploy-model/customize/references/customize-workflow.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Customize Workflow — Detailed Phase Instructions
 
 > Reference for: `models/deploy-model/customize/SKILL.md`

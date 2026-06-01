@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/trace/trace.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/trace/trace.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/trace/trace.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Foundry Agent Trace Analysis
 
 Analyze production traces for Foundry agents using Application Insights and GenAI OpenTelemetry semantic conventions. This skill provides structured KQL-powered workflows for a selected agent root and environment: searching conversations, diagnosing failures, and identifying latency bottlenecks.
@@ -29,7 +19,7 @@ USE FOR: analyze agent traces, search agent conversations, find failing traces, 
 | Related skills | `troubleshoot` (hosted-agent logs), `eval-datasets` (trace harvesting) |
 | Preferred query tool | `monitor_resource_log_query` (Azure MCP) - use for App Insights KQL queries |
 | OTel conventions | [GenAI Spans](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/), [Agent Spans](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-agent-spans/) |
-| Local metadata | `.foundry/agent-metadata.yaml` |
+| Local metadata | selected `.foundry/agent-metadata*.yaml` file |
 
 ## Entry Points
 
@@ -42,12 +32,13 @@ USE FOR: analyze agent traces, search agent conversations, find failing traces, 
 | "Show me this conversation" / "Trace detail" | [Conversation Detail](references/conversation-detail.md) |
 | "Find eval results for response ID" / "eval scores from traces" | [Eval Correlation](references/eval-correlation.md) |
 | "What KQL do I need?" | [KQL Templates](references/kql-templates.md) |
+| "Auto-detect agent issues" / "Get automated insights" / "What's wrong with my agent?" | [Tracing Insights API](references/tracing-insights-api.md) |
 
 ## Before Starting — Resolve App Insights Connection
 
-1. Resolve the target agent root and environment from `.foundry/agent-metadata.yaml`.
-2. Check `environments.<env>.observability.applicationInsightsConnectionString` or `environments.<env>.observability.applicationInsightsResourceId` in the metadata.
-3. If observability settings are missing, use `project_connection_list` to discover App Insights linked to the Foundry project, then persist the chosen resource back to `environments.<env>.observability` in `agent-metadata.yaml` before querying.
+1. Resolve the target agent root, selected metadata file, and environment from `.foundry/agent-metadata*.yaml`.
+2. Check `environments.<env>.observability.applicationInsightsConnectionString` or `environments.<env>.observability.applicationInsightsResourceId` in the selected metadata file.
+3. If observability settings are missing, use `project_connection_list` to discover App Insights linked to the Foundry project, then persist the chosen resource back to `environments.<env>.observability` in the selected metadata file before querying.
 4. Confirm the selected App Insights resource and environment with the user before querying.
 5. Use **`monitor_resource_log_query`** (Azure MCP tool) to execute KQL queries against the App Insights resource. This is preferred over delegating to the `azure-kusto` skill. Pass the App Insights resource ID and the KQL query directly.
 

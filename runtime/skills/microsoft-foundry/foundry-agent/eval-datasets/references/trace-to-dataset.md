@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/trace-to-dataset.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/trace-to-dataset.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/trace-to-dataset.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Trace-to-Dataset Pipeline — Harvest Production Traces as Test Cases
 
 Extract production traces from App Insights using KQL, transform them into evaluation dataset format, and persist as versioned datasets. This is the core workflow for turning real-world agent failures into reproducible test cases.
@@ -24,8 +14,10 @@ Extract production traces from App Insights using KQL, transform them into evalu
 ## Prerequisites
 
 - App Insights resource resolved (see [trace skill](../../trace/trace.md) Before Starting)
-- Agent root, environment, and project endpoint available in `.foundry/agent-metadata.yaml`
+- Agent root, selected metadata file, environment, and project endpoint available from `.foundry/agent-metadata*.yaml`
 - Time range confirmed with user (default: last 7 days)
+
+When a repo contains multiple agent roots, this workflow updates only the selected agent root's `.foundry/datasets/`, `.foundry/results/`, and metadata files. Do **not** merge sibling agent folders.
 
 > 💡 **Run all KQL queries** using **`monitor_resource_log_query`** (Azure MCP tool) against the App Insights resource. This is preferred over delegating to the `azure-kusto` skill.
 

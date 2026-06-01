@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/trace/references/analyze-latency.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/trace/references/analyze-latency.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/trace/references/analyze-latency.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Analyze Latency — Find and Diagnose Slow Traces
 
 Identify slow agent traces, find bottleneck spans, and correlate with token usage.

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/agentframework.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/agentframework.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/agentframework.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Microsoft Agent Framework — Best Practices for Hosted Agents
 
 Best practices when building hosted agents with Microsoft Agent Framework for deployment to Foundry Agent Service.

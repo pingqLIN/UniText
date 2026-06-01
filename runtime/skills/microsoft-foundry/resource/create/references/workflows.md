@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/resource/create/references/workflows.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/resource/create/references/workflows.md`
-> Source of truth: `registry/skills/microsoft-foundry/resource/create/references/workflows.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Detailed Workflows: Create Foundry Resource
 
 **Table of Contents:** [Workflow 1: Create Resource Group](#workflow-1-create-resource-group---detailed-steps) · [Workflow 2: Create Foundry Resource](#workflow-2-create-foundry-resource---detailed-steps) · [Workflow 3: Register Resource Provider](#workflow-3-register-resource-provider---detailed-steps)

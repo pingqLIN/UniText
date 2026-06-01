@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/tool-bing-grounding.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/tool-bing-grounding.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/tool-bing-grounding.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Bing Grounding Tool
 
 Access real-time web information via Bing Search. Unlike the [Web Search tool](tool-web-search.md) (which works out of the box), Bing Grounding requires a dedicated Bing resource and a project connection.

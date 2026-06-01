@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/observe/references/optimize-deploy.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/observe/references/optimize-deploy.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/observe/references/optimize-deploy.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Steps 6–7 — Optimize Prompt & Deploy New Version
 
 ## Step 6 — Optimize Prompt

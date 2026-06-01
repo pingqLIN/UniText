@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/references/ptu-guide.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/references/ptu-guide.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/references/ptu-guide.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Provisioned Throughput Units (PTU) Guide
 
 **Table of Contents:** [Understanding PTU vs Standard TPM](#understanding-ptu-vs-standard-tpm) · [When to Use PTU](#when-to-use-ptu) · [PTU Capacity Planning](#ptu-capacity-planning) · [Deploy Model with PTU](#deploy-model-with-ptu) · [Request PTU Quota Increase](#request-ptu-quota-increase) · [Understanding Region and Deployment Quotas](#understanding-region-and-deployment-quotas) · [External Resources](#external-resources)

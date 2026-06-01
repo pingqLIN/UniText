@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-comparison.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-comparison.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-comparison.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Dataset Comparison — A/B Testing Across Dataset Versions
 
 Run structured experiments that compare how an agent performs across different dataset versions, and present results as leaderboards with per-evaluator breakdowns. Use this to answer: "Did scores drop because of harder tests or agent regression?"

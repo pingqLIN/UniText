@@ -1,16 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/create-prompt.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/create-prompt.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/create-prompt.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Create Prompt Agent
 
-Create and manage prompt agents in Azure Foundry Agent Service using MCP tools or Python SDK. For hosted agents (container-based), see [create.md](create.md).
+Create and manage prompt agents in Azure Foundry Agent Service using MCP tools or Python SDK. For hosted agents (container-based), see [create-hosted.md](create-hosted.md).
 
 ## Quick Reference
 

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/trace/references/analyze-failures.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/trace/references/analyze-failures.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/trace/references/analyze-failures.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Analyze Failures — Find and Cluster Failing Traces
 
 Identify failing agent traces, group them by root cause, and produce a prioritized action table.

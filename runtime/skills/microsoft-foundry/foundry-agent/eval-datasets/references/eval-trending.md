@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-trending.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-trending.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-trending.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Eval Trending — Metrics Over Time
 
 Track evaluation metrics across multiple runs and versions to visualize improvement trends and detect regressions. This addresses the gap of understanding how agent quality changes over time.
@@ -15,7 +5,7 @@ Track evaluation metrics across multiple runs and versions to visualize improvem
 ## Prerequisites
 
 - At least 2 evaluation runs in the same evaluation group (same `evaluationId` when created)
-- Project endpoint and selected environment available in `.foundry/agent-metadata.yaml`
+- Project endpoint and selected environment available in the selected `.foundry/agent-metadata*.yaml` file
 
 > ⚠️ **Eval-group immutability:** Trend a group only when its evaluator set and thresholds stayed fixed across runs. If either changed, start a new evaluation group and track that history separately.
 

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/models/deploy-model/TEST_PROMPTS.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/models/deploy-model/TEST_PROMPTS.md`
-> Source of truth: `registry/skills/microsoft-foundry/models/deploy-model/TEST_PROMPTS.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Deploy Model — Test Prompts
 
 Test prompts for the unified `deploy-model` skill with router, preset, customize, and capacity sub-skills.

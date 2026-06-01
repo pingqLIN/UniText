@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/models/deploy-model/preset/references/preset-workflow.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/models/deploy-model/preset/references/preset-workflow.md`
-> Source of truth: `registry/skills/microsoft-foundry/models/deploy-model/preset/references/preset-workflow.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Preset Deployment Workflow - Detailed Implementation
 
 This file contains the full step-by-step bash/PowerShell scripts for preset (optimal region) model deployment. Referenced from the main [SKILL.md](../SKILL.md).

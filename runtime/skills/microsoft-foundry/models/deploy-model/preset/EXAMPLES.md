@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/models/deploy-model/preset/EXAMPLES.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/models/deploy-model/preset/EXAMPLES.md`
-> Source of truth: `registry/skills/microsoft-foundry/models/deploy-model/preset/EXAMPLES.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Examples: preset
 
 ## Example 1: Fast Path — Current Region Has Capacity

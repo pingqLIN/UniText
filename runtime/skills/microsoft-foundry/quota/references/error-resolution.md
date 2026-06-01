@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/references/error-resolution.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/references/error-resolution.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/references/error-resolution.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Error Resolution Workflows
 
 **Table of Contents:** [Workflow 7: Quota Exhausted Recovery](#workflow-7-quota-exhausted-recovery) · [Workflow 8: Resolve 429 Rate Limit Errors](#workflow-8-resolve-429-rate-limit-errors) · [Workflow 9: Resolve DeploymentLimitReached](#workflow-9-resolve-deploymentlimitreached) · [Workflow 10: Resolve InsufficientQuota](#workflow-10-resolve-insufficientquota) · [Workflow 11: Resolve QuotaExceeded](#workflow-11-resolve-quotaexceeded)
@@ -152,3 +142,4 @@ az cognitiveservices account deployment create --name <resource> --resource-grou
 **Decision:** Available < 10% → Different region; 10-50% → Delete/reduce; > 50% → Delete one deployment
 
 ---
+

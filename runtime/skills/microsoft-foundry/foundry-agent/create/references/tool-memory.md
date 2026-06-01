@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/tool-memory.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/tool-memory.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/tool-memory.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Agent Memory
 
 Managed long-term memory for Foundry agents. Enables agent continuity across sessions, devices, and workflows. Agents retain user preferences, conversation history, and deliver personalized experiences. Memory is stored in your project's owned storage.

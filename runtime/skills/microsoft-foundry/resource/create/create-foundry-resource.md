@@ -10,15 +10,8 @@ compatibility:
   optional:
     - powershell: ">=7.0"
     - azure-portal: "any"
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/resource/create/create-foundry-resource.md
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/resource/create/create-foundry-resource.md`
-> Source of truth: `registry/skills/microsoft-foundry/resource/create/create-foundry-resource.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Create Foundry Resource
 
 This sub-skill orchestrates creation of Azure AI Services multi-service resources using Azure CLI.
@@ -90,7 +83,7 @@ az group create --name <rg-name> --location <location>
 az group show --name <rg-name> --query "{Name:name, Location:location, State:properties.provisioningState}"
 ```
 
-See [Detailed Workflow Steps](references/workflows.md) for complete instructions.
+See [Detailed Workflow Steps](./references/workflows.md) for complete instructions.
 
 ---
 
@@ -122,7 +115,7 @@ az cognitiveservices account keys list --name <resource-name> --resource-group <
 
 **Important:** S0 (Standard) is the only supported SKU - F0 free tier not available for AIServices.
 
-See [Detailed Workflow Steps](references/workflows.md) for complete instructions.
+See [Detailed Workflow Steps](./references/workflows.md) for complete instructions.
 
 ---
 
@@ -140,7 +133,7 @@ az provider show --namespace Microsoft.CognitiveServices --query "registrationSt
 
 If you lack permissions, ask a subscription Owner/Contributor to register it or use `microsoft-foundry:rbac` skill.
 
-See [Detailed Workflow Steps](references/workflows.md) for complete instructions.
+See [Detailed Workflow Steps](./references/workflows.md) for complete instructions.
 
 ---
 
@@ -154,6 +147,6 @@ See [Detailed Workflow Steps](references/workflows.md) for complete instructions
 
 ## Additional Resources
 
-- [Common Patterns](references/patterns.md) - Quick setup patterns and command reference
-- [Troubleshooting](references/troubleshooting.md) - Common errors and solutions
+- [Common Patterns](./references/patterns.md) - Quick setup patterns and command reference
+- [Troubleshooting](./references/troubleshooting.md) - Common errors and solutions
 - [Azure AI Services documentation](https://learn.microsoft.com/en-us/azure/ai-services/multi-service-resource?pivots=azcli)

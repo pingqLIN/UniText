@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/quota.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/quota.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/quota.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Microsoft Foundry Quota Management
 
 Quota and capacity management for Microsoft Foundry. Quotas are **subscription + region** level.
@@ -48,7 +38,7 @@ Use this sub-skill when the user needs to:
 3. Multi-region enables failover and load distribution
 4. Quota requests specify target region
 
-See [detailed guide](references/workflows.md#regional-quota).
+See [detailed guide](./references/workflows.md#regional-quota).
 
 ---
 
@@ -84,7 +74,7 @@ az rest --method get \
   --query "value[?name.value=='OpenAI.Standard.gpt-4o'].{Model:name.value, Used:currentValue, Limit:limit, Available:(limit-currentValue)}" -o table
 ```
 
-See [workflows reference](references/workflows.md#multi-region-check) for multi-region comparison.
+See [workflows reference](./references/workflows.md#multi-region-check) for multi-region comparison.
 
 ---
 
@@ -167,7 +157,7 @@ Calculated required TPM: [Z TPM]. Current [N TPM] insufficient.
 Request increase to [M TPM]. Deployment target: [date].
 ```
 
-See [detailed quota request guide](references/workflows.md#request-quota-increase) for complete steps.
+See [detailed quota request guide](./references/workflows.md#request-quota-increase) for complete steps.
 
 ---
 
@@ -175,22 +165,22 @@ See [detailed quota request guide](references/workflows.md#request-quota-increas
 
 | Error | Quick Fix | Detailed Guide |
 |-------|-----------|----------------|
-| `QuotaExceeded` | Delete unused deployments or request increase | [Error Resolution](references/error-resolution.md#quotaexceeded) |
-| `InsufficientQuota` | Reduce capacity or try different region | [Error Resolution](references/error-resolution.md#insufficientquota) |
-| `DeploymentLimitReached` | Delete unused deployments (10-20 slot limit) | [Error Resolution](references/error-resolution.md#deploymentlimitreached) |
-| `429 Rate Limit` | Increase TPM or migrate to PTU | [Error Resolution](references/error-resolution.md#429-errors) |
+| `QuotaExceeded` | Delete unused deployments or request increase | [Error Resolution](./references/error-resolution.md#quotaexceeded) |
+| `InsufficientQuota` | Reduce capacity or try different region | [Error Resolution](./references/error-resolution.md#insufficientquota) |
+| `DeploymentLimitReached` | Delete unused deployments (10-20 slot limit) | [Error Resolution](./references/error-resolution.md#deploymentlimitreached) |
+| `429 Rate Limit` | Increase TPM or migrate to PTU | [Error Resolution](./references/error-resolution.md#429-errors) |
 
 ---
 
 ## References
 
 **Detailed Guides:**
-- [Error Resolution Workflows](references/error-resolution.md) - Detailed workflows for quota exhausted, 429 errors, insufficient quota, deployment limits
-- [Troubleshooting Guide](references/troubleshooting.md) - Quick error fixes and diagnostic commands
-- [Quota Optimization Strategies](references/optimization.md) - 5 strategies for freeing quota and reducing costs
-- [Capacity Planning Guide](references/capacity-planning.md) - TPM vs PTU comparison, model selection, workload calculations
-- [Workflows Reference](references/workflows.md) - Complete workflow steps and multi-region checks
-- [PTU Guide](references/ptu-guide.md) - Provisioned throughput capacity planning
+- [Error Resolution Workflows](./references/error-resolution.md) - Detailed workflows for quota exhausted, 429 errors, insufficient quota, deployment limits
+- [Troubleshooting Guide](./references/troubleshooting.md) - Quick error fixes and diagnostic commands
+- [Quota Optimization Strategies](./references/optimization.md) - 5 strategies for freeing quota and reducing costs
+- [Capacity Planning Guide](./references/capacity-planning.md) - TPM vs PTU comparison, model selection, workload calculations
+- [Workflows Reference](./references/workflows.md) - Complete workflow steps and multi-region checks
+- [PTU Guide](./references/ptu-guide.md) - Provisioned throughput capacity planning
 
 **Official Microsoft Documentation:**
 - [Azure OpenAI Service Pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/) - Official pay-per-token rates

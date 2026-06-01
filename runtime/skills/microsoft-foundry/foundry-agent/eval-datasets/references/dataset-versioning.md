@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-versioning.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-versioning.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/dataset-versioning.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Dataset Versioning — Version Management & Tagging
 
 Manage dataset versions with naming conventions, tagging, and version pinning for reproducible evaluations. This workflow formalizes dataset lifecycle management using existing MCP tools and local conventions.
@@ -18,7 +8,7 @@ Use the pattern `<agent-name>-<source>-v<N>`:
 
 | Component | Values | Example |
 |-----------|--------|---------|
-| `<agent-name>` | Selected environment's `agentName` from `agent-metadata.yaml` | `support-bot-prod` |
+| `<agent-name>` | Selected environment's `agentName` from the selected metadata file | `support-bot-prod` |
 | `<source>` | `traces`, `synthetic`, `manual`, `combined` | `traces` |
 | `v<N>` | Incremental version number | `v3` |
 

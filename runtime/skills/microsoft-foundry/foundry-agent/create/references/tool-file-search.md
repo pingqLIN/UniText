@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/tool-file-search.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/tool-file-search.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/tool-file-search.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # File Search Tool
 
 Enables agents to search through uploaded files using semantic and keyword search from vector stores. Supports a wide range of file formats including PDF, Markdown, Word, and more.

@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/tool-mcp.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/tool-mcp.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/tool-mcp.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # MCP Tool (Model Context Protocol)
 
 Connect agents to remote MCP servers to extend capabilities with external tools and data sources. MCP is an open standard for LLM tool integration.

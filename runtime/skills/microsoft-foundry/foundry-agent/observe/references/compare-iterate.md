@@ -1,18 +1,8 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/observe/references/compare-iterate.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/observe/references/compare-iterate.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/observe/references/compare-iterate.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Steps 8–10 — Re-Evaluate, Compare Versions, Iterate
 
 ## Step 8 — Re-Evaluate
 
-Use **`evaluation_agent_batch_eval_create`** with the **same `evaluationId`** as the baseline run. This places both runs in the same eval group for comparison. Use the same local test dataset (from `.foundry/datasets/`) and evaluator bundle from the selected environment/test case. Update `agentVersion` to the new version.
+Use **`evaluation_agent_batch_eval_create`** with the **same `evaluationId`** as the baseline run. This places both runs in the same eval group for comparison. Use the same local test dataset (from the selected agent root's `.foundry/datasets/`) and evaluator bundle from the selected environment/evaluation suite. Update `agentVersion` to the new version.
 
 > ⚠️ **Parameter switch reminder:** Re-evaluation creation uses `evaluationId`, but follow-up calls to `evaluation_get` and `evaluation_comparison_create` must use `evalId`.
 

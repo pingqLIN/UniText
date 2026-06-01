@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-lineage.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-lineage.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/eval-datasets/references/eval-lineage.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Eval Lineage — Full Traceability from Production to Deployment
 
 Track the complete chain from production traces through dataset creation, evaluation runs, comparisons, and deployment decisions. Enables "why was this deployed?" audit queries and compliance reporting.

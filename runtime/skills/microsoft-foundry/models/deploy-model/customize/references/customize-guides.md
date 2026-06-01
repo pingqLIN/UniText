@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/models/deploy-model/customize/references/customize-guides.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/models/deploy-model/customize/references/customize-guides.md`
-> Source of truth: `registry/skills/microsoft-foundry/models/deploy-model/customize/references/customize-guides.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Customize Guides — Selection Guides & Advanced Topics
 
 > Reference for: `models/deploy-model/customize/SKILL.md`

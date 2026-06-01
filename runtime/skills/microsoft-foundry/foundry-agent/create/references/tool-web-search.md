@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/create/references/tool-web-search.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/create/references/tool-web-search.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/create/references/tool-web-search.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Web Search Tool (Preview)
 
 Enables agents to retrieve and ground responses with real-time public web information before generating output. Returns up-to-date answers with inline URL citations. This is the **default tool for web search** — no external resource or connection setup required.

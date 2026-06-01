@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/foundry-agent/troubleshoot/troubleshoot.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/foundry-agent/troubleshoot/troubleshoot.md`
-> Source of truth: `registry/skills/microsoft-foundry/foundry-agent/troubleshoot/troubleshoot.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Foundry Agent Troubleshoot
 
 Troubleshoot and debug Foundry agents by collecting hosted-agent session logs, discovering observability connections, and querying Application Insights telemetry.

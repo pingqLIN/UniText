@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/references/troubleshooting.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/references/troubleshooting.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/references/troubleshooting.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Troubleshooting Quota Errors
 
 **Table of Contents:** [Common Quota Errors](#common-quota-errors) · [Detailed Error Resolution](#detailed-error-resolution) · [Request Quota Increase Process](#request-quota-increase-process) · [Diagnostic Commands](#diagnostic-commands) · [External Resources](#external-resources)

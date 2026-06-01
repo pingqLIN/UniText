@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/microsoft-foundry/quota/references/workflows.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/microsoft-foundry/quota/references/workflows.md`
-> Source of truth: `registry/skills/microsoft-foundry/quota/references/workflows.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Detailed Workflows: Quota Management
 
 **Table of Contents:** [Workflow 1: View Current Quota Usage](#workflow-1-view-current-quota-usage---detailed-steps) · [Workflow 2: Find Best Region for Model Deployment](#workflow-2-find-best-region-for-model-deployment---detailed-steps) · [Workflow 3: Check Quota Before Deployment](#workflow-3-check-quota-before-deployment---detailed-steps) · [Workflow 4: Monitor Quota Across Deployments](#workflow-4-monitor-quota-across-deployments---detailed-steps) · [Quick Command Reference](#quick-command-reference) · [MCP Tools Reference](#mcp-tools-reference-optional-wrappers)
