@@ -1,0 +1,4 @@
+interface:
+  display_name: "Advise Project Direction"
+  short_description: "Project-grounded advice before action"
+  default_prompt: "Use $advise-project-direction to assess this idea against the project goal, progress, and branch/new-project boundary before acting."

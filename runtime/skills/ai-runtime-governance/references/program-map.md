@@ -1,11 +1,11 @@
 ---
 runtime_projection: true
-source_of_truth: registry/skills/ai-runtime-governor/references/program-map.md
+source_of_truth: registry/skills/ai-runtime-governance/references/program-map.md
 ---
 
 > Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/ai-runtime-governor/references/program-map.md`
-> Source of truth: `registry/skills/ai-runtime-governor/references/program-map.md`
+> First-read entrypoint: `runtime/skills/ai-runtime-governance/references/program-map.md`
+> Source of truth: `registry/skills/ai-runtime-governance/references/program-map.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
 # Program Map

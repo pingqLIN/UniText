@@ -1,11 +1,11 @@
 param(
   [ValidateSet('enable','disable')]
   [string]$Mode = 'enable',
-  [string]$TaskName = 'AI-Runtime-Governor-DriftAudit',
+  [string]$TaskName = 'AI-Runtime-Governance-DriftAudit',
   [string]$SharedRoot = 'C:\Dev\AI_UNIFIED'
 )
 
-$script = "C:\Dev\AI_UNIFIED\skills\ai-runtime-governor\scripts\audit-drift.ps1"
+$script = "C:\Dev\AI_UNIFIED\skills\ai-runtime-governance\scripts\audit-drift.ps1"
 if ($Mode -eq 'disable') {
   if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false

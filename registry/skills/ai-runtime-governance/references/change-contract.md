@@ -1,13 +1,3 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/ai-runtime-governor/references/change-contract.md
----
-
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/ai-runtime-governor/references/change-contract.md`
-> Source of truth: `registry/skills/ai-runtime-governor/references/change-contract.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Change Contract
 
 ## Required Pre-Change
@@ -30,7 +20,7 @@ source_of_truth: registry/skills/ai-runtime-governor/references/change-contract.
 
 ## Verification Minimum
 
-- Path object type is expected (dir/file/reparsepoint/hardlink)
+- Path object type is expected (dir/file/reparse point/hard link)
 - Config key exists with expected value or expected absence
 - CLI still starts with non-error status for touched program
 

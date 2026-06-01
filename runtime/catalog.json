@@ -35,6 +35,43 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "advise-project-direction",
+      "type": "skill",
+      "runtime_path": "runtime/skills/advise-project-direction/SKILL.md",
+      "source_of_truth": "registry/skills/advise-project-direction/SKILL.md",
+      "canonical_location": "/registry/skills/advise-project-direction",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/advise-project-direction/SKILL.md",
+      "intent_tags": [
+        "advise-project-direction",
+        "use",
+        "when",
+        "the",
+        "user",
+        "raises",
+        "an",
+        "idea"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "ai-first-readiness-review",
       "type": "skill",
       "runtime_path": "runtime/skills/ai-first-readiness-review/SKILL.md",
@@ -72,11 +109,11 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
-      "id": "ai-runtime-governor",
+      "id": "ai-runtime-governance",
       "type": "skill",
-      "runtime_path": "runtime/skills/ai-runtime-governor/SKILL.md",
-      "source_of_truth": "registry/skills/ai-runtime-governor/SKILL.md",
-      "canonical_location": "/registry/skills/ai-runtime-governor",
+      "runtime_path": "runtime/skills/ai-runtime-governance/SKILL.md",
+      "source_of_truth": "registry/skills/ai-runtime-governance/SKILL.md",
+      "canonical_location": "/registry/skills/ai-runtime-governance",
       "status": null,
       "supported_clis": [
         "claude",
@@ -93,9 +130,9 @@
         "codex-skills",
         "codex-native-config"
       ],
-      "entrypoint": "runtime/skills/ai-runtime-governor/SKILL.md",
+      "entrypoint": "runtime/skills/ai-runtime-governance/SKILL.md",
       "intent_tags": [
-        "ai-runtime-governor",
+        "ai-runtime-governance",
         "unified",
         "governance",
         "for",
