@@ -4,10 +4,10 @@ This starter copies `assets/template/` into a new project.
 
 ## Root Files
 
-- `manifest.json`: Manifest V3 baseline with popup, options page, storage permission, and placeholder metadata.
+- `manifest.json`: Manifest V3 baseline with popup, options page, storage permission, and placeholder metadata. Runtime pages are referenced under the generated `extension/` load root.
 - `package.json`: Minimal Node toolchain using TypeScript and esbuild.
 - `tsconfig.json`: TypeScript settings for the extension source.
-- `.gitignore`: Ignore build output and local dependency folders.
+- `.gitignore`: Ignore local dependency folders, obsolete/transient `dist/`, and logs while keeping `extension/` available as the unpacked load root.
 - `README.md`: Project-specific setup and customization steps.
 
 ## Source Layout
@@ -20,7 +20,7 @@ This starter copies `assets/template/` into a new project.
 
 ## Build Files
 
-- `scripts/build.mjs`: Bundles TypeScript entrypoints and copies static assets into `dist/`.
+- `scripts/build.mjs`: Bundles TypeScript entrypoints and copies static assets into `extension/`, the Chrome Load unpacked root.
 
 ## Audit Docs
 

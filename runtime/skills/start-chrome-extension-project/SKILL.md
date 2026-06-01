@@ -25,7 +25,7 @@ Use the bundled scaffold script when you want a deterministic copy of the templa
 2. Ask for the narrowest possible `permissions`, `host_permissions`, and `content_scripts.matches` values. If the user does not answer, keep `host_permissions` empty, prefer the smallest safe permission set, and record the open decision in `docs/audit/`.
 3. Run `scripts/scaffold_chrome_extension.py` to copy `assets/template/` into the target project.
 4. Update `manifest.json`, UI copy, and `docs/audit/` to match the actual extension behavior.
-5. Build the project and flag any remaining gaps such as icons, host scopes, or store-readiness items.
+5. Build the project and flag any remaining gaps such as icons, host scopes, or store-readiness items. The generated `extension/` directory is the Chrome Load unpacked root; `dist/` is not the load target.
 
 ## Required Decisions
 
@@ -83,7 +83,7 @@ Treat these as living project docs. Update them as decisions change instead of l
 ## Resources
 
 - `scripts/scaffold_chrome_extension.py`: Copy the starter into a target project and replace placeholders.
-- `assets/template/`: Manifest V3 starter with TypeScript, popup, options, background, shared code, docs, and build script.
+- `assets/template/`: Manifest V3 starter with TypeScript, popup, options, background, shared code, docs, build script, and generated `extension/` load-root convention.
 - `references/audit-rules.md`: Chrome extension review baseline for least privilege, privacy, and release checks.
 - `references/template-map.md`: File-by-file explanation of the starter layout.
 

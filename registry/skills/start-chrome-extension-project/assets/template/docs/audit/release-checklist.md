@@ -11,7 +11,7 @@
 
 - [ ] `npm run typecheck`
 - [ ] `npm run build`
-- [ ] Load `dist/` in Chrome and smoke test major flows
+- [ ] Load `extension/` in Chrome and smoke test major flows
 - [ ] Re-check permissions after implementation is complete
 
 ## Review Readiness
