@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/mode-web-manual.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/mode-web-manual.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/mode-web-manual.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Mode: External Web Audit
 
 Use this mode when the user wants visible, human-supervised review through a browser product such as ChatGPT or Gemini.
@@ -27,6 +20,7 @@ This is the safest fallback when automation boundaries are unclear.
 3. ask for read-only findings only
 4. copy the response back into the project note or audit report
 5. normalize the findings into the standard report format
+6. classify missing, acknowledgement-only, or confirmation-request-only responses as failed gates
 
 ## Required safeguards
 

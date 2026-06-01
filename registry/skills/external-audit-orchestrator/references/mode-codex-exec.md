@@ -21,13 +21,18 @@ If this mode is selected, cite the relevant sources in the final audit report:
 1. build the audit packet
 2. export a Codex exec prompt and JSON schema
 3. review the generated runner before executing it
-4. run the generated runner only when the operator is ready to spend a Codex run
-5. normalize the final response into the standard audit report if needed
+4. run a tiny health check before the full packet when the lane is unproven
+5. run the generated runner only when the operator is ready to spend a Codex run
+6. normalize the final response into the standard audit report if needed
 
 ## Recommended asset
 
 Use [../assets/codex/audit-report.schema.json](../assets/codex/audit-report.schema.json) as the final response schema.
 Use [../scripts/export-codex-exec-request.ps1](../scripts/export-codex-exec-request.ps1) to materialize the prompt, schema, and local runner into a target project.
+
+## Health check and permission notes
+
+Use [codex-permission-notes.md](codex-permission-notes.md) when diagnosing Codex exec failures. Prefer the real executable path, such as `%APPDATA%\npm\codex.cmd`, when scripting. A reviewer health check should return a substantive sentinel like `AUDIT_OK`; missing final output, policy-blocked shell commands, or `存取被拒。 (os error 5)` is a failed or unavailable lane until rerun with an operator-approved execution boundary.
 
 ## Startup gate limitation
 

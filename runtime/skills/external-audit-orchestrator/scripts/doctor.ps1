@@ -155,6 +155,7 @@ $requiredPaths = @(
     "references\mode-same-provider.md",
     "references\mode-tb2.md",
     "references\report-format.md",
+    "references\reviewer-gate-failures.md",
     "references\source-attribution-policy.md",
     "assets\codex\audit-report.schema.json",
     "assets\gemini\plan-architect.md",
@@ -256,7 +257,7 @@ else {
         Invoke-ExternalWithTimeout `
             -Name "live:codex-exec:minimal" `
             -FilePath $codexPath `
-            -ArgumentList @("exec", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--output-last-message", $codexLastMessage, "OK") `
+            -ArgumentList @("exec", "--ephemeral", "--ignore-user-config", "--ignore-rules", "--output-last-message", $codexLastMessage, "Return exactly: AUDIT_OK") `
             -TimeoutSeconds $LiveTimeoutSeconds
     }
     else {
@@ -267,7 +268,7 @@ else {
         Invoke-ExternalWithTimeout `
             -Name "live:claude-print:minimal" `
             -FilePath $claudePath `
-            -ArgumentList @("--print", "--no-session-persistence", "--output-format", "text", "--permission-mode", "dontAsk", "OK") `
+            -ArgumentList @("--print", "--no-session-persistence", "--output-format", "text", "--permission-mode", "dontAsk", "Return exactly: AUDIT_OK") `
             -TimeoutSeconds $LiveTimeoutSeconds
     }
     else {
@@ -278,7 +279,7 @@ else {
         Invoke-ExternalWithTimeout `
             -Name "live:gemini-headless:minimal" `
             -FilePath $geminiPath `
-            -ArgumentList @("-p", "OK", "--output-format", "json") `
+            -ArgumentList @("-p", "Return exactly: AUDIT_OK", "--output-format", "json") `
             -TimeoutSeconds $LiveTimeoutSeconds
     }
     else {

@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/audit-packet-format.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/audit-packet-format.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/audit-packet-format.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Audit Packet Format
 
 The audit packet is the handoff artifact between the developer agent and the external reviewer.

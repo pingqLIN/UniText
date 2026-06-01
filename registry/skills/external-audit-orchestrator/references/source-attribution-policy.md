@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/source-attribution-policy.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/source-attribution-policy.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/source-attribution-policy.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Source Attribution Policy
 
 Every audit output must include a `Reference Inputs` section when any external or cross-project material affected the work.

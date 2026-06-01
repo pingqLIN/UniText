@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/mode-cli-mcp.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/mode-cli-mcp.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/mode-cli-mcp.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Mode: External CLI Or MCP Audit
 
 Use this mode when the reviewer is exposed through a stable CLI or MCP interface.
@@ -30,6 +23,8 @@ Use this mode when the reviewer is exposed through a stable CLI or MCP interface
 - require deterministic input shape
 - keep the reviewer read-only unless the user asked for auto-fix
 - capture the exact command or MCP tool name in the report notes
+- classify auth, quota, billing, permission, `ConnectionRefused`, and API availability errors as `unavailable`
+- classify timeout, empty output, or request-only output as `failed` unless substantive findings were captured before the failure
 - if the reviewer depends on another project wrapper, list that wrapper in `Reference Inputs`
 
 ## Good fit

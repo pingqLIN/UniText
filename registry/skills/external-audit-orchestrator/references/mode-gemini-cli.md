@@ -39,7 +39,7 @@ Useful headless pattern:
 gemini -p "<prompt text>" --output-format json
 ```
 
-When using headless mode for automation, capture raw stdout and stderr as audit evidence before normalizing the result.
+When using headless mode for automation, capture raw stdout and stderr as separate audit evidence before normalizing the result.
 
 ## Included agents
 
@@ -98,6 +98,7 @@ Allowed design issue categories are `uiux`, `visual`, `responsive`, `accessibili
 - Route design-facing packets to `external_design_critic` when UI/UX, design images, illustration assets, or visual design acceptance matters.
 - Use temperature `0.1` to `0.2` for the critic so JSON stays stable while still allowing edge-case reasoning.
 - Preserve the raw Gemini output before normalizing reports.
+- If Gemini produces actionable findings but a later final-report or normalization retry times out, classify the gate as `partial` and preserve the useful raw output.
 - Always include Gemini CLI documentation and any copied or adapted prompt template in `Reference Inputs`.
 - If Gemini CLI is unauthenticated or unavailable, report that the mode is blocked and fall back to web-manual or same-provider mode only if the user accepts the change.
 

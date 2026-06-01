@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/install-tb2-template.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/install-tb2-template.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/install-tb2-template.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Install: TB2 Template Export
 
 Use this path when the target project wants a prebuilt TB2 request artifact rather than an immediate live reviewer run.

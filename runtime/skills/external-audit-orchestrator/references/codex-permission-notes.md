@@ -1,4 +1,4 @@
----
+﻿---
 runtime_projection: true
 source_of_truth: registry/skills/external-audit-orchestrator/references/codex-permission-notes.md
 ---
@@ -59,3 +59,57 @@ Related v0.1.4 follow-up hardening:
   `run-codex-exec-audit.ps1`.
 - Add smoke coverage for `run-external-audit-flow.ps1 -Mode codex-exec`.
 - Tighten the Codex audit schema for `reference_inputs_used`.
+
+## 2026-06-01 design-system reviewer routing
+
+Context:
+
+- Target repo: `<windows-project-root>\dev-governance-kit`
+- Task under review: promote visual style and design-system sidecar docs.
+- Intended reviewer path: multiple external reviewers for design-system,
+  governance, and bilingual documentation perspectives.
+- Captured evidence path in the target repo: ignored `reports\` audit packet
+  and reviewer output files.
+
+Observed issues:
+
+- Same-provider subagents repeatedly returned only AGENTS/runtime
+  acknowledgement text or lifecycle state such as `shutdown`, without reading
+  the packet or returning findings. Treat this as a failed review gate, not a
+  weak approval.
+- A follow-up prompt asking the reviewer to perform the actual review was not
+  enough to recover acknowledgement-only behavior after the first turn stalled.
+- `claude --print --permission-mode plan` failed with
+  `API Error: Unable to connect to API (ConnectionRefused)`. This is an
+  unavailable reviewer path.
+- `opencode run` timed out twice while inspecting the working tree or attached
+  packet. Timeout remains a failed or partial gate until raw reviewer output is
+  captured.
+- `gemini --prompt --approval-mode plan --output-format text --skip-trust`
+  produced substantive findings while also emitting environment noise. Capture
+  stdout to an ignored report file and do not treat stderr noise as findings
+  unless it blocks output.
+- A reviewer can produce useful findings before a later final-report retry
+  times out. Preserve the useful raw output, but report the retry timeout
+  instead of claiming a clean final reviewer pass.
+
+Recommended operator procedure:
+
+1. Before a full packet, run a tiny reviewer health check that must return a
+   substantive sentinel, not just AGENTS acknowledgement text.
+2. For same-provider reviewer subagents, make the first prompt narrow and
+   action-oriented: name the exact files, forbid edits, and require findings or
+   an explicit no-findings verdict in the first response.
+3. If the first response is acknowledgement-only, `shutdown`, timeout, or
+   request-only, mark the gate failed and switch lanes instead of repeatedly
+   nudging the same stalled reviewer.
+4. For CLI reviewers, run one role at a time when the host is already noisy or
+   slow; parallel CLI review can make timeout diagnosis ambiguous.
+5. Capture reviewer stdout and stderr separately when possible.
+6. Put the output contract before the packet and include: "Do not ask for
+   confirmation. Do not write files. Output only the normalized audit report."
+7. Classify `ConnectionRefused`, auth, quota, billing, and account errors as
+   unavailable reviewer paths that require operator action.
+8. If a reviewer produces actionable findings but the normalized final rerun
+   fails, use the findings to fix the target project, then report the final
+   normalization gap explicitly.

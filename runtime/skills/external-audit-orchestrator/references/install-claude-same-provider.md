@@ -1,4 +1,4 @@
----
+﻿---
 runtime_projection: true
 source_of_truth: registry/skills/external-audit-orchestrator/references/install-claude-same-provider.md
 ---
@@ -8,11 +8,9 @@ source_of_truth: registry/skills/external-audit-orchestrator/references/install-
 > Source of truth: `registry/skills/external-audit-orchestrator/references/install-claude-same-provider.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/install-claude-same-provider.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/install-claude-same-provider.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
+﻿---
+---
+
 # Install: Claude Same-Provider Audit
 
 Use this path when the target project will run review inside Claude Code using a local project subagent.

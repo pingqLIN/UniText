@@ -1,13 +1,6 @@
----
-runtime_projection: true
-source_of_truth: registry/skills/external-audit-orchestrator/references/mode-same-provider.md
+﻿---
 ---
 
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/mode-same-provider.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/mode-same-provider.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
 # Mode: Same-Provider Parallel Or Subagent Audit
 
 Use this mode when the main development agent and the reviewer live in the same provider family.
@@ -50,6 +43,9 @@ Before invoking the reviewer:
 2. include `Reference Inputs`
 3. explicitly request read-only review
 4. ask for severity-ordered findings
+5. require findings or an explicit no-findings verdict in the first response
+
+Use a narrow first prompt: name the exact files or scope, forbid edits, and request the normalized audit report. If the reviewer returns only acknowledgement text, lifecycle state, or a request for confirmation, classify the gate as failed and switch lanes.
 
 ## Suggested operating shape
 
@@ -58,6 +54,10 @@ Before invoking the reviewer:
 3. reviewer returns severity-ordered findings
 4. main agent fixes or rejects findings
 5. rerun reviewer if any warning-or-higher issue was addressed
+
+## Failure handling
+
+Same-provider subagents can appear to complete while only acknowledging AGENTS/runtime instructions. That is not approval. Apply [reviewer-gate-failures.md](reviewer-gate-failures.md) before using `accept`.
 
 ## Attribution note
 

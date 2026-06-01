@@ -26,6 +26,24 @@ param(
 
     [string]$RawReviewPath,
 
+    [ValidateSet("passed", "failed", "partial", "unavailable")]
+    [string]$AuditGate = "failed",
+
+    [string]$ReviewerId = "",
+
+    [string]$CommandOrRoute = "",
+
+    [string]$RawStdoutPath = "",
+
+    [string]$RawStderrPath = "",
+
+    [string]$ExitCodeOrTimeout = "",
+
+    [string]$UnavailableReason = "",
+
+    [ValidateSet("yes", "no", "unknown")]
+    [string]$SubstantiveFindingsCaptured = "unknown",
+
     [string]$ReportPath,
 
     [string]$GeminiCommand = "gemini",
@@ -122,11 +140,6 @@ switch ($Mode) {
             SkillRoot = $resolvedSkillRoot
             TargetProject = $resolvedTargetProject
             AuditPacketPath = $packetPath
-            GeminiCommand = $GeminiCommand
-            ArchitectModel = $GeminiArchitectModel
-            CriticModel = $GeminiCriticModel
-            DesignCriticModel = $GeminiDesignCriticModel
-            MaxReviewRounds = $GeminiMaxReviewRounds
         }
 
         if ($Apply) {
@@ -158,6 +171,11 @@ switch ($Mode) {
             SkillRoot = $resolvedSkillRoot
             TargetProject = $resolvedTargetProject
             AuditPacketPath = $packetPath
+            GeminiCommand = $GeminiCommand
+            ArchitectModel = $GeminiArchitectModel
+            CriticModel = $GeminiCriticModel
+            DesignCriticModel = $GeminiDesignCriticModel
+            MaxReviewRounds = $GeminiMaxReviewRounds
         }
 
         if ($Apply) {
@@ -202,6 +220,14 @@ if (-not [string]::IsNullOrWhiteSpace($RawReviewPath)) {
         AuditMode = $Mode
         ProjectPath = $resolvedTargetProject
         Scope = $scopeLabel
+        AuditGate = $AuditGate
+        ReviewerId = $ReviewerId
+        CommandOrRoute = $CommandOrRoute
+        RawStdoutPath = $RawStdoutPath
+        RawStderrPath = $RawStderrPath
+        ExitCodeOrTimeout = $ExitCodeOrTimeout
+        UnavailableReason = $UnavailableReason
+        SubstantiveFindingsCaptured = $SubstantiveFindingsCaptured
         Reference = $Reference
         Disposition = $Disposition
         NextAction = $NextAction
@@ -212,6 +238,7 @@ if (-not [string]::IsNullOrWhiteSpace($RawReviewPath)) {
     }
 
     $reportOutput = & $normalizeScript @normalizeSplat
+    $flowSummary += "- audit_gate: $AuditGate"
     $flowSummary += "- normalized_report: $reportOutput"
 }
 else {

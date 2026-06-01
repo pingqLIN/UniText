@@ -1,4 +1,4 @@
----
+﻿---
 runtime_projection: true
 source_of_truth: registry/skills/external-audit-orchestrator/references/mode-tb2.md
 ---
@@ -8,11 +8,9 @@ source_of_truth: registry/skills/external-audit-orchestrator/references/mode-tb2
 > Source of truth: `registry/skills/external-audit-orchestrator/references/mode-tb2.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/mode-tb2.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/mode-tb2.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
+﻿---
+---
+
 # Mode: TB2 Audit Template
 
 Use this mode when you want an external reviewer path that is session-based, traceable, and reusable across providers.
@@ -48,6 +46,8 @@ So treat TB2 `claude` and `codex` reviewer flows as templates until the user val
 3. route through `connect/send/read/disconnect` or higher-level relay shape
 4. preserve transcript output
 5. normalize transcript findings into the standard report format
+
+The request JSON or manifest is not reviewer output. If TB2 only materializes a request template and no live reviewer transcript exists, classify the gate as `failed` or `partial`, not `passed`.
 
 ## Recommended asset
 

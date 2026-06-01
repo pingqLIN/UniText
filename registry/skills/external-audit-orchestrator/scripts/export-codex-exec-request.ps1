@@ -70,8 +70,9 @@ else {
 $promptText = @"
 Read-only engineering audit. Review the audit packet below.
 
-Return only the final JSON object that conforms to audit-report.schema.json.
+Do not ask for confirmation. Do not write files. Return only the final JSON object that conforms to audit-report.schema.json.
 Order findings by severity and preserve explicit Reference Inputs Used when any local project, official documentation, public repository, article, or obvious reference shaped the audit.
+If you cannot complete the review because of instructions, permissions, missing files, or unavailable tools, return a JSON report with disposition 'escalate-to-human' and a warning finding that describes the blocker. Do not return acknowledgement-only text.
 
 $startupGateText
 

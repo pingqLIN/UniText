@@ -1,4 +1,4 @@
----
+﻿---
 runtime_projection: true
 source_of_truth: registry/skills/external-audit-orchestrator/references/reference-sources.md
 ---
@@ -8,11 +8,9 @@ source_of_truth: registry/skills/external-audit-orchestrator/references/referenc
 > Source of truth: `registry/skills/external-audit-orchestrator/references/reference-sources.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/reference-sources.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/reference-sources.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
+﻿---
+---
+
 # Reference Sources
 
 This file records the main sources used to shape `external-audit-orchestrator` v0.1.
@@ -91,6 +89,12 @@ Repeat these citations in user-facing audit outputs when they materially affect 
      - `ai-first-readiness-review`
      - `conversation-memo`
      - `project-development-loop`
+
+4. `<windows-project-root>\external-audit-orchestrator\references\codex-permission-notes.md`
+   - Why used: observed Codex exec permission failures and reviewer-routing failure modes.
+
+5. `<windows-project-root>\external-audit-orchestrator\docs\local\side-conversations\2026-06-01-reviewer-failure-handling.zh-TW.md`
+   - Why used: failed, partial, and unavailable reviewer gate classification rules.
 
 ## Usage rule
 

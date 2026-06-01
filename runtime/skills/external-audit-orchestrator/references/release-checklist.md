@@ -1,4 +1,4 @@
----
+﻿---
 runtime_projection: true
 source_of_truth: registry/skills/external-audit-orchestrator/references/release-checklist.md
 ---
@@ -8,11 +8,9 @@ source_of_truth: registry/skills/external-audit-orchestrator/references/release-
 > Source of truth: `registry/skills/external-audit-orchestrator/references/release-checklist.md`
 > Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
 > Consumer scope: `skill-support`
-> Runtime projection for consumer agents.
-> First-read entrypoint: `runtime/skills/external-audit-orchestrator/references/release-checklist.md`
-> Source of truth: `registry/skills/external-audit-orchestrator/references/release-checklist.md`
-> Use this runtime file first. Follow rewritten registry links only when this runtime view points you there.
-> Consumer scope: `skill-support`
+﻿---
+---
+
 # Release Checklist
 
 Use this checklist before publishing or installing `external-audit-orchestrator` outside this repository.
