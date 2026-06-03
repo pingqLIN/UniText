@@ -1,7 +1,0 @@
-{
-  "name": "codex_relay",
-  "arguments": {
-    "disconnect": true,
-    "prompt": "Read-only engineering audit. Do not ask for confirmation. Do not write files. Output only the normalized audit report. Review the packet below. Return findings ordered as Critical, Warning, Suggestion, or give an explicit no-findings verdict. Acknowledge any Reference Inputs that materially influence the review.\n\n{{AUDIT_PACKET}}"
-  }
-}
