@@ -69,6 +69,7 @@ UniText 的整體設計從一開始就把 `Windows`、`macOS`、`Linux` 當成 t
 判斷：
 
 - 這一組最值得優先移植，因為是 shared governance 的核心檢查鏈
+- `validate-workspace-sensitive-metadata-rules.py`、`verify-workspace-boundaries.py`、`get-publishability-report.py` 已作為第二批 Python core；同名 `ps1` 入口保留為 Windows wrapper
 
 ### C. Template / rebuild family
 
@@ -207,8 +208,10 @@ local/scripts/
 
 ## 12. Recommended Next Step
 
-下一步建議不是全面改寫，而是先開一個 bounded batch：
+下一步建議不是全面改寫，而是以 bounded batch 延續已落地的 core / wrapper 樣板：
 
-**把 renormalize family 改成 Python core，並保留現有 `ps1` 當 wrapper。**
+1. `Renormalize / hygiene family` 已完成 Python core + PowerShell wrapper。
+2. `Boundary / governance family` 已開始完成 Python core + PowerShell wrapper。
+3. 下一個批次應補 `health-check` 的 Python core，或開始把 `Template / rebuild family` 的 shared package layout logic 抽到 Python library。
 
-這會是最適合建立跨平台改寫樣板的第一個落點。
+這個順序可以讓 cross-platform 目標先覆蓋治理安全鏈，再進入 release-facing export / verify flow。

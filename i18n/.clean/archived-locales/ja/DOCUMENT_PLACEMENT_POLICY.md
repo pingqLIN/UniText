@@ -31,6 +31,12 @@ UniText は同時に次の三つです。
 - 文書が単一の作者 workspace の現在状態を記述しているなら local layer に置く
 - 文書が操作履歴、出力結果、audit evidence、generated state を記述しているなら operations layer に置く
 
+どの「作業ウィンドウ」やどの authoring マシンでその文書を書いたかは、主判定ではありません。
+
+- UniText authoring workspace 内で書かれたからといって、自動的に `local/docs/authoring/` になるわけではない
+- tracked であることも、自動的に「公開可能」や「push 可能」を意味しない
+- まずその文書が誰のためのもので、どの真実レイヤーを記述しているかを確認し、その後で配置先を決める
+
 ## 3. Placement Matrix
 
 | Content type | Canonical location | Tracked | Share-safe | Notes |
@@ -84,14 +90,39 @@ template / rebuild の export が安全でも、それは export 産物の境界
 3. この文書は将来 template / rebuild / shared registry から安全に参照されることを期待しているか
    - はい：まず root docs、`registry/`、または shared workflow layer を検討する
 
-## 8. Common Misplacements
+## 8. Decision Ladder
+
+より安定して判断したい場合は、次の順序で確認します。
+
+1. これは generated state、audit evidence、drift report、または export output か
+   - はい：`ops/` に置く
+2. これは単一の authoring workspace、単一のマシン、または現在の live wiring を記述しているか
+   - はい：`local/docs/` に置く
+3. 単一 workspace を記述している場合、それは draft、review note、または authoring workboard か
+   - はい：`local/docs/authoring/` に置く
+4. 将来の shared readers が繰り返し参照するための canonical truth であり、template-safe であるべきか
+   - はい：tracked shared layer に置く
+5. tracked shared layer に置くなら、どの種類に近いか
+   - repo-wide policy / spec：root docs に置く
+   - sanitized reference：`registry/.../references/` に置く
+   - shared workflow / runbook：`registry/workflow/` に置く
+6. shared 版と live 版の両方が必要な場合
+   - sanitized/live の pair を作り、2 つの境界を 1 つのファイルに混ぜない
+
+まだ迷う場合は、次を使います。
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document-placement-recommendation.ps1 -Topic "cloudflare workflow" -CanonicalSharedTruth -SharedForm registry-reference
+```
+
+## 9. Common Misplacements
 
 - live Cloudflare baseline を `registry/.../references/` に置く
 - strategy / review plan を root に置く
 - export output や audit evidence を canonical reference として扱う
 - machine-specific path を shared governance docs に直接書く
 
-## 9. Review Gate
+## 10. Review Gate
 
 新しい governance / reference 文書を追加する前に、少なくとも次を確認します。
 
@@ -99,7 +130,7 @@ template / rebuild の export が安全でも、それは export 産物の境界
 - push されたとしても `NO_PUBLISH_POLICY.md` と template-safe の期待に合うか
 - 単一ファイルに両方を詰め込むのではなく sanitized/live の pair が必要ではないか
 
-## 10. Related Docs
+## 11. Related Docs
 
 - `README.md`
 - `INDEX.md`

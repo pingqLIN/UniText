@@ -5,6 +5,7 @@ license: MIT
 metadata:
   author: Microsoft
   version: "1.0.1"
+  runtime_support_files: true
 ---
 
 ## Overview

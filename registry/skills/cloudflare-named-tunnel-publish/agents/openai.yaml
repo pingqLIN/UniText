@@ -1,0 +1,7 @@
+interface:
+  display_name: "Cloudflare Named Tunnel Publish"
+  short_description: "Publish localhost sites on your Cloudflare domain"
+  default_prompt: "Use $cloudflare-named-tunnel-publish to expose a local site on a user-owned Cloudflare hostname with a reversible named tunnel workflow."
+
+policy:
+  allow_implicit_invocation: true

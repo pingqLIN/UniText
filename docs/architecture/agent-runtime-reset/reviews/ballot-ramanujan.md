@@ -1,0 +1,12 @@
+# Ballot
+- ranked_order:
+  - 4: Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md
+  - 3: Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md
+  - 2: Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md
+  - 1: Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md
+- best_reason: `template2-d.md` is the strongest because it cleanly separates canonical authoring, tracked runtime policy, local materialization, CLI wiring, and audit evidence without making generated runtime artifacts canonical. It is Codex-first without becoming Codex-only, keeps MCP as discovery rather than implicit activation, and gives a realistic migration path that can be implemented by evolving the existing bootstrap semantics instead of replacing the whole system with a new abstraction stack.
+- fatal_flaws:
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md: Places the primary runtime root outside the repo in `$HOME/.unitext/runtime`, which weakens inspectability and makes the runtime contract less repo-centered than the rest of UniText.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md: Treats generated `runtime/` artifacts as a central tracked surface and introduces a new `runtimectl` control plane that feels heavier and less incremental than the current implementation base.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md: none
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md: Too underspecified operationally; it describes the projection concept well but does not define a sufficiently concrete contract for packaging, activation, and cross-CLI verification.

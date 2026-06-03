@@ -1,0 +1,61 @@
+# Skills Governance Scan — 2026-04-26
+
+> Source: `Q:\Projects\skills-governance`
+> Target scanned: `Q:\UniText\registry\skills`
+> Publication: local-only until explicitly approved.
+
+## Result
+
+Command:
+
+```powershell
+pwsh -NoProfile -File scripts/sg.ps1 scan --out reports\unitext-scan-2026-04-26.json
+```
+
+Summary:
+
+- total skills: `54`
+- hard validation ok: `54`
+- hard validation fail: `0`
+- skills with warnings: `54`
+
+## Warning Triage
+
+Warnings are quality backlog, not hard failures.
+
+Initial scan showed `10` missing-direct-reference warnings. A follow-up fix in `Q:\Projects\skills-governance` taught the scanner to accept both `references/foo.md` and `./references/foo.md` links, reducing this category to `2`. The two remaining true positives were then fixed in UniText by turning bare reference paths into Markdown links.
+
+| Category | Count | Interpretation |
+|---|---:|---|
+| Optional registration missing | 54 | `registry/skills-registry.json` in `skills-governance` is optional and currently empty; this should not block UniText runtime adoption. |
+| Deep reference path | 96 | Several skills keep SDK or service-specific references under nested folders. This is usually acceptable for large provider families, but should be reviewed when a skill becomes hard to re-enter. |
+| No direct references link | 0 | Cleared on 2026-04-26. Keep this at zero for future registry changes. |
+
+Top warning-heavy skills:
+
+| Skill | Warning Count | Main Cause |
+|---|---:|---|
+| `azure-ai` | 15 | SDK reference nesting plus optional registration |
+| `azure-prepare` | 12 | Service reference nesting plus optional registration |
+| `azure-storage` | 12 | SDK reference nesting plus optional registration |
+| `azure-deploy` | 11 | Recipe reference nesting plus optional registration |
+| `azure-compliance` | 10 | SDK/reference nesting plus optional registration |
+
+## Policy Decision
+
+Use `skills-governance` as a read-only quality gate for UniText:
+
+- `fail > 0` blocks the current batch.
+- `warn > 0` opens a quality backlog, but does not block runtime projection or bootstrap verification.
+- Optional registration warnings should stay non-blocking until UniText explicitly adopts `skills-governance` as a registration authority.
+- Deep reference path warnings should be assessed by skill family; Azure provider skills may legitimately need deeper SDK/reference trees.
+- Missing direct reference links are good candidates for small maintenance batches because they improve progressive disclosure without changing behavior.
+
+## Next Maintenance Candidate
+
+The direct-reference warning class is clear. The remaining backlog is to decide whether optional registration should stay non-blocking and whether deep Azure/reference trees need family-specific exceptions. Rerun:
+
+```powershell
+pwsh -NoProfile -File scripts/sg.ps1 scan
+python -m unittest discover -s tests -p "test*.py"
+```

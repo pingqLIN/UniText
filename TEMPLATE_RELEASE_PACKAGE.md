@@ -28,6 +28,8 @@
 
 - 核心文件
   - `README.md`
+  - `README.zh-TW.md`
+  - `LICENSE`
   - `INDEX.md`
   - `VISION.md`
   - `RESOURCE_SPEC.md`
@@ -45,6 +47,7 @@
   - `.github/pull_request_template.md`
   - `.mcp.json`
   - `.claude/settings.json`
+  - `local/config/integration-surfaces.json`
 - generic examples
   - `registry/skills/example-skill/`
   - `registry/agents/example-agent/`
@@ -57,17 +60,24 @@
   - `local/docs/PATH_MAP.md`
   - `local/scripts/bootstrap.py`
   - `local/scripts/verify-bootstrap.py`
+  - `local/scripts/build-runtime-layer.py`
   - `local/scripts/create-git-bundle.py`
   - `local/scripts/preview-renormalize.py`
   - `local/scripts/preview-renormalize.ps1`
   - `local/scripts/run-renormalize.ps1`
   - `local/scripts/run-renormalize.py`
   - `local/scripts/lib/renormalize_core.py`
+  - `local/scripts/lib/integration_surfaces.py`
   - `local/scripts/sync-skills.ps1`
   - `local/scripts/validate-workspace-sensitive-metadata-rules.ps1`
   - `local/scripts/lib/workspace-sensitive-metadata.ps1`
   - `local/scripts/verify-workspace-boundaries.ps1`
   - `local/scripts/get-publishability-report.ps1`
+- project map UI source
+  - `local/scripts/build-project-map.py`
+  - `local/scripts/project-map-runtime.js`
+  - `local/scripts/project-map-template.html`
+  - `web/project-map-ui/`
 - release metadata
 - `manifest.json`
 - `release.json`
@@ -170,7 +180,7 @@ python local/scripts/create-git-bundle.py
 
 ## 6. Current Interpretation
 
-截至 2026-03-24，`UniText` 已具備：
+截至 2026-04-30，`UniText` 已具備：
 
 - 外部審查 package
 - reviewer-facing entry docs

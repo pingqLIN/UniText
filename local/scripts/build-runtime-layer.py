@@ -6,7 +6,9 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -32,6 +34,31 @@ REPO_MARKERS = [
 
 FRONTMATTER_PATTERN = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
 LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+MANAGED_RUNTIME_PATHS = ("catalog.json", "skills", "agents", "workflow")
+PAYLOAD_RUNTIME_DIRS = {"skills", "agents", "workflow"}
+DIFF_SAMPLE_LIMIT = 25
+RUNTIME_SKILL_OVERLAY_PREFIXES = ("source-command",)
+SUPPORT_EXCLUDED_DIR_NAMES = {
+    "__pycache__",
+    "node_modules",
+    "dist",
+    "build",
+    "tmp",
+    "temp",
+}
+SUPPORT_EXCLUDED_FILE_NAMES = {
+    ".ds_store",
+    "desktop.ini",
+    "thumbs.db",
+}
+SUPPORT_EXCLUDED_SUFFIXES = {
+    ".bak",
+    ".log",
+    ".pyc",
+    ".pyo",
+    ".tmp",
+    ".swp",
+}
 
 
 @dataclass(frozen=True)
@@ -80,18 +107,45 @@ def validate_repo_root(repo_root: Path) -> None:
         raise SystemExit(f"repo root is missing required markers: {', '.join(missing)}")
 
 
-def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
+def parse_scalar(value: str) -> str | bool:
+    value = value.strip().strip("'").strip('"')
+    if value.lower() in {"true", "yes", "on"}:
+        return True
+    if value.lower() in {"false", "no", "off"}:
+        return False
+    return value
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, object], str]:
     match = FRONTMATTER_PATTERN.match(text)
     if not match:
         return {}, text
 
-    fields: dict[str, str] = {}
+    fields: dict[str, object] = {}
+    current_mapping_key: str | None = None
     for raw_line in match.group(1).splitlines():
+        if not raw_line.strip() or ":" not in raw_line:
+            continue
+
+        is_nested = raw_line[:1].isspace()
         line = raw_line.strip()
+        if is_nested and current_mapping_key:
+            nested = fields.get(current_mapping_key)
+            if isinstance(nested, dict):
+                key, raw_value = line.split(":", 1)
+                nested[key.strip()] = parse_scalar(raw_value)
+            continue
+
         if not line or ":" not in line:
             continue
         key, raw_value = line.split(":", 1)
-        fields[key.strip()] = raw_value.strip().strip("'").strip('"')
+        key = key.strip()
+        if raw_value.strip():
+            fields[key] = parse_scalar(raw_value)
+            current_mapping_key = None
+        else:
+            fields[key] = {}
+            current_mapping_key = key
     return fields, text[match.end() :]
 
 
@@ -106,6 +160,30 @@ def repo_relative(path: Path, repo_root: Path) -> str:
     return path.relative_to(repo_root).as_posix()
 
 
+def runtime_projection_display_path(runtime_file: Path, repo_root: Path) -> str:
+    return repo_relative(runtime_projection_logical_path(runtime_file, repo_root), repo_root)
+
+
+def runtime_projection_logical_path(path: Path, repo_root: Path) -> Path:
+    relative_parts = Path(repo_relative(path, repo_root)).parts
+    if "runtime" in relative_parts:
+        runtime_index = relative_parts.index("runtime")
+        logical_parts = list(relative_parts[runtime_index + 1 :])
+        if logical_parts and logical_parts[0].startswith(".runtime-dryrun-"):
+            logical_parts = logical_parts[1:]
+        return repo_root / "runtime" / Path(*logical_parts)
+    return path
+
+
+def logical_runtime_projection_target(path: Path, repo_root: Path) -> Path:
+    runtime_root = repo_root / "runtime"
+    try:
+        path.relative_to(runtime_root)
+    except ValueError:
+        return path
+    return runtime_projection_logical_path(path, repo_root)
+
+
 def rewrite_relative_links(
     text: str,
     *,
@@ -115,6 +193,8 @@ def rewrite_relative_links(
     source_root: Path | None = None,
     runtime_root: Path | None = None,
 ) -> str:
+    logical_wrapper_dir = runtime_projection_logical_path(wrapper_dir, repo_root)
+
     def replace(match: re.Match[str]) -> str:
         label = match.group(1)
         raw_target = match.group(2).strip()
@@ -150,7 +230,8 @@ def rewrite_relative_links(
         else:
             runtime_resolved = resolved
 
-        replacement = Path(os.path.relpath(runtime_resolved, wrapper_dir)).as_posix()
+        logical_target = logical_runtime_projection_target(runtime_resolved, repo_root)
+        replacement = Path(os.path.relpath(logical_target, logical_wrapper_dir)).as_posix()
         return f"[{label}]({replacement}{anchor_suffix})"
 
     return LINK_PATTERN.sub(replace, text)
@@ -164,7 +245,7 @@ def build_projection_preamble(
     resource_type: str,
 ) -> str:
     source_relative = repo_relative(source_file, repo_root)
-    runtime_relative = repo_relative(runtime_file, repo_root)
+    runtime_relative = runtime_projection_display_path(runtime_file, repo_root)
     return "\n".join(
         [
             f"> Runtime projection for consumer agents.",
@@ -235,7 +316,79 @@ def slug_tags(text: str) -> list[str]:
 
 def write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content.rstrip() + "\n", encoding="utf-8")
+    path.write_text(content.rstrip() + "\n", encoding="utf-8", newline="\n")
+
+
+def remove_path(path: Path) -> None:
+    if not path.exists() and not path.is_symlink():
+        return
+    if path.is_symlink() or path.is_file():
+        try:
+            path.chmod(0o700)
+        except OSError:
+            pass
+        path.unlink()
+        return
+
+    def onerror(func, failed_path, exc_info) -> None:
+        try:
+            Path(failed_path).chmod(0o700)
+        except OSError:
+            pass
+        func(failed_path)
+
+    for attempt in range(3):
+        try:
+            shutil.rmtree(path, onerror=onerror)
+            return
+        except PermissionError:
+            # Windows refuses to remove a directory that is another process' cwd.
+            # Clearing children still lets the runtime builder refresh its payload.
+            for child in sorted(path.iterdir()):
+                remove_path(child)
+            return
+        except OSError as exc:
+            if getattr(exc, "winerror", None) != 145 or attempt == 2:
+                raise
+            for child in sorted(path.iterdir()):
+                remove_path(child)
+            time.sleep(0.1)
+
+
+def reset_managed_runtime_dir(path: Path, *, preserved_entry_prefixes: tuple[str, ...] = ()) -> None:
+    path.mkdir(parents=True, exist_ok=True)
+    for item in sorted(path.iterdir()):
+        if item.name.startswith("."):
+            continue
+        if any(item.name.startswith(prefix) for prefix in preserved_entry_prefixes):
+            continue
+        remove_path(item)
+
+
+def is_projectable_support_file(source_file: Path, *, source_root: Path, entrypoint_name: str) -> bool:
+    relative = source_file.relative_to(source_root)
+    if any(part.startswith(".") for part in relative.parts):
+        return False
+    if any(part.lower() in SUPPORT_EXCLUDED_DIR_NAMES for part in relative.parts[:-1]):
+        return False
+    if source_file.name == entrypoint_name or source_file.suffix.lower() == ".md":
+        return False
+    if source_file.name.lower() in SUPPORT_EXCLUDED_FILE_NAMES:
+        return False
+    if source_file.suffix.lower() in SUPPORT_EXCLUDED_SUFFIXES:
+        return False
+    return True
+
+
+def project_support_file_tree(*, source_root: Path, runtime_root: Path, entrypoint_name: str) -> None:
+    for source_file in sorted(source_root.rglob("*")):
+        if not source_file.is_file():
+            continue
+        if not is_projectable_support_file(source_file, source_root=source_root, entrypoint_name=entrypoint_name):
+            continue
+        runtime_file = runtime_root / source_file.relative_to(source_root)
+        runtime_file.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source_file, runtime_file)
 
 
 def project_markdown_tree(
@@ -247,7 +400,8 @@ def project_markdown_tree(
     entrypoint_name: str,
 ) -> None:
     for source_file in sorted(source_root.rglob("*.md")):
-        if source_file.name.startswith(".") or source_file.name == entrypoint_name:
+        relative = source_file.relative_to(source_root)
+        if any(part.startswith(".") for part in relative.parts) or source_file.name == entrypoint_name:
             continue
         runtime_file = runtime_root / source_file.relative_to(source_root)
         rendered = render_runtime_markdown(
@@ -283,26 +437,47 @@ def canonical_location_for(resource_type: str, resource_id: str) -> str:
 
 
 def metadata_from_frontmatter(
-    frontmatter: dict[str, str],
+    frontmatter: dict[str, object],
     *,
     resource_type: str,
     matched_surfaces: list[object],
 ) -> tuple[str | None, list[str], str]:
-    status = frontmatter.get("status") or None
+    status_raw = frontmatter.get("status")
+    status = status_raw if isinstance(status_raw, str) and status_raw else None
     supported_clis_raw = frontmatter.get("supported_clis", "")
     if supported_clis_raw:
-        supported_clis = [item.strip() for item in supported_clis_raw.split(",") if item.strip()]
+        supported_clis = [item.strip() for item in str(supported_clis_raw).split(",") if item.strip()]
     else:
         supported_clis = cli_ids_for_resource_type(matched_surfaces, resource_type)
-    delivery_guidance = frontmatter.get("delivery_guidance") or default_delivery_guidance(resource_type, matched_surfaces)
+    delivery_guidance_raw = frontmatter.get("delivery_guidance")
+    delivery_guidance = (
+        delivery_guidance_raw
+        if isinstance(delivery_guidance_raw, str) and delivery_guidance_raw
+        else default_delivery_guidance(resource_type, matched_surfaces)
+    )
     return status, supported_clis, delivery_guidance
+
+
+def frontmatter_bool(frontmatter: dict[str, object], key: str) -> bool:
+    value = frontmatter.get(key, "")
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.strip().lower() in {"1", "true", "yes", "on"}:
+        return True
+
+    metadata = frontmatter.get("metadata")
+    if isinstance(metadata, dict):
+        metadata_value = metadata.get(key, "")
+        if isinstance(metadata_value, bool):
+            return metadata_value
+        if isinstance(metadata_value, str):
+            return metadata_value.strip().lower() in {"1", "true", "yes", "on"}
+    return False
 
 
 def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_skills_root = runtime_root / "skills"
-    if runtime_skills_root.exists():
-        shutil.rmtree(runtime_skills_root)
-    runtime_skills_root.mkdir(parents=True, exist_ok=True)
+    reset_managed_runtime_dir(runtime_skills_root, preserved_entry_prefixes=RUNTIME_SKILL_OVERLAY_PREFIXES)
 
     entries: list[RuntimeEntry] = []
     excluded_skills = load_catalog_exclusions(repo_root)
@@ -314,6 +489,7 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
         source_file = skill_dir / "SKILL.md"
         if not source_file.exists():
             continue
+        frontmatter, body = parse_frontmatter(source_file.read_text(encoding="utf-8"))
         runtime_file = runtime_skills_root / skill_dir.name / "SKILL.md"
         rendered = render_runtime_markdown(
             source_file=source_file,
@@ -331,7 +507,12 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
             resource_type="skill-support",
             entrypoint_name="SKILL.md",
         )
-        frontmatter, body = parse_frontmatter(source_file.read_text(encoding="utf-8"))
+        if frontmatter_bool(frontmatter, "runtime_support_files"):
+            project_support_file_tree(
+                source_root=skill_dir,
+                runtime_root=runtime_file.parent,
+                entrypoint_name="SKILL.md",
+            )
         matched_surfaces = surfaces_for_resource_type(integration_surfaces, "skill")
         status, supported_clis, delivery_guidance = metadata_from_frontmatter(
             frontmatter,
@@ -343,14 +524,14 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
             RuntimeEntry(
                 resource_id=skill_dir.name,
                 resource_type="skill",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("skill", skill_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
                 hot_path=skill_dir.name in {"env", "cloudflare-governance", "doc-coauthoring", "frontend-design", "webapp-testing"},
@@ -362,9 +543,7 @@ def build_skill_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
 
 def build_agent_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_agents_root = runtime_root / "agents"
-    if runtime_agents_root.exists():
-        shutil.rmtree(runtime_agents_root)
-    runtime_agents_root.mkdir(parents=True, exist_ok=True)
+    reset_managed_runtime_dir(runtime_agents_root)
 
     entries: list[RuntimeEntry] = []
     for agent_dir in sorted((repo_root / "registry" / "agents").iterdir()):
@@ -402,14 +581,14 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
             RuntimeEntry(
                 resource_id=agent_dir.name,
                 resource_type="agent",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("agent", agent_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(summary_source),
                 consumer_scope="runtime-first",
                 hot_path=agent_dir.name == "registry-curator",
@@ -421,9 +600,7 @@ def build_agent_wrappers(repo_root: Path, runtime_root: Path, integration_surfac
 
 def build_workflow_wrappers(repo_root: Path, runtime_root: Path, integration_surfaces: list[object]) -> list[RuntimeEntry]:
     runtime_workflow_root = runtime_root / "workflow"
-    if runtime_workflow_root.exists():
-        shutil.rmtree(runtime_workflow_root)
-    runtime_workflow_root.mkdir(parents=True, exist_ok=True)
+    reset_managed_runtime_dir(runtime_workflow_root)
 
     entries: list[RuntimeEntry] = []
     for workflow_dir in sorted((repo_root / "registry" / "workflow").iterdir()):
@@ -460,14 +637,14 @@ def build_workflow_wrappers(repo_root: Path, runtime_root: Path, integration_sur
             RuntimeEntry(
                 resource_id=workflow_dir.name,
                 resource_type="workflow",
-                runtime_path=repo_relative(runtime_file, repo_root),
+                runtime_path=runtime_projection_display_path(runtime_file, repo_root),
                 source_of_truth=repo_relative(source_file, repo_root),
                 canonical_location=canonical_location_for("workflow", workflow_dir.name),
                 status=status,
                 supported_clis=supported_clis,
                 delivery_guidance=delivery_guidance,
                 available_surfaces=[surface.surface_id for surface in matched_surfaces],
-                entrypoint=repo_relative(runtime_file, repo_root),
+                entrypoint=runtime_projection_display_path(runtime_file, repo_root),
                 intent_tags=slug_tags(body[:400]),
                 consumer_scope="runtime-first",
                 hot_path=False,
@@ -491,17 +668,247 @@ def write_catalog(repo_root: Path, runtime_root: Path, entries: list[RuntimeEntr
     write_text(runtime_root / "catalog.json", json.dumps(catalog, indent=2, ensure_ascii=False))
 
 
+def managed_runtime_files(root: Path) -> dict[str, Path]:
+    files: dict[str, Path] = {}
+    for managed_path in MANAGED_RUNTIME_PATHS:
+        candidate = root / managed_path
+        if candidate.is_file():
+            files[managed_path] = candidate
+            continue
+        if not candidate.is_dir():
+            continue
+        for file_path in sorted(candidate.rglob("*")):
+            if not file_path.is_file():
+                continue
+            relative = file_path.relative_to(root)
+            if is_ignored_managed_runtime_file(relative):
+                continue
+            files[relative.as_posix()] = file_path
+    return files
+
+
+def tracked_managed_runtime_files(root: Path) -> dict[str, Path]:
+    try:
+        repo_result = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        repo_root = Path(repo_result.stdout.strip()).resolve()
+        relative_root = root.resolve().relative_to(repo_root).as_posix()
+        files_result = subprocess.run(
+            ["git", "-C", str(repo_root), "ls-files", "-z", "--", relative_root],
+            check=True,
+            capture_output=True,
+        )
+    except (OSError, subprocess.CalledProcessError, ValueError):
+        return managed_runtime_files(root)
+
+    files: dict[str, Path] = {}
+    for raw_path in files_result.stdout.split(b"\0"):
+        if not raw_path:
+            continue
+        repo_relative = Path(raw_path.decode("utf-8"))
+        file_path = repo_root / repo_relative
+        if not file_path.is_file():
+            continue
+        try:
+            relative = file_path.relative_to(root.resolve())
+        except ValueError:
+            continue
+        if is_ignored_managed_runtime_file(relative):
+            continue
+        files[relative.as_posix()] = file_path
+    return files
+
+
+def is_ignored_managed_runtime_file(relative_path: Path) -> bool:
+    parts = relative_path.parts
+    if any(part.startswith(".") for part in parts):
+        return True
+    if len(parts) >= 2 and parts[0] == "skills" and any(
+        parts[1].startswith(prefix) for prefix in RUNTIME_SKILL_OVERLAY_PREFIXES
+    ):
+        return True
+    if any(part.lower() in SUPPORT_EXCLUDED_DIR_NAMES for part in parts[:-1]):
+        return True
+    if relative_path.name.lower() in SUPPORT_EXCLUDED_FILE_NAMES:
+        return True
+    if relative_path.suffix.lower() in SUPPORT_EXCLUDED_SUFFIXES:
+        return True
+    return False
+
+
+def is_payload_runtime_path(relative_path: str) -> bool:
+    first_part = Path(relative_path).parts[0]
+    return first_part in PAYLOAD_RUNTIME_DIRS
+
+
+def summarize_paths(paths: list[str]) -> dict[str, object]:
+    return {
+        "count": len(paths),
+        "sample": paths[:DIFF_SAMPLE_LIMIT],
+    }
+
+
+def normalize_line_endings(raw: bytes) -> bytes:
+    return raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+
+def read_bytes_with_retry(path: Path) -> bytes:
+    for attempt in range(3):
+        try:
+            return path.read_bytes()
+        except FileNotFoundError:
+            if attempt == 2:
+                raise
+            time.sleep(0.1)
+    raise FileNotFoundError(path)
+
+
+def compare_runtime_trees(generated_root: Path, tracked_runtime_root: Path) -> dict[str, object]:
+    generated_files = managed_runtime_files(generated_root)
+    tracked_files = tracked_managed_runtime_files(tracked_runtime_root)
+    all_paths = sorted(set(generated_files) | set(tracked_files))
+
+    added: list[str] = []
+    changed: list[str] = []
+    line_ending_only: list[str] = []
+    content_changed: list[str] = []
+    removed: list[str] = []
+    for relative_path in all_paths:
+        generated_file = generated_files.get(relative_path)
+        tracked_file = tracked_files.get(relative_path)
+        if generated_file is None:
+            removed.append(relative_path)
+            continue
+        if tracked_file is None:
+            added.append(relative_path)
+            continue
+        generated_bytes = read_bytes_with_retry(generated_file)
+        tracked_bytes = read_bytes_with_retry(tracked_file)
+        if generated_bytes != tracked_bytes:
+            changed.append(relative_path)
+            if normalize_line_endings(generated_bytes) == normalize_line_endings(tracked_bytes):
+                line_ending_only.append(relative_path)
+            else:
+                content_changed.append(relative_path)
+
+    payload_paths = [path for path in added + changed + removed if is_payload_runtime_path(path)]
+    payload_content_paths = [path for path in added + content_changed + removed if is_payload_runtime_path(path)]
+    payload_line_ending_paths = [path for path in line_ending_only if is_payload_runtime_path(path)]
+    catalog_paths = [path for path in added + changed + removed if path == "catalog.json"]
+    blocking_payload_paths = payload_content_paths
+    routine_write_allowed = not blocking_payload_paths
+
+    return {
+        "compared_against": str(tracked_runtime_root),
+        "managed_paths": list(MANAGED_RUNTIME_PATHS),
+        "status": "clean" if not added and not changed and not removed else "drift",
+        "generated_file_count": len(generated_files),
+        "tracked_file_count": len(tracked_files),
+        "added_by_generator": summarize_paths(added),
+        "changed_by_generator": summarize_paths(changed),
+        "content_changed_by_generator": summarize_paths(content_changed),
+        "line_ending_only_drift": summarize_paths(line_ending_only),
+        "stale_tracked_runtime_files": summarize_paths(removed),
+        "payload_drift": summarize_paths(payload_paths),
+        "blocking_payload_drift": summarize_paths(blocking_payload_paths),
+        "payload_content_drift": summarize_paths(payload_content_paths),
+        "payload_line_ending_only_drift": summarize_paths(payload_line_ending_paths),
+        "catalog_drift": summarize_paths(catalog_paths),
+        "write_gate": {
+            "strategy": "no-payload-content-drift",
+            "routine_write_allowed": routine_write_allowed,
+            "requires_review": not routine_write_allowed,
+            "reason": (
+                "managed payload files have added, removed, or content-level drift that still requires review"
+                if not routine_write_allowed
+                else "only line-ending-only drift or catalog-only drift remains in managed runtime files"
+            ),
+        },
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the tracked runtime layer for consumer agents.")
     parser.add_argument("--write", action="store_true", help="Write the runtime layer into the repository.")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Optional output directory for generated runtime files. Without --write this becomes a dry-run target.",
+    )
     args = parser.parse_args()
 
     repo_root = get_repo_root()
     validate_repo_root(repo_root)
-    runtime_root = repo_root / "runtime"
+    if args.output_dir is None:
+        runtime_root = repo_root / "runtime"
+    else:
+        runtime_root = args.output_dir
+        if not runtime_root.is_absolute():
+            runtime_root = (repo_root / runtime_root).resolve()
+
+    if args.output_dir is not None:
+        try:
+            runtime_root.relative_to(repo_root.resolve())
+        except ValueError:
+            print(
+                json.dumps(
+                    {
+                        "error": "output-dir must be inside the repository root when used with build-runtime-layer.py.",
+                    },
+                    indent=2,
+                    ensure_ascii=False,
+                )
+            )
+            return 1
     integration_manifest, integration_surfaces = load_integration_surfaces(repo_root)
 
     if not args.write:
+        if args.output_dir is not None:
+            if runtime_root.resolve() == (repo_root / "runtime").resolve():
+                print(
+                    json.dumps(
+                        {
+                            "error": "Dry-run output-dir may not target runtime/. Use --write to update tracked runtime.",
+                        },
+                        indent=2,
+                        ensure_ascii=False,
+                    )
+                )
+                return 1
+
+            remove_path(runtime_root)
+            entries: list[RuntimeEntry] = []
+            entries.extend(build_skill_wrappers(repo_root, runtime_root, integration_surfaces))
+            entries.extend(build_agent_wrappers(repo_root, runtime_root, integration_surfaces))
+            entries.extend(build_workflow_wrappers(repo_root, runtime_root, integration_surfaces))
+            write_catalog(repo_root, runtime_root, entries, integration_manifest)
+            summary = {
+                "repo_root": str(repo_root),
+                "runtime_root": str(runtime_root),
+                "integration_surfaces_manifest": str(integration_manifest),
+                "dry_run": True,
+                "output_dir_scope": "repository-relative",
+                "actions": [
+                    "rebuild runtime/skills from registry/skills",
+                    "rebuild runtime/agents from registry/agents",
+                    "rebuild runtime/workflow from registry/workflow",
+                    "rewrite relative links back to registry source files",
+                    "refresh runtime/catalog.json with integration surface metadata",
+                ],
+                "skills": len([entry for entry in entries if entry.resource_type == "skill"]),
+                "agents": len([entry for entry in entries if entry.resource_type == "agent"]),
+                "workflow": len([entry for entry in entries if entry.resource_type == "workflow"]),
+                "catalog_entries": len(entries),
+                "diff_summary": compare_runtime_trees(runtime_root, repo_root / "runtime"),
+            }
+            print(json.dumps(summary, indent=2, ensure_ascii=False))
+            return 0
+
         summary = {
             "repo_root": str(repo_root),
             "runtime_root": str(runtime_root),

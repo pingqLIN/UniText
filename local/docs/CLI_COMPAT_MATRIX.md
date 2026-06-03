@@ -6,7 +6,7 @@
 | CLI | 版本基準 | UniText 依賴行為 | 目前狀態 | 最後驗證 |
 |---|---|---|---|---|
 | Claude Code | 2.1.63 | 讀取 `~/.claude/skills`、支援 project `.mcp.json` | Windows host delivery path verified | 2026-03-24 |
-| Codex CLI | 0.106.0 | 從 `config.toml` 的 `skills_path` 讀取 machine-local runtime target，並可註冊 `[mcp_servers.unitext_registry]` | Windows host runtime bootstrap baseline verified | 2026-04-20 |
+| Codex CLI | 0.106.0 | 從 `config.toml` 的 `skills_path` 讀取 machine-local runtime target；canonical MCP 維持 repo `.mcp.json`，不由 bootstrap 自動註冊全域 `unitext_registry` | Windows host runtime bootstrap baseline verified | 2026-04-23 |
 | Gemini CLI | 0.31.0 | 讀取 `~/.gemini/skills` 與 `~/.agents/skills` | Windows host delivery path verified | 2026-03-24 |
 | Copilot CLI | 1.0.12 | 讀取 `AGENTS.md` / related instructions，並可透過 `~/.copilot/mcp-config.json` 註冊 `unitext-registry` | Windows host bootstrap baseline verified | 2026-04-02 |
 | VS Code | 1.109.5 | 非直接 resource consumer，主要作 authoring environment | 已知限制 | 2026-03-02 |

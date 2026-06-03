@@ -5,6 +5,7 @@ import argparse
 import json
 import shutil
 import subprocess
+import sys
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -178,26 +179,23 @@ def build_workspace_sensitive_fixture(target_root: Path) -> None:
         "local/scripts/export-rebuild-project.ps1",
         "local/scripts/verify-rebuild-project.ps1",
         "local/scripts/validate-workspace-sensitive-metadata-rules.ps1",
+        "local/scripts/validate-workspace-sensitive-metadata-rules.py",
         "local/scripts/verify-workspace-boundaries.ps1",
+        "local/scripts/verify-workspace-boundaries.py",
         "local/scripts/get-publishability-report.ps1",
+        "local/scripts/get-publishability-report.py",
+        "local/scripts/get-document-placement-recommendation.ps1",
         "local/scripts/lib/renormalize_core.py",
         "local/scripts/lib/workspace-sensitive-metadata.ps1",
+        "local/scripts/lib/workspace_sensitive_metadata.py",
+        "local/scripts/lib/workspace_boundaries.py",
         "local/scripts/repair-workspace-sensitive-rules.py",
         "local/scripts/repair-workspace-sensitive-content-patterns.py",
         "registry/README.md",
         "registry/skills/conversation-memo/SKILL.md",
         "registry/skills/conversation-memo/references/memo-lifecycle.md",
-        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/credential-auth-errors.md",
-        "registry/skills/azure-compute/workflows/vm-troubleshooter/references/vm-agent-not-responding.md",
-        "registry/skills/azure-deploy/references/recipes/azcli/verify.md",
-        "registry/skills/azure-deploy/references/recipes/azd/verify.md",
-        "registry/skills/azure-deploy/references/recipes/bicep/verify.md",
-        "registry/skills/azure-deploy/references/recipes/cicd/verify.md",
-        "registry/skills/azure-deploy/references/recipes/terraform/verify.md",
-        "registry/skills/azure-diagnostics/SKILL.md",
-        "registry/skills/azure-diagnostics/aks-troubleshooting/aks-troubleshooting.md",
-        "registry/skills/azure-diagnostics/aks-troubleshooting/networking.md",
-        "registry/skills/azure-diagnostics/references/container-apps/README.md",
+        "registry/skills/microsoft-foundry/SKILL.md",
+        "registry/skills/impeccable/SKILL.md",
     }
 
     for relative_path in sorted(fixture_paths):
@@ -262,7 +260,7 @@ def run_runtime_target_drift() -> dict[str, object]:
             build_wrong_target(home_dir / relative)
 
         verify_before_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "verify-bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -273,7 +271,7 @@ def run_runtime_target_drift() -> dict[str, object]:
         before_report = json.loads(before_stdout)
 
         bootstrap_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -289,7 +287,7 @@ def run_runtime_target_drift() -> dict[str, object]:
         bootstrap_report = json.loads(bootstrap_stdout) if bootstrap_stdout.strip() else {}
 
         verify_after_command = [
-            "python",
+            sys.executable,
             str(REPO_ROOT / "local" / "scripts" / "verify-bootstrap.py"),
             "--home-dir",
             str(home_dir),
@@ -356,7 +354,7 @@ def run_review_bundle_contract_drift() -> dict[str, object]:
         before_code, before_stdout, before_stderr = run_command(export_before_command)
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-external-review-bundle-contract.py"),
             "--repo-root",
             str(fixture_root),
@@ -430,7 +428,7 @@ def run_workspace_sensitive_boundary_drift() -> dict[str, object]:
         before_report = json.loads(before_stdout) if before_stdout.strip() else {}
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-rules.py"),
             "--repo-root",
             str(fixture_root),
@@ -522,7 +520,7 @@ def run_workspace_sensitive_content_pattern_drift() -> dict[str, object]:
         before_verify_report = json.loads(before_verify_stdout) if before_verify_stdout.strip() else {}
 
         repair_command = [
-            "python",
+            sys.executable,
             str(fixture_root / "local" / "scripts" / "repair-workspace-sensitive-content-patterns.py"),
             "--repo-root",
             str(fixture_root),

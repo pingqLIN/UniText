@@ -1,0 +1,3 @@
+display_name: Codex Context Budget Audit
+short_description: Estimate Codex startup token overhead from skills, plugins, MCP, memory, and instructions.
+default_prompt: Audit Codex context/token overhead for this workdir, separate the result by phase, and show the ASCII prompt ratio sketch.

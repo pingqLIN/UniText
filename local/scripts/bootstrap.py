@@ -10,7 +10,6 @@ import re
 import shutil
 import subprocess
 import sys
-import textwrap
 from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
@@ -29,7 +28,7 @@ REPO_MARKERS = [
     Path("INDEX.md"),
 ]
 
-UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 60.0
+CODEX_UNITEXT_REGISTRY_BLOCK_PATTERN = r"(?ms)\n*\[mcp_servers\.unitext_registry\]\n.*?(?=^\[|\Z)"
 
 
 def get_repo_root() -> Path:
@@ -139,13 +138,23 @@ def copy_path(source: Path, destination: Path) -> None:
     shutil.copy2(source, destination)
 
 
+def runtime_bundle_entries(source: Path) -> list[Path]:
+    return [item for item in sorted(source.iterdir()) if not item.name.startswith(".")]
+
+
+def copy_runtime_bundle(source: Path, target: Path) -> None:
+    target.mkdir(parents=True, exist_ok=True)
+    for item in runtime_bundle_entries(source):
+        copy_path(item, target / item.name)
+
+
 def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str, str]]:
     if not source.exists() or not source.is_dir():
         return []
     if not target.exists() or not target.is_dir():
         return []
 
-    canonical_by_key = {item.name.casefold(): item.name for item in sorted(source.iterdir())}
+    canonical_by_key = {item.name.casefold(): item.name for item in runtime_bundle_entries(source)}
     aliases: list[dict[str, str]] = []
     for item in sorted(target.iterdir()):
         canonical_name = canonical_by_key.get(item.name.casefold())
@@ -155,7 +164,8 @@ def find_noncanonical_alias_entries(source: Path, target: Path) -> list[dict[str
 
 
 def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str, object]:
-    baseline_entries = [item.name for item in sorted(source.iterdir())]
+    baseline_items = runtime_bundle_entries(source)
+    baseline_entries = [item.name for item in baseline_items]
     alias_entries = find_noncanonical_alias_entries(source, target)
     if dry_run:
         return {
@@ -171,7 +181,7 @@ def sync_runtime_baseline(source: Path, target: Path, dry_run: bool) -> dict[str
     target.mkdir(parents=True, exist_ok=True)
     for alias_entry in alias_entries:
         remove_path(Path(alias_entry["path"]))
-    for item in sorted(source.iterdir()):
+    for item in baseline_items:
         destination = target / item.name
         if destination.exists() or destination.is_symlink():
             remove_path(destination)
@@ -244,7 +254,7 @@ def set_skills_target(
         except OSError as exc:
             if mode == "symlink":
                 raise RuntimeError(f"symlink creation failed for {target}: {exc}") from exc
-    shutil.copytree(source, target)
+    copy_runtime_bundle(source, target)
     return {"target": str(target), "action": "created", "mode": "mirror"}
 
 
@@ -261,103 +271,16 @@ def toml_string(value: str) -> str:
     return f'"{escaped}"'
 
 
-def render_codex_wrapper() -> str:
-    return textwrap.dedent(
-        """\
-        #!/usr/bin/env python3
-        from __future__ import annotations
-
-        import argparse
-        import importlib.util
-        import sys
-        import time
-        import traceback
-        from pathlib import Path
+def contains_codex_mcp_block(text: str) -> bool:
+    return re.search(CODEX_UNITEXT_REGISTRY_BLOCK_PATTERN, text) is not None
 
 
-        def append_log(log_path: Path, message: str) -> None:
-            log_path.parent.mkdir(parents=True, exist_ok=True)
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-            with log_path.open("a", encoding="utf-8") as handle:
-                handle.write(f"[{timestamp}] {message}\\n")
-
-
-        def load_module(target: Path):
-            spec = importlib.util.spec_from_file_location("unitext_registry_server", target)
-            if spec is None or spec.loader is None:
-                raise RuntimeError(f"unable to load module from {target}")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            return module
-
-
-        def main() -> int:
-            parser = argparse.ArgumentParser(add_help=False)
-            parser.add_argument("--target", required=True)
-            parser.add_argument("--log", required=True)
-            args, passthrough = parser.parse_known_args()
-
-            log_path = Path(args.log)
-            target = Path(args.target)
-            start = time.perf_counter()
-
-            append_log(log_path, f"wrapper start argv={sys.argv!r}")
-            append_log(log_path, f"cwd={Path.cwd()} target={target}")
-
-            try:
-                module = load_module(target)
-                import_ms = round((time.perf_counter() - start) * 1000, 2)
-                append_log(log_path, f"target imported in {import_ms} ms")
-
-                sys.argv = [str(target), *passthrough]
-                append_log(log_path, f"delegating with argv={sys.argv!r}")
-
-                run_start = time.perf_counter()
-                exit_code = int(module.main())
-                run_ms = round((time.perf_counter() - run_start) * 1000, 2)
-                append_log(log_path, f"target main exited code={exit_code} run_ms={run_ms}")
-                return exit_code
-            except SystemExit as exc:
-                code = exc.code if isinstance(exc.code, int) else 0
-                total_ms = round((time.perf_counter() - start) * 1000, 2)
-                append_log(log_path, f"SystemExit code={code} total_ms={total_ms}")
-                raise
-            except Exception:
-                total_ms = round((time.perf_counter() - start) * 1000, 2)
-                append_log(log_path, f"exception after {total_ms} ms:\\n{traceback.format_exc()}")
-                raise
-
-
-        if __name__ == "__main__":
-            raise SystemExit(main())
-        """
-    )
-
-
-def render_codex_mcp_block(server: Path, root: Path, wrapper_path: Path, log_path: Path) -> str:
-    args = ", ".join(
-        toml_string(item)
-        for item in [str(wrapper_path), "--target", str(server), "--log", str(log_path), "--root", str(root)]
-    )
-    return "\n".join(
-        [
-            "[mcp_servers.unitext_registry]",
-            f"startup_timeout_sec = {UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC}",
-            f"command = {toml_string(sys.executable)}",
-            f"args = [{args}]",
-            "",
-        ]
-    )
-
-
-def upsert_codex_mcp_block(text: str, server: Path, root: Path, wrapper_path: Path, log_path: Path) -> str:
-    block = render_codex_mcp_block(server, root, wrapper_path, log_path)
-    pattern = r"(?ms)^\[mcp_servers\.unitext_registry\]\n.*?(?=^\[|\Z)"
-    if re.search(pattern, text):
-        return re.sub(pattern, lambda _: block, text)
-    if not text.endswith("\n"):
-        text += "\n"
-    return text + "\n" + block
+def remove_codex_mcp_block(text: str) -> str:
+    updated = re.sub(CODEX_UNITEXT_REGISTRY_BLOCK_PATTERN, "\n", text)
+    updated = re.sub(r"\n{3,}", "\n\n", updated)
+    if updated and not updated.endswith("\n"):
+        updated += "\n"
+    return updated
 
 
 def render_project_mcp() -> dict[str, object]:
@@ -497,7 +420,11 @@ def main() -> int:
     else:
         summary["runtime"] = ensure_runtime_layer(repo, args.dry_run)
     if not runtime_skills.exists():
-        raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
+        if not args.dry_run:
+            raise SystemExit(f"runtime skills source not found after build: {runtime_skills}")
+        runtime_details = summary.get("runtime", {})
+        if isinstance(runtime_details, dict):
+            runtime_details["runtime_skills_missing_after_plan"] = str(runtime_skills)
     if not server.exists():
         raise SystemExit(f"mcp server not found: {server}")
 
@@ -514,9 +441,6 @@ def main() -> int:
             summary["skills"].append(result)
 
     if not args.skip_codex:
-        wrapper_path = codex_config.parent / "diagnostics" / "unitext_registry_wrapper.py"
-        log_path = codex_config.parent / "diagnostics" / "unitext_registry_startup.log"
-        wrapper = render_codex_wrapper()
         if not args.dry_run and (codex_skills_target.exists() or codex_skills_target.is_symlink()):
             backup_path(codex_skills_target, run_dir / "codex" / "skills")
         codex_skills_result = set_skills_target(
@@ -527,28 +451,22 @@ def main() -> int:
             preserve_local_extras=codex_skills_surface.preserve_local_extras,
         )
         original = codex_config.read_text(encoding="utf-8") if codex_config.exists() else ""
-        wrapper_original = wrapper_path.read_text(encoding="utf-8") if wrapper_path.exists() else ""
+        legacy_global_mcp_present = contains_codex_mcp_block(original)
         updated = update_line(original, r"^skills_path\s*=.*$", f"skills_path = {toml_string(str(codex_skills_target))}")
-        updated = upsert_codex_mcp_block(updated, server, repo, wrapper_path, log_path)
-        changed = updated != original or wrapper != wrapper_original
+        updated = remove_codex_mcp_block(updated)
+        changed = updated != original
         summary["codex"] = {
             "path": str(codex_config),
             "surface_id": codex_config_surface.surface_id,
             "changed": changed,
             "skills_path": str(codex_skills_target),
             "skills_target": codex_skills_result,
-            "mcp_server": "unitext_registry",
-            "wrapper_path": str(wrapper_path),
-            "log_path": str(log_path),
+            "legacy_global_mcp_present": legacy_global_mcp_present,
         }
         if changed and not args.dry_run:
             codex_config.parent.mkdir(parents=True, exist_ok=True)
             if codex_config.exists():
                 backup_path(codex_config, run_dir / "codex" / "config.toml")
-            wrapper_path.parent.mkdir(parents=True, exist_ok=True)
-            if wrapper_path.exists():
-                backup_path(wrapper_path, run_dir / "codex" / "unitext_registry_wrapper.py")
-            wrapper_path.write_text(wrapper, encoding="utf-8")
             codex_config.write_text(updated, encoding="utf-8")
 
     if not args.skip_copilot:

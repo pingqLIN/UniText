@@ -1,6 +1,6 @@
 ---
 name: cloudflare-access-mcp
-description: Use when auditing or changing Cloudflare Access OAuth, DCR, redirect URIs, policies, or MCP connector authentication for this workspace.
+description: Use when the request is specifically about Cloudflare Access app OAuth, DCR, redirect URIs, Access policies, or MCP connector authentication for this workspace. Do not use for tunnel ingress, DNS, WARP, Zero Trust device policy, or zone-edge security review.
 runtime_projection: true
 source_of_truth: registry/skills/cloudflare-access-mcp/SKILL.md
 ---
@@ -25,6 +25,12 @@ source_of_truth: registry/skills/cloudflare-access-mcp/SKILL.md
 - You need to add or verify callback URLs for ChatGPT or another MCP client.
 - You need to inspect Access app policy coverage or OAuth metadata.
 
+## Do Not Use This Skill When
+
+- The issue is about local WARP or Zero Trust device behavior.
+- The issue is about tunnel routing, hostname mapping, or DNS records.
+- The issue is about WAF, browser checks, or bot rules.
+
 ## Checks
 
 - Access app ID and name
@@ -39,4 +45,4 @@ source_of_truth: registry/skills/cloudflare-access-mcp/SKILL.md
 
 ## Escalate
 
-- Use [cloudflare-governance](../../../registry/skills/cloudflare-governance/SKILL.md) when the issue also involves Tunnel, DNS, edge security, or runtime drift.
+- Use [cloudflare-governance](../../../registry/skills/cloudflare-governance/SKILL.md) first for broad Cloudflare review or when the issue also involves Tunnel, DNS, edge security, runtime drift, or WARP device policy.

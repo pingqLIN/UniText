@@ -1,9 +1,16 @@
 backup/
 recovered_*/
 .bak_*/
+%SystemDrive%/
+.idea/
 .playwright-mcp/
 .tmp_unitext_protocol.log
+desktop.ini
 **/__pycache__/
+runtime/skills/.system/
+runtime/skills/source-command*/
+runtime/.runtime-dryrun-*/
+.tmp.codex-test/
 ops/history/backup_*/
 ops/history/bootstrap_*/
 ops/history/drift_*/
@@ -18,6 +25,10 @@ ops/review-package/
 ops/template-package/
 ops/rebuild-project/
 ops/project-map/
+!ops/project-map/
+ops/project-map/*
+!ops/project-map/design-variants/
+!ops/project-map/design-variants/**
 ops/agent-governance/
 ops/git-bundles/
 ops/reports/
@@ -38,3 +49,4 @@ local/docs/authoring/
 local/docs/reviews/
 SOCIAL_POSTS_*.md
 STRATEGIC_REVIEW_*.md
+**/desktop.ini

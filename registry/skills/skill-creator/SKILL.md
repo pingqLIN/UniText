@@ -2,6 +2,8 @@
 name: skill-creator
 description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
 license: Complete terms in LICENSE.txt
+metadata:
+  runtime_support_files: true
 ---
 
 # Skill Creator
@@ -284,8 +286,8 @@ When editing the (newly-generated or existing) skill, remember that the skill is
 
 Consult these helpful guides based on your skill's needs:
 
-- **Multi-step processes**: See references/workflows.md for sequential workflows and conditional logic
-- **Specific output formats or quality standards**: See references/output-patterns.md for template and example patterns
+- **Multi-step processes**: See [references/workflows.md](./references/workflows.md) for sequential workflows and conditional logic
+- **Specific output formats or quality standards**: See [references/output-patterns.md](./references/output-patterns.md) for template and example patterns
 
 These files contain established best practices for effective skill design.
 

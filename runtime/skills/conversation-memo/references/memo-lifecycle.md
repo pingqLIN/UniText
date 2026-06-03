@@ -16,8 +16,7 @@ For memo-worthy discussions, preserve the full raw conversation before summarizi
 
 Default raw archive root:
 
-- `%USERPROFILE%\.agents\.little_talks` (Windows)
-- `$HOME/.agents/.little_talks` (POSIX-style reference)
+- `C:\Users\<user>\.agents\.little_talks`
 
 Suggested filename:
 

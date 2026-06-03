@@ -64,6 +64,8 @@
 
 현재 외부 review 주 집합은 전체 후보군이 아니라 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 의 `8 + 4` 선별 skills 를 기준으로 합니다.
 
+`2026-04-18` 기준으로 authoring tree 내부의 `registry/skills/` 에는 `48` 개의 skill 디렉터리가 있습니다. 아래 표는 review-facing catalog excerpt 이며 전체 inventory dump 는 아닙니다.
+
 ### Review Package
 
 외부 reviewer 용 자료를 준비하려면 [docs/reviews/EXTERNAL_REVIEW_PACKAGE.md](docs/reviews/EXTERNAL_REVIEW_PACKAGE.md) 를 진입점으로 사용하고, `local/scripts/export-review-package.ps1` 로 재생성 가능한 review package 를 만드세요.
@@ -132,6 +134,7 @@ shared metadata 탐지 규칙을 조정하거나 규칙 사례를 이해하려�
 | `cloudflare-edge-security` | Workspace | `/registry/skills/cloudflare-edge-security` | `active` |
 | `cloudflare-runtime-sync` | Workspace | `/registry/skills/cloudflare-runtime-sync` | `active` |
 | `cloudflare-tunnel-dns` | Workspace | `/registry/skills/cloudflare-tunnel-dns` | `active` |
+| `cloudflare-zerotrust-device` | Workspace | `/registry/skills/cloudflare-zerotrust-device` | `active` |
 
 ### Workflow
 

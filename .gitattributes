@@ -1,5 +1,10 @@
 * text=auto eol=lf
 
+# runtime/skills is generated projection output. Keep whitespace review on the
+# registry source of truth, but do not let projected vendor/reference payloads
+# block commits with trailing-space or EOF whitespace noise.
+runtime/skills/** whitespace=-trailing-space,-blank-at-eof
+
 *.pdf binary
 *.gz binary
 *.zip binary

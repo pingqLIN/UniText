@@ -1,0 +1,12 @@
+# Ballot
+- ranked_order:
+  - 4: Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md
+  - 3: Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md
+  - 2: Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md
+  - 1: Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md
+- best_reason: `template2-b` gives the cleanest balance of a tracked runtime contract, a single low-noise agent entrypoint, and cross-CLI profile extensibility without collapsing back into direct registry browsing. It is the most operable proposal while still preserving registry-first canonical authoring.
+- fatal_flaws:
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md: introduces a heavy new compiler/control-plane split and a hidden `.unitext` pack, which is realistic only after more infrastructure than this repo currently has.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md: `A05` pushes the catalog toward full registry breadth, which risks reintroducing noise into the runtime facade.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-c.md: makes the runtime surface local-only, which weakens source hygiene and reviewability compared with a tracked runtime contract.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md: the `runtimectl` facade is clean but underspecified on artifact location and runtime scoping, leaving implementation details too open.

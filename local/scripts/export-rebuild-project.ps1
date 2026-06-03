@@ -7,12 +7,22 @@ param(
 $ErrorActionPreference = "Stop"
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot "..\\..")).Path
+. (Join-Path $PSScriptRoot "lib\path-safety.ps1")
 $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$folder = if ($Name) { $Name } else { "rebuild_$stamp" }
+$folder = if ($Name) {
+  Assert-SafeSimpleName -Value $Name -Label "Name" -Pattern '^[a-z0-9][a-z0-9_-]{0,127}$'
+} else {
+  "rebuild_$stamp"
+}
 $exportScript = Join-Path $PSScriptRoot "export-template-package.ps1"
 $verifyScript = Join-Path $PSScriptRoot "verify-template-package.ps1"
 $rebuildGuide = Join-Path $root "REBUILD_AS_NEW_PROJECT.md"
 $stagingRoot = "ops/template-package"
+$allowedOutputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath "ops/rebuild-project"
+$outputBase = Get-NormalizedFullPath -BasePath $root -CandidatePath $OutputRoot
+if (-not (Test-IsUnderPath -RootPath $allowedOutputBase -CandidatePath $outputBase)) {
+  throw "OutputRoot must remain under ops/rebuild-project: $outputBase"
+}
 
 if (-not (Test-Path -LiteralPath $exportScript)) {
   throw "Template export script not found: $exportScript"
@@ -23,7 +33,7 @@ if (-not (Test-Path -LiteralPath $rebuildGuide)) {
 }
 
 $template = & $exportScript -OutputRoot $stagingRoot -Name $folder -DryRun:$DryRun
-$finalOutputRoot = Join-Path $root $OutputRoot
+$finalOutputRoot = $outputBase
 $finalPackage = Join-Path $finalOutputRoot $folder
 
 if ($DryRun) {

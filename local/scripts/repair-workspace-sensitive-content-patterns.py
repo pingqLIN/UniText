@@ -12,7 +12,7 @@ RULES_RELATIVE_PATH = "WORKSPACE_SENSITIVE_METADATA_RULES.json"
 CANONICAL_CONTENT_PATTERNS = {
     "live workspace hostname": {
         "label": "live workspace hostname",
-        "regex": r"(?i)\b(?:zone hostnames?|public hostnames?|custom hostnames?|mcp hostnames?|health hostnames?)\b[^\r\n]*\b(?!workspace\.example\.com\b)(?!example\.com\b)(?:[a-z0-9-]+\.)+[a-z]{2,}\b",
+        "regex": r"(?i)\b(?:zone hostnames?|ingress hostnames?|access app domain|public health host|workspace domain|tunnel hostname|hostname mapping|public hostnames?|custom hostnames?|mcp hostnames?|health hostnames?)\b[^\r\n]*\b(?!workspace\.example\.com\b)(?!example\.com\b)(?:[a-z0-9-]+\.)+[a-z]{2,}\b",
         "skip_script_pattern_lines": True,
     }
 }
@@ -31,6 +31,11 @@ CANONICAL_SELF_TEST_CASES = {
     "flag live mcp hostname in governance text": {
         "label": "flag live mcp hostname in governance text",
         "sample": "MCP hostname: mcp.colorgeek.co",
+        "expected_labels": ["live workspace hostname"],
+    },
+    "flag ingress hostname binding": {
+        "label": "flag ingress hostname binding",
+        "sample": "Ingress hostname: app.colorgeek.co",
         "expected_labels": ["live workspace hostname"],
     },
     "allow azure bare hostname guidance": {

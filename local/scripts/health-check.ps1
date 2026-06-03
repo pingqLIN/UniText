@@ -44,6 +44,7 @@ $required = @(
   "local\\scripts\\verify-template-package.ps1",
   "local\\scripts\\verify-workspace-boundaries.ps1",
   "local\\scripts\\get-publishability-report.ps1",
+  "local\\scripts\\get-document-placement-recommendation.ps1",
   "local\\docs\\ADOPTION_CHECKLIST.md",
   "local\\docs\\CLI_COMPAT_MATRIX.md",
   "registry\\agents\\registry-curator\\AGENT.md",
@@ -64,6 +65,7 @@ $trackedSkillFiles = @((& git -C $root ls-files "$skillsRoot/*/SKILL.md") | Wher
 $skills = @($trackedSkillFiles | ForEach-Object { Split-Path $_ -Parent } | Sort-Object -Unique)
 $invalid = @()
 $rulesScript = Join-Path $root "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1"
+$i18nAuditScript = Join-Path $root "local\\scripts\\audit-i18n-drift.py"
 
 foreach ($skill in $skills) {
   $path = Join-Path $root (Join-Path $skill "SKILL.md")
@@ -80,6 +82,35 @@ foreach ($skill in $skills) {
 
 $rulesCheck = & $rulesScript
 $rulesOk = [bool]$rulesCheck.ok
+$i18nSummary = $null
+$i18nError = $null
+
+try {
+  $i18nRaw = (& python $i18nAuditScript --format json --sample-size 0 --exit-zero | Out-String).Trim()
+  if ($LASTEXITCODE -ne 0) {
+    $i18nError = "audit-i18n-drift.py exited with code $LASTEXITCODE"
+  } elseif ([string]::IsNullOrWhiteSpace($i18nRaw)) {
+    $i18nError = "audit-i18n-drift.py returned empty output"
+  } else {
+    $i18nSummary = $i18nRaw | ConvertFrom-Json
+  }
+} catch {
+  $i18nError = $_.Exception.Message
+}
+
+$i18nCollected = $null -ne $i18nSummary
+$i18nMissing = $null
+$i18nStale = $null
+$i18nUntracked = $null
+$i18nSourceMissing = $null
+
+if ($i18nCollected) {
+  $byLocale = @($i18nSummary.by_locale.PSObject.Properties.Value)
+  $i18nMissing = ($byLocale | Measure-Object -Property missing -Sum).Sum
+  $i18nStale = ($byLocale | Measure-Object -Property stale -Sum).Sum
+  $i18nUntracked = ($byLocale | Measure-Object -Property untracked -Sum).Sum
+  $i18nSourceMissing = ($byLocale | Measure-Object -Property source_missing -Sum).Sum
+}
 
 [pscustomobject]@{
   missing_files = $missing
@@ -90,5 +121,13 @@ $rulesOk = [bool]$rulesCheck.ok
   workflow_seed = Test-Path "registry\\workflow\\claude-plans\\WORKFLOW.md"
   boundary_rules_ok = $rulesOk
   boundary_rule_errors = @($rulesCheck.errors)
+  i18n_drift_collected = $i18nCollected
+  i18n_drift_ok = if ($i18nCollected) { [bool]$i18nSummary.ok } else { $null }
+  i18n_issues_found = if ($i18nCollected) { [int]$i18nSummary.issues_found } else { $null }
+  i18n_missing = $i18nMissing
+  i18n_stale = $i18nStale
+  i18n_untracked = $i18nUntracked
+  i18n_source_missing = $i18nSourceMissing
+  i18n_drift_error = $i18nError
   ok = ($missing.Count -eq 0) -and ($invalid.Count -eq 0) -and ($skills.Count -ge 1) -and $rulesOk
 }

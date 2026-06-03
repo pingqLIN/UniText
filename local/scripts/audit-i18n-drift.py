@@ -34,6 +34,7 @@ def run_git(repo: Path, path: str) -> tuple[str | None, int | None]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--repo-root", default=None)
     parser.add_argument("--format", choices=("json", "markdown"), default="json")
     parser.add_argument("--sample-size", type=int, default=40)
     parser.add_argument("--locale", action="append", dest="locales")
@@ -115,7 +116,7 @@ def write_output(text: str, output: str | None) -> None:
 
 def main() -> int:
     args = parse_args()
-    repo = get_repo_root()
+    repo = Path(args.repo_root).resolve() if args.repo_root else get_repo_root()
     manifest_path = repo / "i18n" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest_locales = list(manifest["locales"])

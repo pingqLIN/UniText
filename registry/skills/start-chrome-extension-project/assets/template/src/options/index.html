@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>__EXTENSION_NAME__ Settings</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: #ffffff;
+        color: #0f172a;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 32px 20px;
+      }
+
+      label,
+      input,
+      button {
+        display: block;
+      }
+
+      input {
+        width: 100%;
+        max-width: 420px;
+        margin: 8px 0 16px;
+        padding: 10px 12px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: #0f766e;
+        color: #ffffff;
+        cursor: pointer;
+      }
+
+      #status {
+        margin-top: 12px;
+        color: #334155;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>__EXTENSION_NAME__ Settings</h1>
+      <p>Use this page to keep starter configuration local and visible.</p>
+      <label for="preference">Preference</label>
+      <input id="preference" name="preference" type="text" />
+      <button id="save" type="button">Save</button>
+      <div id="status"></div>
+    </main>
+    <script type="module" src="./options.js"></script>
+  </body>
+</html>

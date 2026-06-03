@@ -8,7 +8,8 @@
 - `registry/skills/` 已建立
 - 至少 5 個 skills 完成 canonical adoption
 - `INDEX.md` 有對應 catalog entries
-- `local/scripts/sync-skills.ps1` 指向 `registry/skills`
+- `local/scripts/build-runtime-layer.py` 可由 `registry/` 重建 `runtime/`
+- `local/scripts/sync-skills.ps1` 指向 `runtime/skills`
 - `local/scripts/verify-delivery.ps1` 可驗證 skills source 與 target 狀態
 - `local/scripts/health-check.ps1` 可通過基本檢查
 
@@ -24,12 +25,14 @@
 
 - Git repository 已初始化
 - `.gitignore` 已排除 local-only 與大型歷史產物
+- `README.md`、`INDEX.md`、`RUNTIME.md` 與 current runtime contract 狀態一致
 - `README.md`、`INDEX.md`、`docs/reports/status/PROJECT_STATUS_REPORT_2026-03-23.md` 三者狀態一致
 - `docs/reviews/EXTERNAL_REVIEW_PACKAGE.md` 已定義審查範圍、閱讀順序與排除項目
 - `docs/reviews/EXTERNAL_REVIEW_COVER_NOTE.md` 與 `docs/reviews/EXTERNAL_REVIEW_HIGHLIGHTS.md` 已可作為 reviewer-facing entry docs
 - `SECRET_HANDLING_GUIDELINES.md` 已建立治理邊界，並納入核心閱讀順序
 - `local/scripts/export-review-package.ps1` 可重複產出 review package
 - 已提供跨平台 `bootstrap -> verify` first-run 路徑
+- consumer agents 有明確的 runtime-first startup path
 - 外部審查可直接看到：
   - 核心架構文件
   - 已 adoption 的 canonical skills

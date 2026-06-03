@@ -5,6 +5,7 @@
 
 ## Required
 
+- [ ] 已先分類到 `local-only overlay`、`project-local MCP / companion`、或 `governed registry promotion`
 - [ ] 目錄名稱符合 `id` 規則
 - [ ] `SKILL.md` 存在
 - [ ] `SKILL.md` 以 frontmatter 開頭
@@ -14,10 +15,12 @@
 
 ## Recommended
 
+- [ ] lane 選擇與 `DOCUMENT_PLACEMENT_POLICY.md` 一致
 - [ ] 有 `LICENSE.txt` 或等價授權說明
 - [ ] 有清楚的 Usage、Workflow 或 Process 段落
 - [ ] 無硬編碼的個人帳號與本機絕對路徑
 - [ ] 若含 scripts / references，路徑關係清楚且可被 agent 發現
+- [ ] 若要進 governed `registry/`，source / provenance 已可明示
 
 ## Review Outcome
 

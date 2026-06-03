@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 
@@ -78,6 +79,17 @@ class I18nWaveTests(unittest.TestCase):
         self.assertTrue(payload["safe_to_split"])
         self.assertEqual(payload["summary"]["eol_only"], 1)
         self.assertEqual(payload["summary"]["substantive"], 0)
+
+    def test_is_eol_only_decodes_git_diff_as_utf8(self):
+        module = load_module()
+        completed = subprocess.CompletedProcess(args=["git"], returncode=1, stdout="差異", stderr="")
+        with mock.patch.object(module.subprocess, "run", return_value=completed) as run:
+            self.assertFalse(module.is_eol_only(Path("repo"), "i18n/zh-TW/README.md"))
+
+        kwargs = run.call_args.kwargs
+        self.assertTrue(kwargs["text"])
+        self.assertEqual(kwargs["encoding"], "utf-8")
+        self.assertEqual(kwargs["errors"], "replace")
 
 
 if __name__ == "__main__":

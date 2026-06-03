@@ -72,8 +72,37 @@ For `Lane B`, also inspect the target project's local MCP surface before writing
 - `Lane C`
   - adopt into `registry/`
   - rebuild `runtime/`
-  - run bootstrap / verify
+  - run repo-side verify before any host wiring
   - keep the diff reviewable and provenance-visible
+
+### Phase 5: Attach host targets only when requested
+
+Registry adoption and runtime rebuild do not automatically authorize host takeover.
+
+Use these commands by boundary:
+
+| Boundary | Command | May modify `~/.codex` |
+|---|---|---:|
+| Preview runtime and host changes | `python local/scripts/bootstrap.py --dry-run` | No |
+| Rebuild tracked runtime only | `python local/scripts/build-runtime-layer.py --write` | No |
+| Verify repo/runtime without Codex config remediation | `python local/scripts/verify-bootstrap.py --skip-codex` | No |
+| Attach active host skills/config | `python local/scripts/bootstrap.py --force` | Yes |
+
+When `bootstrap.py --force` runs without `--skip-codex`, it may update `~/.codex/skills`, rewrite `~/.codex/config.toml` so `skills_path` points at the Codex-local skills target, and remove legacy global `[mcp_servers.unitext_registry]` from Codex config. Existing host targets are backed up under `ops/history/bootstrap_*`.
+
+## Runtime Restore
+
+`runtime/` is a generated read model. Deleting it only removes the projection; restoration means rebuilding it from canonical `registry/` content.
+
+Use this sequence:
+
+```bash
+git status --short --branch
+python local/scripts/build-runtime-layer.py --write
+python local/scripts/verify-bootstrap.py --skip-codex
+```
+
+Run full `python local/scripts/verify-bootstrap.py` only when host `.codex` wiring is intentionally part of the check.
 
 ## Promotion Gate For New Skills And MCPs
 

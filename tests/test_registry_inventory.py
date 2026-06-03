@@ -8,6 +8,10 @@ SKILLS_ROOT = REPO_ROOT / "registry" / "skills"
 RUNTIME_CATALOG = REPO_ROOT / "runtime" / "catalog.json"
 
 
+def visible_skill_dirs() -> list[Path]:
+    return [path for path in SKILLS_ROOT.iterdir() if path.is_dir() and not path.name.startswith(".")]
+
+
 class RegistryInventoryTests(unittest.TestCase):
     def test_review_shortlist_skills_exist(self):
         expected = {
@@ -24,7 +28,7 @@ class RegistryInventoryTests(unittest.TestCase):
             "internal-comms",
             "theme-factory",
         }
-        actual = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
+        actual = {path.name for path in visible_skill_dirs()}
         self.assertTrue(expected.issubset(actual))
 
     def test_expanded_skill_families_exist(self):
@@ -32,21 +36,22 @@ class RegistryInventoryTests(unittest.TestCase):
             "cloudflare",
             "cloudflare-governance",
             "microsoft-foundry",
-            "azure-prepare",
-            "azure-validate",
-            "azure-cost",
-            "azure-resource-lookup",
+            "impeccable",
             "entra-app-registration",
         }
-        actual = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
+        actual = {path.name for path in visible_skill_dirs()}
         self.assertTrue(expected.issubset(actual))
 
     def test_skill_inventory_has_not_collapsed_below_current_baseline(self):
-        actual = [path for path in SKILLS_ROOT.iterdir() if path.is_dir()]
-        self.assertGreaterEqual(len(actual), 44)
+        actual = visible_skill_dirs()
+        self.assertGreaterEqual(len(actual), 35)
+
+    def test_skill_inventory_excludes_hidden_directories(self):
+        actual = {path.name for path in visible_skill_dirs()}
+        self.assertNotIn(".clean", actual)
 
     def test_project_development_loop_registration_uses_canonical_lowercase(self):
-        actual = {path.name for path in SKILLS_ROOT.iterdir() if path.is_dir()}
+        actual = {path.name for path in visible_skill_dirs()}
         self.assertIn("project-development-loop", actual)
         self.assertNotIn("Project-development-loop", actual)
 

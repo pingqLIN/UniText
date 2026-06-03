@@ -1,17 +1,22 @@
 {
   "shared_surface_scope": [
     "AGENTS.md",
+    "AGENT_GOVERNANCE_LAYERING.md",
     "README.md",
+    "README.zh-TW.md",
     "INDEX.md",
     "VISION.md",
     "RESOURCE_SPEC.md",
+    "RUNTIME.md",
     "OPERATIONS.md",
     "PROJECT_MODES.md",
+    "PROJECT_DRIFT_GOVERNANCE.md",
     "WORKSPACE_SENSITIVE_METADATA_RULES.md",
     "SECRET_HANDLING_GUIDELINES.md",
     "TEMPLATE_RELEASE_PACKAGE.md",
     "TEMPLATE_RELEASE_CHECKLIST.md",
     "REBUILD_AS_NEW_PROJECT.md",
+    "TEST_BASELINE.md",
     "MILESTONES.md",
     "NO_PUBLISH_POLICY.md",
     "DOCUMENT_PLACEMENT_POLICY.md",
@@ -38,10 +43,16 @@
     "local/scripts/export-rebuild-project.ps1",
     "local/scripts/verify-rebuild-project.ps1",
     "local/scripts/validate-workspace-sensitive-metadata-rules.ps1",
+    "local/scripts/validate-workspace-sensitive-metadata-rules.py",
     "local/scripts/verify-workspace-boundaries.ps1",
+    "local/scripts/verify-workspace-boundaries.py",
     "local/scripts/get-publishability-report.ps1",
+    "local/scripts/get-publishability-report.py",
+    "local/scripts/get-document-placement-recommendation.ps1",
     "local/scripts/lib/renormalize_core.py",
     "local/scripts/lib/workspace-sensitive-metadata.ps1",
+    "local/scripts/lib/workspace_sensitive_metadata.py",
+    "local/scripts/lib/workspace_boundaries.py",
     "WORKSPACE_SENSITIVE_METADATA_RULES.json",
     "registry"
   ],
@@ -66,12 +77,12 @@
   "content_patterns": [
     {
       "label": "machine-specific Windows path",
-      "regex": "(?i)\\b[A-Z]:\\\\(Users|Services|Projects)\\\\",
+      "regex": "(?i)\\b[A-Z]:\\\\(Users|Services|Projects)\\\\(?!<[^>]+>\\\\)",
       "skip_script_pattern_lines": false
     },
     {
       "label": "live workspace hostname",
-      "regex": "(?i)\\b(?:zone hostnames?|public hostnames?|custom hostnames?|mcp hostnames?|health hostnames?)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
+      "regex": "(?i)\\b(?:zone hostnames?|ingress hostnames?|access app domain|public health host|workspace domain|tunnel hostname|hostname mapping|public hostnames?|custom hostnames?|mcp hostnames?|health hostnames?)\\b[^\\r\\n]*\\b(?!workspace\\.example\\.com\\b)(?!example\\.com\\b)(?:[a-z0-9-]+\\.)+[a-z]{2,}\\b",
       "skip_script_pattern_lines": true
     },
     {
@@ -102,9 +113,19 @@
       "expected_labels": ["live workspace hostname"]
     },
     {
+      "label": "flag ingress hostname binding",
+      "sample": "Ingress hostname: app.colorgeek.co",
+      "expected_labels": ["live workspace hostname"]
+    },
+    {
       "label": "flag live mcp hostname in governance text",
       "sample": "MCP hostname: mcp.colorgeek.co",
       "expected_labels": ["live workspace hostname"]
+    },
+    {
+      "label": "allow generic hostname example in docs",
+      "sample": "For example, report https://myapp.azurewebsites.net, never myapp.azurewebsites.net.",
+      "expected_labels": []
     },
     {
       "label": "allow azure bare hostname guidance",
@@ -122,8 +143,18 @@
       "expected_labels": []
     },
     {
+      "label": "allow domain controller text with docs link",
+      "sample": "\"Trust relationship between workstation and domain failed\" | Reset machine account or rejoin domain | https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/windows/troubleshoot-rdp-connection",
+      "expected_labels": []
+    },
+    {
       "label": "allow ingress placeholder command",
       "sample": "kubectl get pods -n <ingress-ns> -l app.kubernetes.io/name=ingress-nginx",
+      "expected_labels": []
+    },
+    {
+      "label": "allow placeholder Windows user path",
+      "sample": "Use C:\\Users\\<user>\\.cloudflared\\cert.pem as placeholder documentation.",
       "expected_labels": []
     },
     {

@@ -1,0 +1,12 @@
+# Ballot
+- ranked_order:
+  - 4: Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md
+  - 3: Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md
+  - 2: Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md
+  - 1: Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md
+- best_reason: `template2-b.md` gives the strongest balance of architecture correctness and implementation realism: it cleanly separates canonical registry from runtime materialization, keeps Codex operable via curated profiles, preserves MCP-based deep discovery instead of inventing a hard forked discovery path, and defines practical build/install/verify contracts with migration-safe rollback behavior.
+- fatal_flaws:
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-a.md: Introduces a new default `unitext-runtime` MCP surface and strict registry denial in one step, which increases migration and compatibility risk versus current verified tooling.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-b.md: none
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-d.md: Runtime contract is directionally correct but under-specifies deterministic artifact and adapter state guarantees, leaving enforcement ambiguity.
+  - Q:/UniText/docs/architecture/agent-runtime-reset/template2-e.md: Lacks sufficiently concrete build/apply/verify mechanics and machine-contract detail, so operability and cross-CLI rollout are not implementation-complete.

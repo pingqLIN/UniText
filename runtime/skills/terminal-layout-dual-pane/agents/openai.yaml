@@ -1,0 +1,4 @@
+interface:
+  display_name: "Terminal Layout Dual Pane"
+  short_description: "Arrange Explorer and terminal in a left-right split"
+  default_prompt: "Use $terminal-layout-dual-pane to place Explorer left and terminal right for the current folder."

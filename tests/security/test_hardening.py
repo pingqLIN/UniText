@@ -50,6 +50,14 @@ def load_bootstrap_module():
     return module
 
 
+def normalize_manifest_path(value: str) -> str:
+    return "/".join(part for part in value.replace("\\", "/").split("/") if part)
+
+
+def quote_powershell_string(value: Path | str) -> str:
+    return "'" + str(value).replace("'", "''") + "'"
+
+
 class SecurityHardeningTests(unittest.TestCase):
     def test_with_server_rejects_shell_string_by_default(self):
         script = REPO_ROOT / "registry" / "skills" / "webapp-testing" / "scripts" / "with_server.py"
@@ -191,6 +199,174 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("ops/template-package", result.stdout + result.stderr)
 
+    def test_export_template_dry_run_lists_required_starter_members(self):
+        script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+        result = run_command(
+            [
+                powershell,
+                "-NoProfile",
+                "-Command",
+                f"& '{script}' -DryRun | ConvertTo-Json -Depth 6",
+            ]
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        sources = {normalize_manifest_path(item["source"]) for item in payload["items"]}
+        targets = {normalize_manifest_path(item["target"]) for item in payload["items"]}
+
+        self.assertIn("README.md", sources)
+        self.assertIn("registry/mcp/claude-project-mcp-seed", sources)
+        self.assertIn("local/scripts/bootstrap.py", sources)
+        self.assertIn("local/scripts/build-runtime-layer.py", sources)
+        self.assertIn("local/scripts/lib/integration_surfaces.py", sources)
+        self.assertIn("local/scripts/validate-workspace-sensitive-metadata-rules.py", sources)
+        self.assertIn("local/scripts/verify-workspace-boundaries.py", sources)
+        self.assertIn("local/scripts/get-publishability-report.py", sources)
+        self.assertIn("local/scripts/lib/workspace_sensitive_metadata.py", sources)
+        self.assertIn("local/scripts/lib/workspace_boundaries.py", sources)
+        self.assertIn("local/config/integration-surfaces.json", sources)
+        self.assertIn("registry/skills/example-skill", targets)
+        self.assertIn("machine-local runtime state", payload["excluded"])
+
+    def test_export_template_actual_write_verifies_package(self):
+        script = REPO_ROOT / "local" / "scripts" / "export-template-package.ps1"
+        verify_script = REPO_ROOT / "local" / "scripts" / "verify-template-package.ps1"
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+
+        output_base = REPO_ROOT / "ops" / "template-package"
+        output_base.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=output_base, prefix="unit_") as temp_dir:
+            output_root = Path(temp_dir)
+            package_name = "template-test"
+            package_path = output_root / package_name
+            export_result = run_command(
+                [
+                    powershell,
+                    "-NoProfile",
+                    "-File",
+                    str(script),
+                    "-OutputRoot",
+                    str(output_root),
+                    "-Name",
+                    package_name,
+                ]
+            )
+            self.assertEqual(export_result.returncode, 0, export_result.stdout + export_result.stderr)
+            self.assertTrue((package_path / "manifest.json").is_file())
+            self.assertTrue((package_path / "release.json").is_file())
+
+            command = f"& {quote_powershell_string(verify_script)} -Path {quote_powershell_string(package_path)} | ConvertTo-Json -Depth 6"
+            verify_result = run_command([powershell, "-NoProfile", "-Command", command])
+
+        self.assertEqual(verify_result.returncode, 0, verify_result.stdout + verify_result.stderr)
+        payload = json.loads(verify_result.stdout)
+        self.assertTrue(payload["ok"], verify_result.stdout)
+        self.assertEqual(payload["missing"], [])
+        self.assertEqual(payload["forbidden_present"], [])
+        self.assertEqual(payload["content_violations"], [])
+
+    def test_external_review_contract_validates_and_export_uses_contract(self):
+        contract_path = REPO_ROOT / "docs" / "reviews" / "external-review-bundle.contract.json"
+        repair_script = REPO_ROOT / "local" / "scripts" / "repair-external-review-bundle-contract.py"
+        result = run_command([sys.executable, str(repair_script)])
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertTrue(payload["validation"]["ok"], payload)
+        self.assertFalse(payload["changed"], payload)
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+
+        export_script = REPO_ROOT / "local" / "scripts" / "export-review-package.ps1"
+        export_result = run_command(
+            [
+                powershell,
+                "-NoProfile",
+                "-Command",
+                f"& {quote_powershell_string(export_script)} -DryRun | ConvertTo-Json -Depth 8",
+            ]
+        )
+        self.assertEqual(export_result.returncode, 0, export_result.stdout + export_result.stderr)
+        export_payload = json.loads(export_result.stdout)
+
+        expected_items = (
+            [("file", normalize_manifest_path(path)) for path in contract["files"]]
+            + [("dir", normalize_manifest_path(path)) for path in contract["directories"]]
+            + [("dir", f"registry/skills/{skill}") for skill in contract["skills"]["core"]]
+            + [("dir", f"registry/skills/{skill}") for skill in contract["skills"]["expansion"]]
+        )
+        actual_items = [
+            (item["kind"], normalize_manifest_path(item["path"]))
+            for item in export_payload["items"]
+        ]
+
+        self.assertEqual(actual_items, expected_items)
+        self.assertEqual(export_payload["item_count"], len(expected_items))
+
+    def test_export_rebuild_rejects_escape_output_root(self):
+        script = REPO_ROOT / "local" / "scripts" / "export-rebuild-project.ps1"
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+        result = run_command(
+            [
+                powershell,
+                "-NoProfile",
+                "-File",
+                str(script),
+                "-OutputRoot",
+                "..\\outside",
+                "-DryRun",
+            ]
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("ops/rebuild-project", result.stdout + result.stderr)
+
+    def test_export_rebuild_actual_write_verifies_package(self):
+        script = REPO_ROOT / "local" / "scripts" / "export-rebuild-project.ps1"
+        verify_script = REPO_ROOT / "local" / "scripts" / "verify-rebuild-project.ps1"
+        powershell = get_powershell_executable()
+        if powershell is None:
+            self.skipTest("PowerShell executable not available")
+
+        output_base = REPO_ROOT / "ops" / "rebuild-project"
+        output_base.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=output_base, prefix="unit_") as temp_dir:
+            output_root = Path(temp_dir)
+            package_name = f"rebuild-test-{output_root.name}"
+            package_path = output_root / package_name
+            export_result = run_command(
+                [
+                    powershell,
+                    "-NoProfile",
+                    "-File",
+                    str(script),
+                    "-OutputRoot",
+                    str(output_root),
+                    "-Name",
+                    package_name,
+                ]
+            )
+            self.assertEqual(export_result.returncode, 0, export_result.stdout + export_result.stderr)
+            self.assertTrue((package_path / "REBUILD_AS_NEW_PROJECT.md").is_file())
+
+            command = f"& {quote_powershell_string(verify_script)} -Path {quote_powershell_string(package_path)} | ConvertTo-Json -Depth 6"
+            verify_result = run_command([powershell, "-NoProfile", "-Command", command])
+
+        self.assertEqual(verify_result.returncode, 0, verify_result.stdout + verify_result.stderr)
+        payload = json.loads(verify_result.stdout)
+        self.assertTrue(payload["ok"], verify_result.stdout)
+        self.assertTrue(payload["template_ok"], verify_result.stdout)
+        self.assertEqual(payload["missing"], [])
+        self.assertEqual(payload["forbidden_present"], [])
+
     def test_batch_adopt_rejects_invalid_skill_id(self):
         script = REPO_ROOT / "local" / "scripts" / "batch-adopt-skills.ps1"
         powershell = get_powershell_executable()
@@ -305,6 +481,8 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertTrue(good["validation_ok"])
         self.assertEqual(good["name"], "good-skill")
         self.assertFalse(bad["validation_ok"])
+        self.assertIsNone(bad["name"])
+        self.assertFalse(bad["has_description"])
         self.assertIn("Duplicate key", bad["validation_message"])
 
     def test_generate_index_entries_uses_explicit_root(self):

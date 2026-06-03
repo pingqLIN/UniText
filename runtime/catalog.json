@@ -35,6 +35,43 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "advise-project-direction",
+      "type": "skill",
+      "runtime_path": "runtime/skills/advise-project-direction/SKILL.md",
+      "source_of_truth": "registry/skills/advise-project-direction/SKILL.md",
+      "canonical_location": "/registry/skills/advise-project-direction",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/advise-project-direction/SKILL.md",
+      "intent_tags": [
+        "advise-project-direction",
+        "use",
+        "when",
+        "the",
+        "user",
+        "raises",
+        "an",
+        "idea"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "ai-first-readiness-review",
       "type": "skill",
       "runtime_path": "runtime/skills/ai-first-readiness-review/SKILL.md",
@@ -66,6 +103,80 @@
         "runbooks",
         "and",
         "operational"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "ai-runtime-governance",
+      "type": "skill",
+      "runtime_path": "runtime/skills/ai-runtime-governance/SKILL.md",
+      "source_of_truth": "registry/skills/ai-runtime-governance/SKILL.md",
+      "canonical_location": "/registry/skills/ai-runtime-governance",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/ai-runtime-governance/SKILL.md",
+      "intent_tags": [
+        "ai-runtime-governance",
+        "unified",
+        "governance",
+        "for",
+        "local",
+        "ai",
+        "tools",
+        "and"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "algorithmic-art",
+      "type": "skill",
+      "runtime_path": "runtime/skills/algorithmic-art/SKILL.md",
+      "source_of_truth": "registry/skills/algorithmic-art/SKILL.md",
+      "canonical_location": "/registry/skills/algorithmic-art",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/algorithmic-art/SKILL.md",
+      "intent_tags": [
+        "algorithmic-art",
+        "creating",
+        "algorithmic",
+        "art",
+        "using",
+        "p5",
+        "js",
+        "with"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -109,11 +220,11 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
-      "id": "azure-ai",
+      "id": "book-image-renamer",
       "type": "skill",
-      "runtime_path": "runtime/skills/azure-ai/SKILL.md",
-      "source_of_truth": "registry/skills/azure-ai/SKILL.md",
-      "canonical_location": "/registry/skills/azure-ai",
+      "runtime_path": "runtime/skills/book-image-renamer/SKILL.md",
+      "source_of_truth": "registry/skills/book-image-renamer/SKILL.md",
+      "canonical_location": "/registry/skills/book-image-renamer",
       "status": null,
       "supported_clis": [
         "claude",
@@ -130,126 +241,15 @@
         "codex-skills",
         "codex-native-config"
       ],
-      "entrypoint": "runtime/skills/azure-ai/SKILL.md",
+      "entrypoint": "runtime/skills/book-image-renamer/SKILL.md",
       "intent_tags": [
-        "azure-ai",
-        "use",
-        "for",
-        "azure",
-        "ai",
-        "search",
-        "speech",
-        "openai"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-aigateway",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-aigateway/SKILL.md",
-      "source_of_truth": "registry/skills/azure-aigateway/SKILL.md",
-      "canonical_location": "/registry/skills/azure-aigateway",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-aigateway/SKILL.md",
-      "intent_tags": [
-        "azure-aigateway",
-        "configure",
-        "azure",
-        "api",
-        "management",
-        "as",
-        "an",
-        "ai"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-cloud-migrate",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-cloud-migrate/SKILL.md",
-      "source_of_truth": "registry/skills/azure-cloud-migrate/SKILL.md",
-      "canonical_location": "/registry/skills/azure-cloud-migrate",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-cloud-migrate/SKILL.md",
-      "intent_tags": [
-        "azure-cloud-migrate",
-        "assess",
-        "and",
-        "migrate",
-        "cross-cloud",
-        "workloads",
-        "to",
-        "azure"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-compliance",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-compliance/SKILL.md",
-      "source_of_truth": "registry/skills/azure-compliance/SKILL.md",
-      "canonical_location": "/registry/skills/azure-compliance",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-compliance/SKILL.md",
-      "intent_tags": [
-        "azure-compliance",
-        "run",
-        "azure",
-        "compliance",
-        "and",
-        "security",
-        "audits",
+        "book-image-renamer",
+        "identify",
+        "book",
+        "photos",
+        "extract",
+        "visible",
+        "metadata",
         "with"
       ],
       "consumer_scope": "runtime-first",
@@ -257,11 +257,11 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
-      "id": "azure-compute",
+      "id": "brand-guidelines",
       "type": "skill",
-      "runtime_path": "runtime/skills/azure-compute/SKILL.md",
-      "source_of_truth": "registry/skills/azure-compute/SKILL.md",
-      "canonical_location": "/registry/skills/azure-compute",
+      "runtime_path": "runtime/skills/brand-guidelines/SKILL.md",
+      "source_of_truth": "registry/skills/brand-guidelines/SKILL.md",
+      "canonical_location": "/registry/skills/brand-guidelines",
       "status": null,
       "supported_clis": [
         "claude",
@@ -278,608 +278,16 @@
         "codex-skills",
         "codex-native-config"
       ],
-      "entrypoint": "runtime/skills/azure-compute/SKILL.md",
+      "entrypoint": "runtime/skills/brand-guidelines/SKILL.md",
       "intent_tags": [
-        "azure-compute",
-        "azure",
-        "vm",
+        "brand-guidelines",
+        "applies",
+        "anthropic",
+        "official",
+        "brand",
+        "colors",
         "and",
-        "vmss",
-        "router",
-        "for",
-        "recommendations"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-cost",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-cost/SKILL.md",
-      "source_of_truth": "registry/skills/azure-cost/SKILL.md",
-      "canonical_location": "/registry/skills/azure-cost",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-cost/SKILL.md",
-      "intent_tags": [
-        "azure-cost",
-        "unified",
-        "azure",
-        "cost",
-        "management",
-        "query",
-        "historical",
-        "costs"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-deploy",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-deploy/SKILL.md",
-      "source_of_truth": "registry/skills/azure-deploy/SKILL.md",
-      "canonical_location": "/registry/skills/azure-deploy",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-deploy/SKILL.md",
-      "intent_tags": [
-        "azure-deploy",
-        "execute",
-        "azure",
-        "deployments",
-        "for",
-        "already-prepared",
-        "applications",
-        "that"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-diagnostics",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-diagnostics/SKILL.md",
-      "source_of_truth": "registry/skills/azure-diagnostics/SKILL.md",
-      "canonical_location": "/registry/skills/azure-diagnostics",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-diagnostics/SKILL.md",
-      "intent_tags": [
-        "azure-diagnostics",
-        "debug",
-        "azure",
-        "production",
-        "issues",
-        "on",
-        "using",
-        "applens"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-enterprise-infra-planner",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-enterprise-infra-planner/SKILL.md",
-      "source_of_truth": "registry/skills/azure-enterprise-infra-planner/SKILL.md",
-      "canonical_location": "/registry/skills/azure-enterprise-infra-planner",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-enterprise-infra-planner/SKILL.md",
-      "intent_tags": [
-        "azure-enterprise-infra-planner",
-        "architect",
-        "and",
-        "provision",
-        "enterprise",
-        "azure",
-        "infrastructure",
-        "from"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-hosted-copilot-sdk",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-hosted-copilot-sdk/SKILL.md",
-      "source_of_truth": "registry/skills/azure-hosted-copilot-sdk/SKILL.md",
-      "canonical_location": "/registry/skills/azure-hosted-copilot-sdk",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-hosted-copilot-sdk/SKILL.md",
-      "intent_tags": [
-        "azure-hosted-copilot-sdk",
-        "build",
-        "deploy",
-        "modify",
-        "github",
-        "copilot",
-        "sdk",
-        "apps"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-kubernetes",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-kubernetes/SKILL.md",
-      "source_of_truth": "registry/skills/azure-kubernetes/SKILL.md",
-      "canonical_location": "/registry/skills/azure-kubernetes",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-kubernetes/SKILL.md",
-      "intent_tags": [
-        "azure-kubernetes",
-        "plan",
-        "create",
-        "and",
-        "configure",
-        "production-ready",
-        "azure",
-        "kubernetes"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-kusto",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-kusto/SKILL.md",
-      "source_of_truth": "registry/skills/azure-kusto/SKILL.md",
-      "canonical_location": "/registry/skills/azure-kusto",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-kusto/SKILL.md",
-      "intent_tags": [
-        "azure-kusto",
-        "query",
-        "and",
-        "analyze",
-        "data",
-        "in",
-        "azure",
-        "explorer"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-messaging",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-messaging/SKILL.md",
-      "source_of_truth": "registry/skills/azure-messaging/SKILL.md",
-      "canonical_location": "/registry/skills/azure-messaging",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-messaging/SKILL.md",
-      "intent_tags": [
-        "azure-messaging",
-        "troubleshoot",
-        "and",
-        "resolve",
-        "issues",
-        "with",
-        "azure",
-        "messaging"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-prepare",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-prepare/SKILL.md",
-      "source_of_truth": "registry/skills/azure-prepare/SKILL.md",
-      "canonical_location": "/registry/skills/azure-prepare",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-prepare/SKILL.md",
-      "intent_tags": [
-        "azure-prepare",
-        "prepare",
-        "azure",
-        "apps",
-        "for",
-        "deployment",
-        "infra",
-        "bicep"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-quotas",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-quotas/SKILL.md",
-      "source_of_truth": "registry/skills/azure-quotas/SKILL.md",
-      "canonical_location": "/registry/skills/azure-quotas",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-quotas/SKILL.md",
-      "intent_tags": [
-        "azure-quotas",
-        "check",
-        "manage",
-        "azure",
-        "quotas",
-        "and",
-        "usage",
-        "across"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-rbac",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-rbac/SKILL.md",
-      "source_of_truth": "registry/skills/azure-rbac/SKILL.md",
-      "canonical_location": "/registry/skills/azure-rbac",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-rbac/SKILL.md",
-      "intent_tags": [
-        "azure-rbac",
-        "helps",
-        "users",
-        "find",
-        "the",
-        "right",
-        "azure",
-        "rbac"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-resource-lookup",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-resource-lookup/SKILL.md",
-      "source_of_truth": "registry/skills/azure-resource-lookup/SKILL.md",
-      "canonical_location": "/registry/skills/azure-resource-lookup",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-resource-lookup/SKILL.md",
-      "intent_tags": [
-        "azure-resource-lookup",
-        "list",
-        "find",
-        "and",
-        "show",
-        "azure",
-        "resources",
-        "across"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-resource-visualizer",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-resource-visualizer/SKILL.md",
-      "source_of_truth": "registry/skills/azure-resource-visualizer/SKILL.md",
-      "canonical_location": "/registry/skills/azure-resource-visualizer",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-resource-visualizer/SKILL.md",
-      "intent_tags": [
-        "azure-resource-visualizer",
-        "analyze",
-        "azure",
-        "resource",
-        "groups",
-        "and",
-        "generate",
-        "detailed"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-storage",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-storage/SKILL.md",
-      "source_of_truth": "registry/skills/azure-storage/SKILL.md",
-      "canonical_location": "/registry/skills/azure-storage",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-storage/SKILL.md",
-      "intent_tags": [
-        "azure-storage",
-        "azure",
-        "storage",
-        "services",
-        "including",
-        "blob",
-        "file",
-        "shares"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-upgrade",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-upgrade/SKILL.md",
-      "source_of_truth": "registry/skills/azure-upgrade/SKILL.md",
-      "canonical_location": "/registry/skills/azure-upgrade",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-upgrade/SKILL.md",
-      "intent_tags": [
-        "azure-upgrade",
-        "assess",
-        "and",
-        "upgrade",
-        "azure",
-        "workloads",
-        "between",
-        "plans"
-      ],
-      "consumer_scope": "runtime-first",
-      "hot_path": false,
-      "registry_access": "runtime-first-then-linked-registry"
-    },
-    {
-      "id": "azure-validate",
-      "type": "skill",
-      "runtime_path": "runtime/skills/azure-validate/SKILL.md",
-      "source_of_truth": "registry/skills/azure-validate/SKILL.md",
-      "canonical_location": "/registry/skills/azure-validate",
-      "status": null,
-      "supported_clis": [
-        "claude",
-        "gemini",
-        "agents",
-        "codex"
-      ],
-      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
-      "available_surfaces": [
-        "runtime-read-model",
-        "claude-skills",
-        "gemini-skills",
-        "agents-skills",
-        "codex-skills",
-        "codex-native-config"
-      ],
-      "entrypoint": "runtime/skills/azure-validate/SKILL.md",
-      "intent_tags": [
-        "azure-validate",
-        "pre-deployment",
-        "validation",
-        "for",
-        "azure",
-        "readiness",
-        "run",
-        "deep"
+        "typography"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -917,6 +325,117 @@
         "deploying",
         "remote",
         "mcp"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "canvas-design",
+      "type": "skill",
+      "runtime_path": "runtime/skills/canvas-design/SKILL.md",
+      "source_of_truth": "registry/skills/canvas-design/SKILL.md",
+      "canonical_location": "/registry/skills/canvas-design",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/canvas-design/SKILL.md",
+      "intent_tags": [
+        "canvas-design",
+        "create",
+        "beautiful",
+        "visual",
+        "art",
+        "in",
+        "png",
+        "and"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "chinese-writing-clarifier",
+      "type": "skill",
+      "runtime_path": "runtime/skills/chinese-writing-clarifier/SKILL.md",
+      "source_of_truth": "registry/skills/chinese-writing-clarifier/SKILL.md",
+      "canonical_location": "/registry/skills/chinese-writing-clarifier",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/chinese-writing-clarifier/SKILL.md",
+      "intent_tags": [
+        "chinese-writing-clarifier",
+        "ai",
+        "use",
+        "this",
+        "skill",
+        "when",
+        "polishing",
+        "chinese"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "claude-design-playbook",
+      "type": "skill",
+      "runtime_path": "runtime/skills/claude-design-playbook/SKILL.md",
+      "source_of_truth": "registry/skills/claude-design-playbook/SKILL.md",
+      "canonical_location": "/registry/skills/claude-design-playbook",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/claude-design-playbook/SKILL.md",
+      "intent_tags": [
+        "claude-design-playbook",
+        "use",
+        "when",
+        "the",
+        "user",
+        "wants",
+        "claude",
+        "design"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -986,11 +505,48 @@
         "cloudflare-access-mcp",
         "use",
         "when",
-        "auditing",
-        "or",
-        "changing",
+        "the",
+        "request",
+        "is",
+        "specifically",
+        "about"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-deploy",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-deploy/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-deploy/SKILL.md",
+      "canonical_location": "/registry/skills/cloudflare-deploy",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/cloudflare-deploy/SKILL.md",
+      "intent_tags": [
+        "cloudflare-deploy",
+        "deploy",
+        "applications",
+        "and",
+        "infrastructure",
+        "to",
         "cloudflare",
-        "access"
+        "using"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1023,11 +579,11 @@
         "cloudflare-edge-security",
         "use",
         "when",
-        "auditing",
-        "or",
-        "changing",
-        "cloudflare",
-        "zone"
+        "the",
+        "request",
+        "is",
+        "specifically",
+        "about"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1059,15 +615,52 @@
       "intent_tags": [
         "cloudflare-governance",
         "use",
-        "when",
-        "deciding",
-        "which",
-        "cloudflare",
-        "governance",
-        "skill"
+        "as",
+        "the",
+        "default",
+        "entrypoint",
+        "for",
+        "broad"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-named-tunnel-publish",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-named-tunnel-publish/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-named-tunnel-publish/SKILL.md",
+      "canonical_location": "/registry/skills/cloudflare-named-tunnel-publish",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/cloudflare-named-tunnel-publish/SKILL.md",
+      "intent_tags": [
+        "cloudflare-named-tunnel-publish",
+        "use",
+        "when",
+        "the",
+        "user",
+        "wants",
+        "to",
+        "temporarily"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
@@ -1097,11 +690,11 @@
         "cloudflare-runtime-sync",
         "use",
         "when",
-        "checking",
-        "or",
-        "changing",
         "the",
-        "local"
+        "request",
+        "is",
+        "specifically",
+        "about"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1134,11 +727,85 @@
         "cloudflare-tunnel-dns",
         "use",
         "when",
-        "auditing",
-        "or",
-        "changing",
-        "cloudflare",
-        "tunnel"
+        "the",
+        "request",
+        "is",
+        "specifically",
+        "about"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "cloudflare-zerotrust-device",
+      "type": "skill",
+      "runtime_path": "runtime/skills/cloudflare-zerotrust-device/SKILL.md",
+      "source_of_truth": "registry/skills/cloudflare-zerotrust-device/SKILL.md",
+      "canonical_location": "/registry/skills/cloudflare-zerotrust-device",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/cloudflare-zerotrust-device/SKILL.md",
+      "intent_tags": [
+        "cloudflare-zerotrust-device",
+        "use",
+        "when",
+        "the",
+        "request",
+        "is",
+        "specifically",
+        "about"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "codex-context-budget-audit",
+      "type": "skill",
+      "runtime_path": "runtime/skills/codex-context-budget-audit/SKILL.md",
+      "source_of_truth": "registry/skills/codex-context-budget-audit/SKILL.md",
+      "canonical_location": "/registry/skills/codex-context-budget-audit",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/codex-context-budget-audit/SKILL.md",
+      "intent_tags": [
+        "codex-context-budget-audit",
+        "audit",
+        "codex",
+        "initial-context",
+        "budget",
+        "and",
+        "token",
+        "overhead"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1176,6 +843,80 @@
         "and",
         "derive",
         "structured"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "darwin-skill",
+      "type": "skill",
+      "runtime_path": "runtime/skills/darwin-skill/SKILL.md",
+      "source_of_truth": "registry/skills/darwin-skill/SKILL.md",
+      "canonical_location": "/registry/skills/darwin-skill",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/darwin-skill/SKILL.md",
+      "intent_tags": [
+        "darwin-skill",
+        "darwin",
+        "skill",
+        "autonomous",
+        "optimizer",
+        "inspired",
+        "by",
+        "karpathy"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "doc",
+      "type": "skill",
+      "runtime_path": "runtime/skills/doc/SKILL.md",
+      "source_of_truth": "registry/skills/doc/SKILL.md",
+      "canonical_location": "/registry/skills/doc",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/doc/SKILL.md",
+      "intent_tags": [
+        "doc",
+        "use",
+        "when",
+        "the",
+        "task",
+        "involves",
+        "reading",
+        "creating"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1293,6 +1034,117 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "env",
+      "type": "skill",
+      "runtime_path": "runtime/skills/env/SKILL.md",
+      "source_of_truth": "registry/skills/env/SKILL.md",
+      "canonical_location": "/registry/skills/env",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/env/SKILL.md",
+      "intent_tags": [
+        "env",
+        "display",
+        "and",
+        "manage",
+        "loaded",
+        "environment",
+        "details",
+        "including"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "file-organizer",
+      "type": "skill",
+      "runtime_path": "runtime/skills/file-organizer/SKILL.md",
+      "source_of_truth": "registry/skills/file-organizer/SKILL.md",
+      "canonical_location": "/registry/skills/file-organizer",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/file-organizer/SKILL.md",
+      "intent_tags": [
+        "file-organizer",
+        "intelligently",
+        "organizes",
+        "your",
+        "files",
+        "and",
+        "folders",
+        "across"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "find-skills",
+      "type": "skill",
+      "runtime_path": "runtime/skills/find-skills/SKILL.md",
+      "source_of_truth": "registry/skills/find-skills/SKILL.md",
+      "canonical_location": "/registry/skills/find-skills",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/find-skills/SKILL.md",
+      "intent_tags": [
+        "find-skills",
+        "helps",
+        "users",
+        "discover",
+        "and",
+        "install",
+        "agent",
+        "skills"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "frontend-design",
       "type": "skill",
       "runtime_path": "runtime/skills/frontend-design/SKILL.md",
@@ -1327,6 +1179,635 @@
       ],
       "consumer_scope": "runtime-first",
       "hot_path": true,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "gcp-service-adoption",
+      "type": "skill",
+      "runtime_path": "runtime/skills/gcp-service-adoption/SKILL.md",
+      "source_of_truth": "registry/skills/gcp-service-adoption/SKILL.md",
+      "canonical_location": "/registry/skills/gcp-service-adoption",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/gcp-service-adoption/SKILL.md",
+      "intent_tags": [
+        "gcp-service-adoption",
+        "use",
+        "for",
+        "google",
+        "cloud",
+        "or",
+        "gcp",
+        "capability"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "gh-address-comments",
+      "type": "skill",
+      "runtime_path": "runtime/skills/gh-address-comments/SKILL.md",
+      "source_of_truth": "registry/skills/gh-address-comments/SKILL.md",
+      "canonical_location": "/registry/skills/gh-address-comments",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/gh-address-comments/SKILL.md",
+      "intent_tags": [
+        "gh-address-comments",
+        "address",
+        "actionable",
+        "github",
+        "pull",
+        "request",
+        "review",
+        "feedback"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "gh-fix-ci",
+      "type": "skill",
+      "runtime_path": "runtime/skills/gh-fix-ci/SKILL.md",
+      "source_of_truth": "registry/skills/gh-fix-ci/SKILL.md",
+      "canonical_location": "/registry/skills/gh-fix-ci",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/gh-fix-ci/SKILL.md",
+      "intent_tags": [
+        "gh-fix-ci",
+        "use",
+        "when",
+        "user",
+        "asks",
+        "to",
+        "debug",
+        "or"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "google-cloud-service-adoption",
+      "type": "skill",
+      "runtime_path": "runtime/skills/google-cloud-service-adoption/SKILL.md",
+      "source_of_truth": "registry/skills/google-cloud-service-adoption/SKILL.md",
+      "canonical_location": "/registry/skills/google-cloud-service-adoption",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/google-cloud-service-adoption/SKILL.md",
+      "intent_tags": [
+        "google-cloud-service-adoption",
+        "alias",
+        "entrypoint",
+        "for",
+        "google",
+        "cloud",
+        "and",
+        "gcp"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "guizang-ppt-skill",
+      "type": "skill",
+      "runtime_path": "runtime/skills/guizang-ppt-skill/SKILL.md",
+      "source_of_truth": "registry/skills/guizang-ppt-skill/SKILL.md",
+      "canonical_location": "/registry/skills/guizang-ppt-skill",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/guizang-ppt-skill/SKILL.md",
+      "intent_tags": [
+        "guizang-ppt-skill",
+        "ppt",
+        "html",
+        "webgl",
+        "ikb",
+        "swiss",
+        "style",
+        "horizontal"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hatch-pet",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hatch-pet/SKILL.md",
+      "source_of_truth": "registry/skills/hatch-pet/SKILL.md",
+      "canonical_location": "/registry/skills/hatch-pet",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hatch-pet/SKILL.md",
+      "intent_tags": [
+        "hatch-pet",
+        "create",
+        "repair",
+        "validate",
+        "preview",
+        "and",
+        "package",
+        "codex-compatible"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hf-mcp",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hf-mcp/SKILL.md",
+      "source_of_truth": "registry/skills/hf-mcp/SKILL.md",
+      "canonical_location": "/registry/skills/hf-mcp",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hf-mcp/SKILL.md",
+      "intent_tags": [
+        "hf-mcp",
+        "use",
+        "hugging",
+        "face",
+        "hub",
+        "via",
+        "mcp",
+        "server"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-cli",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-cli/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-cli/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-cli",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-cli/SKILL.md",
+      "intent_tags": [
+        "hugging-face-cli",
+        "execute",
+        "hugging",
+        "face",
+        "hub",
+        "operations",
+        "using",
+        "the"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-datasets",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-datasets/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-datasets/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-datasets",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-datasets/SKILL.md",
+      "intent_tags": [
+        "hugging-face-datasets",
+        "create",
+        "and",
+        "manage",
+        "datasets",
+        "on",
+        "hugging",
+        "face"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-evaluation",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-evaluation/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-evaluation/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-evaluation",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-evaluation/SKILL.md",
+      "intent_tags": [
+        "hugging-face-evaluation",
+        "add",
+        "and",
+        "manage",
+        "evaluation",
+        "results",
+        "in",
+        "hugging"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-jobs",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-jobs/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-jobs/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-jobs",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-jobs/SKILL.md",
+      "intent_tags": [
+        "hugging-face-jobs",
+        "this",
+        "skill",
+        "should",
+        "be",
+        "used",
+        "when",
+        "users"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-model-trainer",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-model-trainer/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-model-trainer/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-model-trainer",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-model-trainer/SKILL.md",
+      "intent_tags": [
+        "hugging-face-model-trainer",
+        "this",
+        "skill",
+        "should",
+        "be",
+        "used",
+        "when",
+        "users"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-paper-publisher",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-paper-publisher/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-paper-publisher/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-paper-publisher",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-paper-publisher/SKILL.md",
+      "intent_tags": [
+        "hugging-face-paper-publisher",
+        "publish",
+        "and",
+        "manage",
+        "research",
+        "papers",
+        "on",
+        "hugging"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-tool-builder",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-tool-builder/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-tool-builder/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-tool-builder",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-tool-builder/SKILL.md",
+      "intent_tags": [
+        "hugging-face-tool-builder",
+        "use",
+        "this",
+        "skill",
+        "when",
+        "the",
+        "user",
+        "wants"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "hugging-face-trackio",
+      "type": "skill",
+      "runtime_path": "runtime/skills/hugging-face-trackio/SKILL.md",
+      "source_of_truth": "registry/skills/hugging-face-trackio/SKILL.md",
+      "canonical_location": "/registry/skills/hugging-face-trackio",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/hugging-face-trackio/SKILL.md",
+      "intent_tags": [
+        "hugging-face-trackio",
+        "track",
+        "and",
+        "visualize",
+        "ml",
+        "training",
+        "experiments",
+        "with"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "huggingface-gradio",
+      "type": "skill",
+      "runtime_path": "runtime/skills/huggingface-gradio/SKILL.md",
+      "source_of_truth": "registry/skills/huggingface-gradio/SKILL.md",
+      "canonical_location": "/registry/skills/huggingface-gradio",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/huggingface-gradio/SKILL.md",
+      "intent_tags": [
+        "huggingface-gradio",
+        "build",
+        "gradio",
+        "web",
+        "uis",
+        "and",
+        "demos",
+        "in"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "impeccable",
+      "type": "skill",
+      "runtime_path": "runtime/skills/impeccable/SKILL.md",
+      "source_of_truth": "registry/skills/impeccable/SKILL.md",
+      "canonical_location": "/registry/skills/impeccable",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/impeccable/SKILL.md",
+      "intent_tags": [
+        "impeccable",
+        "use",
+        "when",
+        "the",
+        "user",
+        "wants",
+        "to",
+        "design"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
@@ -1404,6 +1885,80 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "microsoft-foundry",
+      "type": "skill",
+      "runtime_path": "runtime/skills/microsoft-foundry/SKILL.md",
+      "source_of_truth": "registry/skills/microsoft-foundry/SKILL.md",
+      "canonical_location": "/registry/skills/microsoft-foundry",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/microsoft-foundry/SKILL.md",
+      "intent_tags": [
+        "microsoft-foundry",
+        "deploy",
+        "evaluate",
+        "and",
+        "manage",
+        "foundry",
+        "agents",
+        "end-to-end"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "notepad-plus-plus-plugin-workflow",
+      "type": "skill",
+      "runtime_path": "runtime/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "source_of_truth": "registry/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "canonical_location": "/registry/skills/notepad-plus-plus-plugin-workflow",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/notepad-plus-plus-plugin-workflow/SKILL.md",
+      "intent_tags": [
+        "notepad-plus-plus-plugin-workflow",
+        "use",
+        "for",
+        "notepad",
+        "plugin",
+        "extension",
+        "work",
+        "including"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "obsidian-index-adapter",
       "type": "skill",
       "runtime_path": "runtime/skills/obsidian-index-adapter/SKILL.md",
@@ -1435,6 +1990,43 @@
         "notes",
         "from",
         "completed"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "openai-apps-sdk-oauth",
+      "type": "skill",
+      "runtime_path": "runtime/skills/openai-apps-sdk-oauth/SKILL.md",
+      "source_of_truth": "registry/skills/openai-apps-sdk-oauth/SKILL.md",
+      "canonical_location": "/registry/skills/openai-apps-sdk-oauth",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/openai-apps-sdk-oauth/SKILL.md",
+      "intent_tags": [
+        "openai-apps-sdk-oauth",
+        "use",
+        "when",
+        "building",
+        "website",
+        "mcp",
+        "server",
+        "or"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1478,6 +2070,80 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "plan-first-execution",
+      "type": "skill",
+      "runtime_path": "runtime/skills/plan-first-execution/SKILL.md",
+      "source_of_truth": "registry/skills/plan-first-execution/SKILL.md",
+      "canonical_location": "/registry/skills/plan-first-execution",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/plan-first-execution/SKILL.md",
+      "intent_tags": [
+        "plan-first-execution",
+        "use",
+        "when",
+        "the",
+        "user",
+        "asks",
+        "to",
+        "write"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "playwright",
+      "type": "skill",
+      "runtime_path": "runtime/skills/playwright/SKILL.md",
+      "source_of_truth": "registry/skills/playwright/SKILL.md",
+      "canonical_location": "/registry/skills/playwright",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/playwright/SKILL.md",
+      "intent_tags": [
+        "playwright",
+        "use",
+        "when",
+        "the",
+        "task",
+        "requires",
+        "automating",
+        "real"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "pptx",
       "type": "skill",
       "runtime_path": "runtime/skills/pptx/SKILL.md",
@@ -1515,6 +2181,43 @@
       "registry_access": "runtime-first-then-linked-registry"
     },
     {
+      "id": "project-bootstrap-architect",
+      "type": "skill",
+      "runtime_path": "runtime/skills/project-bootstrap-architect/SKILL.md",
+      "source_of_truth": "registry/skills/project-bootstrap-architect/SKILL.md",
+      "canonical_location": "/registry/skills/project-bootstrap-architect",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/project-bootstrap-architect/SKILL.md",
+      "intent_tags": [
+        "project-bootstrap-architect",
+        "bootstrap",
+        "new",
+        "greenfield",
+        "projects",
+        "by",
+        "choosing",
+        "the"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
       "id": "project-development-loop",
       "type": "skill",
       "runtime_path": "runtime/skills/project-development-loop/SKILL.md",
@@ -1538,14 +2241,162 @@
       ],
       "entrypoint": "runtime/skills/project-development-loop/SKILL.md",
       "intent_tags": [
-        "name",
         "project-development-loop",
-        "description",
-        "reusable",
         "autonomous",
-        "workflow",
+        "repo-maintenance",
+        "loop",
         "for",
-        "existing"
+        "existing",
+        "codebases",
+        "only"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "readme-quality",
+      "type": "skill",
+      "runtime_path": "runtime/skills/readme-quality/SKILL.md",
+      "source_of_truth": "registry/skills/readme-quality/SKILL.md",
+      "canonical_location": "/registry/skills/readme-quality",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/readme-quality/SKILL.md",
+      "intent_tags": [
+        "readme-quality",
+        "readme",
+        "quality",
+        "skill",
+        "produces",
+        "or",
+        "improves",
+        "md"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "security-best-practices",
+      "type": "skill",
+      "runtime_path": "runtime/skills/security-best-practices/SKILL.md",
+      "source_of_truth": "registry/skills/security-best-practices/SKILL.md",
+      "canonical_location": "/registry/skills/security-best-practices",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/security-best-practices/SKILL.md",
+      "intent_tags": [
+        "security-best-practices",
+        "perform",
+        "language",
+        "and",
+        "framework",
+        "specific",
+        "security",
+        "best-practice"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "security-ownership-map",
+      "type": "skill",
+      "runtime_path": "runtime/skills/security-ownership-map/SKILL.md",
+      "source_of_truth": "registry/skills/security-ownership-map/SKILL.md",
+      "canonical_location": "/registry/skills/security-ownership-map",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/security-ownership-map/SKILL.md",
+      "intent_tags": [
+        "security-ownership-map",
+        "analyze",
+        "git",
+        "repositories",
+        "to",
+        "build",
+        "security",
+        "ownership"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "security-threat-model",
+      "type": "skill",
+      "runtime_path": "runtime/skills/security-threat-model/SKILL.md",
+      "source_of_truth": "registry/skills/security-threat-model/SKILL.md",
+      "canonical_location": "/registry/skills/security-threat-model",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/security-threat-model/SKILL.md",
+      "intent_tags": [
+        "security-threat-model",
+        "repository-grounded",
+        "threat",
+        "modeling",
+        "that",
+        "enumerates",
+        "trust",
+        "boundaries"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1583,6 +2434,302 @@
         "skills",
         "this",
         "skill"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "slack-agent",
+      "type": "skill",
+      "runtime_path": "runtime/skills/slack-agent/SKILL.md",
+      "source_of_truth": "registry/skills/slack-agent/SKILL.md",
+      "canonical_location": "/registry/skills/slack-agent",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/slack-agent/SKILL.md",
+      "intent_tags": [
+        "slack-agent",
+        "use",
+        "when",
+        "working",
+        "on",
+        "slack",
+        "agent",
+        "bot"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "slack-gif-creator",
+      "type": "skill",
+      "runtime_path": "runtime/skills/slack-gif-creator/SKILL.md",
+      "source_of_truth": "registry/skills/slack-gif-creator/SKILL.md",
+      "canonical_location": "/registry/skills/slack-gif-creator",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/slack-gif-creator/SKILL.md",
+      "intent_tags": [
+        "slack-gif-creator",
+        "knowledge",
+        "and",
+        "utilities",
+        "for",
+        "creating",
+        "animated",
+        "gifs"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "sora",
+      "type": "skill",
+      "runtime_path": "runtime/skills/sora/SKILL.md",
+      "source_of_truth": "registry/skills/sora/SKILL.md",
+      "canonical_location": "/registry/skills/sora",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/sora/SKILL.md",
+      "intent_tags": [
+        "sora",
+        "use",
+        "when",
+        "the",
+        "user",
+        "asks",
+        "to",
+        "generate"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "start-chrome-extension-project",
+      "type": "skill",
+      "runtime_path": "runtime/skills/start-chrome-extension-project/SKILL.md",
+      "source_of_truth": "registry/skills/start-chrome-extension-project/SKILL.md",
+      "canonical_location": "/registry/skills/start-chrome-extension-project",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/start-chrome-extension-project/SKILL.md",
+      "intent_tags": [
+        "start-chrome-extension-project",
+        "scaffold",
+        "new",
+        "chrome",
+        "extension",
+        "project",
+        "starter",
+        "with"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "supabase-hosted-admin-oauth",
+      "type": "skill",
+      "runtime_path": "runtime/skills/supabase-hosted-admin-oauth/SKILL.md",
+      "source_of_truth": "registry/skills/supabase-hosted-admin-oauth/SKILL.md",
+      "canonical_location": "/registry/skills/supabase-hosted-admin-oauth",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/supabase-hosted-admin-oauth/SKILL.md",
+      "intent_tags": [
+        "supabase-hosted-admin-oauth",
+        "verify",
+        "and",
+        "prepare",
+        "hosted",
+        "supabase",
+        "admin",
+        "oauth"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "system-screenshot",
+      "type": "skill",
+      "runtime_path": "runtime/skills/system-screenshot/SKILL.md",
+      "source_of_truth": "registry/skills/system-screenshot/SKILL.md",
+      "canonical_location": "/registry/skills/system-screenshot",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/system-screenshot/SKILL.md",
+      "intent_tags": [
+        "system-screenshot",
+        "capture",
+        "and",
+        "verify",
+        "screenshots",
+        "of",
+        "runtime",
+        "apps"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "terminal-layout-dual-pane",
+      "type": "skill",
+      "runtime_path": "runtime/skills/terminal-layout-dual-pane/SKILL.md",
+      "source_of_truth": "registry/skills/terminal-layout-dual-pane/SKILL.md",
+      "canonical_location": "/registry/skills/terminal-layout-dual-pane",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/terminal-layout-dual-pane/SKILL.md",
+      "intent_tags": [
+        "terminal-layout-dual-pane",
+        "arrange",
+        "the",
+        "current",
+        "windows",
+        "desktop",
+        "into",
+        "dual-pane"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "terminal-layout-three-pane",
+      "type": "skill",
+      "runtime_path": "runtime/skills/terminal-layout-three-pane/SKILL.md",
+      "source_of_truth": "registry/skills/terminal-layout-three-pane/SKILL.md",
+      "canonical_location": "/registry/skills/terminal-layout-three-pane",
+      "status": null,
+      "supported_clis": [
+        "claude",
+        "gemini",
+        "agents",
+        "codex"
+      ],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model, claude-skills, gemini-skills, agents-skills, codex-skills, codex-native-config.",
+      "available_surfaces": [
+        "runtime-read-model",
+        "claude-skills",
+        "gemini-skills",
+        "agents-skills",
+        "codex-skills",
+        "codex-native-config"
+      ],
+      "entrypoint": "runtime/skills/terminal-layout-three-pane/SKILL.md",
+      "intent_tags": [
+        "terminal-layout-three-pane",
+        "arrange",
+        "the",
+        "current",
+        "windows",
+        "desktop",
+        "into",
+        "three-pane"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,
@@ -1795,6 +2942,33 @@
         "ai",
         "recommended",
         "structure"
+      ],
+      "consumer_scope": "runtime-first",
+      "hot_path": false,
+      "registry_access": "runtime-first-then-linked-registry"
+    },
+    {
+      "id": "heartbeat-protocol",
+      "type": "workflow",
+      "runtime_path": "runtime/workflow/heartbeat-protocol/WORKFLOW.md",
+      "source_of_truth": "registry/workflow/heartbeat-protocol/WORKFLOW.md",
+      "canonical_location": "/registry/workflow/heartbeat-protocol",
+      "status": null,
+      "supported_clis": [],
+      "delivery_guidance": "Use the declared integration surfaces; final delivery depends on the selected surface capabilities and local environment. Surfaces: runtime-read-model.",
+      "available_surfaces": [
+        "runtime-read-model"
+      ],
+      "entrypoint": "runtime/workflow/heartbeat-protocol/WORKFLOW.md",
+      "intent_tags": [
+        "heartbeat",
+        "protocol",
+        "workflow",
+        "purpose",
+        "the",
+        "gives",
+        "tools",
+        "shared"
       ],
       "consumer_scope": "runtime-first",
       "hot_path": false,

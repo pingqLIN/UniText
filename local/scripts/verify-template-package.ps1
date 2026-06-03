@@ -20,7 +20,10 @@ $required = @(
   ".github\\pull_request_template.md",
   ".mcp.json",
   ".claude\\settings.json",
+  "local\\config\\integration-surfaces.json",
   "README.md",
+  "README.zh-TW.md",
+  "LICENSE",
   "INDEX.md",
   "VISION.md",
   "RESOURCE_SPEC.md",
@@ -46,17 +49,32 @@ $required = @(
   "local\\docs\\PATH_MAP.md",
   "local\\scripts\\bootstrap.py",
   "local\\scripts\\verify-bootstrap.py",
+  "local\\scripts\\build-runtime-layer.py",
   "local\\scripts\\create-git-bundle.py",
   "local\\scripts\\preview-renormalize.py",
   "local\\scripts\\preview-renormalize.ps1",
   "local\\scripts\\run-renormalize.ps1",
   "local\\scripts\\run-renormalize.py",
   "local\\scripts\\sync-skills.ps1",
+  "local\\scripts\\lib\\integration_surfaces.py",
   "local\\scripts\\lib\\renormalize_core.py",
   "local\\scripts\\validate-workspace-sensitive-metadata-rules.ps1",
+  "local\\scripts\\validate-workspace-sensitive-metadata-rules.py",
   "local\\scripts\\lib\\workspace-sensitive-metadata.ps1",
+  "local\\scripts\\lib\\workspace_sensitive_metadata.py",
+  "local\\scripts\\lib\\workspace_boundaries.py",
   "local\\scripts\\verify-workspace-boundaries.ps1",
-  "local\\scripts\\get-publishability-report.ps1"
+  "local\\scripts\\verify-workspace-boundaries.py",
+  "local\\scripts\\get-publishability-report.ps1",
+  "local\\scripts\\get-publishability-report.py",
+  "local\\scripts\\get-document-placement-recommendation.ps1",
+  "local\\scripts\\build-project-map.py",
+  "local\\scripts\\project-map-runtime.js",
+  "local\\scripts\\project-map-template.html",
+  "web\\project-map-ui\\README.md",
+  "web\\project-map-ui\\build-project-map.py",
+  "web\\project-map-ui\\project-map-runtime.js",
+  "web\\project-map-ui\\project-map-template.html"
 )
 
 $forbidden = @(
@@ -109,8 +127,8 @@ $contentViolations = @($rawViolations | ForEach-Object {
   package_path = $resolvedPath
   rules_ok = [bool]$rulesCheck.ok
   rules_errors = @($rulesCheck.errors)
-  missing = $missing
-  forbidden_present = $presentForbidden
+  missing = @($missing)
+  forbidden_present = @($presentForbidden)
   content_violations = @($contentViolations)
   ok = [bool]$rulesCheck.ok -and ($missing.Count -eq 0) -and ($presentForbidden.Count -eq 0) -and (@($contentViolations).Count -eq 0)
 }

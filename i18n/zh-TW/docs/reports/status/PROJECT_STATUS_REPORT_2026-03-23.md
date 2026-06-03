@@ -3,6 +3,7 @@
 > 報告日期：2026-03-24
 > 報告性質：專案現況盤點 / Status Report
 > 盤點範圍：目前 workspace 內可見文件、`registry/`、`local/`、`ops/` 產物，以及本輪驗證結果
+> 註：本文件描述的是 `2026-03-24` 當時的基線快照；其中「Codex 直接對齊 `/registry/skills`」已不再是現行做法。現行新案 baseline 以 `RUNTIME.md` 與 `runtime/` layer 為準，CLI 需由 machine-local target 對齊 `runtime/skills`。
 
 ## 一、執行摘要
 
@@ -12,7 +13,7 @@
 
 - `mcp` 已從純示意 seed 提升為可實跑的 read-only baseline
 - 新增跨平台 `bootstrap.py` 與 `verify-bootstrap.py`
-- Codex `skills_path` 與 project `.mcp.json` 已完成本輪實機驗證
+- 當時的 Codex `skills_path` 與 project `.mcp.json` 已完成本輪實機驗證
 - 新增 `create-git-bundle.py`，降低僅靠單一工作樹的風險
 
 整體來看，專案現在已不只是架構與文件完成，而是具備：
@@ -44,7 +45,7 @@
 四類 shared resources 均已有可審查內容：
 
 - `skills`
-  - 已收斂為 `8 + 4` 審查主集
+  - 當時已收斂為 `8 + 4` 審查主集
 - `agents`
   - 已有 `registry-curator`
 - `mcp`
@@ -91,14 +92,14 @@
 - `health-check.ps1` = `ok`
 - `verify-delivery.ps1` 通過
 - `verify-bootstrap.py` = `ok`
-- Codex `skills_path` 已對齊 `/registry/skills`
+- 當時的 Codex `skills_path` 已對齊 `/registry/skills`
 - repo root `.mcp.json` 已成功寫入
 - `claude-project-mcp-seed/server.py` 已通過最小 MCP 協議 smoke test
 - `create-git-bundle.py` 已成功產出 bundle backup
 
 目前可量化確認的狀態：
 
-- adopted skills = `12`
+- adopted skills = `12`（此數字對應當時的 review shortlist baseline，不代表後續完整 inventory）
 - invalid skills = `0`
 - agent seed = `true`
 - mcp seed = `true`
@@ -151,3 +152,7 @@
 
 因此，專案已不再只是「設計成熟但落地不足」的狀態，而是已進入「可交付、可驗證、可候選發布」的階段。
 
+## 七、後續註記
+
+- 這份報告是舊基線快照，不應再當成新案 runtime startup 的規範依據。
+- 新案請以 `RUNTIME.md`、`runtime/START.md`、`runtime/RULES.md`、`runtime/ROUTES.md`、`runtime/catalog.json` 為準。

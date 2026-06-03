@@ -4,12 +4,18 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from lib.governance_sources import build_governance_sources, is_within_path
+
 SECTION_HEADING_PATTERN = re.compile(r"^(#{1,6})\s+(.+)$", re.MULTILINE)
-LIST_ITEM_PATTERN = re.compile(r"^(?:-|\d+\.)\s+(.+)$")
 
 
 @dataclass(frozen=True)
@@ -25,62 +31,6 @@ def repo_root() -> Path:
 
 def load_policy(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
-
-
-def extract_section_rules(text: str) -> list[dict[str, object]]:
-    sections: list[dict[str, object]] = []
-    current_heading = "Document"
-    current_items: list[str] = []
-    for raw_line in text.replace("\r\n", "\n").split("\n"):
-        line = raw_line.rstrip()
-        heading_match = SECTION_HEADING_PATTERN.match(line)
-        if heading_match:
-            if current_items:
-                sections.append({"heading": current_heading, "items": current_items[:]})
-            current_heading = heading_match.group(2).strip()
-            current_items = []
-            continue
-        item_match = LIST_ITEM_PATTERN.match(line.strip())
-        if item_match:
-            current_items.append(item_match.group(1).strip())
-    if current_items:
-        sections.append({"heading": current_heading, "items": current_items[:]})
-    return sections
-
-
-def load_agents_governance(root: Path) -> dict[str, object]:
-    source_candidates = [
-        ("workspace", root.parent / "AGENTS.md", 1),
-        ("repo", root / "AGENTS.md", 2),
-    ]
-    sources: list[dict[str, object]] = []
-    effective_rules: list[dict[str, object]] = []
-    for scope, path, precedence in source_candidates:
-        if not path.exists():
-            continue
-        sections = extract_section_rules(path.read_text(encoding="utf-8"))
-        sources.append({
-            "scope": scope,
-            "path": str(path),
-            "precedence": precedence,
-            "sections": sections,
-        })
-        for section in sections:
-            for index, item in enumerate(section["items"], start=1):
-                effective_rules.append({
-                    "precedence": precedence,
-                    "scope": scope,
-                    "source_path": str(path),
-                    "section": section["heading"],
-                    "rule_index": index,
-                    "rule": item,
-                })
-    effective_rules.sort(key=lambda item: (item["precedence"], item["source_path"], item["section"], item["rule_index"]))
-    return {
-        "hierarchy_note": "Runtime/system/developer/global-home instructions still sit above file-based AGENTS. This resolver evaluates the file-based portion using workspace overlay first, then repo-local rules.",
-        "sources": sources,
-        "effective_file_rules": effective_rules,
-    }
 
 
 def matches(layer: dict[str, object], inputs: Inputs) -> bool:
@@ -151,11 +101,15 @@ def resolve(policy: dict[str, object], inputs: Inputs, agents_governance: dict[s
         "effective_config": effective,
         "provenance": provenance,
         "agents_hierarchy_note": agents_governance["hierarchy_note"],
+        "analysis_path": agents_governance.get("analysis_path"),
+        "path_classification": agents_governance.get("path_classification"),
         "agents_sources": agents_governance["sources"],
         "effective_file_rules": agents_governance["effective_file_rules"],
+        "effective_hard_rules": agents_governance.get("effective_hard_rules", []),
+        "operational_guidance": agents_governance.get("operational_guidance", []),
         "instruction_evaluation": [
-            "Runtime/system/developer/global-home instructions remain higher-priority and are not directly inspectable from repo files.",
-            "Within file-based scope, workspace overlay AGENTS applies before repo-local AGENTS, and repo-local rules win if there is a conflict.",
+            "Runtime/system/developer/session instructions remain higher-priority and are not directly inspectable from repo files.",
+            "Within observable file-based scope, global-home AGENTS applies before workspace overlay, and repo-local rules remain the nearest project evidence.",
             f"Current file-based source count: {len(agents_governance['sources'])}",
         ],
     }
@@ -245,12 +199,13 @@ def main() -> int:
     parser.add_argument("--environment", required=True, help="Work environment identifier, e.g. codex-local-dev")
     parser.add_argument("--instruction-profile", required=True, help="Instruction profile identifier, e.g. mapping")
     parser.add_argument("--policy", default=str(default_policy), help="Path to governance layer policy JSON")
+    parser.add_argument("--analysis-path", default=str(root), help="Path whose file-based AGENTS applicability should be resolved")
     parser.add_argument("--write-report", action="store_true", help="Write JSON and Markdown reports under ops/agent-governance")
     parser.add_argument("--output-dir", default=str(root / "ops" / "agent-governance"), help="Output directory for generated reports")
     args = parser.parse_args()
 
     policy = load_policy(Path(args.policy).resolve())
-    agents_governance = load_agents_governance(root)
+    agents_governance = build_governance_sources(root, Path(args.analysis_path).resolve())
     resolution = resolve(
         policy,
         Inputs(
@@ -263,7 +218,10 @@ def main() -> int:
 
     summary: dict[str, object] = {"resolution": resolution}
     if args.write_report:
-        json_path, md_path = write_reports(resolution, Path(args.output_dir).resolve())
+        output_dir = Path(args.output_dir).resolve()
+        if not is_within_path(output_dir, root):
+            raise SystemExit(f"Refusing to write governance reports outside repository: {output_dir}")
+        json_path, md_path = write_reports(resolution, output_dir)
         summary["report_paths"] = {
             "json": str(json_path),
             "markdown": str(md_path),

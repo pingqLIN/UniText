@@ -17,7 +17,7 @@ if str(SCRIPT_DIR) not in sys.path:
 from lib.integration_surfaces import find_surface, load_integration_surfaces, surfaces_by_kind
 
 
-UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC = 60
+CODEX_UNITEXT_REGISTRY_BLOCK_PATTERN = r"(?ms)^\[mcp_servers\.unitext_registry\]\n.*?(?=^\[|\Z)"
 
 
 def get_repo_root() -> Path:
@@ -79,9 +79,8 @@ def contains_path(text: str, value: str) -> bool:
     return value in text or value.replace("\\", "\\\\") in text
 
 
-def contains_timeout_value(text: str, seconds: int) -> bool:
-    pattern = rf"(?m)^\s*startup_timeout_sec\s*=\s*{seconds}(?:\.0)?\s*$"
-    return re.search(pattern, text) is not None
+def contains_codex_mcp_block(text: str) -> bool:
+    return re.search(CODEX_UNITEXT_REGISTRY_BLOCK_PATTERN, text) is not None
 
 
 def has_claude_registry_permissions(text: str) -> bool:
@@ -115,13 +114,17 @@ def find_noncanonical_alias_entries(target: Path, runtime_skills: Path) -> list[
     if not runtime_skills.exists() or not runtime_skills.is_dir():
         return []
 
-    canonical_by_key = {item.name.casefold(): item.name for item in sorted(runtime_skills.iterdir())}
+    canonical_by_key = {item.name.casefold(): item.name for item in runtime_bundle_entries(runtime_skills)}
     aliases: list[dict[str, str]] = []
     for item in sorted(target.iterdir()):
         canonical_name = canonical_by_key.get(item.name.casefold())
         if canonical_name and item.name != canonical_name:
             aliases.append({"path": str(item), "canonical_name": canonical_name})
     return aliases
+
+
+def runtime_bundle_entries(runtime_skills: Path) -> list[Path]:
+    return [item for item in sorted(runtime_skills.iterdir()) if not item.name.startswith(".")]
 
 
 def codex_target_contains_runtime_baseline(
@@ -144,7 +147,7 @@ def codex_target_contains_runtime_baseline(
         return False, "file", [], str(target), []
 
     missing: list[str] = []
-    for item in sorted(runtime_skills.iterdir()):
+    for item in runtime_bundle_entries(runtime_skills):
         candidate = target / item.name
         if not candidate.exists() and not candidate.is_symlink():
             missing.append(item.name)
@@ -278,9 +281,7 @@ def main() -> int:
             "exists": codex_config.exists(),
             "skills_path_matches": contains_path(codex_text, str(codex_skills_target)),
             "skills_path_points_to_registry": contains_path(codex_text, str(registry_skills)),
-            "startup_timeout_matches": contains_timeout_value(codex_text, UNITEXT_REGISTRY_STARTUP_TIMEOUT_SEC),
-            "mcp_command_matches": contains_path(codex_text, str(sys.executable)),
-            "mcp_args_match": contains_path(codex_text, str(server)),
+            "legacy_global_mcp_present": contains_codex_mcp_block(codex_text),
             "runtime_target_exists": codex_skills_target.exists() or codex_skills_target.is_symlink(),
             "runtime_target_mode": codex_target_mode,
             "runtime_target_resolved": codex_target_resolved,
@@ -299,9 +300,7 @@ def main() -> int:
     codex_ok = True if args.skip_codex else (
         report["codex"]["skills_path_matches"]
         and not report["codex"]["skills_path_points_to_registry"]
-        and report["codex"]["startup_timeout_matches"]
-        and report["codex"]["mcp_command_matches"]
-        and report["codex"]["mcp_args_match"]
+        and not report["codex"]["legacy_global_mcp_present"]
         and report["codex"]["runtime_target_exists"]
         and report["codex"]["runtime_target_contains_runtime_baseline"]
     )

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UniText Project Map UI Variants</title>
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --ink: #191713;
+      --muted: #6f665b;
+      --line: #d9cdbc;
+      --panel: #fffaf1;
+      --accent: #a14f2b;
+      --accent-2: #0f766e;
+      --shadow: 0 18px 50px rgba(35, 28, 18, .11);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 14% 0%, rgba(161, 79, 43, .16), transparent 31%),
+        linear-gradient(180deg, #fbf5ea, var(--bg));
+      color: var(--ink);
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+    }
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 44px 0;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 26px;
+    }
+    .kicker {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font: 800 12px/1.2 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      max-width: 9ch;
+      font-size: clamp(46px, 8vw, 92px);
+      line-height: .84;
+      letter-spacing: -.07em;
+    }
+    .lede {
+      margin: 0;
+      color: var(--muted);
+      font: 500 16px/1.7 ui-sans-serif, system-ui, sans-serif;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    article {
+      display: grid;
+      gap: 18px;
+      min-height: 360px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .variant-no {
+      color: var(--accent-2);
+      font: 900 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+      letter-spacing: .18em;
+    }
+    h2 {
+      margin: 0;
+      font-size: 30px;
+      line-height: .98;
+      letter-spacing: -.045em;
+    }
+    p, li {
+      color: var(--muted);
+      font: 500 14px/1.58 ui-sans-serif, system-ui, sans-serif;
+    }
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    a {
+      align-self: end;
+      display: inline-flex;
+      justify-content: center;
+      padding: 12px 14px;
+      border: 1px solid color-mix(in srgb, var(--accent) 44%, var(--line));
+      border-radius: 12px;
+      color: var(--ink);
+      font: 800 13px/1 ui-sans-serif, system-ui, sans-serif;
+      text-decoration: none;
+      background: #fff6e7;
+    }
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      font: 500 13px/1.6 ui-sans-serif, system-ui, sans-serif;
+    }
+    @media (max-width: 900px) {
+      header,
+      .grid { grid-template-columns: 1fr; }
+      article { min-height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <section>
+        <p class="kicker">Impeccable-style product UI review</p>
+        <h1>Project Map Variants</h1>
+      </section>
+      <p class="lede">三個版本都避開 purple gradients、generic SaaS hero、cards-on-cards 與重複控制。A 是保守微調，B 是相似但更 product-console，C 是全新治理作戰室。</p>
+    </header>
+    <section class="grid">
+      <article>
+        <span class="variant-no">VERSION A</span>
+        <h2>Original Polish</h2>
+        <p>保留目前資訊架構，只做層級、對比、空間與控制顯著性的微調。</p>
+        <ul>
+          <li>最小改動，低風險。</li>
+          <li>保留三分頁、地圖、節點清單、細節欄。</li>
+          <li>適合先落地到正式 template。</li>
+        </ul>
+        <a href="variant-a-original-polish.html">Open Version A</a>
+      </article>
+      <article>
+        <span class="variant-no">VERSION B</span>
+        <h2>Product Console</h2>
+        <p>接近現有頁面，但套用 Impeccable product mode：服務操作者、減少裝飾、加強證據與狀態。</p>
+        <ul>
+          <li>推薦版本。</li>
+          <li>導覽與治理狀態更明確。</li>
+          <li>保留可維護性。</li>
+        </ul>
+        <a href="variant-b-product-console.html">Open Version B</a>
+      </article>
+      <article>
+        <span class="variant-no">VERSION C</span>
+        <h2>Governance Room</h2>
+        <p>全新發想：把治理漏斗、任意路徑解析、地圖 viewport 作為核心操作模型。</p>
+        <ul>
+          <li>最大膽，最不像現有頁。</li>
+          <li>適合治理功能成為主產品。</li>
+          <li>需要較多 implementation work。</li>
+        </ul>
+        <a href="variant-c-governance-room.html">Open Version C</a>
+      </article>
+    </section>
+    <div class="note">建議採用 B 作為主線，A 作為安全 fallback，C 作為下一階段治理視覺實驗。</div>
+  </main>
+</body>
+</html>

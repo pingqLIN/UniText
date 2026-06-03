@@ -1,0 +1,9 @@
+interface:
+  display_name: "Claude Design Playbook"
+  short_description: "Claude Design and DESIGN.md workflows"
+  brand_color: "#C96442"
+  default_prompt: "Use $claude-design-playbook to pick a Claude Design family, derive a DESIGN.md, audit a live site against it, or remix two systems."
+
+policy:
+  allow_implicit_invocation: true
+

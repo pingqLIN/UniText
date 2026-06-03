@@ -68,7 +68,7 @@
 
 目前外部審查主集以 [docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md](docs/reviews/ESSENTIAL_SKILLS_SHORTLIST.md) 的 `8 + 4` 精選 skills 為準，而不是全量候選池。
 
-截至 `2026-04-23`，目前 authoring tree 內的 `registry/skills/` 共有 `48` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
+截至 `2026-05-19`，目前 authoring tree 內的 `registry/skills/` 共有 `78` 個 skill 目錄。下方表格是 review-facing catalog excerpt，不是完整 inventory dump。
 
 ### Review Package
 
@@ -117,7 +117,19 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 
 若要規劃如何把 canonical docs 與 `registry/` 自動轉成可瀏覽的專案 MAP 網頁，請看 [docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md](docs/project-map/PROJECT_MAP_WEB_AUTOMATION_REPORT.md)。
 
-目前最小原型可直接使用 `python local/scripts/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
+Project Map UI 的可維護 source 已切到 [web/project-map-ui](web/project-map-ui/README.md)。目前仍可使用 `python local/scripts/build-project-map.py` 相容入口，或直接使用 `python web/project-map-ui/build-project-map.py` 產出 `ops/project-map/project-map.json` 與 `ops/project-map/site/project-map.html`。
+
+### Tool And Adapter Documentation Hooks
+
+UniText 的工具文檔掛勾不依賴 `unitext_registry` MCP 預設常駐。一般 agent 應先用本文件與 `runtime/` 建立 discovery context；只有需要標準 MCP tool surface 時，才臨時啟用 `/registry/mcp/claude-project-mcp-seed`。
+
+| Need | Start here | Related tool surface |
+|---|---|---|
+| runtime consumer context | [RUNTIME.md](RUNTIME.md) | `runtime/`, `runtime/catalog.json` |
+| delivery / adapter rules | [OPERATIONS.md](OPERATIONS.md) | `local/scripts/bootstrap.py`, `local/scripts/verify-bootstrap.py` |
+| existing-machine adoption | [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md) | Codex / Claude / Copilot local wiring |
+| MCP registry read-only tools | [registry/mcp/claude-project-mcp-seed/README.md](registry/mcp/claude-project-mcp-seed/README.md) | `registry_summary`, `list_registry_entries`, `read_registry_file` |
+| project map generation | [web/project-map-ui/README.md](web/project-map-ui/README.md) | `web/project-map-ui/build-project-map.py` (`local/scripts/build-project-map.py` remains a wrapper) |
 
 ### Review Shortlist Skills
 
@@ -155,6 +167,9 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `conversation-memo` | Workspace | `/registry/skills/conversation-memo` | `active` |
 | `obsidian-index-adapter` | Workspace | `/registry/skills/obsidian-index-adapter` | `active` |
 | `project-development-loop` | Workspace | `/registry/skills/project-development-loop` | `active` |
+| `microsoft-foundry` | Workspace | `/registry/skills/microsoft-foundry` | `active` |
+| `impeccable` | Workspace | `/registry/skills/impeccable` | `active` |
+| `readme-quality` | Workspace | `/registry/skills/readme-quality` | `active` |
 
 ### Workflow
 
@@ -167,6 +182,16 @@ starter package 目前也保留 `.github/pull_request_template.md`，作為最�
 | `source_of_truth` | `/registry/workflow/claude-plans` |
 | `supported_clis` | `claude` |
 | `delivery_guidance` | Use workflow adapter or project-local plan mapping depending on CLI capability. |
+
+| Field | Value |
+|---|---|
+| `id` | `heartbeat-protocol` |
+| `type` | `workflow` |
+| `canonical_location` | `/registry/workflow/heartbeat-protocol` |
+| `status` | `draft` |
+| `source_of_truth` | `/registry/workflow/heartbeat-protocol/WORKFLOW.md` |
+| `supported_clis` | `undocumented` |
+| `delivery_guidance` | Use as sanitized shared workflow guidance only; live heartbeat state belongs to the producing tool or local adapter. |
 
 ### MCP
 

@@ -12,6 +12,9 @@ source_of_truth: registry/skills/cloudflare/SKILL.md
 > Consumer scope: `skill`
 # Cloudflare Platform Skill
 
+This skill is for Cloudflare product selection and platform architecture.
+For workspace operational work such as WARP, Zero Trust, Access, Tunnel, DNS, or edge-policy review, start from [cloudflare-governance](../../../registry/skills/cloudflare-governance/SKILL.md).
+
 ## Use This Skill
 
 - When you need to choose the right Cloudflare product or service.
@@ -81,4 +84,4 @@ source_of_truth: registry/skills/cloudflare/SKILL.md
 
 - Use [wrangler](../../../registry/skills/wrangler/SKILL.md) when the task is primarily `wrangler` CLI, `wrangler.jsonc`, deploy, or local dev.
 - Use [building-mcp-server-on-cloudflare](../../../registry/skills/building-mcp-server-on-cloudflare/SKILL.md) when the task is specifically about remote MCP servers on Workers.
-- Use [cloudflare-governance](../../../registry/skills/cloudflare-governance/SKILL.md) when the task spans Access, Tunnel, DNS, edge security, and local runtime state.
+- Use [cloudflare-governance](../../../registry/skills/cloudflare-governance/SKILL.md) when the task is operational or administrative and spans Access, Tunnel, DNS, edge security, Zero Trust, WARP, or local runtime state.
