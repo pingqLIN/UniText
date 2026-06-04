@@ -200,6 +200,8 @@
   const workspacePrevEl = document.getElementById("workspace-prev");
   const workspaceNextEl = document.getElementById("workspace-next");
   const workspacePageNoteEl = document.getElementById("workspace-page-note");
+  const consoleStatusRailEl = document.getElementById("console-status-rail");
+  const governancePathReadinessEl = document.getElementById("governance-path-readiness");
   const tourStartEl = document.getElementById("tour-start");
   const tourCtaCueEl = document.getElementById("tour-cta-cue");
   const tourLayerEl = document.getElementById("tour-layer");
@@ -552,11 +554,36 @@
     if (workspaceNextEl) workspaceNextEl.disabled = activeIndex >= WORKSPACE_PAGES.length - 1;
   }
 
+  function updateConsoleStatusRail() {
+    if (!consoleStatusRailEl) return;
+    const diagnostics = DATA.diagnostics || {};
+    const activePage = getWorkspacePage();
+    const adapterLabel = ACTIVE_PROJECT_MAP_ADAPTER?.label || DATA.meta?.project_map_adapter?.label || "unknown";
+    const generated = formatTimestamp(DATA.meta?.generated_at || state.lastUpdatedAt);
+    const diagnosticLabel = `${diagnostics.broken_reference_count || 0} broken / ${diagnostics.orphan_node_count || 0} orphan`;
+    const viewLabel = `${visualToneLabel(state.visualTone)} / ${visualThemeLabel(state.visualTheme)} / ${textScaleLabel(state.textScale)}`;
+    const pills = [
+      ["Generated", generated],
+      ["Adapter", adapterLabel],
+      ["Mode", PAGE_MODE],
+      ["Diagnostics", diagnosticLabel],
+      ["Workspace", activePage.label],
+      ["View", viewLabel],
+    ];
+    consoleStatusRailEl.innerHTML = pills.map(([label, value]) => [
+      `<div class="console-status-pill">`,
+      `<span>${escapeHtml(label)}</span>`,
+      `<strong>${escapeHtml(value)}</strong>`,
+      `</div>`,
+    ].join("")).join("");
+  }
+
   function setWorkspacePage(pageId, options = {}) {
     if (!WORKSPACE_PAGE_IDS.has(pageId)) return;
     const changed = state.workspacePage !== pageId;
     state.workspacePage = pageId;
     syncWorkspacePages();
+    updateConsoleStatusRail();
     if ((changed || options.forceSync) && options.persist !== false) {
       saveSettings();
     }
@@ -1204,6 +1231,29 @@
     }).join("");
   }
 
+  function renderGovernancePathReadiness(resolution) {
+    if (!governancePathReadinessEl) return;
+    const classification = resolution.path_classification || {};
+    const applicableSources = (resolution.agents_sources || []).filter((source) => source.applies_to_path);
+    const statusByScope = {
+      repo: "Repo path",
+      workspace: "Workspace path",
+      "global-home": "Global-home path",
+      external: "External path",
+      unknown: "Unknown path",
+    };
+    const verification = classification.verified
+      ? "verified by generated data"
+      : classification.unverified_path_classification
+        ? "browser string classification"
+        : "unverified";
+    governancePathReadinessEl.innerHTML = [
+      `<strong>Deep Scan readiness · ${escapeHtml(statusByScope[classification.scope_hint] || classification.scope_hint || "Unknown path")}</strong>`,
+      `<span>${escapeHtml(classification.note || "尚未指定任意操作路徑。")}</span>`,
+      `<span>分類：${escapeHtml(verification)}；適用來源：${escapeHtml(applicableSources.map((source) => source.scope).join(", ") || "none")}。</span>`,
+    ].join("");
+  }
+
   function governanceLayerDetailText(resolution, layerId) {
     const source = (resolution.agents_sources || []).find((item) => item.scope === layerId);
     const detailByLayer = {
@@ -1231,9 +1281,15 @@
   function renderGovernanceFunnel(resolution) {
     if (!governanceFunnelEl || !governanceLayerDetailEl) return;
     const layerButtons = Array.from(governanceFunnelEl.querySelectorAll("[data-governance-layer]"));
+    const sourceByScope = new Map((resolution.agents_sources || []).map((source) => [source.scope, source]));
     layerButtons.forEach((button) => {
-      const active = (button.dataset.governanceLayer || "") === state.activeGovernanceLayer;
+      const layerId = button.dataset.governanceLayer || "";
+      const active = layerId === state.activeGovernanceLayer;
+      const source = sourceByScope.get(layerId);
+      const applies = ["runtime", "request"].includes(layerId) || Boolean(source?.applies_to_path);
       button.classList.toggle("active", active);
+      button.classList.toggle("applies", applies);
+      button.classList.toggle("evidence-only", Boolean(source && !source.applies_to_path));
       button.setAttribute("aria-pressed", active ? "true" : "false");
     });
     governanceLayerDetailEl.textContent = governanceLayerDetailText(resolution, state.activeGovernanceLayer);
@@ -1241,6 +1297,7 @@
 
   function renderGovernanceResolution(resolution, statusText = "") {
     if (!governanceResultEl) return;
+    renderGovernancePathReadiness(resolution);
     renderGovernanceSourceStatus(resolution);
     renderGovernanceFunnel(resolution);
     const layerLines = resolution.matched_layers.length
@@ -1899,6 +1956,18 @@
         level: state.lastRefreshState === "error" ? "ERR" : "SYS_OK",
         tone: state.lastRefreshState === "error" ? "error" : "",
         message: `${state.lastRefreshMessage || "目前顯示的是最近一次靜態產出的 MAP。"} 最近更新：${formatTimestamp(state.lastUpdatedAt)}。`,
+      },
+      {
+        level: "INFO",
+        tone: "",
+        message: `Adapter：${ACTIVE_PROJECT_MAP_ADAPTER?.label || "unknown"}；page mode：${PAGE_MODE}。`,
+      },
+      {
+        level: state.browserCanScan ? "SYS_OK" : "WARN",
+        tone: state.browserCanScan ? "" : "warn",
+        message: state.browserCanScan
+          ? "瀏覽器支援本機目錄連結，可在互動頁執行重掃。"
+          : "目前瀏覽器或頁面模式不支援目錄連結；請用產生器重建靜態輸出。",
       },
     ];
     const activeFilterLabel = state.diagnosticsFilter === "orphan"
@@ -2595,6 +2664,7 @@
 
   function render() {
     syncWorkspacePages();
+    updateConsoleStatusRail();
     updateSummary();
     renderGovernanceSourceNote();
     updateDiagnosticsCard();

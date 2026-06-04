@@ -13,6 +13,19 @@ The project owns:
 
 The legacy command still works through `local/scripts/build-project-map.py`, but new UI work should land here first.
 
+## Completion Workflow
+
+Use `docs/plans/PROJECT_MAP_WEB_CONSOLE_COMPLETION_PLAN_2026-06-05.md` for the current web-console completion pass.
+
+Keep implementation changes in this folder unless the generator contract or tests require a narrow companion update elsewhere:
+
+- edit `project-map-template.html` for HTML/CSS structure
+- edit `project-map-runtime.js` for browser behavior
+- regenerate `ops/project-map/*` artifacts after source changes
+- keep `local/scripts/build-project-map.py` as compatibility glue only
+
+The console completion target is an operator-grade governance surface: status, diagnostics, map controls, governance path analysis, and share-safe output must remain aligned.
+
 ## Build
 
 From the repository root:
