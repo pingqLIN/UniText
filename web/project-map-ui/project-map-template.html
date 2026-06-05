@@ -774,6 +774,43 @@
       flex-wrap: wrap;
     }
 
+    .console-status-rail {
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+      max-width: 860px;
+    }
+
+    .console-status-pill {
+      display: grid;
+      gap: 2px;
+      min-width: 112px;
+      padding: 7px 9px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-card);
+      color: var(--ink-soft);
+      box-shadow: var(--ghost-outline);
+    }
+
+    .console-status-pill span {
+      font-family: var(--label-font);
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .console-status-pill strong {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-size: 0.76rem;
+      line-height: 1.18;
+    }
+
     .workspace-toggle {
       min-height: 34px;
     }
@@ -948,6 +985,15 @@
     body.workspace-compact .workspace-overview {
       align-items: center;
       gap: 8px;
+    }
+
+    body.workspace-compact .console-status-rail {
+      max-width: 620px;
+    }
+
+    body.workspace-compact .console-status-pill {
+      min-width: 96px;
+      padding: 5px 8px;
     }
 
     body.workspace-compact .workspace-title {
@@ -1576,6 +1622,24 @@
       gap: 8px;
     }
 
+    .governance-path-readiness {
+      display: grid;
+      gap: 4px;
+      margin-top: -2px;
+      padding: 9px 11px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-card-soft);
+      color: var(--ink-soft);
+      font-size: 0.78rem;
+      line-height: 1.45;
+      box-shadow: var(--ghost-outline);
+    }
+
+    .governance-path-readiness strong {
+      color: var(--ink);
+      font-size: 0.82rem;
+    }
+
     .governance-source-card {
       display: grid;
       gap: 5px;
@@ -1632,6 +1696,14 @@
 
     .governance-funnel-layer.active {
       box-shadow: inset 3px 0 0 var(--accent), var(--ghost-outline-strong);
+    }
+
+    .governance-funnel-layer.applies {
+      background: linear-gradient(90deg, rgba(9, 76, 178, 0.12), rgba(217, 226, 255, 0.28));
+    }
+
+    .governance-funnel-layer.evidence-only {
+      opacity: 0.68;
     }
 
     .governance-layer-detail {
@@ -2407,6 +2479,11 @@
         align-items: stretch;
       }
 
+      .console-status-rail {
+        justify-content: flex-start;
+        width: 100%;
+      }
+
       .control-band.primary .toolbar-row,
       .browse-controls,
       .display-controls {
@@ -2446,6 +2523,16 @@
       .workspace-shell {
         padding: 16px;
         border-radius: 22px;
+      }
+
+      .console-status-rail {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      .console-status-pill {
+        min-width: 0;
       }
 
       .workspace-tab {
@@ -2600,6 +2687,7 @@
             <p class="workspace-copy">主巡覽顯示節點清單、地圖與細節；診斷與交付提供健康度與分享輸出；維護與治理處理重掃、層級解析與報告寫出。</p>
           </div>
           <div class="workspace-overview-actions">
+            <div class="console-status-rail" id="console-status-rail" data-share-hide aria-label="控制台狀態摘要"></div>
             <button type="button" class="mini-action secondary workspace-toggle" id="workspace-toggle" aria-expanded="false">展開工作區</button>
           </div>
         </div>
@@ -2775,6 +2863,10 @@
                   <div class="control-group">
                     <label for="governance-analysis-path">任意操作路徑</label>
                     <input id="governance-analysis-path" type="text" placeholder="例如 Q:\\UniText 或 Q:\\Projects\\demo" />
+                  </div>
+                  <div class="governance-path-readiness" id="governance-path-readiness">
+                    <strong>Deep Scan readiness</strong>
+                    <span>尚未解析任意操作路徑。</span>
                   </div>
                   <div class="control-group">
                     <label for="governance-global-path">global-home AGENTS</label>
