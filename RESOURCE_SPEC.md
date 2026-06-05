@@ -40,6 +40,9 @@ Every catalogable resource should expose these fields, either through frontmatte
 | `delivery` | object | Preferred delivery hints by host or surface |
 | `compatibility` | object | Host-specific limitations and dated verification |
 | `references` | array | Related docs, policies, examples, or source links |
+| `trigger_examples` | array | Short phrases that should route to this resource |
+| `avoid_when` | array | Short phrases or contexts that should not route here |
+| `context_budget_hint` | enum | Suggested minimum budget such as `L0`, `L1`, `L2`, `L3`, or `L4` |
 | `last_reviewed` | date | Last human review date |
 | `release_surface` | enum | `shared`, `local-only`, or `template-only` |
 
@@ -49,6 +52,7 @@ Every catalogable resource should expose these fields, either through frontmatte
 - Do not create multiple IDs for the same semantic resource.
 - Make `summary` short enough for progressive disclosure.
 - Use `title` for humans, `summary` for discovery, and `source_of_truth` for exact file targeting.
+- Keep `trigger_examples`, `avoid_when`, and `context_budget_hint` compact. They are routing hints, not full instructions.
 - Avoid machine-specific absolute paths in shared metadata.
 
 ## 5. Runtime Catalog Projection
@@ -63,6 +67,7 @@ Every catalogable resource should expose these fields, either through frontmatte
 - `runtime_projection`
 - `delivery`
 - `references`
+- compact trigger and context-budget hints when available
 
 Documentation-only work should not edit `runtime/catalog.json` by hand. If registry or runtime source files change, rebuild with:
 
@@ -86,6 +91,12 @@ status: active
 summary: Review a pull request for regressions, missing tests, and unsafe behavior.
 source_of_truth: registry/skills/review-pr/SKILL.md
 runtime_projection: runtime/skills/review-pr/SKILL.md
+trigger_examples:
+  - review this PR
+  - inspect this uncommitted diff
+avoid_when:
+  - implement the fix directly
+context_budget_hint: L2
 audiences:
   - agent
   - reviewer
@@ -133,6 +144,7 @@ If the same `(type, id)` maps to different content:
 | Mistake | Correction |
 |---|---|
 | Long essay in `summary` | Keep summary short and route deep content through `source_of_truth` |
+| Full instructions in routing fields | Keep routing fields short and load the resource only after the trigger matches |
 | `source_of_truth` points to a folder only | Point to the main entry file |
 | Delivery mode treated as permanent | Resolve mode at adapter time |
 | Local absolute path in shared metadata | Put machine paths in `local/` or ignored operational evidence |

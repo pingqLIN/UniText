@@ -23,6 +23,30 @@ Read only the deeper source files that the runtime view points to.
 - Codex should read its configured local `skills_path` target, not point directly at `registry/skills`.
 - If a task needs canonical content, follow the runtime projection back to its `source_of_truth` or use the project-local MCP surface.
 
+## Request Budget Routing
+
+Classify the request before opening deeper files, skills, connectors, or web tools. Default to the smallest budget that can answer correctly:
+
+| Budget | Use for | Runtime rule |
+|---|---|---|
+| `L0 no-tool` | General answers, wording, translation, brainstorming, static reasoning | Do not load skills, files, connectors, or web tools. |
+| `L1 light-retrieval` | Known file lookup, metadata checks, small snippets | Read only the route file, catalog entry, or narrow snippet needed. |
+| `L2 targeted-retrieval` | Questions that require specific file evidence or limited comparison | Search first, then open only matching sections. |
+| `L3 artifact` | Creating, editing, converting, or exporting PDF, DOCX, PPTX, XLSX, images, or similar artifacts | Load only the matching artifact skill and its direct support files. |
+| `L4 complex` | Multi-file synthesis, migration, governance rewrite, broad analysis, or data-heavy work | State the expanded scope, keep intermediate summaries, and avoid unrelated skill/tool loading. |
+
+Escalate only when the current budget cannot satisfy the request. Do not pre-load artifact skills, registry folders, connector instructions, or full documents just because they exist.
+
+## Tool And Skill Triggers
+
+| Surface | Use when | Avoid when |
+|---|---|---|
+| Web/search | The user asks for current, latest, recently changed, uncertain, citation-required, legal, financial, medical, schedule, price, or product information | Rewriting, translation, static repo reasoning, or known local facts |
+| File search/read | The user references an uploaded file, repo file, prior document, or asks what a file says | Pure conceptual discussion or ordinary writing |
+| Artifact skills | The user asks to create, edit, convert, export, validate, or package that artifact type | Draft text only, brainstorming, or ordinary explanation |
+| Connectors | The task requires the user's connected email, calendar, drive, issue tracker, deployment, or account data | Public info, local repo work, or simulated examples |
+| Code/runtime tools | The task requires local execution, tests, generated files, repo inspection, or reproducible evidence | Simple explanation where execution adds no confidence |
+
 ## Task Routing
 
 | Task | Start here |

@@ -40,6 +40,9 @@ Operations artifacts、local notes、generated reports、backups、review packet
 | `delivery` | object | Preferred delivery hints by host or surface |
 | `compatibility` | object | Host-specific limitations and dated verification |
 | `references` | array | Related docs、policies、examples、source links |
+| `trigger_examples` | array | 應 route 到此 resource 的短 phrases |
+| `avoid_when` | array | 不應 route 到此 resource 的短 phrases 或 contexts |
+| `context_budget_hint` | enum | 建議的最小 budget，例如 `L0`、`L1`、`L2`、`L3` 或 `L4` |
 | `last_reviewed` | date | Last human review date |
 | `release_surface` | enum | `shared`、`local-only`、`template-only` |
 
@@ -49,6 +52,7 @@ Operations artifacts、local notes、generated reports、backups、review packet
 - 不要為同一 semantic resource 建立多個 IDs。
 - `summary` 要短，適合 progressive disclosure。
 - `title` 服務 humans，`summary` 服務 discovery，`source_of_truth` 服務 exact file targeting。
+- `trigger_examples`、`avoid_when` 與 `context_budget_hint` 要保持精簡。它們是 routing hints，不是完整 instructions。
 - Shared metadata 避免 machine-specific absolute paths。
 
 ## 5. Runtime Catalog Projection
@@ -63,6 +67,7 @@ Operations artifacts、local notes、generated reports、backups、review packet
 - `runtime_projection`
 - `delivery`
 - `references`
+- available 時保留 compact trigger 與 context-budget hints
 
 Docs-only work 不應手動編輯 `runtime/catalog.json`。若 registry 或 runtime source files 改變，使用：
 
@@ -90,6 +95,7 @@ python local/scripts/build-runtime-layer.py
 | Mistake | Correction |
 |---|---|
 | `summary` 塞長篇說明 | 保持短摘要，deep content 透過 `source_of_truth` |
+| Routing fields 塞完整 instructions | Routing fields 保持短，只有 trigger 命中後才載入 resource |
 | `source_of_truth` 只指到資料夾 | 指到 main entry file |
 | Delivery mode 被當永久屬性 | 在 adapter time resolve |
 | Shared metadata 出現 local absolute path | 放到 `local/` 或 ignored operational evidence |

@@ -23,6 +23,30 @@
 - Codex 應讀取其已設定的本機 `skills_path` 目標，不應直接指向 `registry/skills`。
 - 如果任務需要 canonical content，請沿著 runtime projection 回溯到它的 `source_of_truth`，或使用 project-local MCP surface。
 
+## Request Budget 路由
+
+在打開更深層 files、skills、connectors 或 web tools 前，先分類 request。預設使用能正確完成任務的最小 budget：
+
+| Budget | 適用情境 | Runtime rule |
+|---|---|---|
+| `L0 no-tool` | 一般問答、文字潤飾、翻譯、腦暴、靜態推理 | 不載入 skills、files、connectors 或 web tools。 |
+| `L1 light-retrieval` | 已知檔案查找、metadata checks、小片段查證 | 只讀必要的 route file、catalog entry 或 narrow snippet。 |
+| `L2 targeted-retrieval` | 需要特定 file evidence 或有限比對的問題 | 先 search，再只打開命中的 sections。 |
+| `L3 artifact` | 建立、編輯、轉換或匯出 PDF、DOCX、PPTX、XLSX、images 或類似 artifacts | 只載入對應 artifact skill 與它直接需要的 support files。 |
+| `L4 complex` | 多檔 synthesis、migration、governance rewrite、廣泛分析或 data-heavy work | 說明擴大的 scope，保留中間 summaries，並避免載入無關 skill/tool。 |
+
+只有目前 budget 無法滿足 request 時才升級。不要因為 artifact skills、registry folders、connector instructions 或完整文件存在，就預先載入它們。
+
+## Tool 與 Skill 觸發
+
+| Surface | 使用時機 | 避免時機 |
+|---|---|---|
+| Web/search | 使用者要求 current、latest、recently changed、不確定、需要 citation，或涉及法律、金融、醫療、時程、價格、產品資訊 | 改寫、翻譯、靜態 repo reasoning，或已知 local facts |
+| File search/read | 使用者提到 uploaded file、repo file、prior document，或詢問某檔案內容 | 純概念討論或一般寫作 |
+| Artifact skills | 使用者要求建立、編輯、轉換、匯出、驗證或打包該 artifact type | 只需要 draft text、腦暴或一般解釋 |
+| Connectors | 任務需要使用者已連接的 email、calendar、drive、issue tracker、deployment 或 account data | Public info、本機 repo work 或模擬 examples |
+| Code/runtime tools | 任務需要 local execution、tests、generated files、repo inspection 或可重現 evidence | 單純說明，且執行不會增加 confidence |
+
 ## 任務路由
 
 | 任務 | 從這裡開始 |
