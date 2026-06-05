@@ -1,123 +1,96 @@
 # UniText — Resource Spec
 
-> 狀態：Template Base
-> 適用範圍：shared resources 的邏輯契約，不綁定單一作業系統、目錄結構或儲存格式。
+> 狀態：active baseline
+> 範圍：shared resources 的 metadata 與 projection contract。
 
-本 spec 預設所有核心 metadata 都應可被純文本穩定承載，方便 AI 與人類共同閱讀、比對與版本管理。
+本 spec 讓 resource metadata 對人類可讀、對 agents 可發現，並足夠穩定可供 runtime builders 與 adapter scripts 使用。
 
-## 1. Scope
+## 1. Resource Types
 
-本 spec 適用於：
+| Type | Canonical root | Purpose |
+|---|---|---|
+| `skill` | `registry/skills/` | Reusable procedure、prompt、capability pack、support assets |
+| `mcp` | `registry/mcp/` | MCP server definition、policy、adoption notes |
+| `agent` | `registry/agents/` | Persona、role instructions、playbook |
+| `workflow` | `registry/workflow/` | Repeatable process、runbook、plan template |
 
-- `skills`
-- `mcp`
-- `agents`
-- `workflow`
+Operations artifacts、local notes、generated reports、backups、review packets 預設不是 shared resource types。
 
-不適用於：
+## 2. Required Fields
 
-- operations state artifacts
-- 平台特定路徑映射
-- adapter 的內部執行細節
+每個 catalogable resource 應透過 frontmatter、definition file 或 generated catalog metadata 暴露：
 
-## 2. Identity Rules
+| Field | Type | Meaning |
+|---|---|---|
+| `id` | string | Stable kebab-case identifier |
+| `type` | enum | `skill`、`mcp`、`agent`、`workflow` |
+| `title` | string | Human-readable display name |
+| `status` | enum | `draft`、`active`、`deprecated`、`archived` |
+| `summary` | string | Short discovery-first description |
+| `source_of_truth` | path | Canonical authoring entrypoint |
+| `runtime_projection` | path | Main runtime entrypoint, when projected |
 
-一個 shared resource 的主識別由以下組合構成：
+## 3. Recommended Fields
 
-- `type`
+| Field | Type | Meaning |
+|---|---|---|
+| `owners` | array | Maintainers 或 responsible role |
+| `tags` | array | Search and routing hints |
+| `audiences` | array | `human`、`agent`、`operator` 或 host-specific audience |
+| `delivery` | object | Preferred delivery hints by host or surface |
+| `compatibility` | object | Host-specific limitations and dated verification |
+| `references` | array | Related docs、policies、examples、source links |
+| `last_reviewed` | date | Last human review date |
+| `release_surface` | enum | `shared`、`local-only`、`template-only` |
+
+## 4. Naming Rules
+
+- `id` 使用 kebab-case。
+- 不要為同一 semantic resource 建立多個 IDs。
+- `summary` 要短，適合 progressive disclosure。
+- `title` 服務 humans，`summary` 服務 discovery，`source_of_truth` 服務 exact file targeting。
+- Shared metadata 避免 machine-specific absolute paths。
+
+## 5. Runtime Catalog Projection
+
+`runtime/catalog.json` 是 discovery artifact，不是 full content dump。它至少應保留：
+
 - `id`
-
-`id` 應：
-
-- 使用小寫英文字母、數字與 `-`
-- 不含空白
-- 不含作業系統特定分隔符
-
-## 3. Canonical Location
-
-`canonical_location` 必須是邏輯 canonical path，而不是某台機器的絕對路徑。
-
-例如：
-
-- `/registry/skills/example-skill`
-- `/registry/mcp/example-mcp`
-- `/registry/agents/example-agent`
-
-## 4. Metadata Tiers
-
-### Required
-
-- `id`
 - `type`
-- `canonical_location`
 - `status`
-
-### Recommended
-
+- `summary`
 - `source_of_truth`
-- `supported_clis`
-- `delivery_guidance`
+- `runtime_projection`
+- `delivery`
+- `references`
 
-### Optional
+Docs-only work 不應手動編輯 `runtime/catalog.json`。若 registry 或 runtime source files 改變，使用：
 
-- `owner`
-- `provenance`
-- `notes`
-- `last_verified`
-
-## 5. Lifecycle
-
-允許的 `status`：
-
-- `draft`
-- `active`
-- `deprecated`
-- `archived`
-
-## 6. Defaults
-
-- `source_of_truth` 缺省時，視為等於 `canonical_location`
-- `supported_clis` 缺省時，視為 `undocumented`
-- `delivery_guidance` 缺省時，由 adapter / operations 文件推導
-
-## 7. Delivery Guidance
-
-`delivery_guidance` 是 discovery 用提示，不是固定 delivery mode。
-
-它可以說明：
-
-- 該去看哪類 adapter
-- 是否存在平台差異
-- 是否需要查看 `OPERATIONS.md`
-
-它不應寫死：
-
-- 平台絕對路徑
-- 永久固定的 delivery mode
-
-## 8. Conflict Rules
-
-若發現同一組 `(type, id)` 對應多個內容不同的候選資源：
-
-- 不得自動覆蓋
-- 不得靜默推定 canonical source
-- 必須停在 `REVIEW / DRY-RUN`
-
-允許的結果：
-
-- 明確選定 canonical source
-- 重新命名為不同 `id`
-- 標記為 `deprecated` 或 `archived`
-- 暫時維持 `draft`
-
-## 9. Example
-
-```yaml
-id: example-skill
-type: skills
-canonical_location: /registry/skills/example-skill
-status: draft
-source_of_truth: /registry/skills/example-skill/SKILL.md
-supported_clis: undocumented
-delivery_guidance: Use the skills adapter; resolved mode depends on CLI capabilities and local environment.
+```powershell
+python local/scripts/build-runtime-layer.py --write
 ```
+
+先用 dry-run：
+
+```powershell
+python local/scripts/build-runtime-layer.py
+```
+
+## 6. Conflict Rules
+
+若同一 `(type, id)` 對應不同內容：
+
+- 不自動 overwrite
+- 不靜默推定 canonical source
+- 停在 `REVIEW / DRY-RUN`
+- 選定 canonical source、重新命名競爭 resource，或標記為 `deprecated` / `archived`
+
+## 7. Common Mistakes
+
+| Mistake | Correction |
+|---|---|
+| `summary` 塞長篇說明 | 保持短摘要，deep content 透過 `source_of_truth` |
+| `source_of_truth` 只指到資料夾 | 指到 main entry file |
+| Delivery mode 被當永久屬性 | 在 adapter time resolve |
+| Shared metadata 出現 local absolute path | 放到 `local/` 或 ignored operational evidence |
+| 手改 runtime catalog | 改 registry/runtime source，再 rebuild |

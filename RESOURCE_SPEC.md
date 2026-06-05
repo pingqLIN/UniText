@@ -1,123 +1,145 @@
 # UniText — Resource Spec
 
-> 狀態：Template Base
-> 適用範圍：shared resources 的邏輯契約，不綁定單一作業系統、目錄結構或儲存格式。
+> Status: active baseline
+> Scope: metadata and projection contract for shared resources.
 
-本 spec 預設所有核心 metadata 都應可被純文本穩定承載，方便 AI 與人類共同閱讀、比對與版本管理。
+This spec keeps resource metadata readable by humans, discoverable by agents, and stable enough for runtime builders and adapter scripts.
 
-## 1. Scope
+## 1. Resource Types
 
-本 spec 適用於：
+| Type | Canonical root | Purpose |
+|---|---|---|
+| `skill` | `registry/skills/` | Reusable procedure, prompt, capability pack, and support assets |
+| `mcp` | `registry/mcp/` | MCP server definition, policy, and adoption notes |
+| `agent` | `registry/agents/` | Persona, role instructions, or playbook |
+| `workflow` | `registry/workflow/` | Repeatable process, runbook, or plan template |
 
-- `skills`
-- `mcp`
-- `agents`
-- `workflow`
+Operations artifacts, local notes, generated reports, backups, and review packets are not shared resource types by default.
 
-不適用於：
+## 2. Required Fields
 
-- operations state artifacts
-- 平台特定路徑映射
-- adapter 的內部執行細節
+Every catalogable resource should expose these fields, either through frontmatter, a definition file, or generated catalog metadata:
 
-## 2. Identity Rules
+| Field | Type | Meaning |
+|---|---|---|
+| `id` | string | Stable kebab-case identifier |
+| `type` | enum | `skill`, `mcp`, `agent`, or `workflow` |
+| `title` | string | Human-readable display name |
+| `status` | enum | `draft`, `active`, `deprecated`, or `archived` |
+| `summary` | string | Short discovery-first description |
+| `source_of_truth` | path | Canonical authoring entrypoint |
+| `runtime_projection` | path | Main runtime entrypoint, when projected |
 
-一個 shared resource 的主識別由以下組合構成：
+## 3. Recommended Fields
 
-- `type`
+| Field | Type | Meaning |
+|---|---|---|
+| `owners` | array | Maintainers or responsible role |
+| `tags` | array | Search and routing hints |
+| `audiences` | array | `human`, `agent`, `operator`, or host-specific audience |
+| `delivery` | object | Preferred delivery hints by host or surface |
+| `compatibility` | object | Host-specific limitations and dated verification |
+| `references` | array | Related docs, policies, examples, or source links |
+| `last_reviewed` | date | Last human review date |
+| `release_surface` | enum | `shared`, `local-only`, or `template-only` |
+
+## 4. Naming Rules
+
+- Use kebab-case for `id`.
+- Do not create multiple IDs for the same semantic resource.
+- Make `summary` short enough for progressive disclosure.
+- Use `title` for humans, `summary` for discovery, and `source_of_truth` for exact file targeting.
+- Avoid machine-specific absolute paths in shared metadata.
+
+## 5. Runtime Catalog Projection
+
+`runtime/catalog.json` is a discovery artifact, not a full content dump. It should preserve enough information for an agent or adapter to decide what to open next:
+
 - `id`
-
-`id` 應：
-
-- 使用小寫英文字母、數字與 `-`
-- 不含空白
-- 不含作業系統特定分隔符
-
-## 3. Canonical Location
-
-`canonical_location` 必須是邏輯 canonical path，而不是某台機器的絕對路徑。
-
-例如：
-
-- `/registry/skills/example-skill`
-- `/registry/mcp/example-mcp`
-- `/registry/agents/example-agent`
-
-## 4. Metadata Tiers
-
-### Required
-
-- `id`
 - `type`
-- `canonical_location`
 - `status`
-
-### Recommended
-
+- `summary`
 - `source_of_truth`
-- `supported_clis`
-- `delivery_guidance`
+- `runtime_projection`
+- `delivery`
+- `references`
 
-### Optional
+Documentation-only work should not edit `runtime/catalog.json` by hand. If registry or runtime source files change, rebuild with:
 
-- `owner`
-- `provenance`
-- `notes`
-- `last_verified`
+```powershell
+python local/scripts/build-runtime-layer.py --write
+```
 
-## 5. Lifecycle
+Use the dry-run form first:
 
-允許的 `status`：
+```powershell
+python local/scripts/build-runtime-layer.py
+```
 
-- `draft`
-- `active`
-- `deprecated`
-- `archived`
+## 6. Example Skill Metadata
 
-## 6. Defaults
+```yaml
+id: review-pr
+type: skill
+title: Review Pull Request
+status: active
+summary: Review a pull request for regressions, missing tests, and unsafe behavior.
+source_of_truth: registry/skills/review-pr/SKILL.md
+runtime_projection: runtime/skills/review-pr/SKILL.md
+audiences:
+  - agent
+  - reviewer
+delivery:
+  codex:
+    mode: symlink
+    preferred_surface: .agents/skills
+  claude:
+    mode: mirror
+    preferred_surface: .claude/skills
+references:
+  - OPERATIONS.md
+  - docs/adapters/CODEX_CLI_ADAPTER_NOTE.md
+```
 
-- `source_of_truth` 缺省時，視為等於 `canonical_location`
-- `supported_clis` 缺省時，視為 `undocumented`
-- `delivery_guidance` 缺省時，由 adapter / operations 文件推導
+## 7. Example MCP Metadata
 
-## 7. Delivery Guidance
-
-`delivery_guidance` 是 discovery 用提示，不是固定 delivery mode。
-
-它可以說明：
-
-- 該去看哪類 adapter
-- 是否存在平台差異
-- 是否需要查看 `OPERATIONS.md`
-
-它不應寫死：
-
-- 平台絕對路徑
-- 永久固定的 delivery mode
+```yaml
+id: project-docs-mcp
+type: mcp
+title: Project Docs MCP
+status: draft
+summary: Expose reviewed project docs through a read-only MCP server.
+source_of_truth: registry/mcp/project-docs-mcp/definition.json
+runtime_projection: runtime/catalog.json
+delivery:
+  codex:
+    mode: native-config
+  copilot:
+    mode: native-config
+release_surface: shared
+```
 
 ## 8. Conflict Rules
 
-若發現同一組 `(type, id)` 對應多個內容不同的候選資源：
+If the same `(type, id)` maps to different content:
 
-- 不得自動覆蓋
-- 不得靜默推定 canonical source
-- 必須停在 `REVIEW / DRY-RUN`
+- do not overwrite automatically
+- do not silently infer the canonical source
+- stop at `REVIEW / DRY-RUN`
+- choose one canonical source, rename the competing resource, or mark one as `deprecated` / `archived`
 
-允許的結果：
+## 9. Common Mistakes
 
-- 明確選定 canonical source
-- 重新命名為不同 `id`
-- 標記為 `deprecated` 或 `archived`
-- 暫時維持 `draft`
+| Mistake | Correction |
+|---|---|
+| Long essay in `summary` | Keep summary short and route deep content through `source_of_truth` |
+| `source_of_truth` points to a folder only | Point to the main entry file |
+| Delivery mode treated as permanent | Resolve mode at adapter time |
+| Local absolute path in shared metadata | Put machine paths in `local/` or ignored operational evidence |
+| Runtime catalog changed manually | Change registry/runtime source, then rebuild |
 
-## 9. Example
+## 10. Related Docs
 
-```yaml
-id: example-skill
-type: skills
-canonical_location: /registry/skills/example-skill
-status: draft
-source_of_truth: /registry/skills/example-skill/SKILL.md
-supported_clis: undocumented
-delivery_guidance: Use the skills adapter; resolved mode depends on CLI capabilities and local environment.
-```
+- [RUNTIME.md](RUNTIME.md)
+- [OPERATIONS.md](OPERATIONS.md)
+- [DOCUMENT_PLACEMENT_POLICY.md](DOCUMENT_PLACEMENT_POLICY.md)

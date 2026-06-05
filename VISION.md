@@ -1,141 +1,121 @@
 # UniText — Vision
 
-> 狀態：Template Base
-> 原則：以邏輯契約為準，不以任何單一作業系統、目錄結構或部署方式作為規格前提。
+> Status: active baseline
+> Principle: UniText defines a platform-neutral resource governance contract, not a single machine layout.
 
 ## 1. What UniText Is
 
-`UniText` 是一個 text-native、registry-first、AI-first 的 shared resource hub，讓多個 AI CLI / agent 系統能用同一套純文本契約共享資源定義與採用方式。
+UniText is a text-native, registry-first, AI-first governance layer for shared agent resources.
 
-它包含兩層：
+It exists because modern AI runtimes have converged on similar surfaces:
 
-1. `Registry`
-   - 定義 shared resources、canonical identity 與最小契約
-2. `Adapter / Operations Control Plane`
-   - 將 registry 內容對接到不同 CLI，並處理 install、sync、adopt、repair
+- skill or capability folders
+- repository or project instructions
+- MCP definitions
+- workflow/runbook files
+- local settings and delivery targets
 
-## 2. Problem It Solves
+UniText does not invent a replacement format for every tool. It gives those surfaces a common authoring, review, projection, and verification model.
 
-`UniText` 要解決的是跨工具共享資源時常見的碎片化問題：
+## 2. Why It Exists
 
-- skills 散落在不同位置
-- MCP 定義分散在不同設定格式
-- agent instructions 無法共用
-- workflow 慣例難以跨工具延續
-- 缺少一套 AI 容易讀取、版本控制友善的純文本共同介面
+Without a shared governance layer, AI resources tend to drift:
+
+- skills live in tool-specific folders with unclear provenance
+- MCP definitions are copied into incompatible config files
+- agent instructions become long prompts that cannot be reviewed or reused
+- workflow decisions disappear into chat history
+- local paths and private metadata leak into shared docs
+
+UniText turns those materials into versioned resources with a stable identity, clear source of truth, and deliberate delivery path.
 
 ## 3. Architecture Position
 
-正式定位：
+UniText is:
 
-**Registry-first, adapter-enabled, operations-governed**
+**Registry-first, runtime-first, adapter-enabled, operations-governed.**
 
-關鍵原則：
-
-- 沒有 registry，就沒有共同來源與共同語義
-- 沒有 adapter，就無法把 registry 真正送進各 CLI
-- AI 是重要的 consumer 與協作者，但不是唯一可靠的整合機制
+| Principle | Meaning |
+|---|---|
+| Registry-first | Shared resources have canonical identity and source before delivery |
+| Runtime-first | Consumer agents start from a small generated read model |
+| Adapter-enabled | Host tools receive resources through their supported surfaces |
+| Operations-governed | Mutations use scan, review, dry-run, backup, deliver, verify |
 
 ## 4. Resource Types
 
-預設 shared resource types：
+The default shared resource types are:
 
-- `skills`
+- `skill`
 - `mcp`
-- `agents`
+- `agent`
 - `workflow`
 
-`operations state` 不屬於 shared resource type，應獨立存在於 `/operations`。
+Operations state is not a shared resource type. Inventories, baselines, backups, drift reports, repair plans, and audit trails belong to the operations layer, currently `ops/`, unless explicitly promoted into a publishable document.
 
-## 5. Discovery and Delivery
+## 5. Discovery And Delivery
 
-`INDEX.md` 負責 discovery，回答：
+`INDEX.md` answers human discovery questions:
 
-- 有哪些資源
-- 各資源的邏輯位置在哪裡
-- 哪些 CLI 被支援
+- what docs exist
+- where resource families live
+- which page answers a task
 
-`OPERATIONS.md` 負責 delivery，回答：
+`RUNTIME.md` answers agent startup questions:
 
-- 某個 CLI 如何取得資源
-- 何時執行 install、sync、adopt、repair
-- delivery mode 如何解析
+- what to read first
+- which runtime files are authoritative for consumer context
+- when to follow pointers back to canonical sources
 
-可用的 delivery modes：
+`OPERATIONS.md` answers delivery questions:
 
-- `pointer`
-- `mirror`
-- `symlink`
-- `native-config`
+- which delivery mode to use
+- when to scan, review, dry-run, adopt, deliver, or verify
+- how to handle conflicts and local mutation
 
-## 6. Delivery Triggers
+## 6. Delivery Modes
 
-delivery 只能由明確 trigger 啟動：
+UniText recognizes four delivery modes:
 
-- `bootstrap`
-- `sync`
-- `adopt`
-- `repair`
+- `pointer`: expose a discoverable reference without copying content
+- `mirror`: copy a reviewed resource into a host-owned surface
+- `symlink`: link a host surface back to a shared runtime projection
+- `native-config`: write to an official host configuration or instruction surface
 
-所有破壞性操作都應遵守：
-
-- 先 dry-run
-- 先 backup
-- 不可靜默決定 canonical source
+The mode is resolved by the adapter and operation context. It is not a permanent property of the resource itself.
 
 ## 7. Adoption Model
 
-### Soft Adoption
+Formal adoption follows this path:
 
-- 先導入 discovery
-- 不強迫立刻遷移既有資源
+```text
+SCAN -> REVIEW -> DRY-RUN -> ADOPT -> DELIVER -> VERIFY
+```
 
-### Formal Adoption
+If a resource is machine-specific, user-specific, sensitive, or not reusable, it stays in a smaller lane such as local-only overlay or project-local companion. Only reusable, share-safe, reviewed assets should become governed registry resources.
 
-正式納管流程：
+## 8. Non-Goals
 
-1. `SCAN`
-2. `REVIEW`
-3. `DRY-RUN`
-4. `ADOPT`
-5. `DELIVER`
-6. `VERIFY`
+UniText does not:
 
-若發現同名異內容資源，流程必須停在 `REVIEW / DRY-RUN`。
+- silently rewrite global CLI configuration
+- publish or push content without user approval
+- treat private remotes as publication approval
+- make `registry/` the default context dump for agents
+- preserve local secrets, absolute paths, or personal operational notes in shared surfaces
+- claim full support for a host tool without dated verification
 
-## 8. Documentation Set
+## 9. Design Principles
 
-核心文檔：
+- Discovery before automation
+- Stable IDs before delivery
+- Short summaries before deep content
+- Runtime read model before canonical source deep dives
+- Dry-run before mutation
+- Backup before overwrite
+- Explicit user approval before publication
+- Local-only by default for reports, plans, reviews, and operational evidence
 
-- `VISION.md`
-- `INDEX.md`
-- `RESOURCE_SPEC.md`
-- `OPERATIONS.md`
-- `PROJECT_MODES.md`
+## 10. Positioning
 
-## 9. Path Strategy
-
-主文使用 logical canonical paths，例如：
-
-- `/registry/skills`
-- `/registry/mcp`
-- `/registry/agents`
-- `/registry/workflow`
-- `/operations`
-
-絕對路徑與平台專屬設定只屬於 deployment mapping，不屬於願景層契約。
-
-## 10. Design Principles
-
-- `Registry first`
-- `Discovery before automation`
-- `Explicit triggers`
-- `Minimum viable metadata`
-- `Canonical source of truth`
-- `CLI-specific delivery`
-- `Platform-agnostic contract`
-- `Safe mutation`
-
-## 11. One-Sentence Positioning
-
-> UniText 是一個 text-native、registry-first、AI-first 的 shared resource hub，透過明確的 adapter 與 operations control plane，讓多個 AI CLI 能安全地發現、採用並共享同一套 canonical resources。
+> UniText is a registry-first governance layer that lets multiple AI runtimes safely discover, share, and receive the same reviewed resources without turning local machine state into public documentation.
