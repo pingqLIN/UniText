@@ -61,6 +61,8 @@
   const HANDLE_DB_NAME = "unitext-project-map-db";
   const HANDLE_STORE = "handles";
   const HANDLE_KEY = "repo-root";
+  const DEV_GOV_DASHBOARD_FILE = "agent-governance-events.jsonl";
+  let devGovDashboardWriteQueue = Promise.resolve();
   const STRUCTURAL_EDGE_KINDS = new Set(["contains"]);
   const DEFAULT_NODE_IDS = ["doc:RUNTIME.md", "doc:runtime/START.md", "doc:INDEX.md"];
   const WORKSPACE_PAGES = [
@@ -121,6 +123,7 @@
     governanceAnalysisPath: "",
     governanceSourceOverrides: {},
     activeGovernanceLayer: "runtime",
+    lastDevGovEvent: null,
     suppressNextMapClick: false,
     lastMapLayout: null,
     minimapFramePending: false,
@@ -190,6 +193,7 @@
   const governanceSourceStatusEl = document.getElementById("governance-source-status");
   const governanceFunnelEl = document.getElementById("governance-funnel");
   const governanceLayerDetailEl = document.getElementById("governance-layer-detail");
+  const devGovDashboardStatusEl = document.getElementById("devgov-dashboard-status");
   const nodeCountLabelEl = document.getElementById("node-count-label");
   const mapModeNoteEl = document.getElementById("map-mode-note");
   const mapCaptionEl = document.getElementById("map-caption");
@@ -1346,6 +1350,8 @@
       "作業指引",
       guidanceLines,
       resolution.operational_guidance.length > 8 ? `\n... 其餘 ${resolution.operational_guidance.length - 8} 條作業指引會寫入報告。` : "",
+      "",
+      `DevGov Dashboard 最後登錄：${state.lastDevGovEvent ? `${state.lastDevGovEvent.action} @ ${state.lastDevGovEvent.created_at}` : "尚未登錄"}`,
     ].join("\n");
   }
 
@@ -1395,6 +1401,70 @@
 
   function governanceJson(resolution) {
     return `${JSON.stringify(resolution, null, 2)}\n`;
+  }
+
+  function renderDevGovDashboardStatus(statusText) {
+    if (!devGovDashboardStatusEl) return;
+    devGovDashboardStatusEl.textContent = statusText;
+  }
+
+  function generateDevGovEvent(action, details = {}) {
+    return {
+      id: window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : `local-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      version: 1,
+      kind: "devgov-dashboard-event",
+      action,
+      created_at: new Date().toISOString(),
+      location: {
+        href: window.location.href,
+        pathname: window.location.pathname,
+        page_mode: PAGE_MODE,
+      },
+      adapter: ACTIVE_PROJECT_MAP_ADAPTER?.id || "unknown",
+      source: {
+        repo_root: DATA.meta?.repo_root_native || "unknown",
+      },
+      details,
+    };
+  }
+
+  async function writeDevGovDashboardEvent(action, details = {}) {
+    const doWrite = async () => {
+      try {
+        if (PAGE_MODE === "share-safe") {
+          renderDevGovDashboardStatus("分享版不記錄本機 DevGov Dashboard。");
+          return;
+        }
+        const outputPath = governanceOutputPathEl?.value?.trim() || defaultGovernanceOutputPath();
+        const relativeSegments = repoRelativeSegmentsFromNativePath(outputPath);
+        if (!relativeSegments) {
+          renderDevGovDashboardStatus("DevGov Dashboard 未登記：輸出路徑需位於專案目錄內。");
+          return;
+        }
+        const handle = await ensureRepoHandle(false);
+        if (!handle) {
+          renderDevGovDashboardStatus("DevGov Dashboard 未登記：尚未連結專案根目錄。");
+          return;
+        }
+        const outputDirHandle = await ensureDirectoryFromSegments(handle, relativeSegments);
+        const fileHandle = await outputDirHandle.getFileHandle(DEV_GOV_DASHBOARD_FILE, { create: true });
+        const currentText = await (await fileHandle.getFile()).text();
+        const eventRecord = generateDevGovEvent(action, details);
+        const nextText = `${currentText ? `${currentText.replace(/\n$/, "")}\n` : ""}${JSON.stringify(eventRecord)}\n`;
+        const writable = await fileHandle.createWritable();
+        await writable.write(nextText);
+        await writable.close();
+        state.lastDevGovEvent = eventRecord;
+        renderDevGovDashboardStatus(`已登記 DevGov 事件：${eventRecord.action} @ ${new Date(eventRecord.created_at).toLocaleTimeString()}。`);
+      } catch (_error) {
+        renderDevGovDashboardStatus("DevGov Dashboard 未登記：寫入事件失敗。");
+      }
+    };
+    const nextWrite = devGovDashboardWriteQueue.then(() => doWrite(), () => doWrite());
+    devGovDashboardWriteQueue = nextWrite.catch(() => {});
+    return nextWrite;
   }
 
   function splitRelativeSegments(pathText) {
@@ -1781,7 +1851,7 @@
     return haystack.includes(state.search);
   }
 
-  function jumpToNode(nodeId, reveal = false) {
+  function jumpToNode(nodeId, reveal = false, source = "ui") {
     const target = nodeById.get(nodeId);
     if (!target) return;
     if (reveal && !nodeMatchesFilters(target)) {
@@ -1789,6 +1859,13 @@
     }
     if (reveal) setWorkspacePage("browse", { persist: false, updateTour: false });
     state.selectedId = nodeId;
+    void writeDevGovDashboardEvent("node-select", {
+      source,
+      node_id: target.id,
+      node_type: target.type,
+      node_path: target.path,
+      node_status: target.status || "",
+    });
     render();
   }
 
@@ -2018,7 +2095,7 @@
     diagnosticsCardEl.querySelector("#filter-clear-diagnostics")?.addEventListener("click", () => applyDiagnosticsFilter("all"));
     diagnosticsCardEl.querySelectorAll(".diagnostics-source-jump").forEach((button) => {
       button.addEventListener("click", () => {
-        jumpToNode(button.dataset.sourceId, true);
+        jumpToNode(button.dataset.sourceId, true, "diagnostics-source");
       });
     });
   }
@@ -2061,6 +2138,11 @@
   async function resolveGovernanceAction() {
     const resolution = resolveGovernanceInPage();
     renderGovernanceResolution(resolution, "已重新解析治理配置。");
+    void writeDevGovDashboardEvent("governance-resolve", {
+      model: resolution.inputs?.model,
+      environment: resolution.inputs?.environment,
+      instruction_profile: resolution.inputs?.instruction_profile,
+    });
     return resolution;
   }
 
@@ -2080,6 +2162,13 @@
     const outputDirHandle = await ensureDirectoryFromSegments(handle, relativeSegments);
     await writeTextFile(outputDirHandle, "agent-governance-resolution.md", governanceMarkdown(resolution));
     await writeTextFile(outputDirHandle, "agent-governance-resolution.json", governanceJson(resolution));
+    await writeDevGovDashboardEvent("governance-report-write", {
+      output_path: outputPath,
+      model: resolution.inputs?.model,
+      environment: resolution.inputs?.environment,
+      instruction_profile: resolution.inputs?.instruction_profile,
+      matched_layer_count: (resolution.matched_layers || []).length,
+    });
     renderGovernanceResolution(resolution, `已寫出治理報告到 ${outputPath}`);
   }
 
@@ -2105,7 +2194,7 @@
           <span class="node-description">${node.description || "沒有額外描述"}</span>
           <span class="node-path">${node.path}</span>
         `;
-        button.addEventListener("click", () => { state.selectedId = node.id; render(); });
+        button.addEventListener("click", () => { jumpToNode(node.id, false, "sidebar-node"); });
         sidebarEl.appendChild(button);
       });
     });
@@ -2179,7 +2268,7 @@
     detailEl.innerHTML = detailParts.join("");
     detailEl.querySelectorAll(".edge-jump").forEach((button) => {
       button.addEventListener("click", () => {
-        jumpToNode(button.dataset.peerId, true);
+        jumpToNode(button.dataset.peerId, true, "detail-edge");
       });
     });
   }
@@ -2634,14 +2723,12 @@
         event.preventDefault();
         event.stopPropagation();
         state.suppressNextMapClick = false;
-        state.selectedId = node.id;
-        render();
+        jumpToNode(node.id, false, "map-node");
       });
       group.addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
-        state.selectedId = node.id;
-        render();
+        jumpToNode(node.id, false, "map-node");
       });
       nodeLayer.appendChild(group);
     });
@@ -3211,6 +3298,7 @@
     await saveRepoHandle(handle);
     state.repoHandle = handle;
     state.repoHandleName = handle.name;
+    void writeDevGovDashboardEvent("repo-linked", { repo_name: handle.name });
     setRefreshState("success", `已連結 ${handle.name}，可直接更新目前資料。`);
     updateStatusCard();
   }
@@ -3247,6 +3335,7 @@
     updateStatusCard();
     const startedAt = performance.now();
     try {
+      await writeDevGovDashboardEvent("repo-refresh", { reason });
       const payload = await scanRepo(handle);
       setData(payload, reason);
       state.lastRefreshDurationMs = performance.now() - startedAt;
@@ -3274,6 +3363,10 @@
   }
 
   async function maybeAutoRefreshOnLoad() {
+    void writeDevGovDashboardEvent("page-open", {
+      page_mode: PAGE_MODE,
+      bootstrap_mode: DATA.meta?.generated_from || "runtime-load",
+    });
     if (!state.browserCanScan) {
       setRefreshState("idle", PAGE_MODE === "share-safe" ? "分享版僅提供唯讀瀏覽，不包含頁內重掃。" : "此瀏覽器只支援閱讀靜態 MAP。");
       updateStatusCard();

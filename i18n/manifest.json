@@ -17,7 +17,10 @@
   "source_docs": [
     "AGENTS.md",
     "BOUNDARY_INCIDENT_REVIEW_TEMPLATE.md",
+    "docs/adapters/CLAUDE_CODE_ADAPTER_NOTE.md",
+    "docs/adapters/CODEX_CLI_ADAPTER_NOTE.md",
     "docs/adapters/COPILOT_CLI_ADAPTER_NOTE.md",
+    "docs/adapters/GEMINI_ANTIGRAVITY_ADAPTER_NOTE.md",
     "DOCUMENT_PLACEMENT_POLICY.md",
     "NO_PUBLISH_POLICY.md",
     "README.md",

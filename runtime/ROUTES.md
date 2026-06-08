@@ -4,6 +4,11 @@
 
 | Intent | First Read | Allowed Next Reads | Do Not Start With |
 |---|---|---|---|
+| 一般問答、改寫、翻譯、腦暴 | 不需要 repo file | 只有需要 repo policy 時才讀 `runtime/RULES.md` | `registry/*`, artifact skills, web tools |
+| 判斷是否需要 tool / skill | `RUNTIME.md` 的 Request Budget Routing | `runtime/catalog.json` 中命中的單一 entry | 全量 skill 目錄、connector 全量說明 |
+| 需要最新或易變資訊 | web/search tool policy | cited source excerpts | local stale docs |
+| 使用者指定檔案內容 | 指定檔案或 `rg` 搜尋結果 | 命中的 section 或 companion doc | 整個 repo dump |
+| 建立或轉換 artifact | 對應 artifact skill 的 `SKILL.md` | 直接 support files | 其他 artifact skills |
 | 查簡單治理規則 | `runtime/RULES.md` | 對應 root governance doc | `INDEX.md`, `registry/*` |
 | 找技能入口 | `runtime/catalog.json` | `runtime/skills/<id>/SKILL.md` | `registry/skills/*` |
 | 找 agent persona | `runtime/catalog.json` | `runtime/agents/<id>/AGENT.md` | `registry/agents/*` |
@@ -19,6 +24,7 @@
 
 常用高頻入口：
 
+- `RUNTIME.md`
 - `runtime/RULES.md`
 - `runtime/catalog.json`
 - `runtime/skills/env/SKILL.md`

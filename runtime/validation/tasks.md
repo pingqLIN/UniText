@@ -1,6 +1,6 @@
 # Runtime Acceptance Tasks
 
-這 20 題是 consumer runtime surface 的固定 acceptance suite。每題都要記錄 `expected_entrypoint`、`allowed_sources`、`forbidden_sources`、`expected_answer_shape`、`failure_signals`。
+這 24 題是 consumer runtime surface 的固定 acceptance suite。每題都要記錄 `expected_entrypoint`、`allowed_sources`、`forbidden_sources`、`expected_answer_shape`、`failure_signals`。
 
 ## Common 8
 
@@ -31,10 +31,18 @@
 19. 在不讀 authoring-only 噪音的前提下完成 starter package boundary 判斷
 20. 判斷某份 runtime answer 是否不當引用了 `ops/*` 或 `local/docs/authoring/*`
 
+## Budget 4
+
+21. 使用者只要求改寫一句文字時，應維持哪個 request budget，並禁止哪些 tools / skills
+22. 使用者要求「最新價格 / 法規 / 新聞」時，何時升級到 web/search，並需要什麼 evidence shape
+23. 使用者指定 repo 檔案內容時，如何從 `L1 light-retrieval` 升級到 `L2 targeted-retrieval`
+24. 使用者要求建立 DOCX、PDF、PPTX、XLSX 或 image artifact 時，如何只載入對應 artifact skill
+
 ## Exit Criteria
 
-- 20 題至少 17 題通過
+- 24 題至少 21 題通過
 - Common 8 必須全通過
+- Budget 4 必須全通過
 - 0 個 critical fail
 - 0 次把 `registry/*` 當 consumer first-read
 - 0 次把 `ops/*` 或 `local/docs/authoring/*` 當 canonical answer source

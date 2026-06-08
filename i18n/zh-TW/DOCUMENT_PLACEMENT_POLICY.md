@@ -49,6 +49,7 @@ UniText 同時是：
 | live operational checklist | `local/docs/*_LIVE.md` | No | No | 必須 ignore |
 | authoring plans / drafts / review notes | `local/docs/authoring/` | No | No | 必須 ignore |
 | generated audit trail / export output / drift report | `ops/` | No | No | 屬於 state，不是 canonical source |
+| generated resolver / report output | `ops/<tool-or-domain>/` | No | No | 例如 `agent-governance-resolution.md` 與 `agent-governance-resolution.json` 不應寫在 repo root |
 
 ## 4. Naming Rules
 
@@ -96,7 +97,7 @@ template / rebuild 匯出安全，只代表匯出產物的邊界較乾淨，不�
 
 1. 這是不是 generated state、audit evidence、drift report、或 export output
    - 是：放 `ops/`
-2. 這是不是在描述單一 authoring workspace、單一機器、或目前 live wiring
+2. 這是不是在描述單一作者工作區、單一機器、或目前 live wiring
    - 是：放 `local/docs/`
 3. 如果它描述單一 workspace，它是不是 draft、review note、或 authoring workboard
    - 是：放 `local/docs/authoring/`
@@ -129,6 +130,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\get-document
 - 它是不是在描述 shared truth，而不是 live workspace state
 - 它若被 push，是否仍符合 `NO_PUBLISH_POLICY.md` 與 template-safe 預期
 - 它是否需要一個 sanitized/live pair，而不是單檔同時承載兩者
+- 若它是 tracked root shared doc，是否已納入 `WORKSPACE_SENSITIVE_METADATA_RULES.json` 的 `shared_surface_scope`，或是否有明確記錄的例外理由
 
 ## 11. Related Docs
 

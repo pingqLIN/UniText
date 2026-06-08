@@ -1,13 +1,11 @@
 # UniText — Operations
 
-> 狀態：Template Base
-> 角色：定義 adapter / operations control plane 的責任、delivery 規則與安全邊界。
+> 狀態：active baseline
+> 角色：delivery modes、mutation gates、rollback expectations、adapter responsibilities。
 
-所有 delivery 與 mutation 都應以 `UniText` 的純文本 registry / spec 契約為 source of truth。
+`registry/` 是 canonical authoring source。`runtime/` 是 agents 的 tracked read model。`local/` 是 machine-specific wiring layer。Operational reports、backups、review packets、generated evidence 預設留本機，除非使用者明確批准 publication。
 
-Consumer agent 的預設讀取面是 `runtime/`，不是 `registry/`。`registry/` 仍然是 canonical authoring source；`runtime/` 是 tracked runtime read model；`local/` 才是 machine-local wiring。
-
-若操作涉及 password、API key、token、credential 等 sensitive material，請同時遵守 `SECRET_HANDLING_GUIDELINES.md`。
+若操作碰到 passwords、API keys、tokens、credentials 或 live account state，先遵守 [SECRET_HANDLING_GUIDELINES.md](../../SECRET_HANDLING_GUIDELINES.md)。
 
 ## 1. Scope
 
@@ -17,169 +15,114 @@ Consumer agent 的預設讀取面是 `runtime/`，不是 `registry/`。`registry
 - delivery modes
 - delivery triggers
 - adoption flow
-- adoption lanes
-- drift / repair
-- logical-to-physical mapping
+- conflict handling
+- backup and rollback
+- verification
+- troubleshooting
 
-本文件不涵蓋：
-
-- shared resource metadata schema
-- 單一平台的唯一實作方式
-- 本機 authoring repo 的歷史狀態
-
-若需要判斷治理文件、reference、authoring notes、與 operations artifacts 應該放在哪一層，請搭配 `DOCUMENT_PLACEMENT_POLICY.md`。
+Resource metadata schema 請看 [RESOURCE_SPEC.md](../../RESOURCE_SPEC.md)。
 
 ## 2. Delivery Modes
 
-| Mode | When to use |
+| Mode | Meaning | Use when |
+|---|---|---|
+| `pointer` | Expose a reference without copying content | Host 只需要 discovery、documentation、path reference |
+| `mirror` | Copy reviewed content into a host-owned surface | Symlink 不穩、不支援或不適合 |
+| `symlink` | Link a host surface to a runtime projection | 環境支援穩定 links 且需要降低 drift |
+| `native-config` | Write to an official host config or instruction surface | Host 支援 documented configuration entrypoint |
+
+Delivery mode 由 adapter logic 與 local constraints resolve，不是固定 resource identity。
+
+## 3. Standard Flow
+
+```text
+SCAN -> PLAN -> DRY-RUN -> REVIEW -> DELIVER -> VERIFY
+```
+
+| Step | Required outcome |
 |---|---|
-| `pointer` | discovery 或非機器註冊型資源 |
-| `mirror` | CLI 需要本地副本、或 symlink 不穩定 |
-| `symlink` | CLI 需要固定路徑，且環境支援穩定連結 |
-| `native-config` | CLI 有正式設定入口可註冊資源 |
+| `SCAN` | Identify candidate resources、current targets、conflicts、sensitive boundaries |
+| `PLAN` | Decide scope、delivery mode、backup path、verification、rollback |
+| `DRY-RUN` | Show intended writes before mutation |
+| `REVIEW` | Confirm canonical source、conflicts、no-publish impact |
+| `DELIVER` | Apply the smallest reviewed mutation |
+| `VERIFY` | Prove runtime、host、boundary expectations still hold |
 
-`delivery mode` 由 adapter 在操作時解析，不是資源的固定硬屬性。
+## 4. Adapter Guidance
 
-## 3. Delivery Resolution Rules
+| Host | Instruction surface | Skill surface | Config/MCP surface | Preferred mode |
+|---|---|---|---|---|
+| Claude Code | `CLAUDE.md`、`.claude/settings.json` | `.claude/skills/` | `.mcp.json` or managed settings | `mirror` or `symlink` plus `native-config` |
+| Codex | `AGENTS.md`、project docs | `.agents/skills/` or configured `skills_path` | `.codex/config.toml`、`codex mcp` | `symlink` plus `native-config` |
+| Gemini / Antigravity | `GEMINI.md` or documented host instructions | `.agents/skills/` or host-specific skill path | host settings | compatibility-note driven |
+| GitHub Copilot | `.github/copilot-instructions.md`、`.github/instructions/`、`AGENTS.md` | instruction-oriented | repository-native files and supported MCP settings | `native-config` or `pointer` |
 
-adapter 應依優先序考慮：
-
-1. 有正式設定入口時，優先 `native-config`
-2. 需要固定路徑且平台支援穩定連結時，用 `symlink`
-3. 無法安全使用 symlink 時，用 `mirror`
-4. 主要用途是 discovery 或入口時，用 `pointer`
-
-## 4. Delivery Triggers
-
-delivery 只能由明確 trigger 啟動：
-
-- `bootstrap`
-- `sync`
-- `adopt`
-- `repair`
+Adapter notes 位於 [docs/adapters](../../docs/adapters)。它們記錄 current host-specific support 與 limitations；不是 host config mutation 的授權。
 
 ## 5. Safety Rules
 
 ### Dry-Run First
 
-以下操作應先產出 dry-run plan：
-
-- `adopt`
-- `repair`
-- 會覆寫既有狀態的 `sync`
+```powershell
+python local/scripts/build-runtime-layer.py
+python local/scripts/bootstrap.py --dry-run
+powershell -File .\local\scripts\sync-skills.ps1 -DryRun
+```
 
 ### Backup Before Mutation
 
-所有破壞性操作都應具備：
-
-- backup 或等價回復點
-- 可追溯的操作記錄
-- 失敗時的停止條件
+Overwrite host surface 前，保留 backup file、old/new hashes、recoverable `.del` / `.clean` move，或可 review 的 git diff。
 
 ### No Silent Canonicalization
 
-若遇到同名異內容資源：
+若兩個 resources 有同一 ID 但內容不同，停在 review，不自動選 winner，直到 canonical source 明確。
 
-- 必須停在 review
-- 必須讓 operator 明確決定 canonical source
+### No Silent Publication
 
-## 6. Adoption Flow
+本 repo 沒有任何 command 會授權 push、upload、paste 或 publish。即使 remote 存在或 repo 是 private，no-publish policy 仍然適用。
 
-Detailed operator guidance for attaching UniText to an existing machine or project is tracked in [docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md](../../docs/plans/EXISTING_ENVIRONMENT_ADOPTION_PLAN.md).
+## 6. Adoption Lanes
 
-1. `SCAN`
-   - 掃描候選來源，列出可 adopt 的資源與 readiness 狀態
-2. `REVIEW`
-   - 依 review checklist 檢查 metadata、內容品質與 canonical source 合法性
-3. `DRY-RUN`
-   - 預覽 adopt 或 delivery 將修改哪些目標、是否需要 backup
-4. `ADOPT`
-   - 將來源內容寫入 registry canonical location，若覆寫既有內容需先 backup
-5. `DELIVER`
-   - 由 adapter 將 registry 內容送到對應 CLI，若會覆寫既有狀態需保留 log 與 backup
-   - 若 CLI 支援 `native-config`，可在 `bootstrap` 階段寫入 machine-local config，但 canonical definition 仍留在 `registry/`
-6. `VERIFY`
-   - 驗證檔案存在性、路徑解析、delivery mode 與目標 CLI 載入條件是否成立
-
-## 6.1 Adoption Lanes
-
-在 `SCAN` 之後、任何 tracked mutation 之前，每個新資源都應先落到一條 lane：
-
-| Lane | Meaning | Expected surfaces |
+| Lane | Meaning | Expected surface |
 |---|---|---|
-| `local-only overlay` | machine-specific、user-specific、敏感或尚未 review-ready 的資源 | local host wiring、active CLI skill dir、ignored local notes |
-| `project-local MCP / companion` | 只屬於單一 repo 或單一 delivery context 的資源 | target project `.mcp.json`、repo-local notes、project companion docs |
-| `governed registry promotion` | 已可被多專案 / 多 operator 共用的 shared asset | `registry/` → rebuilt `runtime/` → delivery adapter |
+| `local-only overlay` | Machine-specific、user-specific、sensitive、unreviewed resource | local host wiring、ignored local notes |
+| `project-local companion` | Resource belongs to one repo or one delivery context | target project docs、`.mcp.json`、repo companion docs |
+| `governed registry promotion` | Reusable、share-safe、reviewed shared asset | `registry/` -> `runtime/` -> adapter delivery |
 
-預設優先序：
+預設使用能滿足任務的最小 lane。只有 reusable 與 publishability boundaries 清楚時，才 promote 到 `registry/`。
 
-1. 先問能不能留在較小的 lane
-2. 只有在 reusable、share-safe、可 review 時才升級到 governed registry promotion
-3. 若分類不清楚，停在 `REVIEW`
+## 7. Verification
 
-## 6.2 Governance Gate For New Skills And MCPs
+Docs 與 governance changes：
 
-新的 skill 或 MCP 要進入 governed `registry/`，至少要同時滿足：
+```powershell
+git diff --check
+python local/scripts/build-runtime-layer.py
+python local/scripts/verify-workspace-boundaries.py --format json
+python local/scripts/audit-i18n-drift.py --format json --sample-size 0 --exit-zero
+python -m unittest tests.test_registry_inventory tests.security.test_i18n_drift tests.security.test_workspace_sensitive_metadata tests.security.test_release_hygiene
+```
 
-- 可重用，不只綁定單一作者機器
-- 不依賴 plaintext secret、私有 callback URL、或個人絕對路徑
-- 可清楚說明 canonical `id` 與 source / provenance
-- 通過 `local/docs/ADOPTION_CHECKLIST.md`
-- 放置位置符合 `DOCUMENT_PLACEMENT_POLICY.md`
+Runtime、template 或 delivery changes 可再擴充：
 
-若不滿足：
+```powershell
+python local/scripts/verify-bootstrap.py
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-template-package.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\verify-delivery.ps1
+```
 
-- 保持在 `local-only overlay` 或 `project-local MCP / companion`
-- 不要先放進 `registry/` 再補分類
+## 8. Rollback And Recovery
 
-## 6.1 First-Run Baseline
+- Tracked documentation changes 用 git diff review。
+- Recoverable cleanup 使用 `.del` 或 `.clean`；永久刪除需要明確 wording。
+- Host config changes 從 backup restore 後再 retry。
+- Runtime projection drift 先跑 `python local/scripts/build-runtime-layer.py`；只有 registry/runtime source change 是 intentional 時才用 `--write`。
 
-若目標是讓新的 template 使用者在 macOS / Linux / Windows 都能完成最小初始化，應至少提供：
+## 9. Troubleshooting
 
-- 一條跨平台 `bootstrap`
-- 一條跨平台 `verify`
-- 一條可攜的 repo backup 流程
-- 一個可實跑的最小 MCP baseline
-
-## 7. Operations State
-
-以下內容屬於 operations state，而非 shared resources：
-
-- inventories
-- baselines
-- backups
-- drift reports
-- repair plans
-- audit trails
-
-它們應位於 `/operations`，不應混入 `/registry`。
-
-在目前 repo 的實體目錄上，`/operations` 對應的是 `ops/`。`ops/` 屬於 state layer，不是 canonical definition layer。
-
-## 8. Logical-to-Physical Mapping
-
-邏輯路徑是穩定契約；實體路徑是 deployment-specific mapping。
-
-| Logical area | Meaning | Physical mapping examples |
+| Symptom | Likely cause | Response |
 |---|---|---|
-| `/registry/skills` | canonical skill sources | shared directory、repo subdir、mounted path |
-| `/registry/mcp` | canonical MCP definitions | config folder、generated manifest root |
-| `/registry/agents` | canonical agent instruction roots | agent profiles directory、shared prompt library |
-| `/registry/workflow` | workflow docs / runbooks | workflow folder、project-local docs |
-| `/operations` | inventories、backups、drift logs | ops folder、state store、audit directory |
-
-## 9. Self-Repair Simulation
-
-若要評估未來執行過程產生障礙時，system agent 是否有能力自我修復，不要直接憑直覺判斷；請先套用一個固定的 scenario simulation。
-
-最小判斷順序：
-
-1. `detectable`
-2. `bounded`
-3. `reversible`
-4. `verifiable`
-5. `escalatable`
-
-只有當前四項都成立時，agent 才能嘗試 autonomous self-repair。若缺少任何一項，應降級成 guided repair 或 human gate。
-
-完整規則、repair classes、scenario config template 與目前 `UniText` 的評估，請看 [docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md](../../docs/architecture/AGENT_SELF_REPAIR_SCENARIO_SIMULATION.md)。
+| Agent 讀太多 context | 從 `INDEX.md` 或 `registry/` 開始 | 改從 `RUNTIME.md` 與 `runtime/` 開始 |
+| Docs work 造成 runtime catalog 變動 | Manual edit 或 unintended generation | Revert 或說明對應 source change |
+| i18n audit reports stale docs | Companion files 落後 source docs in git history | Companion 與 source docs 一起更新與 commit |
+| GitHub templates mention public workflow | No-publish boundary 未反映 | 加入 local/private wording，避免敏感 disclosure prompts |
