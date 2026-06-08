@@ -10,6 +10,7 @@ param(
     ),
     [int]$CountdownWindowSeconds = 30,
     [int]$MaxStateAgeHours = 3,
+    [int]$FutureToleranceSeconds = 120,
     [switch]$DryRun = $false,
     [switch]$CheckCounterpart = $true,
     [switch]$CheckScriptParity = $true,
@@ -41,6 +42,38 @@ function Get-CanonicalScriptHash {
     } finally {
         $sha256.Dispose()
     }
+}
+
+function Get-StartupHealthChecks {
+    param(
+        [Parameter(Mandatory = $true)]
+        [PSCustomObject]$StartupCheck
+    )
+
+    [string[]]$issues = @()
+    if (-not $StartupCheck.schema_version) {
+        $issues += 'startup schema version missing'
+    } elseif ([int]$StartupCheck.schema_version -lt 2) {
+        $issues += "unsupported startup schema version: $($StartupCheck.schema_version)"
+    }
+
+    if ($null -ne $StartupCheck.branch_match -and $StartupCheck.branch_match -eq $false) {
+        $issues += 'branch mismatch for startup state'
+    }
+
+    if ($null -ne $StartupCheck.state_load_error -and $StartupCheck.state_load_error) {
+        $issues += "startup state load error: $($StartupCheck.state_load_error)"
+    }
+
+    if (($null -ne $StartupCheck.state_age_seconds) -and ($null -ne $StartupCheck.max_state_age_seconds)) {
+        $stateAgeSeconds = [int]$StartupCheck.state_age_seconds
+        $maxAgeSeconds = [int]$StartupCheck.max_state_age_seconds
+        if ($maxAgeSeconds -gt 0 -and $stateAgeSeconds -gt $maxAgeSeconds) {
+            $issues += "startup state age (${stateAgeSeconds}s) exceeds max age (${maxAgeSeconds}s)"
+        }
+    }
+
+    return ([string[]]@($issues))
 }
 
 $resolvedProjectRoot = (Resolve-Path $ProjectRoot).Path
@@ -109,12 +142,18 @@ if ($stateObj.deadline) {
         if (-not $loadError) { $loadError = $_.Exception.Message }
     }
 }
+$stateStartedAt = $null
+if ($stateObj.started_at) {
+    try {
+        $stateStartedAt = [datetime]::Parse($stateObj.started_at)
+    } catch {
+        if (-not $loadError) { $loadError = $_.Exception.Message }
+    }
+}
 
 $now = Get-Date
 $deadlineUnix = if ($stateDeadline) { [Math]::Max(0, [int][Math]::Floor(($stateDeadline - $now).TotalSeconds)) } else { $null }
-$stateAge = if ($stateObj.started_at) {
-    try { [int][Math]::Floor(($now - [datetime]::Parse($stateObj.started_at)).TotalHours) } catch { $null }
-} else { $null }
+$stateAge = if ($stateStartedAt) { [int][Math]::Floor(($now - $stateStartedAt).TotalHours) } else { $null }
 
 $branchMatch = $false
 if ($stateObj.branch -and $currentBranch) {
@@ -122,7 +161,7 @@ if ($stateObj.branch -and $currentBranch) {
 }
 
 $timeAlive = if ($stateObj.started_at) {
-    try { [int][Math]::Floor(($now - [datetime]::Parse($stateObj.started_at)).TotalSeconds) } catch { $null }
+    try { [int][Math]::Floor(($now - $stateStartedAt).TotalSeconds) } catch { $null }
 } else { $null }
 
 $orchestration = [ordered]@{
@@ -150,6 +189,20 @@ $orchestration = [ordered]@{
 if (-not $stateObj -or $loadError) {
     $orchestration.can_resume = $false
     $orchestration.recommendations += 'fix state file load error first'
+}
+if ($stateObj) {
+    $blankableFields = @('mode', 'budget', 'branch', 'active_batch', 'next_intended_action')
+    foreach ($field in $blankableFields) {
+        if (-not [string]::IsNullOrWhiteSpace([string]$stateObj.$field)) {
+            continue
+        }
+        $orchestration.can_resume = $false
+        $orchestration.recommendations += "state field requires non-empty value: $field"
+    }
+}
+if ($stateStartedAt -and $stateStartedAt -gt $now.AddSeconds($FutureToleranceSeconds)) {
+    $orchestration.can_resume = $false
+    $orchestration.recommendations += "state started_at is in the future: $($stateObj.started_at)"
 }
 if ($missingFields.Count -gt 0) {
     $orchestration.can_resume = $false
@@ -255,6 +308,19 @@ try {
     }
     $orchestration.recommendations = @('startup script failed to return a valid JSON health check') + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
 }
+$startupHealthChecks = if ($startupCheck -and $startupCheck.PSObject) {
+    Get-StartupHealthChecks -StartupCheck $startupCheck
+} else {
+    @()
+}
+if ($startupHealthChecks -eq $null) {
+    $startupHealthChecks = @()
+}
+$orchestration.startup_health_checks = $startupHealthChecks
+if ($startupHealthChecks.Count -gt 0) {
+    $orchestration.can_resume = $false
+    $orchestration.recommendations = @("startup health issues: $($startupHealthChecks -join '; ')") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+}
 $orchestration.startup_check = $startupCheck
 
 if ($startupCheck.decision -eq 'stop') {
@@ -295,6 +361,19 @@ if ($CheckCounterpart -and $counterpartStartupPath -and (Test-Path -LiteralPath 
         }
     }
     $orchestration.counterpart_startup_check = $counterpartCheck
+    $counterpartHealthChecks = if ($counterpartCheck -and $counterpartCheck.PSObject) {
+        Get-StartupHealthChecks -StartupCheck $counterpartCheck
+    } else {
+        @()
+    }
+    if ($counterpartHealthChecks -eq $null) {
+        $counterpartHealthChecks = @()
+    }
+    $orchestration.counterpart_health_checks = $counterpartHealthChecks
+    if ($counterpartHealthChecks.Count -gt 0) {
+        $orchestration.can_resume = $false
+        $orchestration.recommendations = @("counterpart startup health issues: $($counterpartHealthChecks -join '; ')") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+    }
 
     $parityMismatch = @()
     $compareFields = @('decision', 'decision_reason', 'state_file_written', 'state_file_error', 'schema_version', 'progress_state')
