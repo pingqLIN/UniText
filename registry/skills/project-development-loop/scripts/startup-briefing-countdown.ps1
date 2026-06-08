@@ -7,8 +7,32 @@ param(
     [switch]$DryRun = $false,
     [switch]$OutputJson = $false,
     [switch]$Reset = $false,
-    [int]$MaxStateAgeSeconds = 10800
+    [int]$MaxStateAgeSeconds = 10800,
+    [int]$StateWriteRetryMs = 75
 )
+
+function Write-StateFileWithRetry {
+    param(
+        [Parameter(Mandatory = $true)] [string]$Path,
+        [Parameter(Mandatory = $true)] [string]$Content,
+        [int]$MaxRetries = 5,
+        [int]$RetryDelayMs = 75
+    )
+
+    for ($i = 0; $i -lt $MaxRetries; $i++) {
+        try {
+            Set-Content -Path $Path -Value $Content -Encoding UTF8 -ErrorAction Stop
+            return [ordered]@{ ok = $true; error = $null }
+        } catch {
+            if ($i -eq ($MaxRetries - 1)) {
+                return [ordered]@{ ok = $false; error = $_.Exception.Message }
+            }
+            Start-Sleep -Milliseconds ([Math]::Max(0, $RetryDelayMs * [Math]::Pow(2, $i)))
+        }
+    }
+
+    return [ordered]@{ ok = $false; error = 'unknown write failure' }
+}
 
 $normalizedRepoRoot = (Resolve-Path $RepoRoot).Path
 $safeStateName = [IO.Path]::GetFileName($normalizedRepoRoot).Replace(':','_')
@@ -136,10 +160,15 @@ $stateFileContent = [ordered]@{
     state_load_error = $stateLoadError
     resume_reason = $resumeReason
     max_state_age_seconds = $MaxStateAgeSeconds
+    state_file_written = $false
+    state_file_error = $null
 }
 
 $stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
-Set-Content -Path $stateFile -Value $stateFileContentJson -Encoding UTF8
+$writeResult = Write-StateFileWithRetry -Path $stateFile -Content $stateFileContentJson -RetryDelayMs $StateWriteRetryMs
+$stateFileContent.state_file_written = $writeResult.ok
+$stateFileContent.state_file_error = $writeResult.error
+$stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
 
 if ($OutputJson) {
     Write-Output $stateFileContentJson
