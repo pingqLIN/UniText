@@ -4,13 +4,44 @@ param(
     [string]$StateFile,
     [string]$StartupScript = "runtime/skills/project-development-loop/scripts/startup-briefing-countdown.ps1",
     [string]$CounterpartStartupScript = "runtime/skills/project-development-loop/scripts/startup-briefing-countdown.ps1",
+    [string[]]$ScriptFileNames = @(
+        'startup-briefing-countdown.ps1',
+        'validate-loop-state.ps1'
+    ),
     [int]$CountdownWindowSeconds = 30,
     [int]$MaxStateAgeHours = 3,
     [switch]$DryRun = $false,
     [switch]$CheckCounterpart = $true,
+    [switch]$CheckScriptParity = $true,
     [switch]$OutputJson = $false,
     [switch]$Strict = $false
 )
+
+function Get-CanonicalScriptHash {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path,
+        [string]$FileName
+    )
+
+    $raw = Get-Content -Raw -LiteralPath $Path -Encoding UTF8
+    $normalized = $raw -replace "`r`n", "`n"
+    if ($FileName -eq 'validate-loop-state.ps1') {
+        $normalized = [regex]::Replace(
+            $normalized,
+            '(\[string\]\$CounterpartStartupScript\s*=\s*")[^"]+(")',
+            '${1}<counterpart-startup-script-placeholder>${2}'
+        )
+    }
+
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+        return [BitConverter]::ToString($sha256.ComputeHash($bytes)).Replace('-', '')
+    } finally {
+        $sha256.Dispose()
+    }
+}
 
 $resolvedProjectRoot = (Resolve-Path $ProjectRoot).Path
 $startupPath = Join-Path $resolvedProjectRoot $StartupScript
@@ -140,6 +171,60 @@ if ($stateAge -ne $null -and $stateAge -gt $MaxStateAgeHours) {
 if ($orchestration.recommendations.Count -eq 0) {
     $orchestration.can_resume = $true
     $orchestration.recommendations += 'resume conditions satisfied'
+}
+
+$scriptParityChecks = @()
+if ($CheckScriptParity) {
+    $scriptRootRuntime = Join-Path $resolvedProjectRoot "runtime/skills/project-development-loop/scripts"
+    $scriptRootRegistry = Join-Path $resolvedProjectRoot "registry/skills/project-development-loop/scripts"
+    foreach ($file in $ScriptFileNames) {
+        $runtimeFile = Join-Path $scriptRootRuntime $file
+        $registryFile = Join-Path $scriptRootRegistry $file
+        $entry = [ordered]@{
+            file = $file
+            runtime_exists = $false
+            registry_exists = $false
+            runtime_hash = $null
+            registry_hash = $null
+            hashes_match = $false
+            check_error = $null
+        }
+
+        if (Test-Path -LiteralPath $runtimeFile) {
+            $entry.runtime_exists = $true
+        } else {
+            $entry.check_error = "missing runtime script: $runtimeFile"
+            $orchestration.can_resume = $false
+            $orchestration.recommendations = @("runtime script missing: $runtimeFile") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+        }
+
+        if (Test-Path -LiteralPath $registryFile) {
+            $entry.registry_exists = $true
+        } else {
+            $entry.check_error = if ($entry.check_error) { $entry.check_error + '; ' } else { '' } + "missing registry script: $registryFile"
+            $orchestration.can_resume = $false
+            $orchestration.recommendations = @("registry script missing: $registryFile") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+        }
+
+        if ($entry.runtime_exists -and $entry.registry_exists) {
+            try {
+                $entry.runtime_hash = Get-CanonicalScriptHash -Path $runtimeFile -FileName $file
+                $entry.registry_hash = Get-CanonicalScriptHash -Path $registryFile -FileName $file
+                $entry.hashes_match = ($entry.runtime_hash -eq $entry.registry_hash)
+                if (-not $entry.hashes_match) {
+                    $orchestration.can_resume = $false
+                    $orchestration.recommendations = @("parity mismatch: $file") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+                }
+            } catch {
+                $entry.check_error = $_.Exception.Message
+                $orchestration.can_resume = $false
+                $orchestration.recommendations = @("script parity check failed for ${file}: $($_.Exception.Message)") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+            }
+        }
+
+        $scriptParityChecks += $entry
+    }
+    $orchestration.script_parity_checks = $scriptParityChecks
 }
 
 $startupCheck = $null
