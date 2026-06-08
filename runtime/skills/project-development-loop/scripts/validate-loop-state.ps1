@@ -1,16 +1,24 @@
 param(
     [string]$ProjectRoot = (Get-Location).Path,
-    [string]$StateRoot = "Q:\UniText\ops\project-development-loop",
+    [string]$StateRoot = '',
     [string]$StateFile,
     [string]$StartupScript = "runtime/skills/project-development-loop/scripts/startup-briefing-countdown.ps1",
+    [string]$CounterpartStartupScript = "registry/skills/project-development-loop/scripts/startup-briefing-countdown.ps1",
     [int]$CountdownWindowSeconds = 30,
     [int]$MaxStateAgeHours = 3,
+    [switch]$DryRun = $false,
+    [switch]$CheckCounterpart = $true,
     [switch]$OutputJson = $false,
     [switch]$Strict = $false
 )
 
 $resolvedProjectRoot = (Resolve-Path $ProjectRoot).Path
 $startupPath = Join-Path $resolvedProjectRoot $StartupScript
+$counterpartStartupPath = if ([string]::IsNullOrWhiteSpace($CounterpartStartupScript)) {
+    $null
+} else {
+    Join-Path $resolvedProjectRoot $CounterpartStartupScript
+}
 $stateRootResolved = if ([string]::IsNullOrWhiteSpace($StateRoot)) {
     Join-Path $resolvedProjectRoot "ops\project-development-loop"
 } else {
@@ -136,7 +144,24 @@ if ($orchestration.recommendations.Count -eq 0) {
 
 $startupCheck = $null
 try {
-    $startupOutputRaw = & powershell -NoProfile -ExecutionPolicy Bypass -File $startupPath -RepoRoot $resolvedProjectRoot -TimeoutSeconds $CountdownWindowSeconds -Reset -OutputJson
+    $startupArgs = @(
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        $startupPath,
+        '-RepoRoot',
+        $resolvedProjectRoot,
+        '-TimeoutSeconds',
+        $CountdownWindowSeconds,
+        '-Reset',
+        '-OutputJson'
+    )
+    if ($DryRun) {
+        $startupArgs += '-DryRun'
+    }
+
+    $startupOutputRaw = & powershell @startupArgs
     $startupCheck = $startupOutputRaw | ConvertFrom-Json -ErrorAction Stop
 } catch {
     $orchestration.can_resume = $false
@@ -152,9 +177,56 @@ if ($startupCheck.decision -eq 'stop') {
     $orchestration.recommendations = @('startup countdown window reached stop; extend CountdownWindowSeconds if needed') + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
 }
 
-if ($startupCheck.state_file_written -eq $false) {
+if (-not $DryRun -and $startupCheck.state_file_written -eq $false) {
     $orchestration.can_resume = $false
     $orchestration.recommendations = @('startup state file write failed; verify writable state path') + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+}
+
+if ($CheckCounterpart -and $counterpartStartupPath -and (Test-Path -LiteralPath $counterpartStartupPath)) {
+    $counterpartArgs = @(
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        $counterpartStartupPath,
+        '-RepoRoot',
+        $resolvedProjectRoot,
+        '-TimeoutSeconds',
+        $CountdownWindowSeconds,
+        '-Reset',
+        '-OutputJson'
+    )
+    if ($DryRun) {
+        $counterpartArgs += '-DryRun'
+    }
+
+    $counterpartCheck = $null
+    try {
+        $counterpartRaw = & powershell @counterpartArgs
+        $counterpartCheck = $counterpartRaw | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        $counterpartCheck = [ordered]@{
+            decision = 'error'
+            decision_reason = $_.Exception.Message
+        }
+    }
+    $orchestration.counterpart_startup_check = $counterpartCheck
+
+    $parityMismatch = @()
+    $compareFields = @('decision', 'decision_reason', 'state_file_written', 'state_file_error', 'schema_version', 'progress_state')
+    foreach ($field in $compareFields) {
+        if (($startupCheck[$field] -ne $counterpartCheck[$field])) {
+            $parityMismatch += "field_mismatch:$field|${startupCheck[$field]}<>${counterpartCheck[$field]}"
+        }
+    }
+    if ($parityMismatch.Count -gt 0) {
+        $orchestration.can_resume = $false
+        $orchestration.recommendations = @('startup runtime/registry parity mismatch: ' + ($parityMismatch -join '; ')) + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
+    }
+} elseif ($CheckCounterpart) {
+    $orchestration.counterpart_startup_check = $null
+    $orchestration.can_resume = $false
+    $orchestration.recommendations = @("counterpart startup script not found: $CounterpartStartupScript") + @($orchestration.recommendations | Where-Object { $_ -ne 'resume conditions satisfied' })
 }
 
 if (-not $stateObj -and -not $strict) {

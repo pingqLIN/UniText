@@ -165,10 +165,16 @@ $stateFileContent = [ordered]@{
 }
 
 $stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
-$writeResult = Write-StateFileWithRetry -Path $stateFile -Content $stateFileContentJson -RetryDelayMs $StateWriteRetryMs
-$stateFileContent.state_file_written = $writeResult.ok
-$stateFileContent.state_file_error = $writeResult.error
-$stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
+if ($DryRun) {
+    $stateFileContent.state_file_written = $false
+    $stateFileContent.state_file_error = 'dry-run skip write'
+    $stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
+} else {
+    $writeResult = Write-StateFileWithRetry -Path $stateFile -Content $stateFileContentJson -RetryDelayMs $StateWriteRetryMs
+    $stateFileContent.state_file_written = $writeResult.ok
+    $stateFileContent.state_file_error = $writeResult.error
+    $stateFileContentJson = $stateFileContent | ConvertTo-Json -Depth 5
+}
 
 if ($OutputJson) {
     Write-Output $stateFileContentJson
