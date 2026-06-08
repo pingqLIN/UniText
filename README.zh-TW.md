@@ -202,7 +202,7 @@ python -m unittest tests.test_registry_inventory tests.security.test_i18n_drift 
 | Claude Code | 前期 architecture exploration、skill workflow design、review 與 planning support |
 | Gemini CLI | Cross-CLI compatibility target 與 adjacent review surface |
 
-> Disclaimer: 作者已盡力審查並驗證 AI 產生的程式碼與文件，但不保證其正確性、安全性，或適用於任何特定目的。使用者需自行承擔風險。
+> ⚠️ **Disclaimer:** 作者已盡力審查並驗證 AI 產生的程式碼與文件，但不保證其正確性、安全性，或適用於任何特定目的。使用者需自行承擔風險。
 
 ---
 

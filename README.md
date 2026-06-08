@@ -202,7 +202,7 @@ This project was developed with AI assistance.
 | Claude Code | Prior architecture exploration, skill workflow design, review, and planning support |
 | Gemini CLI | Cross-CLI compatibility target and adjacent review surface |
 
-> Disclaimer: The author has made every effort to review and validate AI-generated code and documentation, but no guarantee is made regarding correctness, security, or fitness for a particular purpose. Use at your own risk.
+> ⚠️ **Disclaimer:** While the author has made every effort to review and validate the AI-generated code and documentation, no guarantee can be made regarding its correctness, security, or fitness for any particular purpose. Use at your own risk.
 
 ---
 

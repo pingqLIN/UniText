@@ -1,6 +1,6 @@
 ---
 name: JING JING Clarifier 晶晶體修飾器
-description: chinese-writing-clarifier。幫助 AI 將「中文主體文本」中的中英混用進行統一中文潤稿：保留必要專有名詞、代碼與品牌名稱，將可對映的英文術語轉為中文並補齊工程語義註記。Use this skill when polishing Chinese responses that accidentally keep mixed English phrases, especially in Docker/Docker workflow, CI parity, deployment readiness, logs, ports, and architecture reviews.
+description: 原始名稱：chinese-writing-clarifier。幫助 AI 將「中文主體文本」中的中英混用進行統一中文潤稿：保留必要專有名詞、代碼與品牌名稱，將可對映的英文術語轉為中文並補齊工程語義註記。Use this skill when polishing Chinese responses that accidentally keep mixed English phrases, especially in Docker/Docker workflow, CI parity, deployment readiness, logs, ports, and architecture reviews.
 runtime_projection: true
 source_of_truth: registry/skills/chinese-writing-clarifier/SKILL.md
 ---
