@@ -1,38 +1,72 @@
 # AGENTS.md
 
-## No-Publish Rule
+> Scope: repo-local baseline for coding agents and automation.
+> Audience: coding agents and reviewers working inside this repository.
+> Precedence: stricter higher-level instructions may add constraints; they never weaken this file.
 
-This repository contains materials that may remain private unless the user gives explicit permission.
+## Mission
 
-Agents operating in this repository MUST follow these rules:
+Operate from the smallest relevant surface, keep shared resources reviewable, and keep local or sensitive state out of shared docs.
 
-1. Do not push commits to any remote unless the user explicitly asks for that push.
-2. Do not upload repository content to GitHub, social platforms, cloud docs, paste sites, or any other network service unless the user explicitly asks for that upload.
-3. Treat the following as especially sensitive by default:
-   - social post drafts
-   - project comparison notes
-   - cross-project collaboration discussions
-   - review notes
-   - strategic planning documents
-4. If the user asks for publishing, push, upload, or posting, only publish the specific content the user approved.
-5. When in doubt, keep content local and ask before publishing.
+## Non-negotiable rules
 
-## Scope Note
+1. Do not push, upload, paste, post, or publish repository content without explicit user approval.
+2. Do not treat a private remote, clean branch, or publishability report as publication permission.
+3. Do not place secrets, live workspace values, or machine-specific state into shared surfaces.
+4. Do not silently rewrite host configuration without a reviewed dry-run path.
+5. Do not permanently delete files unless the request is explicit.
 
-This policy applies even when:
+## Startup order
 
-- a remote already exists
-- the repository is private
-- the content appears ready for publication
+Use the smallest entrypoint that fits the task.
 
-Private repository does not equal automatic permission to publish.
+1. `RUNTIME.md`
+2. `INDEX.md`
+3. `OPERATIONS.md`
+4. `DOCUMENT_PLACEMENT_POLICY.md`
+5. `NO_PUBLISH_POLICY.md`
 
-## Git Startup
+## Allowed without extra approval
 
-For a new development session in this repository, prefer:
+- inspect repository files
+- compare docs for ambiguity or drift
+- draft documentation rewrites
+- propose file locations
+- run read-only or dry-run validation steps
+- prepare handoff notes and review summaries
+
+## Requires explicit approval
+
+- `git push`
+- uploading repository content to a network service
+- posting to social platforms or cloud docs
+- host-config mutation without dry-run review
+- permanent file deletion
+- publishing only part of a document when approval scope is ambiguous
+
+## Session startup
+
+For a new session, prefer:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\local\scripts\git-startup.ps1
 ```
 
-This helper resolves the canonical base branch from `origin/HEAD` first, then falls back to local `main` or `master` only when needed. It also enforces a clean working tree, fetches `origin --prune`, fast-forwards explicitly against the resolved base branch, and refuses to reuse an existing feature branch name.
+## Handoff contract
+
+When task is complete, report:
+
+- files changed
+- rationale
+- validation performed
+- assumptions still open
+- approval-gated actions intentionally deferred
+
+## Related docs
+
+- `RUNTIME.md`
+- `INDEX.md`
+- `OPERATIONS.md`
+- `DOCUMENT_PLACEMENT_POLICY.md`
+- `NO_PUBLISH_POLICY.md`
+- `SECRET_HANDLING_GUIDELINES.md`
