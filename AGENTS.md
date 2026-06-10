@@ -13,7 +13,7 @@ Operate from the smallest relevant surface, keep shared resources reviewable, an
 1. Do not push, upload, paste, post, or publish repository content without explicit user approval.
 2. Do not treat a private remote, clean branch, or publishability report as publication permission.
 3. Do not place secrets, live workspace values, or machine-specific state into shared surfaces.
-4. Do not silently rewrite host configuration without a reviewed dry-run path.
+4. Do not silently rewrite host configuration without a reviewed dry-run path and a rollback path (backup or equivalent).
 5. Do not permanently delete files unless the request is explicit.
 
 ## Startup order

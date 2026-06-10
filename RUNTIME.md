@@ -3,7 +3,7 @@
 > Status: active baseline
 > Role: shortest safe entrypoint for consumer agents and automation.
 
-If you are an agent executing work in this repository, start here. Do not use `README.md` or `INDEX.md` as your default startup surface.
+If you are an agent executing work in this repository, start here. Do not use `README.md` or `INDEX.md` as your default startup surface, except when the request is explicitly human-facing discovery.
 
 ## First Read Order
 
